@@ -1,195 +1,155 @@
-# 0-to-professional technical roadmap
+# Final professional roadmap: 0 to technical capability
 
-This roadmap is the master sequence for building real technical capability from zero. It is designed to be broad enough to cover many major engineering domains, but ordered in a way that avoids confusion and wasted effort.
+This is the final synthesis of the full learning path in this repository.
 
-## Phase 1: Learn to think and compute (Weeks 1-8)
+## The real goal
 
-### Major goals
-- Learn the idea of abstraction
-- Learn binary, logic, boolean algebra
-- Learn basic math concepts used in computing
-- Learn a first programming language deeply
+The final goal is not to know a lot of topics. The final goal is to become able to:
 
-### Topics
-- arithmetic and number systems
-- binary, hexadecimal
-- logic and truth tables
-- algebra basics
-- simple statistics and probability
-- variables, functions, loops, conditionals
-- debugging and syntax understanding
-- command line basics
+- reason about systems
+- debug problems reliably
+- build useful software or hardware projects
+- explain technical decisions clearly
+- deploy and maintain working systems
+- grow into a professional engineer
 
-### Tools
-- Python
-- Bash
-- VS Code
-- Git and GitHub
+## The correct learning sequence
 
-### Output milestone
-- Build 3 small programs
-- Understand how code executes
-- Use Git to track your work
+### 1. Foundations
+Learn:
+- math and logic
+- binary and number systems
+- basic electronics intuition
+- problem solving and debugging
+- Git and terminal usage
 
-## Phase 2: Learn systems and software basics (Weeks 9-20)
+Output:
+- can use terminal and Git normally
+- can write basic scripts
+- can reason through simple technical problems
 
-### Major goals
-- Learn data structures and algorithms at a beginner level
-- Learn how operating systems work at a practical level
-- Learn Linux usage thoroughly
-- Learn how software is built and shipped
+### 2. Programming and problem solving
+Learn:
+- Python, C, Bash, JavaScript/TypeScript
+- functions, loops, recursion
+- lists, dictionaries, sets, trees, graphs
+- SQL basics
+- complexity analysis
 
-### Topics
-- arrays, lists, sets, maps
-- recursion
-- sorting and searching
-- stacks, queues, trees
-- process and memory
-- file system basics
+Output:
+- can write clean code
+- can implement common algorithms and data structures
+- can debug code systematically
+
+### 3. Linux, OS, and systems basics
+Learn:
+- process and memory basics
 - shell scripting
-- shell pipelines and redirection
-- packages and build tools
-- version control workflows
-
-### Output milestone
-- Solve algorithmic exercises
-- Write Linux automation scripts
-- Build a small command-line project
-
-## Phase 3: Learn engineering foundations (Weeks 21-36)
-
-### Major goals
-- Build the engineering base for all technical work
-- Learn software structure and design
-- Understand databases, APIs, networking, architecture
-
-### Topics
-- OOP and clean code principles
-- SQL and data modeling
-- HTTP and APIs
-- REST design
+- filesystem and permissions
+- logs and troubleshooting
 - networking basics
-- debugging tools
-- testing fundamentals
-- software life cycle
+- operating system concepts
 
-### Output milestone
-- Build a small backend service
-- Deploy a simple app
-- Understand a complete software workflow
+Output:
+- can operate in a real engineering environment
+- can automate tasks and inspect systems
+- can use logs and process tools effectively
 
-## Phase 4: Choose a primary track (Months 5-9)
+### 4. Software engineering and system design
+Learn:
+- clean code and refactoring
+- APIs and data models
+- testing strategies
+- CI/CD fundamentals
+- architectural trade-offs
+- reliability and security basics
 
-At this point, you should pick one major direction. The track should match your goals and interests.
+Output:
+- can build a small but real software product
+- can explain technical design choices
+- can work in a project workflow
 
-### Option A: Software engineering / web / backend / full-stack
-- web fundamentals
-- frontend frameworks
-- backend frameworks
-- production workflows
-- performance and reliability
+### 5. Choose a primary track
+Choose one of these major directions:
 
-### Option B: AI / ML / data science
-- Python for data
-- statistics
-- ML fundamentals
-- deep learning
-- deployment
+- Web / frontend / backend / full-stack
+- Embedded / hardware / computer engineering
+- AI / ML / data science / NLP
+- Cybersecurity / networking / telecom
+- Robotics / automation / mechatronics
+- Cloud / DevOps / platform engineering
+- Data engineering / fintech / enterprise systems
 
-### Option C: Embedded / electronics / computer engineering
-- C and microcontrollers
-- digital logic
-- electronics
-- firmware
-- debugging and hardware integration
+Output:
+- clear technical direction
+- a strong set of early project skills
 
-### Option D: Cybersecurity / networking
-- OS and network security
-- web security
-- crypto basics
-- pentesting practice
-- detection and defense
+### 6. Build real projects
+Build projects that solve real problems:
+- not just tutorials
+- not just toy examples
+- but systems with logic, structure, and validation
 
-### Option E: Robotics / automation / mechatronics
-- electronics
-- control systems
-- sensors and actuators
-- ROS basics
-- integration and testing
+Output:
+- project portfolio
+- practical proof of technical ability
 
-## Phase 5: Build depth and real production ability (Months 9-18)
+### 7. Learn adjacent support domains
+Each track depends on adjacent knowledge:
 
-### Goals
-- Learn how real systems are built
-- Learn distributed systems and production engineering
-- Learn testing, monitoring, deployment, and architecture
+- web depends on Linux, SQL, networking, security
+- embedded depends on electronics, C, control, debugging
+- AI depends on math, data, software engineering, deployment
+- security depends on Linux, networks, systems, secure coding
+- robotics depends on hardware, control, perception, software
+- cloud depends on Linux, networking, automation, reliability
 
-### Core skills
-- cloud basics
+Output:
+- broad engineering awareness without losing focus
+
+### 8. Production engineering and deployment
+Learn:
 - Docker and containerization
-- CI/CD
-- infrastructure as code
-- debugging production systems
-- observability and monitoring
-- security as part of engineering
+- CI/CD pipelines
+- cloud deployment
+- monitoring and alerting
+- observability
+- incident handling
+- security and performance tuning
 
-### Output milestone
-- Build a real project with devops pipeline
-- Deploy something publicly
-- Use logs, metrics, and monitoring
+Output:
+- can deploy systems and maintain them
+- can reason about reliability and failure modes
 
-## Phase 6: Produce portfolio and specialization (Months 18-30)
+### 9. Professional maturity
+Learn:
+- technical communication
+- writing docs and architecture notes
+- code reviews
+- engineering judgment
+- project planning
+- collaboration at scale
+- open source contribution
 
-### Goals
-- Turn learning into proof
-- Build portfolio-grade projects
-- Use open-source or real-world work to validate capability
+Output:
+- strong engineering presence
+- portfolio and communication skills
+- real professional readiness
 
-### Portfolio expectations
-- 2-3 high-quality projects
-- excellent documentation
-- code quality and testing
-- working deployment or demo
-- real problem solving and architecture
+## High-value rule
 
-## Phase 7: Advanced professional level (12-24+ months)
+Do not try to learn everything equally. Learn:
+- fundamentals deeply
+- one main track deeply
+- adjacent skills strategically
+- production skills practically
 
-At this stage, you should be able to understand and build:
-- production systems
-- secure and reliable architectures
-- scalable technical designs
-- critical debugging workflows
-- system trade-offs and engineering decisions
+This is the fastest route to real capability.
 
-## Real-world advice
+## Final goal of this repository
 
-The strongest engineers are not the ones who know 80 domains shallowly. They are the ones who:
-- understand the fundamentals deeply
-- choose a direction intentionally
-- build things repeatedly
-- document their process
-- keep improving iteratively
+This repository aims to help you build a layered learning path that turns curiosity into competence.
 
-## Fastest route to competence
+The goal is not just to read about technology. The goal is to become capable of building, debugging, and improving technical systems in the real world.
 
-If you want speed:
-- master Linux and Git early
-- master one programming language early
-- focus on one real branch (web, embedded, AI, security, robotics)
-- build 3 projects in that branch
-- then learn adjacent dependencies to deepen the branch
-
-## Summary
-
-A complete learning path is not a single linear list. It is a layered progression:
-
-- logic and math
-- programming and debugging
-- Linux and tooling
-- software and systems fundamentals
-- specialization
-- production engineering
-- portfolio and professional depth
-
-This is the correct structure for becoming genuinely capable in technology.
-
+That is the real meaning of a professional learning path.
