@@ -1,139 +1,164 @@
-# Programming
+# Linux & Operating Systems
 
-Programming is the base language of technology. A strong programmer knows logic, problem solving, abstraction, debugging, and structure.
+Linux is one of the most important foundations for technical work in engineering, software, AI, cybersecurity, cloud, DevOps, embedded systems, and automation.
+
+## Why this domain matters
+
+Most real technical systems run on Linux, even when users do not see it. Understanding Linux means understanding:
+
+- filesystems and permissions
+- processes and memory
+- shell usage and automation
+- debugging and troubleshooting
+- networking
+- system-level thinking
+- how software actually runs in the real world
 
 ## Core goals
-- Learn at least one language deeply
-- Understand syntax, flow, logic, and debugging
-- Learn structured thinking
-- Build small projects and solve real tasks
-- Understand software quality and maintainability
+
+- use Linux confidently in daily technical work
+- understand shell, process, and file management
+- reason about how the OS manages resources
+- build practical command-line tools and scripts
+- understand system calls, memory, and process execution
+- develop a systems mindset for software, security, and infrastructure
 
 ## Learning sequence
 
-### Stage 1: Basics
-- Variables, constants, types
-- Operators
-- Conditionals
-- Loops
-- Functions
-- Input/output
-- File handling
-- Exception handling
-- Basic recursion
+### 1. Command line essentials
+- shell basics
+- `ls`, `cd`, `pwd`, `cp`, `mv`, `rm`, `mkdir`, `touch`
+- redirection and pipes
+- `grep`, `sed`, `awk`, `find`, `head`, `tail`
+- environment variables
+- package managers
+- permissions and ownership
+- SSH and remote access basics
 
-### Stage 2: Intermediate
-- Data structures
-- OOP / procedural thinking
-- Modules and packages
-- Libraries and APIs
-- Error handling patterns
-- Testing basics
-- Debugging tools
-- Regular expressions
-- JSON / serialization
-- Basic networking
+### 2. Filesystem and shell mastery
+- Linux directory structure
+- users and groups
+- file permissions (`rwx`)
+- symbolic vs hard links
+- file search and text processing
+- cron and scheduled tasks
+- bash scripting
+- shell loops and conditionals
+- command-line automation workflows
 
-### Stage 3: Advanced
-- Design patterns
-- Concurrency and parallelism
-- Memory-safe programming
-- Code architecture
-- Performance optimization
-- Build tools
-- CI/CD basics
-- Profiling and benchmarking
-- Static analysis and linting
+### 3. Process, memory, and execution
+- process lifecycle
+- PID, parent/child processes
+- signals
+- jobs and foreground/background execution
+- memory basics
+- stack, heap, static memory
+- program loading and execution flow
+- file descriptors
+- system calls
 
-## Recommended language progression
+### 4. OS concepts and internals
+- kernel vs user space
+- virtual memory
+- paging
+- scheduling basics
+- inter-process communication
+- threads and synchronization basics
+- boot process
+- init/systemd basics
+- device files and drivers basics
 
-### Path A: general software engineering
-- Python -> JavaScript/TypeScript -> SQL -> C -> Go/Rust
+### 5. Networking and Linux in practice
+- IP basics
+- routing basics
+- TCP/IP and sockets
+- `ss`, `netstat`, `ip`
+- DNS and host resolution
+- firewalls and packet flow
+- log inspection and troubleshooting
+- containers and virtualization basics
 
-### Path B: systems / embedded
-- C -> C++ -> Rust -> Bash -> Python
+### 6. Advanced Linux and operations
+- Docker basics
+- container concepts
+- virtualization basics
+- systemd services
+- logs and observability
+- performance monitoring
+- debugging tools such as `strace`, `lsof`, `top`, `htop`
+- security hardening
 
-### Path C: AI/data science
-- Python -> SQL -> Bash -> JavaScript (for apps)
+## Tools and ecosystem
 
-## Topics to master
-- Logic
-- Abstraction
-- Data structures
-- Algorithms
-- Object-oriented and functional thinking
-- Testing
-- Debugging
-- Performance intuition
-- Clean code
-- Package management
-
-## Important frameworks and tools
-- Python: Flask, FastAPI, Django
-- JavaScript: Node.js, React, Next.js, Express
-- TypeScript
-- SQL
-- Git
+- bash / zsh
+- GNU coreutils
+- `grep`, `rg`, `awk`, `sed`
+- `find`, `xargs`, `ps`, `top`, `htop`
+- `ssh`, `scp`, `curl`
+- `systemctl`, `journalctl`
+- `gcc`, `make`, `gdb`
+- `strace`, `lsof`, `vmstat`
 - Docker
-- Virtual envs / package managers
-- pytest / unittest / Jest / Vitest
+- Git
 
-## Beginner project list
-- Calculator
-- To-do app
-- Expense tracker
-- Mini blog backend
-- File manager script
-- Password generator
-- Student record system
-- Weather API consumer
-- Quiz game
-- Markdown note tool
+## Core concepts checklist
 
-## Intermediate project list
-- Chat app backend
-- Inventory management system
-- Ecommerce API
-- Task scheduler
-- Blog with auth
-- Real-time dashboard
-- REST API with JWT
-- Mini search engine
-- Forum project
+- [ ] Use Shell commands confidently
+- [ ] Understand filesystem hierarchy and permissions
+- [ ] Write scripts for automation
+- [ ] Understand processes and signals
+- [ ] Inspect running system health
+- [ ] Work with logs and debugging tools
+- [ ] Understand networking basics in Linux
+- [ ] Use package managers and system services
+- [ ] Understand memory and execution model
 
-## Advanced project ideas
-- Distributed task runner
-- Service-oriented backend system
-- Compile-time safe code
-- Custom CLI toolchain
-- Multi-service API platform
-- Observability and metrics app
+## Project ideas
 
-## Recommended repositories
-- python/cpython: https://github.com/python/cpython
-- TheAlgorithms/Python: https://github.com/TheAlgorithms/Python
-- nodejs/node: https://github.com/nodejs/node
-- facebook/react: https://github.com/facebook/react
-- django/django: https://github.com/django/django
-- fastapi/fastapi: https://github.com/tiangolo/fastapi
-- expressjs/express: https://github.com/expressjs/express
-- rust-lang/rust: https://github.com/rust-lang/rust
-- golang/go: https://github.com/golang/go
-- microsoft/TypeScript: https://github.com/microsoft/TypeScript
+- custom shell toolkit
+- file organizer script
+- log analyzer
+- backup and restore utility
+- process monitor dashboard
+- file server in local network
+- simple package manager clone
+- environment bootstrap script
+- container playground
 
-## Skills checklist
-- [ ] Write functions and modules
-- [ ] Use iteration and conditionals correctly
-- [ ] Solve simple algorithmic problems
-- [ ] Read and fix errors
-- [ ] Use Git with branching
-- [ ] Write clean code
-- [ ] Build a small app from scratch
-- [ ] Use packages and dependencies
-- [ ] Write tests
+## Strong repositories and references
 
-## Next path
-- [Linux & OS](linux-os.md)
+- torvalds/linux: https://github.com/torvalds/linux
+- 0xAX/linux-insides: https://github.com/0xAX/linux-insides
+- mit-pdos/xv6-public: https://github.com/mit-pdos/xv6-public
+- docker/cli: https://github.com/docker/cli
+- kubernetes/kubernetes: https://github.com/kubernetes/kubernetes
+- systemd/systemd: https://github.com/systemd/systemd
+- qemu/qemu: https://github.com/qemu/qemu
+
+## Recommended learning path
+
+1. Learn shell, file management, and permissions
+2. Learn process management and memory basics
+3. Learn networking and filesystems
+4. Learn OS architecture and system calls
+5. Practice with shell scripts and debugging tools
+6. Move into Docker, virtualization, and system services
+
+## Related domains
+
+- [Foundations](foundation.md)
+- [Programming](programming.md)
 - [Computer Science](computer-science.md)
+- [Cybersecurity / Networking](cybersecurity-networking.md)
 - [Software Engineering](software-engineering.md)
-- [Web Development](web-fullstack.md)
+- [Embedded Systems](embedded-systems.md)
+
+## Recommended next step
+
+After Linux and OS, continue to:
+
+- [Computer Science](computer-science.md)
+- [Cybersecurity / Networking](cybersecurity-networking.md)
+- [Cloud / DevOps](cloud-devops.md)
+
+This is the layer where everyday technical work becomes true systems fluency.
