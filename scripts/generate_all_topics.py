@@ -13,6 +13,7 @@ if BASE_DIR not in sys.path:
 
 from scripts.tier_definitions import TIERS, TOPICS_METADATA
 from scripts.topic_knowledge_base import get_topic_payload
+from scripts.encyclopedia.enricher_engine import enrich_topic_payload
 
 
 def generate_tier_readmes():
@@ -69,7 +70,8 @@ def generate_topic_files():
         tier_dir = os.path.join(BASE_DIR, "curriculum", tier["dir_name"])
         os.makedirs(tier_dir, exist_ok=True)
         
-        payload = get_topic_payload(t_id, slug, full_title, tier_idx)
+        raw_payload = get_topic_payload(t_id, slug, full_title, tier_idx)
+        payload = enrich_topic_payload(t_id, slug, full_title, tier_idx, raw_payload)
         
         # Navigation links
         prev_meta = TOPICS_METADATA[idx - 1] if idx > 0 else None

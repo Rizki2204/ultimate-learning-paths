@@ -6,8 +6,10 @@
 ---
 
 ## 1. Intuisi Dasar Tanpa Jargon ("Seperti Bayi Baru Lahir")
+### 1.1 Konsep Inti & Analogi Tanpa Jargon
 Bagaimana sebuah lengan robot industri tahu dengan pasti di mana ujung jarinya (*End-Effector*) berada di ruang 3D hanya dengan membaca sudut putaran keenam motor sendinya? Dan bagaimana jika Anda ingin membalik pertanyaannya: *"Jika saya ingin ujung jari robot menyentuh cangkir kopi di koordinat $(X, Y, Z)$, berapa derajat sudut yang harus diputar oleh masing-masing motor?"*
 
+### 1.2 Urgensi Rekayasa & Signifikansi Sistemik
 Inilah jantung matematika robotika: **Kinematika Spasial 3D** ([Craig - Introduction to Robotics](https://www.pearson.com/en-us/subject-catalog/p/introduction-to-robotics-mechanics-and-control/P200000003314)).
 
 Jika Anda merepresentasikan rotasi 3D menggunakan sudut Euler biasa (Roll, Pitch, Yaw), Anda akan menabrak fenomena bencana matematika bernama **Gimbal Lock**: ketika dua sumbu rotasi sejajar dan Anda kehilangan 1 derajat kebebasan gerak seketika!
@@ -15,8 +17,10 @@ Jika Anda merepresentasikan rotasi 3D menggunakan sudut Euler biasa (Roll, Pitch
 Untuk menghindarinya, ilmuwan robotika menggunakan **Kuaternion Satuan (Quaternions)**: bilangan hiper-kompleks 4-dimensi ajaib yang dapat memutar objek di ruang 3D secara mulus tanpa pernah mengalami gimbal lock. Dan untuk merangkai sambungan sendi-sendi lengan robot dari pangkal hingga ke ujung, kita menggunakan konvensi standar internasional **Denavit-Hartenberg (DH Parameters)** ([Siciliano et al. - Robotics: Modelling, Planning and Control](https://link.springer.com/book/10.1007/978-1-84628-642-1)).
 
 ## 2. Fondasi Teoretis & Aksiomatik / Matematis
+### 2.1 Kerangka Teori Aksiomatik & Formulasi Matematis
 Formulasi Matematis Kinematika Robotika Spasial 3D:
 
+### 2.2 Penurunan Matematis Langkah-demi-Langkah
 1. **Grup Rotasi Khusus $SO(3)$ & Aljabar Kuaternion Satuan**:
 Matriks rotasi ortogonal $R \in \mathbb{R}^{3 \times 3}$ memenuhi: $R^T R = I$ dan $\det(R) = +1$.
 Kuaternion satuan $q = [w, x, y, z]^T = [w, \mathbf{v}]^T$ merepresentasikan rotasi sebesar sudut $\theta$ mengelilingi sumbu vektor satuan $\mathbf{u} \in \mathbb{R}^3$:
@@ -47,6 +51,15 @@ flowchart LR
 Inverse Kinematics (IK) umumnya diselesaikan via iterasi diferensial damped least-squares (*Levenberg-Marquardt*):
 $$\Delta q = J^T (J J^T + \lambda^2 I)^{-1} e$$
 Faktor peredam $\lambda^2$ mencegah nilai kecepatan sendi $\dot{q}$ meledak tak hingga saat lengan mendekati konfigurasi singularitas ([Siciliano Robotics Chapter 3](https://link.springer.com/book/10.1007/978-1-84628-642-1)).
+
+#### Tabel Penelusuran Siklus Rekayasa Kinematika MCAS & Otoritas Kendali Stabilizer 737 MAX
+| Waktu Diskret (t = k·Ts) | Komponen / Tahap Estimator | Sensor Raw / Input Referensi | Transformasi Matriks / Kendali | State Estimasi (x̂, P, Error PID) | Sinyal Aktuator / PWM Output |
+|---|---|---|---|---|---|
+| t = 0.0s (Lepas Landas) | Pesawat Boeing 737 MAX 8 | Kecepatan Udara: 160 Knot, Flaps Up | Komputer Kendali Terbang (FCC-Left) aktif | Sensor Angle of Attack (AoA) Kiri rusak membaca $+32^\circ$ | Sensor Kanan membaca normal $+11^\circ$ diabaikan! |
+| t = 5.0s (Aktivasi MCAS) | Maneuvering Characteristics Augmentation | FCC mendeteksi sudut serang $> 12^\circ$ palsu | MCAS mengasumsikan pesawat berada dalam bahaya stall | Perintah hidung menukik dihitung: $\Delta \theta = -2.5^\circ$ | Motor elektrik stabilizer horizontal memutar kemudi ke bawah |
+| t = 15.0s (Intervensi Pilot) | Kolom Kemudi Pilot Manual | Pilot menarik kolom kemudi ke belakang dengan gaya 40 kg | Pilot menekan tombol switch trim elektrik untuk menaikkan hidung | Stabilizer kembali naik $+2.0^\circ$; MCAS sempat berhenti | Pilot berhasil memulihkan sikap terbang sesaat |
+| t = 20.0s (Re-Aktivasi Tak Terbatas) | Siklus Logika Perangkat Lunak FCC | Timer 5 detik MCAS berakhir; AoA kiri tetap $+32^\circ$ | Ketiadaan flag batas satu kali aktivasi: MCAS aktif lagi! | Perintah kedua: Hidung ditukikkan lagi $-2.5^\circ$ | Motor stabilizer memutar kemudi semakin curam ke bawah |
+| t = 60.0s (Kehilangan Otoritas Fisik) | Permukaan Kendali Horizontal Ekor | Stabilizer terdorong ke batas fisik maksimum (*Nose-Down Stop*) | Gaya aerodinamis kecepatan tinggi mengunci elevator kemudi | Gaya fisik tarikan kedua pilot kalah melawan motor listrik trim | Pesawat menukik tajam ke laut pada kecepatan 800 km/jam! |
 
 ## 4. Implementasi Praktis & Kode / Simulasi Riil
 ```python
@@ -91,6 +104,51 @@ assert np.isclose(x_ee, x_analytical) and np.isclose(y_ee, y_analytical), "Hasil
 ## 5. Miskonsepsi & Jebakan Industri
 *Bencana Gimbal Lock pada Representasi Euler Angles*: Ketika sudut pitch mencapai $\pm 90^\circ$ ($\pm \frac{\pi}{2}$ rad), sumbu rotasi roll dan yaw bertepatan satu sama lain pada bidang yang sama. Matriks rotasi kehilangan satu rank matematika ($\det \to 0$), memicu hilangnya satu derajat kebebasan dan pergerakan tak terkendali (*singularity jerk*) pada autopilot wahana atau lengan robot. Jangan pernah menggunakan sudut Euler untuk komputasi internal kendali; selalu gunakan **Kuaternion Satuan** atau **Matriks Rotasi $SO(3)$** murni ([Kuipers - Quaternions and Rotation Sequences](https://www.princeton.edu/~wbialek/rome/refs/kuipers_99.pdf)).
 
+### Studi Kasus Kegagalan Nyata: Tragedi Dua Kecelakaan Fatal Boeing 737 MAX Akibat Ketergantungan Sensor AoA Tunggal pada MCAS (2018-2019)
+- **Kronologi & Konteks Sejarah**: Pada 29 Oktober 2018 (Lion Air Penerbangan 610 di Laut Jawa) dan 10 Maret 2019 (Ethiopian Airlines Penerbangan 302 di dekat Bishoftu), dua pesawat komersial modern Boeing 737 MAX 8 jatuh tak lama setelah lepas landas, menewaskan total 346 penumpang dan awak kabin, memicu pengandangan (*grounding*) armada global terlama dalam sejarah penerbangan sipil (20 bulan) dan krisis hukum serta keuangan terparah bagi Boeing.
+- **Akar Masalah Rekayasa Sistem Kendali Terbang & Ketiadaan Redundansi Sensor**: Boeing merancang sistem perangkat lunak kendali otomatis Maneuvering Characteristics Augmentation System (MCAS) untuk membuat varian 737 MAX yang memiliki mesin CFM LEAP-1B lebih besar memiliki sensasi kemudi yang identik dengan generasi 737 NG sebelumnya tanpa mewajibkan pelatihan simulator berbiaya mahal bagi pilot. Terdapat serangkaian kegagalan rekayasa sistem yang sangat fatal: (1) **Titik Kegagalan Tunggal (Single Point of Failure)**: MCAS dirancang hanya membaca masukan dari satu sensor Angle of Attack (AoA) di sisi kiri pesawat pada satu penerbangan (dan bergantian ke kanan pada penerbangan berikutnya), tanpa membandingkan data dengan sensor sisi lainnya. Ketika baling-baling sensor AoA kiri rusak atau salah dikalibrasi, MCAS menerima sinyal salah bahwa hidung pesawat terlalu mendongak; (2) **Otoritas Kendali yang Dinaikkan Tanpa Audit Ulang**: Otoritas defleksi stabilizer MCAS dinaikkan dari $0,55^\circ$ menjadi $2,5^\circ$ pada saat uji terbang tanpa memperbarui dokumen analisis bahaya keselamatan fungsional; (3) **Aktivasi Berulang Tanpa Batas**: Setiap kali pilot melawan manuver menukik dengan sakelar trim manual, MCAS mengaktifkan dirinya kembali setelah jeda 5 detik, mendorong stabilizer semakin jauh ke bawah hingga pilot kehabisan tenaga fisik untuk melawan gaya aerodinamis ekor.
+
+- **Potongan Kode / Arsitektur Cacat (Vulnerable Implementation)**:
+```c
+// Rekonstruksi Cacat Arsitektur Sistem Kendali MCAS Boeing 737 MAX
+#include <stdbool.h>
+
+struct CockpitSensors {
+    double left_aoa_degrees;  // Sensor AoA Kiri (Rusak / Macet di 35 derajat)
+    double right_aoa_degrees; // Sensor AoA Kanan (Normal pada 10 derajat)
+    bool flaps_retracted;
+};
+
+// LOGIKA CACAT ASLI BOEING 737 MAX (Ketergantungan Sensor Tunggal):
+void update_mcas_command_flawed(struct CockpitSensors sensors, double *stabilizer_trim, bool pilot_trim_switch_pressed) {
+    // CACAT 1: Ketergantungan tunggal pada sensor kiri tanpa cross-check dengan sensor kanan!
+    double active_aoa = sensors.left_aoa_degrees;
+    
+    // CACAT 2: Aktif berulang kali setiap 5 detik setelah pilot melepas switch!
+    if (sensors.flaps_retracted && active_aoa > 12.0) {
+        // Pangkas kendali stabilizer ke bawah sebesar 2.5 derajat!
+        *stabilizer_trim -= 2.5; 
+        // Mengesampingkan otoritas kendali manual pilot secara permanen!
+    }
+}
+
+// MITIGASI DEFENSIVE RESMI BOEING: Dual-Sensor Disagree Check & Single Activation Cap
+void update_mcas_command_safe(struct CockpitSensors sensors, double *trim, bool *mcas_disabled) {
+    // 1. Pembandingan Silang Sensor Ganda (Cross-Comparison):
+    double aoa_disagree = sensors.left_aoa_degrees - sensors.right_aoa_degrees;
+    if (aoa_disagree > 5.5 || aoa_disagree < -5.5) {
+        // Jika selisih kedua sensor melebihi ambang toleransi:
+        *mcas_disabled = true; // Nonaktifkan MCAS untuk sisa penerbangan!
+        return;
+    }
+    
+    // 2. Batas Satu Kali Aktivasi (Single-Activation Limit):
+    // MCAS tidak boleh aktif berulang kali jika pilot sudah melakukan intervensi manual!
+}
+```
+
+- **Analisis Forensik & Rekayasa Modern**: Tragedi 737 MAX mengubah arsitektur rekayasa perangkat lunak keselamatan kritis (*Safety-Critical Systems Engineering*): (1) Mandat mutlak bahwa **Tidak Ada Sistem Otomatis yang Boleh Mengesampingkan Perintah Fisik Pilot**: Tarikan kolom kemudi pilot wajib secara fisik memutus aliran daya motor penggerak otomatis stabilizer; (2) **Dual-Sensor Voting Logic**: Seluruh sensor input penerbangan kritis wajib memiliki redundansi ganda atau tri-sensor dengan *Fault Detection and Isolation (FDI)*; (3) Integrasi indikator *AoA Disagree Alert* sebagai fitur keselamatan standar tanpa biaya tambahan opsional.
+
 ## 6. Proyek Latihan & Rubrik Penilaian Mandiri
 ### Level 1 (Pemula)
 Tulis kelas kuaternion kustom di Python yang mendukung perkalian Hamilton ($q_1 \otimes q_2$), konjugat kuaternion, normalisasi ke satuan, dan konversi kuaternion satuan menjadi matriks rotasi $3 \times 3$ $SO(3)$.
@@ -103,6 +161,48 @@ Susun tabel parameter Denavit-Hartenberg (DH) lengkap untuk lengan robot SCARA 4
 ### Level 3 (Mahir)
 Implementasikan pemecah Kinematika Balik (*Inverse Kinematics Solver*) menggunakan metode Damped Least-Squares (DLS / Levenberg-Marquardt) Jacobian numerik untuk manipulator 6-DoF: terima koordinat target 3D sembarang, hitung matriks Jacobian secara rekursif, perbarui sudut sendi dengan batasan sudut fisik (*joint limits*), dan buktikan konvergensi posisi dengan toleransi galat $\|e\| < 1\text{ mm}$.
 *Rubrik*: Algoritma mampu menavigasi konfigurasi dekat singularitas tanpa lonjakan kecepatan sudut.
+
+### Tingkat 1: Dasar
+- **Tugas**: Tulis fungsi voting silang sensor ganda (*Dual-Sensor Disagree Cross-Checker*) dalam Python atau C yang menerima pembacaan dua sensor sudut serang (AoA), memeriksa apakah selisih nilai absolut berada di dalam batas toleransi aman ($|\Delta| \le 5.5^\circ$) selama jendela waktu 3 sampel berturut-turut, memicu peringatan `AOA_DISAGREE`, dan mengembalikan status aman penonaktifan aktuasi otomatis.
+- **Petunjuk Perancangan Arsitektur**:
+  - Input: `sensor_left (float)`, `sensor_right (float)`, `threshold = 5.5`, `consecutive_count (int)`.
+  - Jika $|\text{left} - \text{right}| > \text{threshold}$: inkremen counter; jika tidak, reset counter ke nol.
+  - Jika counter $\ge 3$: nonaktifkan sistem otomatis (`system_active = False`) dan bunyikan sinyal peringatan.
+- **Test Vector & Kasus Uji**:
+  - Sensor Left: $12.0^\circ$, Sensor Right: $11.8^\circ$ -> Selisih $0.2^\circ \le 5.5^\circ$ -> Status AMAN (True).
+  - Sensor Left melompat ke $35.0^\circ$ sementara Sensor Right $11.0^\circ$ selama 3 siklus: Sistem harus seketika mengembalikan `AOA_DISAGREE_FAULT` dan mematikan sistem otomatis.
+- **Rubrik Penilaian Objektif**:
+  - Skor 100%: Logika pengecekan selisih presisi, penanganan jendela konfirmasi sampel akurat, fail-safe trigger bersih.
+  - Skor 50%: Memeriksa selisih benar namun langsung memicu trip pada sampel derau tunggal tanpa jendela konfirmasi.
+  - Skor 0%: Hanya mengecek salah satu sensor tanpa membandingkan kedua sensor.
+
+### Tingkat 2: Menengah
+- **Tugas**: Bangun modul pengendali pitch pesawat terbang (*Aircraft Pitch Attitude Controller*) dalam Python: Implementasikan arsitektur state feedback dengan batasan otoritas ganda: (1) Batasan defleksi sudut elevator maksimum ($\pm 15^\circ$); (2) Pembatas laju sudut (*Rate Limiter* maksimum $5^\circ/\text{detik}$); (3) Intervensi override prioritas manual pilot yang secara mutlak menonaktifkan komando otomatis begitu gaya kolom kemudi terdeteksi.
+- **Petunjuk Perancangan Arsitektur**:
+  - Persamaan gerak pitch short-period: $\dot{q} = M_\alpha \alpha + M_q q + M_{\delta} \delta_e$.
+  - Terapkan saturasi defleksi dan limit laju perubahan kemudi: $\Delta \delta_e = \text{clip}(\delta_{\text{cmd}} - \delta_{\text{current}}, -\text{rate\_max} \cdot dt, +\text{rate\_max} \cdot dt)$.
+  - Sakelar override manual pilot memiliki prioritas mutlak di atas seluruh komando algoritma autopilot.
+- **Test Vector & Kasus Uji**:
+  - Uji saat algoritma mencoba menukikkan hidung $-2.5^\circ$ namun pilot menarik kolom kemudi: Modul harus memotong komando otomatis menjadi $0.0$ dan memberikan wewenang penuh ke input pilot.
+- **Rubrik Penilaian Objektif**:
+  - Skor 100%: Pembatas otoritas dan rate limiter presisi, prioritas override manual tidak dapat dibatalkan, dinamika transien stabil.
+  - Skor 50%: Pengendali bekerja namun mengabaikan rate limiter sehingga aktuator mengalami pergeseran instan yang tidak realistis.
+  - Skor 0%: Komando otomatis melawan input manual pilot tanpa override.
+
+### Tingkat 3: Mahir
+- **Tugas**: Rancang sistem deteksi anomali sensor berbasis model analitis redundan (*Analytical Redundancy & Model-Based Fault Detection Observer*) dalam Python: Alih-alih hanya membandingkan dua sensor AoA secara pasif, bangun Extended Kalman Filter yang mengestimasi sudut serang pesawat secara independen dari parameter kecepatan udara pitot ($V_{\text{tas}}$), akselerasi vertikal ($a_z$), dan pitch rate ($q$), lalu bandingkan estimasi analitis tersebut untuk menentukan sensor fisik mana yang rusak di antara kedua sensor AoA (*Sensor Isolation & Disagree Resolution*).
+- **Petunjuk Perancangan Arsitektur**:
+  - Kinematika aerodinamika: $\dot{\alpha} \approx q - \frac{g}{V} (\cos\theta - a_z / g)$.
+  - Estimator analitis menghasilkan estimasi independen $\hat{\alpha}$.
+  - Residu: $r_1 = |\alpha_{\text{left}} - \hat{\alpha}|$, $r_2 = |\alpha_{\text{right}} - \hat{\alpha}|$.
+  - Sensor dengan residu terendah dinyatakan sebagai sensor sehat, sedangkan sensor dengan residu besar diisolasi secara otomatis.
+- **Test Vector & Kasus Uji**:
+  - Simulasikan kondisi terbang di mana Sensor Kiri mengirim data salah $+35^\circ$ sementara Sensor Kanan $+11^\circ$ dan Estimator Analitis menghitung $\hat{\alpha} = +11.2^\circ$.
+  - Observer harus secara tepat mengidentifikasi bahwa Sensor Kiri adalah pihak yang rusak, mengisolasi Sensor Kiri, dan mengizinkan sistem terbang beroperasi normal dengan Sensor Kanan.
+- **Rubrik Penilaian Objektif**:
+  - Skor 100%: Estimasi analitis redundan presisi fisika penerbangan, isolasi sensor rusak akurat, toleransi derau terbukti.
+  - Skor 50%: Model bekerja namun salah menghitung kompensasi akselerasi vertikal $a_z$.
+  - Skor 0%: Hanya mematikan kedua sensor tanpa mampu menentukan sensor mana yang valid.
 
 ## 7. Rekomendasi Sumber Belajar Standar Emas
 | Sumber Pembelajaran | Penulis / Institusi | Tautan Langsung | Fokus Materi |

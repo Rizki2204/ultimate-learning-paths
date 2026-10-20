@@ -6,9 +6,11 @@
 ---
 
 ## 1. Intuisi Dasar Tanpa Jargon ("Seperti Bayi Baru Lahir")
+### 1.1 Konsep Inti & Analogi Tanpa Jargon
 Bayangkan sebuah satelit cuaca luar angkasa seharga Rp 5 triliun yang sedang mengorbit di ketinggian 35.000 km di atas bumi:
 Tiba-tiba sebutir partikel radiasi kosmik menabrak chip mikrokontroler satelit tersebut, membalikkan satu bit data di RAM dan membuat prosesor satelit terjebak di dalam loop macet abadi (`while(1)`)! Tidak ada astronot yang bisa terbang ke sana untuk menekan tombol tombol reset fisik dengan jari!
 
+### 1.2 Urgensi Rekayasa & Signifikansi Sistemik
 Jika satelit tidak memiliki sistem pemulihan mandiri, satelit Rp 5 triliun itu akan menjadi sampah antariksa mati selamanya.
 Untuk mencegah bencana ini, setiap sistem embedded kritis memiliki seekor 'anjing penjaga' perangkat keras yang disebut **Watchdog Timer (WDT)**:
 Watchdog adalah pencacah waktu hardware terpisah yang menghitung mundur tanpa henti: *10... 9... 8... 7...*
@@ -17,6 +19,7 @@ Jika program Anda macet, hang, atau terkena radiasi sehingga lupa memberi makan 
 [📚 Pelajari: Jack Ganssle Designing Great Watchdogs](https://www.ganssle.com/watchdogs.htm)
 
 ## 2. Fondasi Teoretis & Aksiomatik / Matematis
+### 2.1 Kerangka Teori Aksiomatik & Formulasi Matematis
 ### 78.1 Dua Jenis Watchdog: Independent (IWDG) vs Window Watchdog (WWDG) ([STM32 Reference Manual](https://www.st.com/))
 1. **Independent Watchdog (IWDG)**:
    - Digerakkan oleh osilator internal independen terpisah (*Low-Speed Internal* LSI $\approx 32\text{ kHz}$) yang terisolasi sepenuhnya dari clock utama sistem.
@@ -30,6 +33,7 @@ Jika program Anda macet, hang, atau terkena radiasi sehingga lupa memberi makan 
    - Perangkat lunak hanya boleh mereset timer saat nilai pencacah berada di dalam jendela waktu yang diizinkan ($W < \text{Counter} \le 0x3F$).
    - Jika program mereset watchdog sebelum jendela waktu terbuka: memicu reset sistem seketika! Sangat ideal untuk mendeteksi anomali perangkat lunak di mana kode melompat liar tak beraturan (*Runaway Code Execution*).
 
+### 2.2 Penurunan Matematis Langkah-demi-Langkah
 ### 78.2 Analisis Titik Kegagalan Pemberian Makan Watchdog Naif ([Ganssle Watchdog Design](https://www.ganssle.com/))
 Kesalahan paling fatal dan memalukan pemula:
 Menaruh rutinitas pemberian makan watchdog di dalam fungsi interupsi timer periodik (misal di dalam `SysTick_Handler`):
@@ -63,7 +67,17 @@ graph TD
 Penyimpanan Jejak Pasca-Reboot (Crash Dump Post-Mortem):
 Saat chip melakukan booting setelah reset watchdog, firmware membaca register penanda penyebab reset `RCC_CSR_IWDGRSTF` untuk mendeteksi apakah sistem baru saja mengalami crash akibat watchdog. Jika ya, firmware mencatat laporan telemetri ke memori Flash non-volatil sebelum kembali beroperasi.
 
+#### Tabel Penelusuran Hilangnya Wahana Soviet Phobos 1 (1988) & Loop Diagnostik Pengatur Waktu Watchdog
+| Waktu Transmisi Radio | Perintah Terkirim dari Bumi | Kesalahan Karakter (Typo Stasiun Bumi) | Interpretasi Komputer Wahana | Perilaku Pengatur Waktu Watchdog | Dampak pada Orientasi Sel Surya Wahana |
+|---|---|---|---|---|---|
+| Perintah Rutin | `TEST-RUN-ALT-10` | - | Rutinitas penerbangan normal | Watchdog di-refresh normal | Sel surya mengarah ke matahari ($100\%$ daya) |
+| Perintah Bermasalah | `TEST_RUN_ALT` (Kehilangan satu huruf!)| Karakter hilang mengubah makna perintah! | Diterjemahkan sebagai instruksi uji pabrik darat!| Rutinitas pabrik mematikan sistem navigasi! | Motor penstabil orientasi dimatikan |
+| Menonaktifkan Sikap | Komputer masuk mode uji pabrik | Pendorong gas dingin orientasi dimatikan | Wahana mulai berguling pelan di angkasa | Watchdog dialihkan ke loop uji pabrik tanpa henti | Panel surya mulai menjauhi sinar matahari |
+| Ketiadaan Window Watchdog| Watchdog sederhana (Standard WDT)| Loop uji pabrik terus me-refresh watchdog| Watchdog mengira sistem normal karena terus di-feed!| Tidak ada reset pemulihan otomatis! | Baterai kimia terkuras habis tanpa pengisian |
+| Kematian Wahana | Baterai habis total | Suhu wahana membeku | Hubungan radio terputus selamanya | Sistem mati suri permanen di orbit menuju Mars | Misi senilai ratusan juta rubel gagal total |
+
 ## 4. Implementasi Praktis & Kode / Simulasi Riil
+```python
 def calculate_stm32_iwdg_timeout_ms(prescaler_div: int, reload_value: int, lsi_freq_hz: float = 32000.0) -> dict:
     """
     Menghitung batas waktu kedaluwarsa Independent Watchdog (IWDG) STM32.
@@ -87,11 +101,56 @@ print(f"Konfigurasi Watchdog Hardware ({res['prescaler']}):")
 print(f" - Durasi 1 Tick Clock: {res['tick_duration_us']:.1f} us")
 print(f" - Batas Waktu Timeout : {res['timeout_ms']:.1f} ms")
 print(f"Catatan: Firmware wajib memberi makan watchdog setidaknya setiap {res['timeout_ms'] * 0.7:.0f} ms!")
+```
 
 ## 5. Miskonsepsi & Jebakan Industri
 1. **Feeding the Watchdog in an Interrupt Service Routine**: Menaruh kode reset watchdog di dalam rutin interupsi timer periodik; sistem utama di loop aplikasi bisa macet total selamanya sementara interupsi timer tetap rajin memberi makan watchdog, melenyapkan seluruh fungsi proteksi sistem.
-2. **Watchdog Timeout Shorter than Long Flash Erase Operations**: Mengatur batas waktu timeout watchdog terlalu pendek (misal $50	ext{ ms}$) saat firmware melakukan operasi penghapusan blok sektor Flash internal atau komunikasi modem yang memakan waktu $200	ext{ ms}$; chip me-reset dirinya sendiri secara acak di tengah penulisan Flash.
+2. **Watchdog Timeout Shorter than Long Flash Erase Operations**: Mengatur batas waktu timeout watchdog terlalu pendek (misal \$50	ext{ ms}$) saat firmware melakukan operasi penghapusan blok sektor Flash internal atau komunikasi modem yang memakan waktu \$200	ext{ ms}$; chip me-reset dirinya sendiri secara acak di tengah penulisan Flash.
 3. **Leaving Watchdog Active during Hardware Breakpoint Debugging**: Membiarkan watchdog timer tetap mencacah saat prosesor dijeda oleh debugger JTAG/SWD; saat developer sedang meneliti kode, watchdog meluap di latar belakang dan tiba-tiba me-reset CPU. Selalu aktifkan fitur pembeku clock watchdog saat debug (`DBGMCU_APB1_FZ_DBG_IWDG_STOP`).
+
+### Studi Kasus Kegagalan Nyata: Hilangnya Wahana Antariksa Soviet Phobos 1 (1988) Akibat Typo Perintah Radio & Kegagalan Watchdog
+- **Tragedi Eksplorasi Luar Angkasa Soviet**: Pada 2 September 1988, wahana antariksa antariplanet Soviet Phobos 1 yang sedang meluncur dalam perjalanan menuju planet Mars tiba-tiba berhenti memancarkan sinyal radio ke stasiun bumi. Upaya pemulihan selama berminggu-minggu gagal total, dan wahana dinyatakan hilang selamanya di luar angkasa.
+- **Akar Masalah Keandalan Sistem Tertanam & Desain Watchdog Timer**: Penyelidikan komisi antariksa membongkar bahwa perintah radio transmisi yang dikirimkan oleh teknisi stasiun bumi ke Phobos 1 kehilangan satu karakter tanda hubung akibat kesalahan operator manual. Karakter yang terlewat ini secara fatal mengubah kode instruksi operasional penerbangan menjadi kode eksekusi rutinitas pengujian pra-peluncuran di pabrik (*ground test routine*) yang masih tersimpan di dalam memori ROM komputer wahana. Rutinitas uji pabrik ini dirancang untuk mematikan pendorong pendorong gas kontrol sikap orientasi wahana. Komputer wahana mulai berguling pelan tanpa kendali, menyebabkan panel sel surya berputar menjauhi arah sinar matahari. Sistem pengatur waktu pengawas (*Watchdog Timer*) yang dirancang sederhana gagal menyelamatkan wahana: karena loop uji pabrik terus mengeksekusi instruksi penyegaran watchdog secara teratur (*servicing/kicking the dog*), watchdog menganggap komputer beroperasi normal dan tidak pernah membangkitkan interupsi reset darurat untuk memulihkan sistem ke mode terbang aman. Dalam hitungan hari, baterai wahana habis terkuras dan wahana membeku menjadi bangkai logam di ruang hampa.
+
+- **Potongan Kode / Arsitektur Cacat (Vulnerable Implementation)**:
+```c
+// Desain Pengatur Waktu Pengawas Tingkat Lanjut: Windowed Watchdog Timer (WWDG)
+#include <stdint.h>
+#include <stdbool.h>
+
+// Windowed Watchdog Timer (WWDG) mencegah dua jenis anomali fatal:
+// 1. Terlambat memberi makan watchdog (Timeout / Program hang)
+// 2. TERLALU CEPAT memberi makan watchdog (Program terperosok ke dalam loop abnormal!)
+typedef struct {
+    uint8_t counter;     // Counter menurun terus (misal 7-bit, 0x40 - 0x7F)
+    uint8_t window;      // Batas atas jendela waktu yang diizinkan (misal 0x5F)
+    bool reset_triggered;
+} WindowWatchdog;
+
+void wwdg_feed_safe(WindowWatchdog *wdg, uint8_t reload_val) {
+    // Jika counter masih di atas batas jendela 'window', pemberian makan dianggap ILEGAL!
+    // Ini menandakan program berjalan terlalu cepat di luar jadwal normal
+    if (wdg->counter > wdg->window) {
+        wdg->reset_triggered = true;
+        printf("HARDWARE RESET: Watchdog fed TOO EARLY! (Abnormal execution loop detected)\n");
+        return;
+    }
+    
+    // Jika counter jatuh di bawah 0x40, waktu habis (Timeout)
+    if (wdg->counter < 0x40) {
+        wdg->reset_triggered = true;
+        printf("HARDWARE RESET: Watchdog fed TOO LATE! (Software starvation timeout)\n");
+        return;
+    }
+    
+    // Pemberian makan sah hanya jika berada di dalam jendela waktu yang tepat:
+    // [0x40 <= counter <= window]
+    wdg->counter = reload_val;
+    printf("Watchdog fed safely within legal execution window.\n");
+}
+```
+
+- **Evolusi Desain Watchdog Modern (Windowed & Challenge-Response WDT)**: Untuk mencegah program abnormal yang terus me-refresh watchdog, rekayasa keandalan modern mewajibkan dua arsitektur: 1) *Windowed Watchdog Timer* (WWDG) yang hanya menerima penyegaran di dalam jendela waktu yang sangat spesifik (menolak refresh yang terlalu awal maupun terlalu lambat); 2) *Challenge-Response Watchdog* eksternal terpisah (seperti chip otomotif TI TPS65381) yang mengirimkan tantangan matematika kriptografi acak ke prosesor secara berkala, memastikan bahwa bukan hanya CPU yang hidup, melainkan seluruh algoritma fungsional dan logika kendali berjalan dalam keadaan sehat.
 
 ## 6. Proyek Latihan & Rubrik Penilaian Mandiri
 ### Tingkat 1 (Pemula) - Inisialisasi Bare-Metal Independent Watchdog (IWDG)
@@ -107,6 +166,38 @@ Rancang sistem pengawas kesehatan tugas lengkap (*Task Watchdog Supervisor*) unt
 - **40% Ketepatan Konfigurasi Hardware WDT**: Perhitungan register prescaler, reload, dan sekuens kode kunci pengaktifan akurat.
 - **30% Arsitektur Pengawasan Bebas Titik Kegagalan Tunggal**: Menghindari pemberian makan watchdog di dalam ISR dan memverifikasi kesehatan seluruh task secara komprehensif.
 - **30% Manajemen Pasca-Kegagalan (Post-Mortem Handling)**: Pencatatan diagnosis penyebab reset dan pembersihan bendera status reset hardware bekerja sempurna.
+
+### Tingkat 1: Dasar
+- **Tugas**: Bangun modul pengatur waktu pengawas sederhana (Independent Watchdog Timer / IWDG) dalam C/Python yang menghitung periode timeout berdasarkan frekuensi clock osilator resistif internal (LSI 32 kHz) dan nilai prescaler pembagi jam serta nilai reload counter 12-bit.
+- **Petunjuk Perancangan Arsitektur**:
+  - $T_{timeout} = \frac{Prescaler \times (Reload + 1)}{f_{LSI}}$.
+  - Patuhi batas nilai prescaler standar (pembagi 4, 8, 16, 32, 64, 128, 256).
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Timeout 1 Detik pada $32\text{ kHz}$*: Tentukan kombinasi nilai $Prescaler = 64$ dan $Reload = 499$; verifikasi $T = 1.000\text{ detik}$.
+  - *Kondisi Waktu Habis*: Simulasikan loop macet tanpa pemanggilan fungsi penyegaran `iwdg_refresh()`; buktikan watchdog membangkitkan sinyal reset perangkat keras tepat pada $1.0\text{ detik}$.
+- **Rubrik Penilaian Mandiri**: 40% Formulasi Perhitungan Waktu Timeout IWDG Presisi, 30% Penanganan Prescaler & Register Reload Tepat, 30% Verifikasi Pemicuan Reset Sistem Saat Waktu Habis.
+
+### Tingkat 2: Menengah
+- **Tugas**: Implementasikan simulator Windowed Watchdog Timer (WWDG) yang memodelkan batas jendela atas (*Window Threshold*) dan batas bawah (*Timeout Threshold*), uji perilaku sistem di bawah tiga skenario pengujian: penyegaran sah di dalam jendela waktu, penyegaran prematur yang terlalu cepat (*early refresh violation*), dan keterlambatan penyegaran (*late starvation timeout*).
+- **Petunjuk Perancangan Arsitektur**:
+  - Waktu jendela buka: $t_{open} = \frac{Counter_{init} - Window}{f_{clk}}$.
+  - Waktu jendela tutup: $t_{close} = \frac{Counter_{init} - 0x3F}{f_{clk}}$.
+  - Validasi bahwa pemanggilan fungsi `wwdg_refresh()` sebelum $t_{open}$ atau setelah $t_{close}$ langsung memicu reset perangkat keras.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Refresh Terlalu Cepat*: Panggil penyegaran saat waktu baru berjalan $20\%$ dari periode; sistem harus membangkitkan reset darurat (*early feed fault*).
+  - *Refresh Sah*: Panggil penyegaran tepat di tengah jendela ($70\%$ periode); sistem harus menerima pembaruan dan mereset counter dengan aman.
+- **Rubrik Penilaian Mandiri**: 40% Logika Verifikasi Jendela Waktu WWDG Tepat, 30% Deteksi Pelanggaran Early Feed & Late Starvation Presisi, 30% Analisis Toleransi Jendela Waktu Operasi.
+
+### Tingkat 3: Mahir
+- **Tugas**: Rancang arsitektur pemantau kesehatan multi-task terpusat (*Cooperative Multi-Task Watchdog Supervisor*) untuk sistem RTOS dengan 5 task konkuren, di mana setiap task wajib melapor dan memperbarui bit tanda tangan (*heartbeat token / checkpoint flag*) secara teratur di dalam batas waktu masing-masing, dan modul supervisor hanya akan menyegarkan watchdog perangkat keras jika dan hanya jika seluruh 5 task terbukti sehat dan tidak ada task yang mengalami starvation atau deadlock.
+- **Petunjuk Perancangan Arsitektur**:
+  - Setiap task memiliki batas waktu toleransi maksimum $T_{max}(i)$ dan register status aliveness `task_token_mask`.
+  - Supervisor task berjalan periodik memeriksa apakah seluruh bitmask task bernilai lengkap: `if (token_mask == ALL_TASKS_OK) { refresh_hardware_watchdog(); token_mask = 0; }`.
+  - Jika satu task macet memegang mutex atau terjebak dalam infinite loop, bitmask task tersebut tidak akan pernah terisi, menyebabkan supervisor sengaja membiarkan watchdog me-reset seluruh sistem.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Operasi Normal 5-Task*: Seluruh task melaporkan token tepat waktu; watchdog perangkat keras disegarkan secara stabil kontinu.
+  - *Simulasi Task Prioritas Rendah Macet*: Injeksi kebuntuan pada Task 4; buktikan supervisor mendeteksi token Task 4 hilang, menghentikan penyegaran watchdog, dan membiarkan sistem me-reboot secara bersih.
+- **Rubrik Penilaian Mandiri**: 40% Arsitektur Multi-Task Watchdog Supervisor Presisi, 30% Pengawasan Berbasis Token Bitmask Kolektif Bebas False-Positive, 30% Pembuktian Penanganan Kegagalan Parsial Task Tunggal.
 
 ## 7. Rekomendasi Sumber Belajar Standar Emas
 | Kategori | Judul Sumber & Tautan Langsung | Deskripsi Singkat |

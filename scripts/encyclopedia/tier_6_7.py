@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
 """
 Tier 6 & Tier 7 Aggregated Knowledge Base
-Covers Topics 88 - 124 (Systems Programming, Data Structures, Algorithms, Linux OS Internals & Compilers)
+Covers Topics 88 - 124 (CS Core, Data Structures, Algorithms, Compilers & Linux OS Internals)
+Canonical realignment applied via CANONICAL_TIERS_6_11.
 """
 
-from scripts.encyclopedia.tier_6_part1 import DATA_TIER_6_PART1
-from scripts.encyclopedia.tier_6_part2 import DATA_TIER_6_PART2
-from scripts.encyclopedia.tier_7_part1 import DATA_TIER_7_PART1
-from scripts.encyclopedia.tier_7_part2 import DATA_TIER_7_PART2
+from scripts.encyclopedia.canonical_tiers_6_11 import CANONICAL_TIERS_6_11
 
-DATA_TIER_6_7 = {}
-DATA_TIER_6_7.update(DATA_TIER_6_PART1)
-DATA_TIER_6_7.update(DATA_TIER_6_PART2)
-DATA_TIER_6_7.update(DATA_TIER_7_PART1)
-DATA_TIER_6_7.update(DATA_TIER_7_PART2)
+DATA_TIER_6_7 = {
+    tid: CANONICAL_TIERS_6_11[tid]
+    for tid in range(88, 125)
+    if tid in CANONICAL_TIERS_6_11
+}

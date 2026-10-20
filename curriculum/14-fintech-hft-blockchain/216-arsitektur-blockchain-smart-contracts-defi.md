@@ -6,8 +6,10 @@
 ---
 
 ## 1. Intuisi Dasar Tanpa Jargon ("Seperti Bayi Baru Lahir")
+### 1.1 Konsep Inti & Analogi Tanpa Jargon
 Bagaimana sekelompok orang asing di seluruh dunia yang tidak saling mengenal dan tidak saling mempercayai bisa bersama-sama menyepakati satu buku besar keuangan tunggal tanpa ada bank, presiden, polisi, atau server pusat yang mengaturnya?
 
+### 1.2 Urgensi Rekayasa & Signifikansi Sistemik
 Satoshi Nakamoto memecahkan teka-teki legendaris ilmu komputer ini (**Masalah Para Jenderal Bizantium / Byzantine Generals Problem**) melalui penemuan **Blockchain & Konsensus Proof-of-Work (PoW)** ([Nakamoto - Bitcoin: A Peer-to-Peer Electronic Cash System](https://bitcoin.org/bitcoin.pdf)).
 
 Bayangkan sebuah buku kas raksasa di mana setiap halaman buku (*blok*) berisi daftar ratusan transaksi keuangan. Untuk mengunci halaman tersebut agar tidak ada yang bisa memalsukannya:
@@ -18,8 +20,10 @@ Bayangkan sebuah buku kas raksasa di mana setiap halaman buku (*blok*) berisi da
 Vitalik Buterin kemudian memperluas ide ini menjadi **Ethereum Virtual Machine (EVM)**: tidak hanya mencatat angka transfer uang, blockchain bisa menjalankan kode program komputer abadi yang tidak bisa dimatikan oleh siapa pun (**Smart Contracts & DeFi**) ([Buterin - Ethereum Whitepaper](https://ethereum.org/en/whitepaper/)).
 
 ## 2. Fondasi Teoretis & Aksiomatik / Matematis
+### 2.1 Kerangka Teori Aksiomatik & Formulasi Matematis
 Formulasi Kriptografi Blockchain & Keuangan Terdesentralisasi:
 
+### 2.2 Penurunan Matematis Langkah-demi-Langkah
 1. **Struktur Rantai Hash Monotonik & Pohon Merkle**:
 Blok ke-$k$ didefinisikan sebagai tuple $\langle H_{k-1}, \text{MerkleRoot}, \text{Timestamp}, \text{Nonce}, \text{Transactions} \rangle$.
 Pohon Merkle mengagregasikan $N$ transaksi secara hierarkis berpasangan via fungsi hash satu arah SHA-256:
@@ -59,6 +63,15 @@ flowchart TD
 ```
 
 EVM beroperasi sebagai mesin status Turing-Complete kuasi-deterministik: setiap instruksi komputasi mengenakan biaya bahan bakar (*Gas*) yang harus dibayar pengirim, menyelesaikan masalah *Halting Problem* secara elegan (program dengan infinite loop akan mati kehabisan gas secara otomatis) ([Wood - Ethereum Yellow Paper](https://ethereum.github.io/yellowpaper/paper.pdf)).
+
+#### Tabel Penelusuran Eksploitasi Reentrancy Kontrak Pintar The DAO di Jaringan Ethereum
+| Timestamp / Sequence ID | Komponen / Lapisan Sistem | Pesan Masuk (FIX / Transaksi) | Operasi Antrean / Komputasi Buku | State Buku Pesanan (LOB / Ledger) | Event Terpancar (Fill / Block Emit) |
+|---|---|---|---|---|---|
+| 17 Jun 2016 (Blok #1718497) | Smart Contract The DAO | Transaksi Penarikan Dana Penyerang | Penyerang memanggil fungsi `withdrawRewardFor()` | Saldo Ether The DAO: 12 Juta ETH (\$150 Miliar) | Penyerang menyiapkan kontrak penyerang eksploit |
+| Pemanggilan Eksternal Cacat | Eksekusi EVM Opcode `CALL` | DAO mengirim dana via `msg.sender.call.value()` | Eksekusi berpindah ke kontrak penyerang SEBELUM saldo di-nolkan! | Saldo penyerang di memori state DAO masih tercatat penuh | Pelanggaran pola Checks-Effects-Interactions! |
+| Pemanggilan Ulang Rekursif | Fungsi Fallback Kontrak Penyerang | Kontrak penyerang memanggil kembali `withdrawRewardFor()` | EVM mengeksekusi reentrant call; saldo dicek kembali dan masih ada! | DAO mengirim transfer dana kedua kalinya! | Loop reentrancy bersarang menguras brankas kontrak |
+| 30 Iterasi Rekursi Per Blok | Mesin Virtual Ethereum (EVM) | Pengurasan saldo tanpa mendebit catatan buku besar | Saldo internal baru didebit setelah seluruh pemanggilan selesai | Saldo penyerang akhirnya di-nolkan, tapi uang sudah lenyap! | Penyerang menguras 3,6 Juta Ether (\$60 Juta) |
+| Garpu Keras (Hard Fork) | Komunitas Pengembang Ethereum | Proposal Pemulihan Dana Korban | Rollback keadaan rantai blok melalui Hard Fork darurat | Rantai blok terbelah dua: Ethereum (ETH) & Ethereum Classic (ETC) | Peristiwa pemisahan konsensus blockchain paling dramatis! |
 
 ## 4. Implementasi Praktis & Kode / Simulasi Riil
 ```python
@@ -120,6 +133,70 @@ print(f"Slippage / Price Impact: {slippage:.2f}%")
 ## 5. Miskonsepsi & Jebakan Industri
 *Kerentanan Serangan Reentrancy pada Smart Contract (Bencana The DAO)*: Dalam kode Solidity, jika kontrak mentransfer koin ether ke alamat pengguna eksternal sebelum memperbarui catatan saldo internalnya (`msg.sender.call{value: amount}("")`), kontrak penerima yang jahat dapat menulis fungsi fallback yang memanggil kembali fungsi penarikan tersebut (*re-entrant call*) secara rekursif sebelum saldo berkurang, menguras seluruh dana kas kontrak. Selalu terapkan pola desain **Checks-Effects-Interactions** atau gunakan ReentrancyGuard mutex ([Atzei et al. - A Survey of Attacks on Ethereum Smart Contracts](https://link.springer.com/chapter/10.1007/978-3-662-54455-6_8)).
 
+### Studi Kasus Kegagalan Nyata: Eksploitasi Serangan Reentrancy Smart Contract The DAO ($60 Juta Ether Drained, Juni 2016)
+- **Kronologi & Konteks Sejarah**: Pada tanggal 17 Juni 2016, sebuah organisasi otonom terdesentralisasi perintis di jaringan Ethereum, *The DAO*—yang berhasil mengumpulkan 14% dari seluruh sirkulasi Ether di dunia (senilai $150 Juta pada saat itu)—dibobol oleh peretas tak dikenal yang berhasil menyedot lebih dari 3,6 Juta ETH (senilai $60 Juta) ke dalam sebuah kontrak *Dark DAO* anak. Skandal eksploitasi ini memicu perdebatan moral filosofis dan teknis yang sengit di komunitas blockchain global hingga berujung pada keputusan kontroversial pelaksanaan *Hard Fork* darurat yang membelah blockchain menjadi dua rantai terpisah: **Ethereum (ETH)** dan **Ethereum Classic (ETC)**.
+- **Akar Masalah Rekayasa Smart Contract & Pelanggaran Pola Checks-Effects-Interactions**: Kerentanan The DAO terletak pada urutan logika eksekusi fungsi penarikan dana reward (*withdraw*). Kontrak pintar mentransfer dana mata uang Ether ke alamat pemanggil menggunakan instruksi tingkat rendah `msg.sender.call.value(amount)()` *sebelum* mengurangi saldo internal akun pemanggil (`balances[msg.sender] = 0`). Dalam arsitektur Ethereum Virtual Machine (EVM), ketika pemanggilan eksternal mentransfer Ether ke alamat kontrak lain, kontrol eksekusi CPU EVM diserahkan sepenuhnya ke fungsi penerima bawaan (*Fallback / Receive Function*) dari kontrak penerima tersebut. Penyerang menyusun kontrak berbahaya yang di dalam fungsi fallback-nya memanggil ulang (*re-enter*) fungsi penarikan dana DAO secara rekursif. Karena status saldo internal belum sempat diperbarui, pemeriksaan kondisi saldo (`require(balances[msg.sender] > 0)`) selalu lolos, memungkinkan penyerang menguras saldo kas brankas DAO puluhan kali lipat dalam satu transaksi tunggal.
+
+- **Potongan Kode / Arsitektur Cacat (Vulnerable Implementation)**:
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+// REKONSTRUKSI CACAT KONTRAK THE DAO (Reentrancy Vulnerability)
+contract VulnerableDAOBank {
+    mapping(address => uint256) public balances;
+
+    function deposit() external payable {
+        balances[msg.sender] += msg.value;
+    }
+
+    // FUNGSI CACAT ASLI: Mentransfer dana SEBELUM memperbarui state saldo!
+    function withdrawAllFunds() external {
+        uint256 balance = balances[msg.sender];
+        require(balance > 0, "Saldo tidak mencukupi");
+
+        // 1. PANGGILAN EKSTERNAL KE ALAMAT PENYERANG:
+        // Kontrol eksekusi EVM berpindah ke kontrak penyerang!
+        (bool success, ) = msg.sender.call{value: balance}("");
+        require(success, "Transfer gagal");
+
+        // 2. PEMBARUAN STATE TERLAMBAT (CACAT FATAL):
+        // Baris ini TIDAK PERNAH TERCAPAI karena penyerang memanggil ulang fungsi di atas!
+        balances[msg.sender] = 0;
+    }
+}
+
+// MITIGASI RESMI: Pola Checks-Effects-Interactions & Mutex ReentrancyGuard
+abstract contract ReentrancyGuard {
+    uint256 private _status = 1; // 1: NOT_ENTERED, 2: ENTERED
+    modifier nonReentrant() {
+        require(_status != 2, "REENTRANCY_DETECTED: Panggilan berulang ditolak!");
+        _status = 2; // Kunci mutex
+        _;
+        _status = 1; // Lepas kunci
+    }
+}
+
+contract SecureDAOBank is ReentrancyGuard {
+    mapping(address => uint256) public balances;
+
+    function withdrawSecure() external nonReentrant {
+        // 1. CHECKS: Validasi kondisi
+        uint256 amount = balances[msg.sender];
+        require(amount > 0, "Saldo kosong");
+
+        // 2. EFFECTS: Mutasi state internal terlebih dahulu SEBELUM interaksi eksternal!
+        balances[msg.sender] = 0;
+
+        // 3. INTERACTIONS: Transfer dana dilakukan paling akhir
+        (bool success, ) = msg.sender.call{value: amount}("");
+        require(success, "Transfer gagal");
+    }
+}
+```
+
+- **Analisis Forensik & Rekayasa Modern**: Tragedi The DAO menjadi fondasi standar rekayasa perangkat lunak keamanan smart contract: (1) Penerapan wajib pola desain **Checks-Effects-Interactions (CEI)** di mana pembaruan variabel state internal wajib diselesaikan sebelum melakukan transfer dana atau pemanggilan eksternal; (2) Penggunaan pengunci mutex bawaan teruji seperti modul OpenZeppelin **`ReentrancyGuard` (`nonReentrant` modifier)**; (3) Integrasi alat analisis statis dan deteksi simbolik bytecode otomatis (**Slither, Mythril, Securify**) dalam pipeline CI/CD sebelum deployment kontrak ke mainnet; (4) Menghindari pemanggilan eksternal raw `.call.value()` yang meneruskan seluruh gas, dan menggantinya dengan pola penarikan berbasis pull (*Pull-over-Push Payment Pattern*).
+
 ## 6. Proyek Latihan & Rubrik Penilaian Mandiri
 ### Level 1 (Pemula)
 Tulis simulasi algoritma penambangan konsensus Proof-of-Work (PoW) sederhana di Python: terima data string blok, lakukan hashing berulang dengan incrementing nonce hingga menemukan hash SHA-256 yang diawali oleh 4 karakter nol ("0000"), dan catat total iterasi serta waktu komputasi yang dibutuhkan.
@@ -132,6 +209,48 @@ Implementasikan struktur Pohon Merkle lengkap beserta fungsi pembuatan bukti aud
 ### Level 3 (Mahir)
 Bangun smart contract Automated Market Maker (AMM) Uniswap v2 mini menggunakan bahasa Solidity atau simulator komputasional Python lengkap: implementasikan fungsi penambahan likuiditas (`mint` LP Token berbasis $\sqrt{x \cdot y}$), fungsi penghapusan likuiditas (`burn`), dan fungsi pertukaran (`swap`) dengan proteksi reentrancy lock.
 *Rubrik*: Invarian produk konstan terverifikasi meningkat secara monotonik akibat akumulasi fee transaksi.
+
+### Tingkat 1: Dasar
+- **Tugas**: Tulis kontrak pintar Solidity mini (`Vault.sol`) yang menerima deposit Ether dan mengimplementasikan fungsi penarikan dana yang aman dari serangan Reentrancy dengan mematuhi pola desain Checks-Effects-Interactions (CEI) secara ketat.
+- **Petunjuk Perancangan Arsitektur**:
+  - Simpan saldo pengguna dalam `mapping(address => uint256) public balances`.
+  - Pada fungsi `withdraw(uint256 amount)`: (1) `require(balances[msg.sender] >= amount)`; (2) Kurangkan saldo: `balances[msg.sender] -= amount`; (3) Kirim Ether: `(bool sent, ) = msg.sender.call{value: amount}("")`.
+  - Tulis tes unit pengujian yang membuktikan bahwa saldo akun terdebit dengan benar.
+- **Test Vector & Kasus Uji**:
+  - Pengguna mendepositokan 5 Ether, lalu menarik 2 Ether.
+  - Saldo yang tercatat di pemetaan internal harus bernilai tepat 3 Ether, dan saldo dompet pengguna bertambah 2 Ether.
+- **Rubrik Penilaian Objektif**:
+  - Skor 100%: Kode Solidity valid, urutan pola CEI presisi, penanganan transfer aman.
+  - Skor 50%: Menulis transfer sebelum pengurangan saldo tanpa pengunci mutex (rentan reentrancy).
+  - Skor 0%: Menggunakan fungsi `send()` atau `transfer()` usang yang memiliki batasan gas 2300 tanpa penanganan status kegagalan.
+
+### Tingkat 2: Menengah
+- **Tugas**: Bangun kontrak pintar penyerang (*Attacker.sol*) dalam Solidity yang menyimulasikan eksploitasi Reentrancy terhadap kontrak bank yang rentan: Fungsi `attack()` menyetor 1 Ether, memicu fungsi penarikan pertama, dan di dalam fungsi `receive() external payable`, panggil ulang fungsi penarikan target hingga saldo brankas bank habis terkuras.
+- **Petunjuk Perancangan Arsitektur**:
+  - Simpan alamat kontrak target yang rentan sebagai variabel state.
+  - Pada fungsi `receive()`: Periksa apakah `address(target).balance >= 1 ether`. Jika ya, panggil kembali `target.withdraw()`.
+  - Hentikan pemanggilan rekursif jika saldo target habis, lalu transfer seluruh Ether hasil curian ke dompet peretas.
+- **Test Vector & Kasus Uji**:
+  - Uji di lingkungan Foundry atau Hardhat lokal: Bank memiliki 10 Ether dari korban lain.
+  - Penyerang mendepositokan 1 Ether dan mengeksekusi `attack()`: Saldo bank harus terkuras menjadi 0 Ether, dan saldo penyerang bertambah menjadi 11 Ether dalam 1 transaksi tunggal.
+- **Rubrik Penilaian Objektif**:
+  - Skor 100%: Eksploitasi reentrancy berhasil menguras saldo target secara deterministik, penanganan kondisi berhenti rekursi rapi.
+  - Skor 50%: Reentrancy terpicu namun terjebak out-of-gas karena lupa menyetel kondisi penghenti pada fungsi receive.
+  - Skor 0%: Kontrak penyerang tidak memiliki fungsi fallback/receive.
+
+### Tingkat 3: Mahir
+- **Tugas**: Rancang detektor kerentanan Reentrancy statis otomatis (*Static AST Reentrancy Scanner*) dalam Python yang membaca Abstract Syntax Tree (AST) berkas kontrak pintar Solidity (hasil ekspor `solc --ast-compact-json`): Pindai seluruh fungsi publik/eksternal, identifikasi apakah terdapat pemanggilan fungsi eksternal tingkat rendah (`call`, `transfer`, `send`) yang mendahului instruksi pembaruan variabel state penyimpanan (`Assignment` ke `StateVariable / IndexAccess`), dan laporkan potensi celah Reentrancy dengan nomor baris kode presisi.
+- **Petunjuk Perancangan Arsitektur**:
+  - Bangun penelusuran graf aliran kontrol (*Control Flow Graph / CFG*) fungsi.
+  - Tandai simpul AST: Simpul `ExternalCall` vs Simpul `StateMutation`.
+  - Jika path eksekusi menemui simpul `ExternalCall` sebelum `StateMutation` pada fungsi yang tidak memiliki modifier `nonReentrant`, tandai sebagai `CRITICAL_REENTRANCY_VULNERABILITY`.
+- **Test Vector & Kasus Uji**:
+  - Masukkan AST kontrak rentan (The DAO): Scanner harus menandai baris panggilan eksternal sebagai kerentanan kritis.
+  - Masukkan AST kontrak aman (dengan pola CEI atau modifier nonReentrant): Scanner harus menyatakan kontrak aman tanpa false positive.
+- **Rubrik Penilaian Objektif**:
+  - Skor 100%: Analisis AST presisi, deteksi pola urutan CEI akurat, verifikasi modifier nonReentrant tepat.
+  - Skor 50%: Menggunakan pencarian string regex sederhana alih-alih inspeksi pohon sintaksis AST JSON.
+  - Skor 0%: Gagal membedakan antara variabel lokal memori dan variabel state penyimpanan blockchain.
 
 ## 7. Rekomendasi Sumber Belajar Standar Emas
 | Sumber Pembelajaran | Penulis / Institusi | Tautan Langsung | Fokus Materi |

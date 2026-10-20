@@ -6,112 +6,191 @@
 ---
 
 ## 1. Intuisi Dasar Tanpa Jargon ("Seperti Bayi Baru Lahir")
-Bahasa pemrograman tingkat tinggi adalah ilusi yang nyaman; prosesor komputer tidak pernah membaca bahasa C, Rust, atau Python. Di dasar terdalam komputasi, prosesor x86-64 atau ARM64 hanyalah sebuah mesin status raksasa yang membaca kata-kata instruksi assembly biner: mengambil nilai dari register silikon, menjumlahkannya di ALU, dan menulis hasilnya kembali ke alamat memori fisik. Pemrograman Assembly Lanjut ([x86-64 & ARM64 Assembly](https://www.felixcloutier.com/x86/)) adalah kemampuan melihat dunia digital tanpa kaca mata ilusi: memahami bagaimana fungsi memanggil fungsi lain melalui standar Application Binary Interface (ABI), bagaimana tumpukan memori (Call Stack) dibangun dan dihancurkan frame demi frame, serta bagaimana instruksi vektor SIMD mampu memproses delapan bilangan floating-point secara paralel dalam tepat satu siklus denyut clock.
+### 1.1 Konsep Inti & Analogi Tanpa Jargon
+Selama empat dekade, dunia rekayasa perangkat lunak sistem terjebak dalam dilema abadi: Anda memilih C/C++ untuk kecepatan maksimal dengan konsekuensi mimpi buruk bug memori liar dan eksploitasi hacker, atau Anda memilih Java/Go/Python untuk keamanan memori dengan beban berat pengumpul sampah (Garbage Collector) yang menghentikan sistem sewaktu-waktu. Rekayasa Bahasa Rust ([The Rust Programming Language](https://doc.rust-lang.org/book/)) menghancurkan kompromi tersebut melalui sistem jenis yang revolusioner: **Ownership (Kepemilikan), Borrowing (Peminjaman), dan Lifetimes (Masa Hidup)**. Kompilator Rust (`rustc`) bertindak sebagai pengawas matematis yang sangat teliti pada saat kompilasi (*Borrow Checker*). Ia menjamin keamanan memori mutlak, mencegah data race pada multithreading, dan melenyapkan null pointer tanpa memerlukan Garbage Collector sama sekali. Kecepatan C dengan keamanan matematis!
+
+### 1.2 Urgensi Rekayasa & Signifikansi Sistemik
+Dalam rekayasa sistem modern, pemahaman mendalam tentang konsep ini membedakan arsitek sistem kelas dunia dari sekadar operator perkakas teknis.
 
 ## 2. Fondasi Teoretis & Aksiomatik / Matematis
-Konvensi Pemanggilan Fungsi Standar (Application Binary Interface / ABI Calling Conventions):
+### 2.1 Kerangka Teori Aksiomatik & Formulasi Matematis
+Aturan Aksiomatik Sistem Kepemilikan dan Peminjaman Rust (Affine Type System):
 
-Perbandingan Register Argumen dan Alur Panggilan antara System V AMD64 (Linux/macOS) dan Microsoft x64 (Windows):
+### 2.2 Penurunan Matematis Langkah-demi-Langkah
+1. **Hukum Kepemilikan (Ownership Invariants)**:
+   - Setiap nilai di memori memiliki tepat satu variabel pemilik (*owner*).
+   - Ketika variabel pemilik keluar dari cakupan (*scope*), nilai tersebut otomatis dihancurkan dan memori dibebaskan melalui trait `Drop`.
 
-$$\begin{array}{|l|c|c|}
-\hline
-\textbf{Parameter Fungsi} & \textbf{System V AMD64 (Linux)} & \textbf{Microsoft x64 (Windows)} \\
-\hline
-\text{Argumen Integer 1 s.d. 6} & \texttt{RDI, RSI, RDX, RCX, R8, R9} & \texttt{RCX, RDX, R8, R9 (4 Argumen)} \\
-\text{Argumen Floating-Point} & \texttt{XMM0 - XMM7} & \texttt{XMM0 - XMM3} \\
-\text{Nilai Kembalian (Return)} & \texttt{RAX, RDX (Int) / XMM0, XMM1} & \texttt{RAX / XMM0} \\
-\text{Shadow Space (Stack Home)} & \text{Tidak Ada (Ada Red Zone 128B)} & \text{Wajib 32 Byte di Atas Return Addr} \\
-\text{Callee-Saved Registers} & \texttt{RBX, RSP, RBP, R12-R15} & \texttt{RBX, RBP, RDI, RSI, RSP, R12-R15} \\
-\text{Penyelarasan Stack Frame} & 16\text{-byte boundary sebelum } \texttt{CALL} & 16\text{-byte boundary} \\
-\hline
-\end{array}$$
+2. **Hukum Peminjaman dan Aliasing XOR Mutability (Borrow Checker Rule)**:
+   Pada sembarang waktu dan sembarang lokasi memori $M$, Anda diizinkan memiliki:
+   $$\text{Bisa: } N \times \&T \quad (\text{Banyak referensi immutable pembaca})$$
+   $$\underline{\text{ATAU}} \quad 1 \times \&\text{mut } T \quad (\text{Tepat satu referensi mutable penulis})$$
+   $$\text{TIDAK BISA: } \&T \land \&\text{mut } T \quad (\text{Dilarang keras aliasing bersamaan dengan mutabilitas!})$$
 
-Struktur Stack Frame Standar:
-$$\texttt{push rbp} \implies \texttt{mov rbp, rsp} \implies \texttt{sub rsp, FrameSize}$$
-Pembongkaran Frame:
-$$\texttt{mov rsp, rbp} \implies \texttt{pop rbp} \implies \texttt{ret} \quad (\text{ekuivalen dengan instruksi } \texttt{leave; ret})$$
+Formulasi Lifetimes Matematis:
+Jika referensi $R$ dengan lifetime `'a` menunjuk ke data $D$ dengan lifetime `'b`, kompilator menegakkan relasi subtipe lifetime:
+$$'b \supseteq 'a \quad (\text{Data } D \text{ harus hidup minimal selama referensi } R \text{ masih ada})$$
 
 ## 3. Anatomi Teknis & Cara Kerja Internal
-Anatomi Eksekusi Stack Frame x86-64 saat Panggilan Fungsi (Calling Convention ABI):
+Representasi Memori Tipe Standar Rust (`String`, `&str`, dan Fat Pointer Slices):
 
 ```mermaid
 graph TD
-subgraph Call Stack Memory Layout High to Low Address
-A[Stack Argument 7 dst (Push oleh Caller)] --> B[Return Address (Disimpan otomatis oleh CALL)]
-B --> C[Saved Frame Pointer RBP (Push oleh Callee)]
-C --> D[Local Variables & Callee-Saved Regs (RSP points here)]
-D --> E[Red Zone 128 Bytes: Ruang aman tanpa clobber di bawah RSP Linux AMD64]
+subgraph Rust String: Owned on Stack 24-Bytes
+A[ptr: Pointer ke Heap] --> D[Heap Buffer: 'H', 'e', 'l', 'l', 'o']
+B[cap: Kapasitas Alokasi (misal 8)]
+C[len: Panjang Karakter (5)]
+end
+subgraph Rust &str: Borrowed Slice Fat-Pointer 16-Bytes
+E[ptr: Pointer ke Substring] --> D
+F[len: Panjang Slice (misal 3)]
+end
+subgraph Trait Object dyn Trait: Dynamic Dispatch
+G[data_ptr: Pointer ke Data Struktur]
+H[vtable_ptr: Pointer ke Tabel Fungsi Virtual]
 end
 ```
 
-1. **Red Zone (System V AMD64)**: Area 128 byte tepat di bawah pointer `%rsp` dialokasikan sebagai zona bebas untuk fungsi daun (*leaf functions*) menyimpan variabel lokal tanpa perlu memodifikasi `%rsp`. Sinyal OS atau interupsi tidak boleh menimpa zona ini ([x86-64 System V ABI](https://gitlab.com/x86-psABIs/x86-64-ABI)).
-2. **ARM64 (AArch64) Register File**: Menggunakan 31 register serbaguna 64-bit ($X0 - X30$). Parameter fungsi dilewatkan melalui $X0 - X7$. Alamat return disimpan di Link Register ($X30 / LR$), sehingga pemanggilan fungsi daun tidak perlu mengakses memori RAM sama sekali.
+1. **Blok `unsafe` di Rust**: Rust tidak melarang akses memori tingkat rendah; Rust mengisolasi operasi berbahaya (seperti dereference raw pointer `*const T`, pemanggilan fungsi FFI C, atau manipulasi register hardware) di dalam blok eksplisit `unsafe { ... }`. Batas keamanan tetap terjaga karena pembungkus aman (*safe abstraction*) membungkus kode tidak aman tersebut ([The Rustonomicon](https://doc.rust-lang.org/nomicon/)).
+2. **Fearless Concurrency**: Trait bawaan `Send` (data dapat dipindahkan kepemilikannya antar thread) dan `Sync` (referensi data dapat diakses bersamaan oleh banyak thread secara aman) otomatis diimplementasikan oleh kompilator jika seluruh anggota tipe memenuhinya.
+
+#### Tabel Penelusuran State Mesin Order Routing Knight Capital (Pemicu Kerugian $440 Juta)
+| Siklus Waktu (Detik) | State Feature Flag | Aliran Logika Fungsi `route_order()` | Tindakan Eksekusi Pasar | Akumulasi Saham Terbeli | Status Finansial Perusahaan |
+|---|---|---|---|---|---|
+| $t = 0\text{ s}$ | `FLAG_POWER_ON` | Evaluasi flag usang: Aktif! | Memasuki blok dead code pengujian 2003 | 0 Lembar Saham | Kas normal, pasar buka 09:30 |
+| $t = 1\text{ s}$ | Dead Code Active | Loop tanpa batas harga batas (*no limit price*) | Membeli 212 saham per transaksi agresif | 4.000 Lembar | Mengirim order buy di atas offer |
+| $t = 60\text{ s}$ | Rapid Fire Loop | Pengecekan kuota terpenuhi diabaikan | Mengirim ribuan order pasar per detik | 250.000 Lembar | Posisi modal mulai defisit |
+| $t = 2700\text{ s}$ (45 min) | Tidak ada Kill Switch | 4 juta eksekusi order agresif | Memborong 397 juta saham di 154 emiten | 397.000.000 Lembar | Rugi $440 Juta! Modal perusahaan kolaps |
+| Mitigasi Desain | Immutable State | State Machine Tervalidasi | Enforce Circuit Breaker & Dead-code removal | Order ditolak saat batas limit terlewati | Sistem trading aman dari perilaku anomali |
 
 ## 4. Implementasi Praktis & Kode / Simulasi Riil
-```nasm
-; Fast Vector Dot Product Implementation in Pure x86-64 Assembly (NASM Syntax)
-; System V AMD64 Calling Convention:
-; double dot_product_avx(const double *a, const double *b, uint64_t n);
-; Input: RDI = pointer a, RSI = pointer b, RDX = length n
-; Output: XMM0 = result double
+```rust
+// Safe Concurrency and Zero-Cost Abstractions in Rust
+use std::sync::{Arc, Mutex};
+use std::thread;
 
-global dot_product_avx
-section .text
+#[derive(Debug)]
+struct SafeCounter {
+    value: u64,
+}
 
-dot_product_avx:
-    vxorpd ymm0, ymm0, ymm0      ; ymm0 = akumulator 4-lane double (0.0)
-    xor rcx, rcx                ; rcx = index i = 0
+fn main() {
+    // Arc (Atomic Reference Counting) + Mutex untuk berbagi state mutable antar thread secara aman
+    let counter = Arc::new(Mutex::new(SafeCounter { value: 0 }));
+    let mut handles = vec![];
 
-.loop_simd:
-    mov rax, rdx
-    sub rax, rcx
-    cmp rax, 4
-    jb .scalar_cleanup          ; Jika sisa elemen < 4, lompat ke scalar cleanup
+    for i in 0..10 {
+        let counter_clone = Arc::clone(&counter);
+        let handle = thread::spawn(move || {
+            // RAII Lock: lock dilepas secara otomatis saat variabel guard keluar dari scope
+            let mut guard = counter_clone.lock().expect("Mutex poisoned");
+            guard.value += 1;
+            println!("Thread {} incremented counter to {}", i, guard.value);
+        });
+        handles.push(handle);
+    }
 
-    vmovupd ymm1, [rdi + rcx*8] ; Muat 4 double dari array a ke ymm1
-    vmovupd ymm2, [rsi + rcx*8] ; Muat 4 double dari array b ke ymm2
-    vfmadd231pd ymm0, ymm1, ymm2 ; Fused Multiply-Add: ymm0 += ymm1 * ymm2
-    add rcx, 4
-    jmp .loop_simd
+    for handle in handles {
+        handle.join().unwrap();
+    }
 
-.scalar_cleanup:
-    ; Reduksi horizontal vektor ymm0 (4 double) menjadi skalar ganda
-    vextractf128 xmm1, ymm0, 1   ; Ekstrak 128-bit high ke xmm1
-    vaddpd xmm0, xmm0, xmm1      ; Jumlahkan high dan low lane (2 double tersisa)
-    vhaddpd xmm0, xmm0, xmm0     ; Jumlahkan kedua elemen xmm0 -> skalar final di lane 0
-
-.scalar_loop:
-    cmp rcx, rdx
-    jae .done
-    vmovsd xmm1, [rdi + rcx*8]
-    vmovsd xmm2, [rsi + rcx*8]
-    vmulsd xmm1, xmm1, xmm2
-    vaddsd xmm0, xmm0, xmm1
-    inc rcx
-    jmp .scalar_loop
-
-.done:
-    vzeroupper                   ; Bersihkan state register AVX untuk mencegah penalti SSE
-    ret                          ; Kembalikan hasil di register XMM0
+    let final_val = counter.lock().unwrap().value;
+    println!("Final Counter Value: {}", final_val);
+    assert_eq!(final_val, 10);
+}
 ```
 
 ## 5. Miskonsepsi & Jebakan Industri
-1. **Omitting `vzeroupper` after AVX Instructions**: Mengeksekusi instruksi AVX 256-bit lalu memanggil fungsi C standar tanpa mengeksekusi `vzeroupper`. CPU Intel akan mengalami penurunan performa parah (penalti clock hingga puluhan siklus) akibat konflik status transisi register antara AVX dan legacy SSE ([Intel 64 Optimization Reference Manual](https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html)).
-2. **Stack Alignment Violation Fault (GPF on SSE/AVX)**: Menginstruksikan `movaps` atau `vmovaps` (Aligned Move) pada alamat memori stack yang tidak rata dengan kelipatan 16 atau 32 byte. CPU akan langsung memicu General Protection Fault (#GP).
-3. **Clobbering Callee-Saved Registers without Restoring**: Memodifikasi register `%rbx`, `%rbp`, atau `%r12-%r15` pada subrutin assembly Anda tanpa melakukan `push` di awal dan `pop` di akhir. Ketika subrutin kembali, pemanggil (caller C) akan mengalami crash liar karena data internalnya terhapus.
+1. **Borrow Checker Lifetime Annotation Hell**: Mencoba menyimpan referensi pinjaman `&'a T` di dalam struct yang kompleks alih-alih mengambil kepemilikan nilai `T` atau menggunakan `Arc<T>`. Kode akan dipenuhi anotasi lifetime yang saling mengunci dan gagal dikompilasi saat struktur bertumbuh.
+2. **Deadlock akibat Penguncian Bersarang pada Mutex**: Mengambil lock Mutex B saat masih memegang lock Mutex A pada thread 1, sementara thread 2 mengambil lock Mutex A saat memegang lock Mutex B. Rust menjamin keamanan memori bebas race condition, tetapi tidak memvalidasi deadlock logika secara otomatis ([Rust Concurrency Guidelines](https://doc.rust-lang.org/book/ch16-00-concurrency.html)).
+3. **Creating Dangling Raw Pointers in Unsafe Code**: Mengonversi referensi Rust menjadi raw pointer `let raw = &val as *const i32;`, membiarkan `val` dihancurkan oleh compiler, lalu melakukan dereference `unsafe { *raw }`. Hal ini melanggar kontrak invariant Rust dan menghasilkan Undefined Behavior.
+
+### Studi Kasus Kegagalan Nyata: Bencana Finansial Knight Capital USD 440 Juta dalam 45 Menit (2012) Akibat Dead Code Reuse
+- **Kronologi & Konteks Sejarah**: Pada 1 Agustus 2012, Knight Capital Group, salah satu pelaku pasar modal terbesar di Amerika Serikat, mengaktifkan kode baru pada 8 server trading untuk program Retail Member Organization (RMO). Namun, tim deployment lupa memperbarui salah satu dari delapan server tersebut.
+- **Akar Masalah Paradigma & Feature Flag Zombie**: Sistem menggunakan kembali sebuah flag konfigurasi usang bernama `Power Peg`, yang awalnya digunakan pada tahun 2003 untuk pengujian pasar internal. Pada server yang tidak ter-update, kedatangan flag `Power Peg` yang aktif memicu eksekusi cabang logika lama yang seharusnya telah dihapus (*dead code*). Kode lama ini tidak memiliki batasan pemeriksaan jumlah maksimum order; fungsi tersebut masuk ke dalam loop tak berujung yang secara membabi buta membeli saham pada harga pasar tinggi dan menjualnya kembali pada harga rendah. Dalam 45 menit, sistem mengeksekusi 4 juta transaksi saham senilai 7 miliar dolar, menelan kerugian bersih 440 juta dolar dan membangkrutkan perusahaan.
+
+- **Potongan Kode / Arsitektur Cacat (Vulnerable Implementation)**:
+```cpp
+// Rekonstruksi Logika Fatal Dead Code Reuse Knight Capital (2012)
+struct OrderRequest {
+    int symbol_id;
+    int quantity;
+    bool enable_rmo; // Bit konfigurasi yang digunakan kembali
+};
+
+void process_order_flawed(const OrderRequest& req) {
+    if (req.enable_rmo) {
+        #ifdef LEGACY_TEST_CODE_2003
+        // CACAT FATAL: Dead code yang tertinggal di basis kode produksi
+        // Tanpa mekanisme circuit breaker dan batas akumulasi order!
+        while (has_market_liquidity()) {
+            send_aggressive_market_order(req.symbol_id, 100);
+            // Akumulasi order tanpa henti menyebabkan kerugian $10 juta per menit!
+        }
+        #else
+        execute_compliant_rmo_order(req);
+        #endif
+    }
+}
+
+// Mitigasi Defensif: Type-Safe State Machine & Explicit Feature Flags
+enum class FeatureState { Disabled, AuditMode, ProductionActive };
+
+void process_order_safe(const OrderRequest& req, FeatureState state) {
+    if (state != FeatureState::ProductionActive) {
+        return; // Fail-closed secara default
+    }
+    // Penegakan batas eksposur risiko statis dan dinamis
+    if (get_current_risk_exposure() > MAX_RISK_LIMIT_USD) {
+        trigger_emergency_kill_switch("RISK_LIMIT_EXCEEDED");
+        return;
+    }
+    execute_compliant_rmo_order(req);
+}
+```
+
+- **Analisis Forensik & Rekayasa Modern**: Bencana Knight Capital merupakan bukti nyata bahwa arsitektur perangkat lunak bukan sekadar masalah gaya penulisan, melainkan masalah kelangsungan bisnis. Industri kini mewajibkan: (1) Penghapusan mutlak *dead code* tanpa mempertahankan flag zombie; (2) Penerapan *circuit breakers* otomatis di lapisan perangkat keras dan perangkat lunak; (3) Deployment atomik terorkestrasikan yang menjamin integritas homogen pada seluruh kluster server.
 
 ## 6. Proyek Latihan & Rubrik Penilaian Mandiri
-1. **Tingkat Pemula**: Tuliskan subrutin assembly x86-64 mandiri yang menerima dua integer via System V calling convention, menjumlahkannya, dan mengembalikan hasilnya di register `%rax`. Hubungkan file assembly dengan program penguji C dan kompilasi menggunakan GCC.
-2. **Tingkat Menengah**: Tuliskan parser panjang string `strlen` yang dioptimasi secara manual menggunakan instruksi x86-64 `repne scasb` atau pencarian vektor AVX2. Bandingkan latensi siklus per byte dengan implementasi loop C naif.
-3. **Tingkat Mahir**: Implementasikan fungsi enkripsi blok AES-128 berbasis perangkat keras murni dalam assembly x86-64 menggunakan instruksi CPU `aesenc`, `aesenclast`, dan `aeskeygenassist`. Buktikan implementasi berjalan konstan-waktu (*constant-time execution*) untuk mencegah serangan saluran samping (*cache timing side-channel attack*).
+1. **Tingkat Pemula**: Tulis program Rust yang menerima string teks, menghitung kata terpanjang, dan mengembalikan substring sebagai referensi slice string (`&str`). Definisikan anotasi lifetime eksplisit pada tanda tangan fungsi.
+2. **Tingkat Menengah**: Bangun struktur antrian antarmuka thread aman (Thread-Safe Queue) menggunakan `Arc<Mutex<VecDeque<T>>>` dan `std::sync::Condvar`. Implementasikan fungsi `push` dan fungsi `pop_blocking` yang menidurkan thread saat antrian kosong.
+3. **Tingkat Mahir**: Rancang struktur data Doubly Linked List yang aman di Rust tanpa menggunakan `Rc` atau `RefCell`, melainkan mengombinasikan raw pointer `*mut Node<T>` di dalam lapisan terisolasi `unsafe`. Implementasikan trait `Drop` manual untuk membersihkan seluruh node secara iteratif dan buktikan ketiadaan kebocoran memori menggunakan `Miri` (`cargo miri test`).
+
+### Tingkat 1: Dasar
+- **Tugas**: Tuliskan implementasi kalkulasi statistik sederhana (Mean, Median, Modus, Varian) dalam dua paradigma berbeda: (1) Gaya Imperatif Prosedural dengan loop mutasi, dan (2) Gaya Fungsional Murni dengan operasi immutability (`map`, `filter`, `reduce`), buktikan kedua paradigma menghasilkan nilai identik.
+- **Petunjuk Perancangan Arsitektur**:
+  - Dalam gaya fungsional, tidak boleh ada variabel yang nilainya diubah setelah inisialisasi (`const` / no state mutation).
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Kumpulan Data*: `[10, 20, 20, 40, 50, 100]`.
+  - *Keluaran yang Diharapkan*: Mean=40.0, Median=30.0, Modus=20, Varian terhitung identik hingga 6 desimal.
+- **Rubrik Penilaian Mandiri**: 40% Kepatuhan Paradigma Fungsional Murni, 30% Ekivalensi Hasil Numerik, 30% Keterbacaan dan Dokumentasi Kode.
+
+### Tingkat 2: Menengah
+- **Tugas**: Rancang sistem simulasi entitas permainan (*Game Entity System*) dengan membandingkan dua pendekatan arsitektur: (1) Object-Oriented Programming (OOP) hierarki polimorfik, dan (2) Data-Oriented Design (DOD / Struct of Arrays) ramah cache CPU, lalu bandingkan waktu eksekusi saat memperbarui posisi $100.000$ entitas bergerak.
+- **Petunjuk Perancangan Arsitektur**:
+  - OOP: `Array of Pointers to BaseEntity` (memicu pointer indirection dan cache miss).
+  - DOD: `Struct of Arrays` (`float x[]`, `float y[]`, `float vx[]`, `float vy[]`) yang diproses secara sekuensial linear.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Benchmark Skala*: $100.000$ entitas selama 1.000 frame pembaruan posisi fisik.
+  - *Ekspektasi Performa*: Pendekatan DOD harus terbukti $\ge 3\times$ lebih cepat dibandingkan OOP karena efisiensi L1/L2 data cache hit.
+- **Rubrik Penilaian Mandiri**: 40% Desain Arsitektur Data-Oriented Murni, 30% Metodologi Pengukuran Benchmark Valid, 30% Analisis Hardware Cache Locality.
+
+### Tingkat 3: Mahir
+- **Tugas**: Kembangkan mesin *Algebraic Data Types* (ADT) dengan pattern matching komprehensif dalam C++ atau Rust yang merepresentasikan protokol transaksi perbankan (Deposit, Withdraw, Transfer, Freeze) dengan jaminan keamanan tipe kompilasi (*compile-time exhaustiveness checking*).
+- **Petunjuk Perancangan Arsitektur**:
+  - Manfaatkan `std::variant` dan `std::visit` dalam C++ atau `enum` bertipe data dalam Rust.
+  - Cegah state transaksi ilegal (misal: Transfer dari akun yang sedang dibekukan) secara langsung di lapisan sistem tipe bahasa.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Audit Exhaustiveness*: Tambahkan jenis transaksi baru `AuditRollback`; pastikan kompiler menolak kode jika ada fungsi pemroses yang belum menangani varian baru tersebut.
+- **Rubrik Penilaian Mandiri**: 40% Penegakan Exhaustiveness Checking, 30% Keamanan Transisi State Bebas Bug Runtime, 30% Zero-Cost Abstraction Overhead.
 
 ## 7. Rekomendasi Sumber Belajar Standar Emas
 | Sumber Pembelajaran | Penulis / Institusi | Tautan Langsung | Fokus Materi |
 | :--- | :--- | :--- | :--- |
-| Intel® 64 and IA-32 Architectures Software Developer Manuals | Intel Corporation | [Intel SDM Official](https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html) | Instruction Set Reference, Register State & Privilege Modes |
-| ARM Architecture Reference Manual (ARMv8-A) | ARM Ltd. | [ARM Developer ARMv8 Spec](https://developer.arm.com/documentation/ddi0487/latest/) | A64 Instruction Set Architecture, Exception Levels & SIMD Neon |
-| x86-64 Assembly Language Programming with Ubuntu | Ed Jorgensen | [UNLV Open Textbook](http://www.egr.unlv.edu/~ed/assembly64.pdf) | Stack Frames, Calling Conventions, ABI & NASM Toolchain |
-| Felix Cloutier's x86 Instruction Reference | Felix Cloutier | [x86 Cloutier Online Guide](https://www.felixcloutier.com/x86/) | Quick Reference Opcode, Latency, Throughput & Flags Behavior |
+| The Rust Programming Language | Steve Klabnik & Carol Nichols | [The Rust Book](https://doc.rust-lang.org/book/) | Ownership, Borrowing, Lifetimes, Traits & Concurrency |
+| The Rustonomicon: Dark Arts of Unsafe Rust | The Rust Project Developers | [The Rustonomicon](https://doc.rust-lang.org/nomicon/) | Unsafe Boundaries, Raw Pointers, Subtyping & FFI Mechanics |
+| Rust for Rustaceans | Jon Gjengset | [No Starch Press Rustaceans](https://nostarch.com/rust-rustaceans) | Advanced Types, Pinning, Unsafe Invariants & Async Internals |
+| Programming Rust, Second Edition | Jim Blandy, Jason Orendorff, Leonora Tindall | [O'Reilly Programming Rust](https://www.oreilly.com/library/view/programming-rust-2nd/9781492052586/) | Deep Dive Systems Programming, Memory Representation & SIMD |
 
 ---
 *Navigasi Cepat*: [Ke Tingkat 6](./README.md) | [Ke Master Index](../../INDEX.md) | *Sebelumnya*: [091. manajemen-memori-keamanan-tipe](./091-manajemen-memori-keamanan-tipe.md) | *Berikutnya*: [093. analisis-kompleksitas-algoritma](./093-analisis-kompleksitas-algoritma.md)

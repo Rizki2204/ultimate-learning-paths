@@ -6,132 +6,183 @@
 ---
 
 ## 1. Intuisi Dasar Tanpa Jargon ("Seperti Bayi Baru Lahir")
-Bahasa C murni memberi Anda kekuasaan tak terbatas atas memori, tetapi menuntut Anda mencuci piring sendiri setiap selesai makan: setiap `malloc` wajib diiringi `free`, setiap file yang dibuka wajib ditutup secara manual, dan jika sebuah fungsi gagal di tengah jalan, kebocoran memori (memory leak) hampir pasti terjadi. Rekayasa C++ Modern ([Modern C++ Design](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines)) memperkenalkan filosofi revolusioner: **RAII (Resource Acquisition Is Initialization)**. Dalam RAII, kepemilikan sumber daya (memori, socket jaringan, lock mutex) diikatkan secara erat pada masa hidup (lifetime) sebuah objek lokal di stack. Ketika fungsi berakhir—baik secara normal maupun akibat lemparan eksepsi—destruktor objek otomatis dipanggil oleh runtime untuk membersihkan sumber daya. Ditambah dengan semantik pemindahan (Move Semantics) yang memindahkan kepemilikan pointer tanpa menduplikasi data di heap, dan komputasi waktu-kompilasi (`constexpr`), C++ modern menghadirkan performa setara C dengan keamanan abstraksi tingkat tinggi.
+### 1.1 Konsep Inti & Analogi Tanpa Jargon
+Tidak semua bahasa pemrograman berakhir sebagai biner kode mesin statis yang kaku di disk. Bahasa-bahasa modern yang menggerakkan internet—seperti JavaScript (V8), Java (JVM), Python (CPython), dan C# (.NET CLR)—berjalan di atas lapisan perangkat lunak sakti yang disebut **Runtime System & Virtual Machine** ([Virtual Machines & Garbage Collection](https://craftinginterpreters.com/a-virtual-machine.html)). Di dalam Virtual Machine, terdapat CPU perangkat lunak tiruan yang mengeksekusi instruksi khusus (Bytecode); terdapat kompilator kilat (**Just-In-Time / JIT Compiler**) yang memantau bagian kode mana yang paling sering dieksekusi (*Hotspots*) dan mengubahnya menjadi kode mesin asli secepat kilat saat aplikasi sedang berlari kencang; dan terdapat petugas kebersihan memori otomatis (**Garbage Collector**) yang memungut sampah-sampah objek yang sudah tidak terpakai lagi tanpa mengharuskan programmer memanggil `free()` manual.
+
+### 1.2 Urgensi Rekayasa & Signifikansi Sistemik
+Dalam rekayasa sistem modern, pemahaman mendalam tentang konsep ini membedakan arsitek sistem kelas dunia dari sekadar operator perkakas teknis.
 
 ## 2. Fondasi Teoretis & Aksiomatik / Matematis
-Formulasi Matematis Nilai Ekspresi dan Move Semantics C++11 (Value Categories):
+### 2.1 Kerangka Teori Aksiomatik & Formulasi Matematis
+Arsitektur Bytecode VM dan Teori Pengumpulan Sampah (Garbage Collection Algorithms):
 
-Sistem klasifikasi nilai ekspresi C++ modern (Value Category Taxonomy):
-$$\text{glvalue (generalized lvalue)} = \text{lvalue} \cup \text{xvalue}$$
-$$\text{rvalue} = \text{prvalue (pure rvalue)} \cup \text{xvalue}$$
+### 2.2 Penurunan Matematis Langkah-demi-Langkah
+1. **Stack-Based VM vs Register-Based VM**:
+   - **Stack-Based (JVM, CPython, WASM)**: Operasi mengambil operand dari puncak stack dan mendorong hasil kembali (`push`, `pop`, `add`). Kode bytecode sangat padat dan ringkas, implementasi mesin virtual sangat sederhana, namun membutuhkan instruksi pengalihan memori lebih banyak.
+   - **Register-Based (LuaJIT, Dalvik/ART Android)**: Menggunakan register virtual berindeks (`ADD R1, R2, R3`). Menghasilkan instruksi per frame eksekusi lebih sedikit (\$30-50\%$ pengurangan loop dispatch overhead), namun ukuran bytecode lebih besar.
 
-Move Constructor mentransfer kepemilikan pointer secara instan dengan kompleksitas $O(1)$, berbeda dengan Copy Constructor yang membutuhkan alokasi mendalam $O(N)$:
-$$\text{Copy Constructor:} \quad T_{\text{dest}} = \text{alloc}(N) \quad + \quad \text{memcpy}(T_{\text{dest}}, T_{\text{src}}, N)$$
-$$\text{Move Constructor:} \quad T_{\text{dest}}.ptr = T_{\text{src}}.ptr; \quad T_{\text{src}}.ptr = \text{nullptr}$$
+2. **Kompilasi Just-In-Time (JIT) dan Deoptimasi Berspekulasi**:
+   $$\text{Bytecode Interpreter} \xrightarrow{\text{Profiler: Loop Counter} > \theta} \text{Baseline JIT} \xrightarrow{\text{Type Feedback}} \text{Optimizing JIT (Tracer / Sea-of-Nodes)}$$
+   Jika optimasi berspekulasi mengasumsikan input selalu integer tetapi tiba-tiba menerima string objek, JIT memicu **Deoptimization (Bailout)**: membuang kode mesin teroptimasi dan mengembalikan eksekusi kembali ke interpreter secara mulus!
 
-Aturan Lima Serangkai (Rule of Five / Zero):
-Jika sebuah kelas mengelola sumber daya mentah dan mendefinisikan salah satu dari:
-1. Destructor `~T()`
-2. Copy Constructor `T(const T&)`
-3. Copy Assignment Operator `T& operator=(const T&)`
-4. Move Constructor `T(T&&)`
-5. Move Assignment Operator `T& operator=(T&&)`
-maka kelas tersebut **wajib** mendefinisikan atau secara eksplisit menghapus kelimanya untuk mencegah kebocoran atau *double-free*.
+3. **Teori Generational Garbage Collection (The Weak Generational Hypothesis)**:
+   $$\text{Sebagian besar objek mati sesaat setelah dilahirkan! } (P(\text{Death}) > 90\% \text{ in Young Gen})$$
+   Memori heap dibagi menjadi dua generasi:
+   - **Young Generation (Eden + Survivor Spaces)**: Dibersihkan dengan cepat menggunakan algoritma penyalinan linier (*Minor GC / Cheneys Copying Collector*).
+   - **Old Generation**: Menampung objek-objek senior yang selamat dari beberapa siklus Minor GC, dibersihkan menggunakan *Major GC (Mark-Sweep-Compact)*.
 
 ## 3. Anatomi Teknis & Cara Kerja Internal
-Struktur Smart Pointer C++ Modern (`std::unique_ptr` vs `std::shared_ptr`):
+Siklus Pengumpulan Sampah Generational GC (Mark-Sweep-Compact vs Cheney's Copying):
 
 ```mermaid
 graph TD
-subgraph unique_ptr: Zero-Overhead Wrapper
-A[unique_ptr<T> on Stack] -->|Sole Owner Raw Pointer 8-Bytes| B[Managed Object T on Heap]
+subgraph Young Generation: Semi-Space Copying O Live Objects
+A[Eden Space: Fast Bump Allocation] -->|Minor GC| B[Survivor From Space]
+B -->|Copy Live Objects| C[Survivor To Space]
 end
-subgraph shared_ptr: Shared Reference Counting
-C[shared_ptr 1] --> D[Managed Object T on Heap]
-E[shared_ptr 2] --> D
-C --> F[Control Block on Heap]
-E --> F
-F --> G[Strong Ref Count: 2]
-F --> H[Weak Ref Count: 0]
-F --> I[Custom Deleter]
+subgraph Old Generation: Mark-Sweep-Compact
+C -->|Object survived 15 Minor GC cycles: Promotion| D[Tenured Old Gen]
+D -->|Mark Phase: Trace from Root Set via Tri-color Marking| E[Sweep Phase: Free Unreachable Objects]
+E -->|Compact Phase: Eliminate Fragmentation| F[Compacted Contiguous Heap]
 end
 ```
 
-1. **`std::unique_ptr`**: Memiliki ukuran yang identik dengan raw pointer biasa (8 byte pada 64-bit OS). Tidak memiliki biaya runtime tambahan (*zero-overhead abstraction*). Tidak dapat di-copy, hanya dapat di-move ([CppReference Unique Pointer](https://en.cppreference.com/w/cpp/memory/unique_ptr)).
-2. **`std::shared_ptr`**: Menggunakan dua pointer (pointer objek + pointer control block). Perubahan reference counter dilakukan secara atomik menggunakan instruksi CPU `LOCK XADD`, membawa sedikit beban overhead multithreading.
+1. **Tri-Color Marking Algorithm (Dijkstra et al., 1978)**:
+   - **White**: Objek belum terjangkau (kandidat sampah yang akan dimusnahkan).
+   - **Grey**: Objek terjangkau dari root set, namun anak-anak pointernya belum dipindai.
+   - **Black**: Objek terjangkau dan seluruh anak-anaknya telah selesai dipindai. Memungkinkan pengumpul sampah berjalan secara bersamaan dengan mutator aplikasi (*Concurrent Garbage Collection*) menggunakan Write Barrier ([Tri-color Marking Paper](https://dl.acm.org/doi/10.1145/359642.359655)).
+
+#### Tabel Penelusuran Siklus Instruksi JVM Bytecode & Verifier Stack Map Frames
+| Offset Bytecode | Instruksi Opcode Bytecode | Operand Stack ($TOS$) | Local Variable Array ($LVA$) | Stack Map Frame Type State | Aksi Verifier / JIT Tiered Compiler |
+|---|---|---|---|---|---|
+| `0x0000` | `aload_0` | `[Reference: this]` | `[this, arg1, arg2]` | `FullFrame(Locals=[Object, Int])` | Tipe data diverifikasi cocok dengan kontrak |
+| `0x0001` | `iload_1` | `[Reference: this, Int: 42]`| `[this, arg1, arg2]` | `Stack=[Reference, Integer]` | Stack depth dihitung: 2 elemen |
+| `0x0002` | `invokevirtual #4` | `[Int: result]` | `[this, arg1, arg2]` | Resolusi VTable offset metode | Dispatch polimorfik; verifikasi hak akses |
+| `0x0005` | `ireturn` | `[]` | `[this, arg1, arg2]` | Verifikasi tipe kembalian (Integer) | Stack kosong terverifikasi; kembali ke pemanggil |
+| T+JIT Tier 4 | C2 Hotspot Compiler | Native Register Alloc | Kompilasi SSA IR ke x86 ASM | Escape Analysis: Stack Allocation | Overhead interpretasi bytecode tereliminasi (0 ns) |
 
 ## 4. Implementasi Praktis & Kode / Simulasi Riil
-```cpp
-// Modern C++20 Resource Management with RAII, Rule of 5 and Move Semantics
-#include <iostream>
-#include <memory>
-#include <utility>
-#include <cstring>
+```c
+// Minimal Stack-Based Bytecode Virtual Machine with Dispatch Loop in C
+#include <stdio.h>
+#include <stdint.h>
+#include <stdbool.h>
 
-class DynamicBuffer {
-private:
-    size_t  m_size;
-    uint8_t *m_data;
+typedef enum {
+    OP_CONSTANT, // Dorong nilai konstanta ke stack
+    OP_ADD,      // Ambil 2 nilai, jumlahkan, dorong hasil
+    OP_SUB,
+    OP_PRINT,    // Cetak nilai puncak stack
+    OP_HALT      // Hentikan mesin virtual
+} opcode_t;
 
-public:
-    // Constructor Alokasi RAII
-    explicit DynamicBuffer(size_t size) : m_size(size), m_data(new uint8_t[size]{}) {
-        std::cout << "Allocated buffer: " << m_size << " bytes\n";
-    }
+#define STACK_MAX 256
 
-    // 1. Destructor
-    ~DynamicBuffer() noexcept {
-        delete[] m_data;
-        std::cout << "Destroyed buffer: " << m_size << " bytes\n";
-    }
+void run_bytecode_vm(const uint8_t *bytecode) {
+    int64_t stack[STACK_MAX];
+    int     sp = -1; // Stack Pointer
+    const uint8_t *ip = bytecode; // Instruction Pointer
 
-    // 2. Copy Constructor (Deep Copy)
-    DynamicBuffer(const DynamicBuffer &other) : m_size(other.m_size), m_data(new uint8_t[other.m_size]) {
-        std::memcpy(m_data, other.m_data, m_size);
-    }
-
-    // 3. Copy Assignment Operator (Copy-and-Swap Idiom)
-    DynamicBuffer& operator=(const DynamicBuffer &other) {
-        if (this != &other) {
-            DynamicBuffer temp(other);
-            swap(*this, temp);
+    for (;;) {
+        uint8_t instruction = *ip++;
+        switch (instruction) {
+            case OP_CONSTANT:
+                stack[++sp] = *ip++; // Baca nilai 1-byte berikutnya
+                break;
+            case OP_ADD: {
+                int64_t b = stack[sp--];
+                int64_t a = stack[sp--];
+                stack[++sp] = a + b;
+                break;
+            }
+            case OP_PRINT:
+                printf("[VM Output] Result: %ld\n", stack[sp--]);
+                break;
+            case OP_HALT:
+                return;
+            default:
+                printf("Unknown opcode: 0x%02X\n", instruction);
+                return;
         }
-        return *this;
     }
-
-    // 4. Move Constructor (Zero-Cost Transfer)
-    DynamicBuffer(DynamicBuffer &&other) noexcept : m_size(other.m_size), m_data(other.m_data) {
-        other.m_size = 0;
-        other.m_data = nullptr; // Kosongkan kepemilikan objek lama!
-    }
-
-    // 5. Move Assignment Operator
-    DynamicBuffer& operator=(DynamicBuffer &&other) noexcept {
-        if (this != &other) {
-            delete[] m_data;
-            m_size = other.m_size;
-            m_data = other.m_data;
-            other.m_size = 0;
-            other.m_data = nullptr;
-        }
-        return *this;
-    }
-
-    friend void swap(DynamicBuffer &first, DynamicBuffer &second) noexcept {
-        using std::swap;
-        swap(first.m_size, second.m_size);
-        swap(first.m_data, second.m_data);
-    }
-};
+}
 ```
 
 ## 5. Miskonsepsi & Jebakan Industri
-1. **Dangling Reference akibat Mengembalikan Referensi Objek Lokal**: Mengembalikan `const T&` dari fungsi yang menginstansiasi objek di stack lokal. Ketika fungsi berakhir, frame stack dihancurkan dan referensi menunjuk ke memori sampah yang terkorupsi.
-2. **Circular Reference Deadlock pada `std::shared_ptr`**: Objek Node A memegang `shared_ptr` ke Node B, dan Node B memegang `shared_ptr` ke Node A. Reference counter tidak pernah menyentuh angka nol, menyebabkan kebocoran memori permanen. Solusi: Gunakan `std::weak_ptr` untuk memutus siklus referensi kepemilikan ([ISO C++ Core Guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Rr-sharedptr-cycles)).
-3. **Missing `noexcept` pada Move Constructor**: Jika Move Constructor tidak ditandai `noexcept`, wadah standar seperti `std::vector` akan menolak menggunakan move semantics saat proses realokasi kapasitas (`push_back`), melainkan terdegradasi ke operasi copy constructor lambat untuk menjaga jaminan keamanan eksepsi (*Strong Exception Guarantee*).
+1. **Stop-The-World (STW) Pauses Freezing Real-Time Systems**: Menggunakan algoritma Tracing Garbage Collector naif pada aplikasi trading keuangan atau game grafis 120 FPS. Fase pembersihan Major GC dapat menghentikan seluruh thread aplikasi selama puluhan hingga ratusan milidetik (*STW Jitter*).
+2. **Circular Reference Memory Leaks in Reference Counting**: Menggunakan Reference Counting sederhana (seperti `std::shared_ptr` atau model lama Python) tanpa siklus detektor (*Cycle Detector*). Dua objek yang saling menunjuk satu sama lain tidak akan pernah dibebaskan meskipun seluruh aplikasi sudah kehilangan akses ke kedua objek tersebut.
+3. **JIT Thrashing / Deopt Loops**: Menulis fungsi JavaScript atau Python yang menerima tipe data argumen yang berubah-ubah secara liar (polimorfik ekstrim). JIT akan terus mengompilasi kode ke biner, mengalami bailout deoptimasi, lalu mengompilasi ulang berulang kali, membuat aplikasi berjalan jauh lebih lambat daripada interpreter biasa.
+
+### Studi Kasus Kegagalan Nyata: JVM Bytecode Verifier Type Confusion Remote Code Execution (CVE-2012-0507)
+- **Kronologi & Konteks Kasus**: Pada tahun 2012, kerentanan kritis tipe confusion ditemukan pada Java Virtual Machine (JVM). Exploit ini digunakan secara luas oleh exploit kit Blackhole untuk menginfeksi ratusan ribu komputer melalui web browser yang menjalankan Java Applet tanpa izin pengguna.
+- **Akar Masalah Type System Bytecode**: Celah ini berada pada kelas `java.util.concurrent.atomic.AtomicReferenceArray`. Serialisasi objek Java mengizinkan modifikasi struktur data internal array objek tanpa verifikasi tipe yang memadai oleh JVM Bytecode Verifier. Penyerang menyisipkan objek yang tidak kompatibel ke dalam array referensi, menyebabkan JVM memperlakukan pointer memori integer sebagai referensi objek Java valid (*type confusion*). Hal ini merusak *sandbox* Java, mematikan `SecurityManager`, dan memberikan penyerang hak akses eksekusi kode biner natif tak terbatas pada sistem operasi host.
+
+- **Potongan Kode / Arsitektur Cacat (Vulnerable Implementation)**:
+```java
+// Rekonstruksi Mekanisme Type Confusion JVM (CVE-2012-0507)
+import java.util.concurrent.atomic.AtomicReferenceArray;
+
+public class JVMTypeConfusionVulnerability {
+    public static void demonstrateVulnerabilityConcept() {
+        // Objek array dibuat dengan asumsi homogen
+        Object[] rawObjects = new Object[2];
+        rawObjects[0] = "String Aman";
+        rawObjects[1] = Integer.valueOf(1337);
+
+        // AtomicReferenceArray membungkus array tanpa melakukan defensive copying
+        AtomicReferenceArray<Object> atomicArray = new AtomicReferenceArray<>(rawObjects);
+
+        // Jika deserialisasi kustom memanipulasi tipe elemen di balik layar,
+        // verifier runtime tertipu dan mengizinkan cast referensi yang tidak sah:
+        // Object untrusted = atomicArray.get(1); // Dievaluasi sebagai objek sembarang
+    }
+}
+```
+
+- **Analisis Forensik & Rekayasa Modern**: Insiden CVE-2012-0507 mempercepat kematian teknologi browser plugin (Java Applets & Flash) dan memaksa runtime engine modern (seperti V8 dan JVM) menerapkan *type-checking immutability* yang jauh lebih agresif. Seluruh deserialisasi data eksternal kini diwajibkan melewati filter validasi ketat (*look-ahead object deserialization filters*).
 
 ## 6. Proyek Latihan & Rubrik Penilaian Mandiri
-1. **Tingkat Pemula**: Buat kelas pembungkus file RAII (`FileDescriptor`) yang membuka file pada constructor dan otomatis menutup file descriptor pada destructor. Uji pemanggilan destructor saat terjadi exception.
-2. **Tingkat Menengah**: Implementasikan template smart pointer kustom `MyUniquePtr<T>` yang mengadopsi prinsip single ownership. Nonaktifkan fungsi copy constructor dan copy assignment, dan implementasikan move semantics penuh beserta operator dereference `*` dan arrow `->`.
-3. **Tingkat Mahir**: Rancang struktur thread pool multithreaded berbasis C++20 yang menggunakan `std::jthread` (cooperative cancellation token), antrian tugas `std::queue<std::move_only_function<void()>>`, dan `std::condition_variable_any`. Buktikan seluruh thread berhenti secara deterministik dan aman tanpa crash saat objek thread pool dihancurkan.
+1. **Tingkat Pemula**: Perluas bytecode virtual machine C di atas untuk mendukung operasi perkalian (`OP_MUL`), pembagian (`OP_DIV`), dan percabangan kondisional sederhana (`OP_JUMP_IF_ZERO`).
+2. **Tingkat Menengah**: Implementasikan Mark-and-Sweep Garbage Collector sederhana dalam bahasa C untuk heap simulasi 100 node. Tandai simpul yang terjangkau dari pointer root set, dan bebaskan simpul putih yang tidak terjangkau.
+3. **Tingkat Mahir**: Bangun mesin JIT Compiler mini untuk arsitektur x86-64 di Linux menggunakan alokasi memori biner `mmap(PROT_READ | PROT_WRITE | PROT_EXEC)`. Terjemahkan bytecode penjumlahan aritmatika menjadi instruksi mesin asli x86-64 (`mov`, `add`, `ret`), lalu panggil blok memori tersebut sebagai fungsi pointer C untuk dieksekusi langsung oleh CPU.
+
+### Tingkat 1: Dasar
+- **Tugas**: Bangun virtual machine berbasis tumpukan (*stack-based interpreter*) sederhana dalam Python/C dengan 8 instruksi dasar (`PUSH`, `POP`, `ADD`, `SUB`, `MUL`, `DUP`, `PRINT`, `HALT`) yang memvalidasi batas kapasitas tumpukan untuk mencegah *stack underflow* dan *stack overflow*.
+- **Petunjuk Perancangan Arsitektur**:
+  - Representasikan instruksi sebagai integer opcode dan operand byte.
+  - Pasang guard clauses: `if (sp < 2) error("Stack Underflow on ADD")`.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Program Aritmatika*: Masukan program `[PUSH 10, PUSH 20, ADD, PUSH 5, MUL, PRINT, HALT]`.
+  - *Keluaran yang Diharapkan*: Menampilkan `150`.
+  - *Kasus Batas*: Eksekusi `POP` pada stack kosong; VM wajib melempar error bersih tanpa crash.
+- **Rubrik Penilaian Mandiri**: 40% Fungsionalitas Operasi Stack Bytecode, 30% Proteksi Underflow/Overflow, 30% Kerapian Struktur Data VM.
+
+### Tingkat 2: Menengah
+- **Tugas**: Kembangkan JIT compiler mikro yang mengkompilasi bytecode aritmatika sederhana langsung menjadi kode mesin natif x86-64 saat runtime menggunakan alokasi memori biner `mmap(PROT_READ | PROT_WRITE | PROT_EXEC)`.
+- **Petunjuk Perancangan Arsitektur**:
+  - Hasilkan opcode mesin x86-64 seperti `0x55` (`push rbp`), `0x48 0x89 0xE5` (`mov rbp, rsp`), dan `0xC3` (`ret`).
+  - Transisikan proteksi memori dari writable ke executable (`mprotect`) sebelum jumping ke alamat kode.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Kompilasi Fungsi*: Bytecode `f(x) = x * 2 + 3`. Panggil via function pointer C `int (*fn)(int)`.
+  - *Validasi*: Panggil `fn(7)`, pastikan output tepat `17`.
+- **Rubrik Penilaian Mandiri**: 40% Pembangkitan Opcode Mesin Valid, 30% Penegakan Keamanan Memori W^X, 30% Verifikasi Eksekusi Function Pointer.
+
+### Tingkat 3: Mahir
+- **Tugas**: Rancang Garbage Collector generasi sederhana (*Generational Copying GC*) dengan Semi-Space (Eden & Survivor) yang mampu melacak referensi pointer aktif dari root set, memindahkan objek hidup, dan memperbaiki pointer yang tergeser (*forwarding pointers*).
+- **Petunjuk Perancangan Arsitektur**:
+  - Gunakan algoritma Cheney's Copying Collector untuk traverse pointer dari tumpukan variabel lokal.
+  - Perbarui referensi yang menunjuk ke lokasi lama objek dengan forwarding address.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Siklus Objek*: Alokasikan graf referensi objek yang mengandung siklus referensi melingkar (*circular reference* $A \to B \to A$) dan putuskan root reference-nya; GC harus mampu mereklamasi seluruh memori tanpa memory leak.
+- **Rubrik Penilaian Mandiri**: 40% Reklamasi Memori Siklik Sempurna, 30% Akurasi Penulisan Forwarding Pointer, 30% Benchmark Alokasi vs Dealokasi.
 
 ## 7. Rekomendasi Sumber Belajar Standar Emas
 | Sumber Pembelajaran | Penulis / Institusi | Tautan Langsung | Fokus Materi |
 | :--- | :--- | :--- | :--- |
-| C++ Core Guidelines | Bjarne Stroustrup & Herb Sutter | [ISO C++ Guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines) | Aturan Baku RAII, Smart Pointers, Concurrency & Rule of 5/0 |
-| Effective Modern C++ | Scott Meyers | [O'Reilly Meyers C++](https://www.oreilly.com/library/view/effective-modern-c/9781491908419/) | Move Semantics, Perfect Forwarding, Lambda Closures & Smart Pointers |
-| Modern C++ Design: Generic Programming and Design Patterns | Andrei Alexandrescu | [Addison-Wesley Alexandrescu](https://www.informit.com/store/modern-c-plus-plus-design-generic-programming-and-9780201704310) | Policy-Based Class Design, Typelists & Compile-Time Patterns |
-| CppReference C++ Standard Library Reference | CppReference Community | [CppReference C++ Portal](https://en.cppreference.com/w/cpp) | Spesifikasi Lengkap Header `<memory>`, `<utility>`, `<type_traits>` |
+| The Garbage Collection Handbook: The Art of Automatic Memory Management | Richard Jones, Antony Hosking, Eliot Moss | [GC Handbook Official Site](https://gchandbook.org/) | Mark-Sweep, Copying, Generational, Concurrent & Real-Time GC Algorithms |
+| Crafting Interpreters (Part III: A Bytecode Virtual Machine) | Robert Nystrom | [Crafting Interpreters VM](https://craftinginterpreters.com/a-virtual-machine.html) | Bytecode Disassembly, Stack-based VM, Hash Tables & Mark-Sweep GC |
+| Java Virtual Machine Specification (Java SE Edition) | Tim Lindholm, Frank Yellin, Gilad Bracha | [Oracle JVM Specification](https://docs.oracle.com/javase/specs/jvms/se17/html/index.html) | Class File Format, Bytecode Instruction Set & Frame Execution |
+| V8 JavaScript Engine Architecture & Sea-of-Nodes JIT | Google V8 Team | [V8 Official Developer Blog](https://v8.dev/blog) | TurboFan Compiler, Ignition Interpreter, Hidden Classes & Deoptimizations |
 
 ---
 *Navigasi Cepat*: [Ke Tingkat 6](./README.md) | [Ke Master Index](../../INDEX.md) | *Sebelumnya*: [089. anatomi-siklus-hidup-eksekusi-program](./089-anatomi-siklus-hidup-eksekusi-program.md) | *Berikutnya*: [091. manajemen-memori-keamanan-tipe](./091-manajemen-memori-keamanan-tipe.md)

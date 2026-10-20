@@ -6,8 +6,10 @@
 ---
 
 ## 1. Intuisi Dasar Tanpa Jargon ("Seperti Bayi Baru Lahir")
+### 1.1 Konsep Inti & Analogi Tanpa Jargon
 Jika Anda pergi ke pasar tradisional, ada penjual yang meneriakkan: *"Saya jual apel ini seharga Rp 10.000!"*, dan ada pembeli yang menawar: *"Saya mau beli apelmu kalau harganya Rp 8.000!"*. Transaksi baru terjadi jika salah satu pihak mengalah dan menyepakati harga di tengah.
 
+### 1.2 Urgensi Rekayasa & Signifikansi Sistemik
 Di bursa efek modern (seperti Nasdaq, NYSE, atau Bursa Efek Indonesia), tidak ada teriakan manusia di lantai bursa lagi. Seluruh aktivitas perdagangan ditangani oleh komputer pencocok pesan berkecepatan mikrodetik bernama **Mesin Pencocok Pesan (Matching Engine)** yang mengelola antrean raksasa bernama **Buku Pesanan Terbatas (Limit Order Book / LOB)** ([Harris - Trading and Exchanges: Market Microstructure for Practitioners](https://academic.oup.com/book/52486)).
 
 Buku pesanan memiliki dua sisi:
@@ -17,8 +19,10 @@ Buku pesanan memiliki dua sisi:
 Selisih antara harga jual termurah dan harga beli termahal disebut **Bid-Ask Spread**. Dan bagaimana dana institusi besar (seperti BlackRock) membeli saham senilai triliunan rupiah tanpa membuat harga pasar meroket liar? Mereka menggunakan algoritma eksekusi bertahap seperti **Time-Weighted Average Price (TWAP)** dan **Volume-Weighted Average Price (VWAP)** ([Almgren & Chriss - Optimal Execution of Portfolio Transactions](https://www.sciencedirect.com/science/article/pii/S1057819600000072)).
 
 ## 2. Fondasi Teoretis & Aksiomatik / Matematis
+### 2.1 Kerangka Teori Aksiomatik & Formulasi Matematis
 Formulasi Matematis Mikrostruktur Pasar & Buku Pesanan:
 
+### 2.2 Penurunan Matematis Langkah-demi-Langkah
 1. **Struktur Formal Limit Order Book (LOB)**:
 Buku pesanan pada waktu $t$ didefinisikan sebagai dua himpunan harga dan kuantitas terurut:
 $$\mathcal{B}_t = \{(p_i^b, q_i^b)\}_{i=1}^{N_b}, \quad p_1^b > p_2^b > \dots > p_{N_b}^b \quad (\text{Best Bid } p_1^b)$$
@@ -64,6 +68,15 @@ flowchart TD
 ```
 
 Dengan arsitektur *Double-Linked List* per tingkat harga dan *Hash Table* pointer pesanan, operasi pembatalan pesanan (*Cancel Order*) dan eksekusi pencocokan (*Fill Order*) dapat diselesaikan dalam kompleksitas waktu konstan murni $\mathcal{O}(1)$ tanpa pencarian linier ([O'Hara - Market Microstructure Theory](https://www.wiley.com/en-us/Market+Microstructure+Theory-p-9780631207610)).
+
+#### Tabel Penelusuran Siklus Buku Pesanan Batas (LOB) & Bencana Flash Crash 6 Mei 2010
+| Timestamp / Sequence ID | Komponen / Lapisan Sistem | Pesan Masuk (FIX / Transaksi) | Operasi Antrean / Komputasi Buku | State Buku Pesanan (LOB / Ledger) | Event Terpancar (Fill / Block Emit) |
+|---|---|---|---|---|---|
+| 14:32:00.000 (Seq #1) | Bursa Berjangka CME Globex | Kontrak E-mini S&P 500 Berjangka | Algoritma Eksekusi Waddell & Reed menjual 75.000 kontrak | Buku pesanan normal: Likuiditas Bid 50.000 kontrak | Pesanan jual masif dieksekusi tanpa batas harga! |
+| 14:41:00.120 (Seq #2) | Mesin Spoofing Penyerang (Sarao) | Ribuan Pesanan Jual Palsu Bertingkat (*Layering*) | Penempatan pesanan jual jutaan lot 4 tick di atas pasar | Buku pesanan sisi penawaran membesar semu | Sinyal likuiditas palsu mengecoh algoritma HFT lain |
+| 14:45:15.340 (Seq #3) | Algoritma Pembuat Pasar HFT | Penarikan Likuiditas Otomatis | Pembatalan massal pesanan Bid karena tekanan jual ekstrem | Kedalaman Buku Pesanan (*Order Book Depth*) runtuh $-99\%$! | Terjadi kekosongan likuiditas total (*Liquidity Black Hole*)! |
+| 14:47:00.780 (Seq #4) | Bursa Saham Gabungan NYSE / NASDAQ | Saham Blue-Chip (Procter & Gamble, Accenture) | Transaksi meluncur ke pesanan beli tersisa di harga \$0.01! | Saham Accenture (\$40) jatuh instan ke \$0.01! | Dow Jones Industrial Average anjlok 1.000 poin dalam 5 menit! |
+| 14:55:00.000 (Seq #5) | Mekanisme Circuit Breaker Bursa | Penghentian Perdagangan Sementara (Pause 5 Detik) | Pesanan otomatis dibekukan; buku pesanan dipulihkan | Pembeli institusional masuk memanfaatkan harga salah | Indeks saham memantul pulih 600 poin dalam 10 menit |
 
 ## 4. Implementasi Praktis & Kode / Simulasi Riil
 ```python
@@ -137,6 +150,39 @@ print(f"Sisa Kuota Belum Terisi: {unfulfilled} lot")
 ## 5. Miskonsepsi & Jebakan Industri
 *Adverse Selection & Latency Arbitrage pada Limit Order*: Menempatkan pesanan limit pasif di buku pesanan seperti meninggalkan penawaran terbuka yang bisa dieksploitasi oleh pedagang frekuensi tinggi (HFT) yang lebih cepat. Jika berita makro ekonomi keluar dan harga pasar global anjlok, algoritma HFT akan mengeksekusi (*sniping*) pesanan beli limit Anda sebelum komputer Anda sempat mengirim instruksi pembatalan (*cancel request*), meninggalkan Anda dengan posisi rugi instan ([Budish, Cramton, Shim - The High-Frequency Trading Arms Race](https://academic.oup.com/qje/article/130/4/1547/1916146)).
 
+### Studi Kasus Kegagalan Nyata: Peristiwa Flash Crash 6 Mei 2010 (Dow Jones Jatuh 1.000 Poin dalam Hitungan Menit)
+- **Kronologi & Konteks Sejarah**: Pada sore hari tanggal 6 Mei 2010 pukul 14:42 EST, pasar saham Amerika Serikat mengalami keruntuhan tercepat dan paling dramatis dalam sejarah: Indeks Dow Jones Industrial Average (DJIA) anjlok hampir 1.000 poin (sekitar 9%) dan menghapus nilai kapitalisasi pasar $1 Triliun hanya dalam waktu kurang dari lima menit, dengan saham-saham perusahaan raksasa seperti Accenture dan Procter & Gamble diperdagangkan pada harga absurd $0,01 per lembar saham sebelum pulih kembali dalam waktu 15 menit berikutnya.
+- **Akar Masalah Rekayasa Mikrostruktur Pasar & Dinamika Buku Pesanan (LOB)**: Laporan bersama Komisi Sekuritas dan Bursa AS (SEC) serta CFTC mengungkap interaksi mematikan antar algoritma perdagangan: (1) Sebuah dana reksa dana (Waddell & Reed) meluncurkan algoritma eksekusi otomatis naif untuk menjual 75.000 kontrak berjangka E-mini S&P 500 (senilai $4,1 Miliar) yang hanya mengoptimalkan volume partisipasi (Target 9% volume pasar) tanpa mempertimbangkan harga atau waktu; (2) Pada saat yang sama, seorang trader individu di London (Navinder Singh Sarao) menggunakan perangkat lunak otomatis khusus untuk melakukan **Spoofing Layering**: menempatkan pesanan jual palsu jutaan lot beberapa tick di atas pasar dan membatalkannya dalam hitungan milidetik (*rapid cancel loop*) untuk menciptakan ilusi tekanan jual raksasa; (3) Ketika algoritma pembuat pasar frekuensi tinggi (*HFT Market Makers*) mendeteksi ketidakseimbangan order book ekstrem dan aliran jual masif, algoritma manajemen risiko mereka serentak mematikan kuotasi bid (*liquidity withdrawal*). Buku pesanan batas (*Limit Order Book*) menguap seketika, menciptakan kekosongan likuiditas di mana pesanan jual dieksekusi terhadap pesanan beli stub seharga 1 sen.
+
+- **Potongan Kode / Arsitektur Cacat (Vulnerable Implementation)**:
+```python
+# Analisis Mikrostruktur Pasar: Simulasi Penguapan Likuiditas Order Book (LOB)
+from collections import deque
+
+class LimitOrderBook:
+    def __init__(self):
+        self.bids = {} # price -> deque of orders [FIFO]
+        self.asks = {}
+        
+    def cancel_all_bids(self):
+        # SIMULASI FLASH CRASH: HFT Market Maker serentak membatalkan likuiditas Bid
+        # akibat ketidakseimbangan order book yang ekstrem:
+        self.bids.clear() # KEDALAMAN BUKU PESANAN LENYAP SEKETIKA!
+        
+    def match_market_sell_order(self, quantity):
+        # Jika pesanan jual pasar masuk saat buku pesanan kosong:
+        if not self.bids:
+            # MITIGASI MODERN: Limit-Up/Limit-Down (LULD) Circuit Breaker!
+            # Mencegah eksekusi terhadap stub quote $0.01!
+            raise RuntimeError("CIRCUIT_BREAKER_TRIGGERED: Liquidity vacuum detected! Halting trading.")
+            
+        executed_qty = 0
+        # Logika pencocokan pesanan FIFO standar...
+        return executed_qty
+```
+
+- **Analisis Forensik & Rekayasa Modern**: Flash Crash 2010 menjadi katalisator modernisasi regulasi mikrostruktur pasar elektronik global: (1) Penerapan mekanisme penghentian perdagangan otomatis **Limit-Up/Limit-Down (LULD)** di seluruh bursa saham AS yang membekukan perdagangan saham individual jika harga bergerak di luar koridor persentase batas aman dalam jendela 5 menit; (2) Kriminalisasi dan pelarangan manipulasi pasar **Spoofing & Layering** di bawah Undang-Undang Dodd-Frank; (3) Penegakan aturan **SEC Rule 15c3-5 (Market Access Rule)** yang mewajibkan broker menerapkan pemeriksaan risiko batas harga dan batas ukuran pesanan pra-perdagangan (*Pre-Trade Risk Controls*) secara deterministik pada tingkat perangkat keras.
+
 ## 6. Proyek Latihan & Rubrik Penilaian Mandiri
 ### Level 1 (Pemula)
 Tulis modul kalkulasi metrik buku pesanan: terima snapshot kedalaman pasar (Depth of Market 5 tingkat), hitung nilai Mid-Price, Micro-Price berbobot volume, dan Order Book Imbalance rasio $\text{OBI} = \frac{Q_{\text{bid}} - Q_{\text{ask}}}{Q_{\text{bid}} + Q_{\text{ask}}}$.
@@ -149,6 +195,49 @@ Bangun simulator eksekusi algoritma Time-Weighted Average Price (TWAP): bagi ord
 ### Level 3 (Mahir)
 Implementasikan mesin pencocok pesanan Limit Order Book (LOB) performa tinggi di C++ atau Python berorientasi pointer: gunakan representasi struktur data ganda `std::map<Price, LimitLevel>` untuk pohon harga dan intrusive doubly-linked list untuk antrean FIFO pesanan, buktikan bahwa operasi `cancel_order` dan `insert_limit` dieksekusi dalam kompleksitas waktu rata-rata $\mathcal{O}(1)$.
 *Rubrik*: Benchmark performa mampu memproses minimal 500.000 pesan order per detik.
+
+### Tingkat 1: Dasar
+- **Tugas**: Implementasikan struktur data Buku Pesanan Batas (*Limit Order Book / LOB*) sederhana dari nol dalam Python: Kelola antrean pesanan sisi Bid (pembelian, terurut dari harga tertinggi ke terendah) dan sisi Ask (penjualan, terurut dari harga terendah ke tertinggi) menggunakan antrean FIFO (`collections.deque`) per tingkat harga, hitung Bid-Ask Spread, dan eksekusi pencocokan saat terjadi *Crossing the Spread*.
+- **Petunjuk Perancangan Arsitektur**:
+  - Simpan tingkat harga dalam struktur terurut (misal `SortedDict` atau list terurut).
+  - Pesanan masuk: `Order(order_id, side, price, quantity, timestamp)`.
+  - Jika `Best Bid >= Best Ask`: Lakukan eksekusi transaksi (*Trade Fill*) pada harga pesanan yang lebih dulu ada di buku pesanan (*Price-Time Priority*).
+- **Test Vector & Kasus Uji**:
+  - Masukkan Bid: 100 lot @ \$50.00, Ask: 50 lot @ \$50.10. Spread = \$0.10.
+  - Masukkan Pesanan Beli Baru: 50 lot @ \$50.15.
+  - Mesin harus mengeksekusi transaksi 50 lot tepat pada harga \$50.10 dan menyisakan Bid lama utuh.
+- **Rubrik Penilaian Objektif**:
+  - Skor 100%: Prioritas Price-Time FIFO presisi, kalkulasi spread akurat, eksekusi parsial tertangani rapi.
+  - Skor 50%: Pencocokan pesanan bekerja namun mengabaikan urutan waktu kedatangan FIFO pada tingkat harga yang sama.
+  - Skor 0%: Membalikkan logika urutan Bid (mengurutkan dari terendah ke tertinggi).
+
+### Tingkat 2: Menengah
+- **Tugas**: Bangun modul deteksi manipulasi pasar Spoofing dan Layering (*Anti-Spoofing Surveillance Detector*) dalam Python: Analisis aliran pesan pasar (Order Add, Cancel, Execute) dari log rekaman ITCH/FIX, hitung rasio Order-to-Trade Ratio (OTR) dan durasi hidup pesanan (*Order Lifetime*), dan tandai akun trading yang menempatkan pesanan volume besar di luar spread lalu membatalkannya dalam waktu $< 50$ milidetik secara berulang.
+- **Petunjuk Perancangan Arsitektur**:
+  - Lacak metrik per akun: Total Pesanan Masuk, Total Pembatalan, Total Transaksi Terealisasi.
+  - Rasio $\text{OTR} = \frac{\text{Volume Pesanan}}{\text{Volume Eksekusi}}$. Jika $\text{OTR} > 100$ dan median waktu hidup pesanan $< 50\text{ ms}$, naikkan skor kecurigaan manipulasi.
+  - Deteksi pola layering: penempatan $\ge 3$ pesanan berjarak 1-tick yang dibatalkan serempak tepat saat ada pesanan berlawanan di sisi lain.
+- **Test Vector & Kasus Uji**:
+  - Masukkan log simulasi perdagangan normal vs log perilaku spoofer Navinder Sarao.
+  - Detektor harus menandai akun spoofer dengan status `CRITICAL_SPOOFING_ALERT` dengan tingkat false positive pada market maker sah $< 2\%$.
+- **Rubrik Penilaian Objektif**:
+  - Skor 100%: Deteksi OTR dan lifetime presisi, identifikasi pola layering akurat, penanganan streaming log efisien.
+  - Skor 50%: Menghitung OTR benar namun tidak memeriksa waktu hidup pembatalan milidetik.
+  - Skor 0%: Hanya mengecek volume pesanan absolut tanpa membandingkan rasio eksekusi.
+
+### Tingkat 3: Mahir
+- **Tugas**: Rancang simulator pasar interaktif Multi-Agent Market Microstructure Simulator dalam Python: Bangun lingkungan perdagangan di mana beberapa agen otonom berinteraksi: (1) Market Maker (menyediakan likuiditas dua sisi); (2) Noise Traders (pembeli/penjual acak); (3) Optimal Execution Agent (mengeksekusi pesanan blok besar menggunakan algoritma Almgren-Chriss Optimal Liquidation Trajectory untuk meminimalkan dampak pasar permanen dan sementara).
+- **Petunjuk Perancangan Arsitektur**:
+  - Model Almgren-Chriss: Minimasikan ekspektasi biaya eksekusi dan varians risiko: $\min \mathbb{E}[x] + \lambda \text{Var}[x]$.
+  - Hitung fungsi dampak pasar: Dampak permanen $\gamma \cdot v_t$ dan dampak sementara $\eta \cdot v_t$.
+  - Lintasan likuiditas optimal membentuk fungsi penurunan hiperbolik: $n_j = \frac{2 \sinh(\frac{1}{2}\kappa \tau)}{\sinh(\kappa T)} \cosh(\kappa(T - (j - \frac{1}{2})\tau)) X$.
+- **Test Vector & Kasus Uji**:
+  - Agen mengeksekusi pesanan jual 100.000 saham selama 1 hari perdagangan.
+  - Bandingkan slippage biaya eksekusi Almgren-Chriss vs eksekusi serakah naif sekaligus: Algoritma optimal harus menghemat biaya slippage dampak pasar minimal $> 60\%$.
+- **Rubrik Penilaian Objektif**:
+  - Skor 100%: Formulasi matematika Almgren-Chriss presisi, pemodelan interaksi multi-agent LOB dinamis, mitigasi dampak pasar terbukti.
+  - Skor 50%: Eksekusi bertahap bekerja namun hanya membagi rata volume linier sederhana (TWAP biasa) tanpa optimasi parameter varians risiko $\lambda$.
+  - Skor 0%: Eksekusi seluruh pesanan dalam satu waktu.
 
 ## 7. Rekomendasi Sumber Belajar Standar Emas
 | Sumber Pembelajaran | Penulis / Institusi | Tautan Langsung | Fokus Materi |

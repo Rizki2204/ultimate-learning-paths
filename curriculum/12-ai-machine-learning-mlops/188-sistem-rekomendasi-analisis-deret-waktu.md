@@ -6,15 +6,19 @@
 ---
 
 ## 1. Intuisi Dasar Tanpa Jargon ("Seperti Bayi Baru Lahir")
+### 1.1 Konsep Inti & Analogi Tanpa Jargon
 Bayangkan Anda membuka aplikasi streaming film seperti Netflix atau platform musik Spotify. Bagaimana sistem bisa menebak dengan akurat bahwa Anda akan menyukai lagu jazz tahun 1970-an yang belum pernah Anda dengar sebelumnya?
 
+### 1.2 Urgensi Rekayasa & Signifikansi Sistemik
 Pendekatan pertama adalah **Collaborative Filtering**: jika Anda dan 1.000 pengguna lain sama-sama menyukai 9 dari 10 lagu yang identik, sistem menyimpulkan selera Anda dan mereka sangat mirip. Jika mereka menyukai lagu ke-10, kemungkinan besar Anda juga akan menyukainya ([Koren et al. - Matrix Factorization Techniques for Recommender Systems](https://ieeexplore.ieee.org/document/5197422)).
 
 Sementara itu, untuk memprediksi masa depan dari data yang berubah seiring berjalannya waktu (seperti fluktuasi harga saham, konsumsi listrik, atau permintaan stok logistik besok pagi), kita menggunakan **Analisis Deret Waktu & Filter Kalman**: memisahkan tren jangka panjang, pola musiman (seperti penjualan es krim melonjak di musim panas), serta menyaring derau acak agar estimasi masa depan tetap stabil dan presisi ([Box, Jenkins, Reinsel - Time Series Analysis](https://onlinelibrary.wiley.com/doi/book/10.1002/9781118619193)).
 
 ## 2. Fondasi Teoretis & Aksiomatik / Matematis
+### 2.1 Kerangka Teori Aksiomatik & Formulasi Matematis
 Formulasi Matematis Sistem Rekomendasi & Time Series:
 
+### 2.2 Penurunan Matematis Langkah-demi-Langkah
 1. **Faktorisasi Matriks Singular / SVD untuk Rekomendasi**:
 Memfaktorkan matriks rating interaksi pengguna-item $R \in \mathbb{R}^{m \times n}$ menjadi ruang representasi laten berdimensi rendah $k \ll \min(m, n)$:
 $$\min_{P, Q} \sum_{(u, i) \in \mathcal{K}} \left( r_{ui} - \mu - b_u - b_i - p_u^T q_i \right)^2 + \lambda \left( \|p_u\|_2^2 + \|q_i\|_2^2 + b_u^2 + b_i^2 \right)$$
@@ -46,6 +50,15 @@ flowchart LR
 ```
 
 Filter Kalman beroperasi sebagai estimator status optimal rekursif secara closed-loop tanpa perlu menyimpan seluruh riwayat masa lalu dalam memori, menjadikannya standar baku pelacakan telemetri dan peramalan deret waktu real-time ([Welch & Bishop - An Introduction to the Kalman Filter](https://www.cs.unc.edu/~welch/media/pdf/kalman_intro.pdf)).
+
+#### Tabel Penelusuran Optimasi Serakah CTR YouTube & Pembentukan Filter Bubble
+| Tahap Komputasi / Layer | Dimensi Tensor / Shape | Operasi Matematika / Kernel | Aliran Gradien / Memori | Status Parameter / Bobot | Efek Sistem / Metrik Loss |
+|---|---|---|---|---|---|
+| 1. Interaksi Pengguna Masuk | Riwayat Tontonan $U$ (10 Video) | Embedding Pengguna $\mathbf{u} \in \mathbb{R}^{64}$ | Riwayat memuat 2 video konspirasi marginal | Representasi preferensi laten dihitung | State pengguna terpetakan di ruang embedding |
+| 2. Candidate Generation (KNN) | Database Video $V$ (10 Juta Item) | Pencarian Tetangga Terdekat Ruang Laten | Cosine similarity: $\cos(\mathbf{u}, \mathbf{v}_i)$ | Algoritma mengambil 1.000 kandidat teratas | Kandidat didominasi konten polarisasi tinggi |
+| 3. Ranking Model (Scoring CTR) | `(1000, 1)` Prediksi P(Click) | Neural Net Memaksimalkan Click-Through-Rate | $\mathcal{L} = -\sum y \log \hat{y}$ (Serakah tanpa penalti) | Bobot mengutamakan video dengan *watch time* tinggi | Model merekomendasikan video yang memicu amarah/emosi |
+| 4. Loop Umpan Balik Positif | Sesi Berulang (Hari 1 s/d 14) | Pengguna mengklik video rekomendasi ekstrem | Embedding $\mathbf{u}$ ditarik semakin dalam ke sudut ekstrem | Varians diversitas rekomendasi anjlok $-78\%$ | Fenomena *Filter Bubble* / Radikalisasi Otomatis |
+| 5. Mitigasi Regulasi Diversitas | Fungsi Objektif Berimbang | Skor = $\text{CTR} - \beta \cdot \text{KL}(\mathcal{D}_U \parallel \mathcal{D}_{\text{global}})$ | Regularisasi entropi menyuntikkan eksplorasi kebaruan | Spektrum rekomendasi mencakup perspektif alternatif | Retensi jangka panjang meningkat, radikalisasi tereduksi |
 
 ## 4. Implementasi Praktis & Kode / Simulasi Riil
 ```python
@@ -105,6 +118,61 @@ print(f"Prediksi Nilai: {ratings_reconstructed[0, 2]:.2f} bintang")
 ## 5. Miskonsepsi & Jebakan Industri
 *Cold-Start Problem pada Collaborative Filtering*: Pengguna baru (*new user*) atau item baru (*new item*) yang belum memiliki riwayat rating/klik sama sekali tidak dapat direpresentasikan dalam matriks dekomposisi laten, menyebabkan rekomendasi gagal total. Solusi industri: gunakan model hibrida dengan memadukan *Content-Based Filtering* (fitur metadata item/profil pengguna) pada arsitektur Two-Tower hingga akumulasi interaksi mencukupi ([Schein et al. - Methods and Metrics for Cold-Start Recommendations](https://dl.acm.org/doi/10.1145/564376.564421)).
 
+### Studi Kasus Kegagalan Nyata: Loop Umpan Balik Radikalisasi Otomatis & Algoritma Filter Bubble YouTube (2018)
+- **Kronologi & Konteks Sejarah**: Sepanjang tahun 2017 hingga 2019, berbagai investigasi jurnalisme data dan studi akademis (termasuk dari Harvard Berkman Klein Center) mengungkap bahwa sistem rekomendasi video YouTube secara sistemik mengarahkan pengguna ke konten disinformasi ekstrem, teori konspirasi, dan polarisasi politik. Pengguna yang awalnya mencari video berita wajar sering kali dipandu secara bertahap menuju video yang semakin ekstrem dalam beberapa kali klik putar otomatis (*Autoplay*).
+- **Akar Masalah Rekayasa Rekomendasi & Optimasi Serakah**: Arsitektur sistem rekomendasi modern berbasis deep learning (Deep Neural Networks for YouTube Recommendations, 2016) dirancang untuk mengoptimalkan satu fungsi tujuan serakah: waktu tonton kumulatif (*Watch Time*) dan probabilitas klik (*Click-Through Rate / CTR*). Algoritma tidak memiliki pemahaman tentang kebenaran faktual atau kesehatan konten; algoritma secara matematis menemukan bahwa konten emosional, sensasional, dan konspiratif memiliki tingkat retensi perhatian manusia yang jauh lebih tinggi. Karena interaksi pengguna langsung diumpankan kembali (*feedback loop*) ke dalam data pelatihan model hari berikutnya, sistem menciptakan spiral radikalisasi tertutup (*self-reinforcing echo chamber*) yang mengikis keberagaman informasi (*diversity collapse*).
+
+- **Potongan Kode / Arsitektur Cacat (Vulnerable Implementation)**:
+```python
+# Analisis Cacat Fungsi Rekomendasi: Optimasi Serakah vs Diversitas Entropi
+import numpy as np
+
+# MODEL CACAT SERAKAH: Hanya mengurutkan berdasarkan prediksi probabilitas klik (CTR)
+def greedy_ranking_recommendation(predicted_ctrs, candidate_videos):
+    # Urutkan murni dari CTR tertinggi ke terendah
+    # Memicu konten sensasional mendominasi seluruh daftar rekomendasi!
+    sorted_indices = np.argsort(predicted_ctrs)[::-1]
+    return [candidate_videos[i] for i in sorted_indices[:10]]
+
+# MITIGASI MODERN: Peringkat dengan Diversifikasi (Maximal Marginal Relevance / MMR)
+def diversified_mmr_recommendation(candidate_embeddings, predicted_ctrs, candidate_videos, top_k=10, lambda_balance=0.6):
+    '''
+    Maximal Marginal Relevance (MMR) menyeimbangkan relevansi CTR dengan keberagaman topik:
+    Skor = lambda * Relevansi - (1 - lambda) * Kesamaan Maksimum dengan Item yang Sudah Dipilih
+    '''
+    selected_indices = []
+    unselected_indices = list(range(len(candidate_videos)))
+    
+    # Pilih item pertama dengan CTR tertinggi
+    first_choice = int(np.argmax(predicted_ctrs))
+    selected_indices.append(first_choice)
+    unselected_indices.remove(first_choice)
+    
+    for _ in range(top_k - 1):
+        best_score = -float('inf')
+        best_idx = None
+        
+        for u in unselected_indices:
+            relevance = predicted_ctrs[u]
+            # Hitung kesamaan maksimum (cosine similarity) dengan item yang telah terpilih
+            selected_embs = candidate_embeddings[selected_indices]
+            sims = np.dot(selected_embs, candidate_embeddings[u]) # Asumsi normalized
+            max_sim = np.max(sims)
+            
+            # Formula penalti redundansi topik
+            mmr_score = lambda_balance * relevance - (1.0 - lambda_balance) * max_sim
+            if mmr_score > best_score:
+                best_score = mmr_score
+                best_idx = u
+                
+        selected_indices.append(best_idx)
+        unselected_indices.remove(best_idx)
+        
+    return [candidate_videos[i] for i in selected_indices]
+```
+
+- **Analisis Forensik & Rekayasa Modern**: Krisis kepercayaan publik memaksa industri platform konten mendesain ulang arsitektur rekomendasi: (1) Penerapan algoritma **Maximal Marginal Relevance (MMR)** dan Determinantal Point Processes (DPP) untuk menjamin diversitas topik dalam feed pengguna; (2) Penyesuaian fungsi loss dari maksimasi klik murni menjadi kepuasan jangka panjang (*Long-Term User Utility*), menyertakan metrik kepuasan pasca-tonton (survei, pembagian konten terverifikasi); (3) Penerapan *Demotion Classifiers* yang secara aktif menurunkan peringkat konten perbatasan (*borderline content*) meskipun memiliki CTR tinggi.
+
 ## 6. Proyek Latihan & Rubrik Penilaian Mandiri
 ### Level 1 (Pemula)
 Bangun model peramalan deret waktu autoregresif AR(1): $X_t = c + \phi X_{t-1} + \epsilon_t$ menggunakan pustaka `statsmodels.tsa.ar_model.AutoReg`, lakukan uji stasionaritas Augmented Dickey-Fuller (ADF test) pada data sebelum fitting model.
@@ -118,6 +186,49 @@ $$e_{ui} = r_{ui} - p_u^T q_i, \quad p_u \leftarrow p_u + \gamma (e_{ui} q_i - \
 ### Level 3 (Mahir)
 Implementasikan Filter Kalman 2-Dimensi untuk melacak posisi dan kecepatan benda bergerak $\mathbf{x} = [p, v]^T$ dengan model dinamika percepatan konstan dan pengukuran posisi berderau tinggi. Hitung matriks kovarians estimasi $P_k$ dan visualisasikan elips ketidakpastian (*uncertainty ellipse* 95% confidence interval).
 *Rubrik*: Filter Kalman mengestimasi kecepatan secara akurat meski hanya menerima masukan posisi berderau.
+
+### Tingkat 1: Dasar
+- **Tugas**: Implementasikan algoritma Collaborative Filtering berbasis faktorisasi matriks sederhana (Matrix Factorization via Alternating Least Squares / ALS) dalam Python untuk memprediksi rating pengguna-item pada matriks sparse $R \approx U \cdot V^T$.
+- **Petunjuk Perancangan Arsitektur**:
+  - Dimensi laten: $K = 8$.
+  - Perbarui matriks faktor pengguna $U$ dengan menahan $V$ konstan: $u_i = (V^T V + \lambda I)^{-1} V^T r_i$.
+  - Perbarui matriks faktor item $V$ dengan menahan $U$ konstan: $v_j = (U^T U + \lambda I)^{-1} U^T r_j$.
+- **Test Vector & Kasus Uji**:
+  - Latih pada matriks rating sintetis $100 \times 50$ dengan $80\%$ nilai hilang.
+  - Nilai Root Mean Squared Error (RMSE) pada data observasi harus menurun secara monoton pada setiap iterasi hingga konvergen (RMSE $< 0.40$).
+- **Rubrik Penilaian Objektif**:
+  - Skor 100%: Pembaharuan ALS teratur dengan penalti Ridge tepat, konvergensi RMSE monoton terbukti.
+  - Skor 50%: Menghitung pembaruan namun mengabaikan regularisasi $\lambda$ sehingga matriks rentan singular.
+  - Skor 0%: Menggunakan regresi acak biasa.
+
+### Tingkat 2: Menengah
+- **Tugas**: Bangun modul rekomendasi berbasis konten (*Content-Based Recommender*) yang menggunakan teknik Maximal Marginal Relevance (MMR) untuk merekomendasikan artikel berita: Sistem menerima vektor embedding dokumen, skor relevansi kueri, dan parameter keragaman $\lambda \in [0, 1]$, lalu menghasilkan daftar rekomendasi yang meminimalkan pengulangan topik serupa.
+- **Petunjuk Perancangan Arsitektur**:
+  - Normalisasikan embedding dokumen menjadi norma satuan ($\|v\|_2 = 1$).
+  - Implementasikan fungsi seleksi greedy MMR iteratif.
+  - Tampilkan metrik Intra-List Diversity (ILD) rata-rata: $\text{ILD} = \frac{2}{K(K-1)} \sum_{i < j} (1 - \cos(v_i, v_j))$.
+- **Test Vector & Kasus Uji**:
+  - Diberikan 5 artikel tentang "Politik Partai X" dan 5 artikel tentang "Teknologi AI".
+  - Pada $\lambda = 1.0$ (relevansi murni): Rekomendasi didominasi oleh 1 topik artikel.
+  - Pada $\lambda = 0.5$ (rekomendasi berimbang): Daftar rekomendasi menyelingi artikel politik dan teknologi dengan skor ILD naik $> 3\times$.
+- **Rubrik Penilaian Objektif**:
+  - Skor 100%: Implementasi MMR efisien, metrik ILD terukur kuantitatif, normalisasi vektor akurat.
+  - Skor 50%: MMR bekerja namun perhitungan kompleksitas waktu kuadratik lambat pada daftar kandidat besar.
+  - Skor 0%: Hanya memilih top-k relevansi tanpa penalti kesamaan.
+
+### Tingkat 3: Mahir
+- **Tugas**: Rancang model peramalan deret waktu (*Time Series Forecasting*) berbasis arsitektur N-BEATS (Neural Basis Expansion Analysis for Interpretable Time Series) atau Temporal Convolutional Network (TCN) dengan dilatasi kausal dalam PyTorch untuk memprediksi permintaan trafik server 24 jam ke depan dengan dekomposisi komponen tren dan musiman (*Trend & Seasonality Decomposition*).
+- **Petunjuk Perancangan Arsitektur**:
+  - Lapisan konvolusi dilatasi kausal 1D dengan faktor dilatasi $d = 1, 2, 4, 8$ untuk memperluas *Receptive Field* tanpa pooling.
+  - Pastikan tidak ada kebocoran waktu (*Causal Padding*): output pada waktu $t$ hanya bergantung pada input $\le t$.
+  - Implementasikan residual blocks dengan skip connections.
+- **Test Vector & Kasus Uji**:
+  - Masukkan data trafik historis dengan pola siklikal 24 jam dan tren kenaikan linear.
+  - Evaluasi metrik Mean Absolute Percentage Error (MAPE) pada 24 jam ke depan: model harus mencapai $\text{MAPE} < 8\%$.
+- **Rubrik Penilaian Objektif**:
+  - Skor 100%: Arsitektur TCN kausal presisi, dekomposisi tren/musiman jelas, zero temporal leakage.
+  - Skor 50%: Model bekerja namun menggunakan konvolusi standar non-kausal (membocorkan data masa depan).
+  - Skor 0%: Menggunakan linear feedforward tanpa penanganan struktur temporal.
 
 ## 7. Rekomendasi Sumber Belajar Standar Emas
 | Sumber Pembelajaran | Penulis / Institusi | Tautan Langsung | Fokus Materi |

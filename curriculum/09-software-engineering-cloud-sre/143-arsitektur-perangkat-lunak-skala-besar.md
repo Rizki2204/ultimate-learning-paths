@@ -6,100 +6,160 @@
 ---
 
 ## 1. Intuisi Dasar Tanpa Jargon ("Seperti Bayi Baru Lahir")
-Menyimpan data bisnis di satu hard disk tunggal adalah tindakan bunuh diri: semua disk pada akhirnya akan rusak atau terbakar. Replikasi Data Terdistribusi ([Distributed Data Replication](https://dataintensive.net/)) adalah seni menggandakan data yang sama ke banyak mesin yang terhubung di jaringan. Tiga mazhab besar menguasai dunia arsitektur penyimpanan modern: **Leader-Follower (Single-Leader)** seperti PostgreSQL di mana semua penulisan wajib disetorkan ke sang Raja tunggal; **Multi-Leader** di mana kantor cabang di berbagai benua dapat menerima penulisan data secara lokal lalu menyinkronkannya perlahan; dan **Leaderless (Amazon Dynamo-style)** seperti Apache Cassandra yang tidak memiliki hierarki pemimpin sama sekali—klien melempar penulisan langsung ke sekumpulan server acak dan menggunakan matematika kuorum sakti ($R + W > N$) untuk menjamin pembacaan data segar tanpa pernah bergantung pada satu server pun!
+### 1.1 Konsep Inti & Analogi Tanpa Jargon
+Di hari-hari pertama sebuah startup teknologi berdiri, satu aplikasi tunggal monolitik yang memuat semua fitur adalah pilihan paling cepat dan paling masuk akal: satu codebase, satu database, satu server. Namun ketika perusahaan bertumbuh memiliki 500 insinyur perangkat lunak dan puluhan juta pengguna, monolit raksasa berubah menjadi monster yang menakutkan: proses deployment memakan waktu berjam-jam, dan satu bug kecil di fitur ulasan restoran dapat meruntuhkan seluruh sistem pembayaran aplikasi! Arsitektur Perangkat Lunak Skala Besar ([Large-Scale Software Architecture](https://microservices.io/)) adalah seni memecah masalah peradaban: dari **Modular Monolith** yang menjaga kerapian batas modul tanpa overhead jaringan; **Microservices** yang memberikan otonomi penuh pada tim kecil untuk merilis layanan secara independen; **Event-Driven Architecture (EDA)** yang menyalurkan aliran pesan asinkron melalui Apache Kafka; hingga keanggunan **Clean / Hexagonal Architecture (Ports and Adapters)** yang memastikan logika bisnis inti Anda tetap suci dan murni tanpa terpengaruh oleh database atau framework web apa pun!
+
+### 1.2 Urgensi Rekayasa & Signifikansi Sistemik
+Dalam rekayasa sistem modern, pemahaman mendalam tentang konsep ini membedakan arsitek sistem kelas dunia dari sekadar operator perkakas teknis.
 
 ## 2. Fondasi Teoretis & Aksiomatik / Matematis
-Matematika Kuorum Replikasi Tanpa Pemimpin (Leaderless Quorum Reads and Writes):
+### 2.1 Kerangka Teori Aksiomatik & Formulasi Matematis
+Hukum Conway dan Dekomposisi Batas Arsitektur Bersih (Clean & Hexagonal Architecture):
 
-Diberikan klaster penyimpanan terdistribusi dengan total $N$ replika penyimpanan data.
-- Setiap operasi penulisan (*Write*) wajib dikonfirmasi oleh minimal $W$ replika.
-- Setiap operasi pembacaan (*Read*) wajib meminta data dari minimal $R$ replika.
+### 2.2 Penurunan Matematis Langkah-demi-Langkah
+1. **Hukum Conway (Melvin Conway, 1967)**:
+   $$\text{'Organisasi yang merancang sistem pasti akan menghasilkan desain arsitektur}$$   $$\text{yang merupakan salinan fotokopi dari struktur komunikasi internal organisasi tersebut!'}$$
+   *Inverse Conway Maneuver*: Bentuk tim-tim kecil otonom yang bertanggung jawab penuh atas satu kemampuan bisnis (*Business Capability*), maka arsitektur microservices yang bersih akan lahir secara alami.
 
-Kondisi Konsistensi Kuorum Ketat (Strict Quorum Condition):
-$$\mathbf{R + W > N}$$
-
-Pembuktian Matematis Prinsip Sarang Merpati (Pigeonhole Principle):
-Jika $R + W > N$, maka himpunan replika yang menerima penulisan data terbaru ($W$) dan himpunan replika yang dibaca oleh klien ($R$) **pasti memiliki irisan minimal satu node bersama**:
-$$|R \cap W| = R + W - N \ge 1$$
-Node yang berada di titik temu irisan tersebut dijamin memegang versi data paling mutakhir (dilacak via Version Vectors), menjamin bahwa pembacaan selalu menghasilkan nilai terkini (*Strong Consistency*)!
-
-Konfigurasi Kuorum Khas pada $N = 3$:
-$$W = 2, \quad R = 2 \implies R + W = 4 > 3 \quad (\text{Mentoleransi 1 node mati secara transparan})$$
+2. **Arsitektur Heksagonal / Ports and Adapters (Alistair Cockburn, 2005)**:
+   Aturan Ketergantungan Masuk (*The Dependency Rule*):
+   Ketergantungan kode **hanya boleh mengarah ke dalam**, menuju pusat logika bisnis:
+   $$\text{Frameworks & Drivers (Web/DB)} \xrightarrow{\text{Depends On}} \text{Adapters (Controllers/Gateways)} \xrightarrow{\text{Depends On}} \text{Application Use Cases} \xrightarrow{\text{Depends On}} \mathbf{Core Domain Entities}$$
+   - **Port**: Antarmuka kontrak abstrak yang didefinisikan oleh inti domain bisnis (misal `OrderRepository` interface).
+   - **Adapter**: Implementasi teknologi konkret di lapisan luar (misal `PostgresOrderRepository` atau `InMemoryOrderRepository`).
 
 ## 3. Anatomi Teknis & Cara Kerja Internal
-Mekanisme Rekonsiliasi Data Replikasi Tanpa Pemimpin: Read Repair dan Anti-Entropy:
+Struktur Lingkaran Konsentris Clean Architecture / Ports and Adapters:
 
 ```mermaid
-sequenceDiagram
-    autonumber
-    participant Client as Client Application
-    participant N1 as Replica 1 (Version 3)
-    participant N2 as Replica 2 (Version 3)
-    participant N3 as Replica 3 (Version 2 - Outdated!)
-    Client->>N1: Read Request (Quorum R=3)
-    Client->>N2: Read Request
-    Client->>N3: Read Request
-    N1-->>Client: Return (Value='Foo', Version 3)
-    N2-->>Client: Return (Value='Foo', Version 3)
-    N3-->>Client: Return (Value='OldBar', Version 2)
-    Note over Client: Client selects Version 3 as winner! Client detects N3 is stale!
-    Client->>N3: Read Repair: Write (Value='Foo', Version 3) to heal N3!
+graph TD
+subgraph Layer 4: External Frameworks & Drivers
+A[PostgreSQL Database, Fastify HTTP Server, Kafka Broker, Redis Cache]
+end
+subgraph Layer 3: Interface Adapters
+B[REST API Controllers, SQL Repositories, Event Serializers] --> A
+end
+subgraph Layer 2: Application Use Cases
+C[CreateOrderUseCase, CancelSubscriptionUseCase] --> B
+end
+subgraph Layer 1: Core Domain Entities
+D[Order Entity, Customer Entity, Money Value Object (Pure Logic!)] --> C
+end
 ```
 
-1. **Read Repair**: Klien yang mendeteksi ada replika yang memegang versi data usang saat operasi pembacaan kuorum secara otomatis mengirimkan pembaruan data terbaru kembali ke replika yang tertinggal untuk menyembuhkannya (*Self-Healing Data*).
-2. **Anti-Entropy Process via Merkle Trees**: Proses latar belakang berkala di mana server membandingkan pohon hash kriptografi (**Merkle Tree**) untuk mendeteksi perbedaan blok data yang hilang tanpa perlu mentransfer seluruh isi database melintasi jaringan.
+1. **Tinjauan Kritis: Monolith vs Microservices**:
+   - **Microservices bukan obat mujarab!** Ia memindahkan kompleksitas kode di memori menjadi kompleksitas jaringan yang brutal (latensi RPC, kegagalan parsial, konsistensi eventual, tracing terdistribusi).
+   - **Modular Monolith**: Pilihan emas untuk 90% arsitektur: satu proses eksekusi tunggal di mana batasan antarmuka antar domain ditegakkan secara ketat pada waktu kompilasi.
+
+#### Tabel Penelusuran Arsitektur Mikroservis & Keruntuhan Latensi Monolit Terdistribusi
+| Skenario Kueri Transaksi Pengguna | Topologi Arsitektur | Jumlah Lompatan Jaringan (Network Hops) | Waktu Eksekusi Kueri Agregat | Titik Kegagalan Tunggal (SPOF) | Ketahanan Partisi Jaringan |
+|---|---|---|---|---|---|
+| Monolit Bersih Tradisional | In-Memory Function Call | 0 Hop (Panggilan Fungsi In-Process) | $\approx 2\text{ ms}$ (Kueri DB lokal) | Single process server | Tidak ada partisi jaringan internal |
+| Mikroservis Naif (Distributed Monolith)| Rantai Sinkronisasi HTTP REST | **12 Hop Jaringan Bertingkat!** | Melonjak ke $\approx 850\text{ ms}$ (**Latensi Meledak!**) | Jika 1 mikroservis lambat, seluruh sistem hang | Rentan kegagalan berantai |
+| Kegagalan Komunikasi | Service A -> B -> C -> D | Timeout pada Service D | Antrean thread di Service A, B, C habis | Database connection pool jenuh | **CASCADING COLLAPSE GLOBAL!** |
+| Arsitektur Event-Driven Modern | Event Bus (Kafka) + CQRS | 0 Hop Sinkron (Asinkron Terputus) | $< 15\text{ ms}$ (Baca dari Materialized View) | Layanan terisolasi penuh | Layanan tetap melayani baca saat write offline! |
 
 ## 4. Implementasi Praktis & Kode / Simulasi Riil
 ```python
-# Quorum Read/Write Consistency Simulator (R + W > N) in Python
-from typing import List, Dict, Optional
+# Hexagonal / Clean Architecture (Ports & Adapters) Implementation in Python
+from typing import Protocol
 
-class ReplicaNode:
-    def __init__(self, node_id: int):
-        self.id = node_id
-        self.store: Dict[str, Tuple[str, int]] = {} # key -> (val, version)
+# --- Layer 1: Core Domain Entity (Murni tanpa library eksternal!) ---
+class BankAccount:
+    def __init__(self, account_id: str, balance: float):
+        self.account_id = account_id
+        self.balance = balance
 
-    def write(self, key: str, val: str, version: int) -> bool:
-        cur_ver = self.store.get(key, (None, -1))[1]
-        if version > cur_ver:
-            self.store[key] = (val, version)
-            return True
-        return False
+    def withdraw(self, amount: float):
+        if amount <= 0: raise ValueError("Invalid withdrawal amount")
+        if amount > self.balance: raise ValueError("Insufficient funds")
+        self.balance -= amount
 
-class QuorumClient:
-    def __init__(self, replicas: List[ReplicaNode], W: int, R: int):
-        self.replicas = replicas
-        self.W = W; self.R = R; self.current_version = 0
+# --- Layer 2: Outbound Port (Abstraksi Kontrak Interface) ---
+class AccountRepositoryPort(Protocol):
+    def find_by_id(self, account_id: str) -> BankAccount: ...
+    def save(self, account: BankAccount) -> None: ...
 
-    def quorum_write(self, key: str, val: str) -> bool:
-        self.current_version += 1
-        acks = sum(r.write(key, val, self.current_version) for r in self.replicas)
-        return acks >= self.W
+# --- Layer 2: Application Use Case ---
+class WithdrawMoneyUseCase:
+    def __init__(self, repo: AccountRepositoryPort):
+        self.repo = repo
 
-    def quorum_read(self, key: str) -> Optional[str]:
-        responses = [r.store.get(key, (None, -1)) for r in self.replicas[:self.R]]
-        # Ambil nilai dengan versi tertinggi yang berhasil dibaca dari kuorum R
-        best_val, best_ver = max(responses, key=lambda item: item[1])
-        return best_val
+    def execute(self, account_id: str, amount: float):
+        account = self.repo.find_by_id(account_id)
+        account.withdraw(amount)
+        self.repo.save(account)
 ```
 
 ## 5. Miskonsepsi & Jebakan Industri
-1. **Sloppy Quorum and Phantom Data Losses**: Menggunakan *Sloppy Quorum* dan *Hinted Handoff* saat partisi jaringan: penulisan diterima oleh node sementara di luar himpunan $N$ utama. Sifat $R + W > N$ runtuh sementara, dan pembacaan kuorum dapat mengembalikan data usang sampai proses hinted handoff selesai.
-2. **Replication Lag in Asynchronous Read Replicas**: Menambahkan 10 read-replica asinkron untuk menangani beban pembacaan web. Selama lonjakan penulisan tinggi, jeda replikasi (*Replication Lag*) membengkak hingga puluhan detik, memicu keluhan pengguna yang melihat data mereka menghilang sementara.
-3. **Multi-Leader Write-Write Conflict Explosion**: Dua pengguna mengedit profil yang sama pada dua data center berbeda secara bersamaan. Jika tidak ada aturan resolusi konflik deterministik (seperti LWW, CRDT, atau Operational Transformation), database akan mengalami percabangan data korup permanen.
+1. **Distributed Monolith Disaster**: Memecah sistem menjadi 50 microservices tetapi semuanya saling memanggil secara sinkron via REST API dan berbagi satu database terpusat yang sama. Anda mendapatkan seluruh kerumitan jaringan microservices tanpa satupun keuntungannya (satu service deploy ulang membekukan seluruh sistem).
+2. **Domain Leaks into Persistence Layer**: Mengimpor decorator framework database (seperti `@Entity` SQLAlchemy atau TypeORM) langsung ke dalam kelas entitas domain inti. Ketika Anda ingin beralih database, seluruh aturan bisnis Anda ikut terancam rusak.
+3. **Premature Microservices Optimization**: Mengadopsi arsitektur microservices pada hari pertama startup dengan 3 insinyur. Waktu dihabiskan untuk mengatur deployment Kubernetes dan jaringan gRPC alih-alih membangun kecocokan produk pasar (*Product-Market Fit*).
+
+### Studi Kasus Kegagalan Nyata: Runtuhnya Performa E-Commerce Global Akibat Dekomposisi Mikroservis Tanpa Batas Domain (Distributed Monolith Disaster)
+- **Kronologi & Konteks Kasus**: Sebuah perusahaan e-commerce internasional memutuskan untuk memecah sistem monolitik mereka menjadi lebih dari 80 mikroservis independen demi mengikuti tren industri modern. Namun beberapa bulan pasca migrasi, waktu respons halaman utama melonjak dari 150 milidetik menjadi lebih dari 4 detik, utilisasi jaringan pusat data jenuh, dan ketersediaan sistem merosot drastis.
+- **Akar Masalah Arsitektur Skala Besar & Distributed Monolith**: Tim rekayasa melakukan dekomposisi sistem tanpa menerapkan prinsip *Domain-Driven Design* (DDD) dan *Bounded Context* yang benar. Mereka memecah sistem berdasarkan entitas basis data (Service Pengguna, Service Produk, Service Pesanan, Service Pembayaran, Service Inventaris) yang berkomunikasi secara sinkron melalui HTTP REST. Untuk menampilkan satu halaman keranjang belanja, Service Frontend harus melakukan lebih dari 40 panggilan HTTP bersarang (*nested synchronous RPC calls*). Ketika satu mikroservis inventaris di ujung rantai mengalami penurunan performa sesaat, puluhan layanan hulu yang menunggunya kehabisan antrean thread pekerja (*thread pool exhaustion*). Sistem tersebut mewarisi seluruh kelemahan sistem terdistribusi (latensi jaringan, kegagalan parsial, kompleksitas deployment) tanpa mendapatkan satupun keuntungannya, bertransformasi menjadi sebuah *Distributed Monolith* yang rapuh.
+
+- **Potongan Kode / Arsitektur Cacat (Vulnerable Implementation)**:
+```c
+// Rekonstruksi Anti-Pattern Rantai Panggilan Sinkron Bersarang pada Mikroservis
+// Service Cart Controller:
+void handle_get_cart_request(int user_id) {
+    // CACAT ARSITEKTUR: Rantai panggilan sinkron bertingkat memicu latensi eksponensial!
+    UserProfile user = http_get("http://user-service/users/%d", user_id);
+    CartItems items = http_get("http://cart-service/carts/%d", user_id);
+    
+    for (int i = 0; i < items.count; i++) {
+        // N+1 Network Call Anti-Pattern: Panggilan jaringan di dalam loop!
+        ProductDetail prod = http_get("http://catalog-service/products/%d", items.item[i].id);
+        InventoryStatus inv = http_get("http://inventory-service/stocks/%d", items.item[i].id);
+        PriceDiscount disc = http_get("http://pricing-service/discounts/%d", items.item[i].id);
+        // Jika inventory-service mengalami timeout 2 detik, total request membeku selama 40 detik!
+    }
+}
+```
+
+- **Analisis Forensik & Rekayasa Modern**: Krisis Monolit Terdistribusi melahirkan kebangkitan prinsip *Modular Monolith* dan arsitektur *Event-Driven Choreography*. Arsitek perangkat lunak terkemuka (seperti Martin Fowler) kini menekankan prinsip 'MonolithFirst': jangan pernah memecah sistem menjadi mikroservis sebelum batas domain bisnis (*Bounded Contexts*) terpetakan secara matang dan stabil. Jika mikroservis benar-benar dibutuhkan, komunikasi antar-layanan wajib dilakukan secara asinkron menggunakan event streaming (Kafka/RabbitMQ) dengan pemisahan baca-tulis (*CQRS*) guna mengeliminasi ketergantungan temporal sinkron antar-layanan.
 
 ## 6. Proyek Latihan & Rubrik Penilaian Mandiri
-1. **Tingkat Pemula**: Diberikan klaster penyimpanan 5 node ($N=5$). Tentukan apakah konfigurasi berikut memenuhi konsistensi kuorum ketat: (a) $W=3, R=3$, (b) $W=4, R=2$, (c) $W=2, R=3$, (d) $W=5, R=1$.
-2. **Tingkat Menengah**: Bangun simulasi Merkle Tree sederhana di Python untuk membandingkan dua dataset 1000 rekaman beralamat kunci. Tunjukkan bagaimana perbedaan data pada satu rekaman tunggal dapat diisolasi dalam waktu $O(\log N)$ penelusuran pohon hash.
-3. **Tingkat Mahir**: Implementasikan arsitektur replikasi Leaderless Cassandra mini lengkap dengan fitur Read Repair asinkron dan deteksi konflik berbasis Vector Clocks. Simulasikan penulisan konkruen yang memicu cabang nilai bercabang (*Siblings*) dan lakukan rekonsiliasi manual di sisi klien.
+1. **Tingkat Pemula**: Gambarkan diagram arsitektur Modular Monolith untuk aplikasi toko online yang memisahkan modul `Catalog`, `Orders`, dan `Billing` dengan batasan antarmuka API publik yang jelas di antara ketiganya.
+2. **Tingkat Menengah**: Lengkapi kode Clean Architecture di atas dengan mengimplementasikan dua Adapter berbeda: (a) `InMemoryAccountRepository` untuk pengujian unit test super-cepat, dan (b) `SqliteAccountRepository` untuk persistensi fisik.
+3. **Tingkat Mahir**: Rancang arsitektur sistem pemesanan tiket bioskop skala besar berbasis Event-Driven Architecture (EDA) menggunakan Event Sourcing dan CQRS (Command Query Responsibility Segregation). Pisahkan model penulisan transaksional (Commands) dari model pembacaan denormalisasi teroptimasi (Queries).
+
+### Tingkat 1: Dasar
+- **Tugas**: Bangun implementasi arsitektur Hexagonal (*Ports and Adapters Architecture*) mandiri dalam Python/C++ untuk sistem manajemen inventaris barang: domain bisnis inti terisolasi dari basis data dan antarmuka web, berkomunikasi hanya melalui antarmuka *Port* (Input Port `IInventoryService` dan Output Port `IInventoryRepository`).
+- **Petunjuk Perancangan Arsitektur**:
+  - Modul domain tidak boleh mengimpor pustaka SQL atau framework web apapun.
+  - Implementasikan dua adapter repositori yang dapat ditukar: `InMemoryInventoryAdapter` (untuk unit testing) dan `SQLiteInventoryAdapter` (untuk produksi).
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Tukar Adapter*: Jalankan pengujian logika bisnis menggunakan `InMemoryInventoryAdapter`; tukar ke `SQLiteInventoryAdapter`; pastikan seluruh aturan bisnis berjalan identik tanpa mengubah satu baris pun kode logika domain inti.
+- **Rubrik Penilaian Mandiri**: 40% Kepatuhan Murni Arsitektur Hexagonal (Ports & Adapters), 30% Keterisolasian Domain Inti dari Ketergantungan Eksternal, 30% Kerapian Polimorfisme Adapter.
+
+### Tingkat 2: Menengah
+- **Tugas**: Kembangkan implementasi pola arsitektur *Outbox Pattern* untuk transaksi terdistribusi dalam Python/Go yang menjamin pengiriman event ke broker pesan (Kafka/RabbitMQ) secara atomik bersamaan dengan pembaruan basis data lokal (*Dual-Write Problem Mitigation*).
+- **Petunjuk Perancangan Arsitektur**:
+  - Tulis data entitas bisnis dan catatan pesan event ke tabel `outbox` dalam satu transaksi ACID basis data lokal yang sama.
+  - Sediakan proses pemindah latar belakang (*Outbox Relay Worker*) yang membaca tabel outbox dan mempublikasikan event ke broker pesan dengan garansi *At-Least-Once Delivery*.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Simulasi Crash Broker Pesan*: Matikan broker pesan di tengah transaksi; buktikan transaksi basis data lokal tetap berhasil dan worker outbox menunda pengiriman pesan hingga broker kembali online tanpa kehilangan event.
+- **Rubrik Penilaian Mandiri**: 40% Eliminasi Masalah Dual-Write via Outbox Pattern, 30% Jaminan Pengiriman At-Least-Once, 30% Idempoten Konsumen Pesan.
+
+### Tingkat 3: Mahir
+- **Tugas**: Rancang pola transaksi saga orkestrasi terdistribusi (*Orchestrated Saga Pattern*) dalam Python/Go untuk proses pemesanan e-commerce (Create Order $\to$ Reserve Stock $\to$ Charge Payment $\to$ Ship Delivery) lengkap dengan transaksi kompensasi otomatis (*Compensating Transactions / Rollback*) saat salah satu langkah di tengah jalan gagal.
+- **Petunjuk Perancangan Arsitektur**:
+  - Saga Orchestrator memelihara state machine persisten status alur transaksi.
+  - Jika tahap pembayaran gagal, orkestrator memanggil aksi kompensasi mundur: lepaskan reservasi stok dan batalkan status pesanan secara bersih.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Simulasi Kegagalan Pembayaran*: Lakukan reservasi stok sukses, lalu suntikkan kegagalan pembayaran; buktikan transaksi kompensasi melepaskan stok kembali ke inventaris dan state akhir sistem konsisten sempurna (*Eventual Consistency*).
+- **Rubrik Penilaian Mandiri**: 40% Arsitektur Saga Orchestrator State Machine yang Akurat, 30% Eksekusi Transaksi Kompensasi Mundur Tanpa Residu, 30% Ketahanan Terhadap Kegagalan Simpul.
 
 ## 7. Rekomendasi Sumber Belajar Standar Emas
 | Sumber Pembelajaran | Penulis / Institusi | Tautan Langsung | Fokus Materi |
 | :--- | :--- | :--- | :--- |
-| Dynamo: Amazon's Highly Available Key-value Store | Giuseppe DeCandia et al. (Amazon) | [Amazon Dynamo SOSP 2007](https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf) | Makalah Orisinal Penemuan Arsitektur Dynamo: Quorums, Merkle Trees & Sloppy Quorums |
-| Designing Data-Intensive Applications (DDIA) | Martin Kleppmann | [DDIA Chapter 5: Replication](https://dataintensive.net/) | Leader-Follower, Multi-Leader, Quorum Reads/Writes & Replication Lag Invariants |
-| Cassandra: A Decentralized Structured Storage System | Avinash Lakshman & Prashant Malik (Facebook) | [ACM SIGOPS 2010 Cassandra](https://www.cs.cornell.edu/projects/ladis2009/papers/lakshman-datastore.pdf) | Arsitektur Cassandra, LSM-Trees, Gossip Protocol & Tunable Consistency |
-| Apache Kafka Replication Internals & In-Sync Replicas (ISR) | Neha Narkhede et al. | [Confluent Kafka Replication](https://www.confluent.io/blog/hands-free-kafka-replication-a-lesson-in-operational-simplicity/) | Model Replikasi Log Komit Terdistribusi & In-Sync Replica (ISR) Pool |
+| Building Microservices: Designing Fine-Grained Systems | Sam Newman (O'Reilly) | [Sam Newman Microservices](https://samnewman.io/books/building_microservices_2nd_edition/) | Alkitab Microservices: Service Boundaries, Integration, Splits & Deployment |
+| Hexagonal Architecture (Ports and Adapters) | Alistair Cockburn | [Alistair Cockburn Original Site](https://alistair.cockburn.us/hexagonal-architecture/) | Makalah Orisinal Penemuan Arsitektur Heksagonal & Decoupling Ports |
+| Microservice Patterns: With Examples in Java | Chris Richardson | [Manning Richardson Book](https://www.manning.com/books/microservices-patterns) | Dekomposisi Domain, Saga Pattern, CQRS, Event Sourcing & API Gateway |
+| Software Architecture: The Hard Parts | Neal Ford, Mark Richards, Pramod Sadalage | [O'Reilly Architecture Hard Parts](https://www.oreilly.com/library/view/software-architecture-the/9781492086888/) | Tradeoff Analisis Distribusi Data, Granularitas Service & Transaksi |
 
 ---
 *Navigasi Cepat*: [Ke Tingkat 9](./README.md) | [Ke Master Index](../../INDEX.md) | *Sebelumnya*: [142. desain-kode-bersih-pola-desain](./142-desain-kode-bersih-pola-desain.md) | *Berikutnya*: [144. metodologi-pengujian-otomatis](./144-metodologi-pengujian-otomatis.md)

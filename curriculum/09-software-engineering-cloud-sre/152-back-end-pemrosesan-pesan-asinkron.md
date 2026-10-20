@@ -6,84 +6,172 @@
 ---
 
 ## 1. Intuisi Dasar Tanpa Jargon ("Seperti Bayi Baru Lahir")
-Banyak programmer mengira pekerjaan mereka selesai begitu kode berhasil dikompilasi dan 'tampak berjalan' di laptop mereka. Itu adalah ilusi yang berbahaya: perangkat lunak yang belum diuji secara ketat adalah bom waktu yang menunggu meledak di tangan pengguna. Metodologi Pengujian Perangkat Lunak ([Software Testing Methodology](https://martinfowler.com/articles/practical-test-pyramid.html)) adalah disiplin rekayasa pertahanan bertingkat. Piramida Pengujian memandu efisiensi kita: ribuan **Unit Tests** cepat di lapisan bawah menguji fungsi terisolasi; **Integration Tests** memastikan database dan API pihak ketiga berbicara dengan harmonis; sementara teknik modern mutakhir—seperti **Property-Based Testing** yang menguji kebenaran properti matematika dengan ribuan input acak ekstrem, dan **Fuzz Testing** yang membombardir biner dengan mutasi data gila—mampu menemukan celah keamanan memori tersembunyi yang tidak pernah terpikirkan oleh otak manusia terpandai sekalipun.
+### 1.1 Konsep Inti & Analogi Tanpa Jargon
+Bayangkan transaksi perbankan modern: Anda mentransfer Rp 1.000.000 dari rekening Bank A Anda untuk membayar belanjaan di toko e-commerce yang menggunakan rekening Bank B. Uang wajib dipotong dari Bank A dan uang wajib masuk ke Bank B. Tidak boleh ada skenario di mana uang di Bank A terpotong namun Bank B gagal menerima uang tersebut (uang lenyap di udara!); dan tidak boleh uang masuk ke Bank B namun Bank A gagal memotong saldo Anda (uang bertambah secara gaib!). Transaksi Terdistribusi ([Distributed Transactions & Sagas](https://microservices.io/patterns/data/saga.html)) adalah protokol penegakan keadilan absolut melintasi batas sistem yang berbeda. Dari protokol klasik yang sangat ketat (**Two-Phase Commit / 2PC**) di mana semua database mengunci data dan bersumpah bersama; hingga pola arsitektur modern microservices (**Saga Pattern**) yang mengoordinasikan transaksi panjang melalui rantai peristiwa dan transaksi kompensasi pembatalan otomatis (*Compensating Transactions*) yang anggun.
+
+### 1.2 Urgensi Rekayasa & Signifikansi Sistemik
+Dalam rekayasa sistem modern, pemahaman mendalam tentang konsep ini membedakan arsitek sistem kelas dunia dari sekadar operator perkakas teknis.
 
 ## 2. Fondasi Teoretis & Aksiomatik / Matematis
-Teorema Pengujian Dijkstra dan Formalisme Property-Based Testing (QuickCheck):
+### 2.1 Kerangka Teori Aksiomatik & Formulasi Matematis
+Protokol Dua Fase (Two-Phase Commit / 2PC) dan Pola Saga Kompensasi (Saga Pattern):
 
-1. **Teorema Edsger W. Dijkstra (1970)**:
-   $$\text{'Pengujian program dapat membuktikan keberadaan bug dengan sangat efektif,}$$
-   $$\text{tetapi secara matematis TIDAK AKAN PERNAH bisa membuktikan ketiadaan bug!'}$$
+### 2.2 Penurunan Matematis Langkah-demi-Langkah
+1. **Protokol Two-Phase Commit (2PC - Gray, 1978)**:
+   Dikelola oleh satu Koordinator Transaksi (**Coordinator**) dan sekumpulan partisipan database (**Participants**):
+   - **Fase 1 (Prepare / Voting)**:
+     Koordinator mengirim pesan $\text{Prepare}$ ke seluruh partisipan. Partisipan mengeksekusi transaksi secara lokal, mengunci baris data (Row Locks), menulis perubahan ke redo log, dan membalas: `VOTE_COMMIT` (siap) atau `VOTE_ABORT` (gagal).
+   - **Fase 2 (Commit / Rollback)**:
+     Jika **SEMUA** partisipan membalas `VOTE_COMMIT`, Koordinator menulis keputusan ke disk log dan menyiarkan perintah $\text{Global\_Commit}$.
+     Jika **ADA SATU SAJA** yang membalas `VOTE_ABORT` (atau timeout), Koordinator menyiarkan perintah $\text{Global\_Abort}$.
 
-2. **Piramida Pengujian (The Test Pyramid - Mike Cohn & Martin Fowler)**:
-   $$\text{UI / End-to-End Tests (10\% - Lambat & Rapuh)} \quad < \quad \text{Integration Tests (20\%)} \quad < \quad \mathbf{Unit Tests (70\% - Cepat & Stabil)}$$
+2. **Kelemahan Fatal 2PC: Sifat Pemblokiran (Blocking Protocol)**:
+   Jika Koordinator mengalami crash permanen setelah partisipan membalas `VOTE_COMMIT` di Fase 1, seluruh partisipan **terkunci selamanya (*Blocked in In-Doubt State*)**! Partisipan tidak boleh membatalkan secara sepihak dan tidak boleh meng-commit sendiri.
 
-3. **Property-Based Testing (Claessen & Hughes, 2000)**:
-   Alih-alih menguji contoh spesifik (*Example-based testing* seperti `add(2, 3) == 5`), kita mendefinisikan sifat invarian matematika universal $\forall x$:
-   $$\forall x, y \in \mathbb{Z}, \quad x + y \equiv y + x \quad (\text{Komutatif})$$
-   $$\forall x \in \text{Data}, \quad \text{deserialize}(\text{serialize}(x)) \equiv x \quad (\text{Round-trip Invariant})$$
-   Mesin penguji secara otomatis menghasilkan ribuan kasus acak; jika ditemukan kegagalan, mesin menjalankan **Shrinking**: memangkas input gagal menjadi contoh terkecil yang paling minimal.
+3. **Pola Transaksi Saga (Hector Garcia-Molina & Kenneth Salem, 1987)**:
+   Memecahkan transaksi global menjadi urutan transaksi lokal independen: $T_1, T_2, \dots, T_n$.
+   Setiap transaksi lokal $T_i$ memiliki pasangan **Transaksi Kompensasi** $C_i$ yang membatalkan dampak efek samping $T_i$ jika terjadi kegagalan di tengah jalan:
+   $$\text{Jika } T_k \text{ Gagal} \implies \text{Eksekusi Kompensasi Mundur: } C_{k-1}, C_{k-2}, \dots, C_1$$
 
 ## 3. Anatomi Teknis & Cara Kerja Internal
-Arsitektur Coverage-Guided Fuzzing (AFL / libFuzzer Engine):
+Arsitektur Saga Pattern (Choreography vs Orchestration) dan Pola Transaksional Outbox:
 
 ```mermaid
 graph LR
-A[Initial Valid Seed Corpus] --> B[Mutation Engine: Bit-Flip, Byte-Swap, Arithmetic]
-B --> C[Execute Target Program Binary with Sanitizers ASAN/UBSAN]
-C --> D{Did execution discover New Code Path / Edge Coverage?}
-D -->|Yes: Expand Corpus!| A
-D -->|No| B
-C -->|Crash Detected! SIGSEGV / Memory Leak| E[Save Minimal Reproducer Crash File!]
+subgraph Saga Orchestrator Pipeline
+O[Saga Orchestrator Workflow Engine] -->|1. Create Order Pending| S1[Order Service]
+O -->|2. Authorize Payment| S2[Payment Service]
+O -->|3. Reserve Stock| S3[Inventory Service]
+S3 -.->|Out of Stock! Error!| O
+O ==>|4. Compensating Action: Refund Payment!| S2
+O ==>|5. Compensating Action: Mark Order Cancelled!| S1
+end
 ```
 
-1. **Sanitizers Instrumentation (ASan / UBSan / TSan)**:
-   Kompilator (Clang/GCC `-fsanitize=address`) menyuntikkan instruksi pengawas bayangan memori (*Shadow Memory*) di setiap akses pointer untuk mendeteksi buffer overflow, use-after-free, dan data race tepat pada instruksi terjadinya kesalahan.
+1. **Transactional Outbox Pattern**: Memecahkan masalah pembaruan database dan publikasi event pesan ke message broker (Kafka/RabbitMQ) secara atomik. Alih-alih mempublikasikan pesan langsung ke jaringan, aplikasi menulis payload pesan ke tabel internal database lokal (`outbox table`) di dalam transaksi database lokal yang sama. Proses latar belakang terpisah (*Message Relay / Debezium CDC*) membaca tabel outbox dan mempublikasikannya ke broker dengan jaminan *At-Least-Once Delivery* ([Microservices.io Outbox Pattern](https://microservices.io/patterns/data/transactional-outbox.html)).
+
+#### Tabel Penelusuran Badai Rebalance Konsumen Apache Kafka (Rebalance Storm)
+| Langkah Operasi Aliran Event | Status Anggota Consumer Group | Heartbeat Thread ke Broker Koordinator | Status Partisi Topik Kafka ($P=12$) | Pemicu Timeout Sesi (*Max Poll Interval*) | Status Throughput Pemrosesan Pesan |
+|---|---|---|---|---|---|
+| Operasi Normal | 6 Consumer memproses 2 partisi masing-masing | Heartbeat dikirim setiap 3 detik | Partisi terbagi rata sempurna | Pemrosesan pesan cepat ($< 1\text{ s}$) | 100.000 Pesan / detik (Lancar) |
+| Konsumen 3 Macet | Konsumen 3 menerima pesan racun (*Poison Pill*) | Heartbeat aktif, TAPI `poll()` terblokir | Konsumen 3 membeku selama 305 detik | Batas `max.poll.interval.ms` (300 s) terlampaui! | Konsumen 3 dianggap mati oleh koordinator! |
+| Sinyal Rebalance Dipicu | Koordinator membatalkan seluruh partisi | Seluruh 5 konsumen lain dipaksa berhenti | **SELURUH KONSUMEN BERHENTI MEMPROSES PESAN!**| Pemicuan protokol `JoinGroup` | **THROUGHPUT ANJLOK KE 0! (JARINGAN BEKU)** |
+| Badai Rebalance Berulang | Partisi dipindahkan ke Konsumen 4 | Konsumen 4 membaca pesan racun yang sama!| Konsumen 4 membeku melampaui timeout! | Koordinator memicu rebalance kedua! | Rebalance storm berputar tanpa henti! |
+| Mitigasi Desain | Cooperative Sticky Assignor + DLQ | Partisi sehat tidak dicabut saat rebalance | Pesan racun dialihkan ke Dead-Letter Queue | Pemrosesan pesan sehat tetap berjalan kontinu | Throughput pulih stabil |
 
 ## 4. Implementasi Praktis & Kode / Simulasi Riil
 ```python
-# Property-Based Testing using Hypothesis Framework in Python
-from hypothesis import given, strategies as st
+# Saga Pattern Orchestrator with Forward Execution and Backward Compensation in Python
+from typing import List, Callable, Tuple
 
-# Fungsi yang diuji: Pengurutan list angka
-def custom_sort(lst: list) -> list:
-    return sorted(lst)
+class SagaStep:
+    def __init__(self, name: str, action: Callable[[], bool], compensate: Callable[[], None]):
+        self.name = name
+        self.action = action         # Transaksi lokal maju
+        self.compensate = compensate # Aksi kompensasi mundur pembalik
 
-# Uji Properti Universal Invarian Pengurutan
-@given(st.lists(st.integers()))
-def test_sorting_properties(input_list):
-    result = custom_sort(input_list)
-    
-    # Properti 1: Panjang output harus selalu sama dengan panjang input
-    assert len(result) == len(input_list)
-    
-    # Properti 2: Elemen hasil wajib terurut secara monoton menaik
-    for i in range(len(result) - 1):
-        assert result[i] <= result[i + 1]
-        
-    # Properti 3: Idempotensi sorting
-    assert custom_sort(result) == result
+class SagaOrchestrator:
+    def __init__(self):
+        self.steps: List[SagaStep] = []
+        self.executed_steps: List[SagaStep] = []
 
-print("Property-based test assertions defined!")
+    def add_step(self, step: SagaStep):
+        self.steps.append(step)
+
+    def execute(self) -> bool:
+        for step in self.steps:
+            print(f"[Saga] Executing forward action: {step.name}...")
+            success = step.action()
+            if success:
+                self.executed_steps.append(step)
+            else:
+                print(f"[Saga ALERT] Action failed at step: {step.name}! Initiating rollback...")
+                self._rollback()
+                return False
+        print("[Saga] Distributed transaction workflow completed successfully!")
+        return True
+
+    def _rollback(self):
+        # Eksekusi kompensasi secara mundur dari langkah terakhir yang sukses!
+        for step in reversed(self.executed_steps):
+            print(f"  [Compensating] Undoing changes for: {step.name}...")
+            step.compensate()
 ```
 
 ## 5. Miskonsepsi & Jebakan Industri
-1. **Over-Mocking Testing Nothing (Mocking All Collaborators)**: Mengganti semua dependensi database dan API dengan mock objek palsu. Unit test lulus 100% dengan warna hijau, namun ketika dijalankan di server nyata, sistem crash seketika karena skema SQL di database fisik tidak cocok dengan mock.
-2. **Flaky Tests Eroding Engineering Trust**: Menulis pengujian integrasi yang mengandalkan jeda waktu tidur `sleep(2)` alih-alih polling kondisi asinkron yang tepat. Pengujian akan gagal sesekali saat CPU server CI sedang sibuk, membuat tim mengabaikan laporan kegagalan pengujian.
-3. **Chasing 100% Code Coverage Vanity Metric**: Mengharuskan 100% line coverage tanpa menguji kondisi batas (*Edge Cases*). Mengeksekusi setiap baris kode bukan berarti menguji seluruh kemungkinan kombinasi status logika.
+1. **2PC Lock Contention Crippling Cloud Microservices**: Menggunakan Two-Phase Commit melintasi microservices independen yang berkomunikasi melalui jaringan publik. Kunci baris database ditahan selama proses voting, membekukan ribuan transaksi lain dan melumpuhkan throughput sistem saat terjadi latensi jaringan.
+2. **Non-Idempotent Compensating Actions in Saga**: Mengimplementasikan aksi kompensasi pembatalan yang tidak idempoten (misal fungsi kompensasi pembalikan saldo dipanggil dua kali akibat timeout retry jaringan, memotong uang nasabah dua kali lipat!).
+3. **Dual-Write Hazard without Transactional Outbox**: Menyimpan data order ke database PostgreSQL, lalu mengirimkan pesan event ke Apache Kafka di baris kode berikutnya. Jika server crash tepat di antara kedua baris kode tersebut, data tersimpan di database tetapi event tidak pernah dikirim ke Kafka, merusak konsistensi antar-microservice.
+
+### Studi Kasus Kegagalan Nyata: Badai Rebalance Konsumen Apache Kafka (Consumer Rebalance Storm) yang Melumpuhkan Pemrosesan Transaksi Finansial
+- **Kronologi & Konteks Kasus**: Pada platform pembayaran digital yang memproses aliran event jutaan transaksi per hari menggunakan kluster Apache Kafka, seluruh pipeline pemrosesan event terhenti total selama lebih dari 3 jam pada saat promosi transaksi akhir bulan.
+- **Akar Masalah Pemrosesan Pesan Asinkron, Partisi Kafka, & Siklus Rebalance**: Kluster konsumen (*Consumer Group*) menggunakan protokol penugasan partisi bawaan *Eager Rebalance Protocol*. Sebuah pesan transaksi yang memuat data korup (*Poison Pill Message*) diterima oleh salah satu instance konsumen. Pemrosesan pesan korup ini memicu loop tak berujung atau pemblokiran I/O yang melebihi batas waktu maksimum polling interval (`max.poll.interval.ms` = 300 detik). Koordinator Kafka mengasumsikan konsumen tersebut telah mati dan memerintahkan seluruh konsumen dalam grup untuk mencabut (*revoke*) seluruh partisi dan bergabung kembali (*JoinGroup*) dari awal. Saat rebalance berlangsung, seluruh pemrosesan event di seluruh partisi terhenti total (*Stop-The-World Pause*). Lebih fatal lagi, partisi yang memuat pesan racun tersebut dialihkan ke konsumen kedua; konsumen kedua membeku dan memicu rebalance baru. Terjadi reaksi berantai *Rebalance Storm* tak berujung yang menahan jutaan transaksi pembayaran nasabah di antrean buffer.
+
+- **Potongan Kode / Arsitektur Cacat (Vulnerable Implementation)**:
+```java
+// Rekonstruksi Anti-Pattern Pemblokiran Thread Konsumen Kafka
+// Consumer Configuration Defect:
+Properties props = new Properties();
+props.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, 300000); // 5 Menit
+props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG, 
+          "org.apache.kafka.clients.consumer.RangeAssignor"); // Eager Rebalance!
+
+KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
+consumer.subscribe(Collections.singletonList("financial-transactions"));
+
+while (true) {
+    ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
+    for (ConsumerRecord<String, String> record : records) {
+        // CACAT FATAL: Pemanggilan panggilan eksternal yang memblokir di dalam loop poll!
+        // Jika pemrosesan memakan waktu > 5 menit, koordinator mencabut seluruh partisi 
+        // dan memicu Stop-The-World Rebalance Storm di seluruh kluster!
+        processFinancialTransactionBlocking(record.value());
+    }
+}
+```
+
+- **Analisis Forensik & Rekayasa Modern**: Insiden Rebalance Storm memicu pembaruan arsitektur besar dalam ekosistem Apache Kafka. Standar rekayasa event-driven modern mewajibkan: (1) Adopsi protokol *Cooperative Sticky Assignor* (`CooperativeStickyAssignor`) yang memungkinkan penugasan ulang partisi secara bertahap tanpa perlu mencabut partisi sehat yang sedang aktif (*Incremental Cooperative Rebalancing*); (2) Penerapan pola *Dead-Letter Queue* (DLQ) dengan pemutusan circuit breaker instan jika suatu pesan gagal diproses setelah sejumlah percobaan ulang, mencegah racun event mematikan thread konsumen; (3) Pemisahan loop polling Kafka dari thread pool eksekusi tugas bisnis menggunakan antrean in-memory terisolasi.
 
 ## 6. Proyek Latihan & Rubrik Penilaian Mandiri
-1. **Tingkat Pemula**: Tulis rangkaian pengujian unit test menggunakan kerangka `pytest` untuk fungsi kalkulator string matematika: uji input normal, pembagian nol, input negatif, dan format karakter tidak valid.
-2. **Tingkat Menengah**: Gunakan pustaka mock (`unittest.mock`) untuk menguji layanan pembayaran pesanan e-commerce: simulasikan kegagalan jaringan saat menghubungi gateway pembayaran dan buktikan status pesanan ditandai sebagai `PAYMENT_FAILED`.
-3. **Tingkat Mahir**: Bangun target Fuzz Testing menggunakan Google `libFuzzer` dan Clang AddressSanitizer (`-fsanitize=fuzzer,address`) untuk mem-fuzz parser header biner paket jaringan kustom di C/C++. Biarkan fuzzer berjalan selama 10 menit dan analisis apakah ditemukan memory leak atau out-of-bounds read.
+1. **Tingkat Pemula**: Simulasikan diagram alur Two-Phase Commit (2PC) ketika terdapat 1 Koordinator dan 3 Partisipan di mana Partisipan nomor 2 menolak dengan suara `VOTE_ABORT`. Tunjukkan pesan yang dikirimkan koordinator pada Fase 2.
+2. **Tingkat Menengah**: Gunakan kelas `SagaOrchestrator` di atas untuk memodelkan proses checkout e-commerce (Langkah 1: Buat Order, Langkah 2: Potong Saldo Kartu Kredit, Langkah 3: Potong Stok Barang). Simulasikan kegagalan pada Langkah 3 dan buktikan saldo kartu kredit dikembalikan secara otomatis via fungsi kompensasi.
+3. **Tingkat Mahir**: Implementasikan pola Transactional Outbox Pattern lengkap menggunakan PostgreSQL dan Python: simpan transaksi pesanan bersama entri pesan event di tabel `outbox` dalam satu transaksi ACID `BEGIN ... COMMIT`. Bangun worker independen yang membaca tabel outbox secara streaming menggunakan Change Data Capture (CDC) atau `SELECT ... FOR UPDATE SKIP LOCKED`.
+
+### Tingkat 1: Dasar
+- **Tugas**: Bangun implementasi antrean pesan in-memory terisolasi berbasis thread (*Thread-Safe Message Queue*) mandiri dalam Python/C++ menggunakan Mutex dan Condition Variable yang mengimplementasikan pola Produsen-Konsumen (*Producer-Consumer Pattern*) dengan batasan kapasitas buffer (*Bounded Buffer Queue*) dan penolakan aman saat antrean penuh.
+- **Petunjuk Perancangan Arsitektur**:
+  - Produsen tertidur saat antrean penuh (`queue.size() == max_capacity`).
+  - Konsumen tertidur saat antrean kosong (`queue.size() == 0`).
+  - Gunakan `notify_one()` untuk membangunkan thread yang tepat.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Kontensi Konkurensi*: 4 Thread Produser menghasilkan total $100.000$ pesan, 4 Thread Konsumen membaca seluruh pesan; buktikan tidak ada pesan yang hilang atau terduplikasi, dan semua thread keluar bersih saat sinyal terminasi dikirim.
+- **Rubrik Penilaian Mandiri**: 40% Penggunaan Condition Variable & Mutex Thread-Safe yang Benar, 30% Eliminasi Deadlock & Race Condition, 30% Integritas Jumlah Pesan 100%.
+
+### Tingkat 2: Menengah
+- **Tugas**: Kembangkan implementasi broker antrean pesan dengan penanganan pesan racun (*Poison Pill & Dead-Letter Queue / DLQ System*) dalam Python yang memproses pesan tugas, melacak jumlah kegagalan pemrosesan per pesan (*Retry Count*), dan secara otomatis memindahkan pesan ke antrean `dead-letter-queue` setelah 3 kali kegagalan beruntun dengan penundaan eksponensial (*Exponential Backoff*).
+- **Petunjuk Perancangan Arsitektur**:
+  - Rumus penundaan: $\text{delay} = \text{base\_delay} \times 2^{\text{retry}} + \text{jitter}$.
+  - Jangan biarkan pesan yang gagal memblokir pesan valid lainnya di antrean utama (*Head-of-Line Blocking Prevention*).
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Penanganan Pesan Racun*: Masukkan 10 pesan normal dan 1 pesan cacat yang selalu melempar exception; buktikan 10 pesan normal berhasil diproses dan tepat 1 pesan cacat dipindahkan ke DLQ tanpa menghentikan worker.
+- **Rubrik Penilaian Mandiri**: 40% Mekanisme Retry Exponential Backoff yang Presisi, 30% Pemindahan Pesan ke DLQ Tanpa Head-of-Line Blocking, 30% Ketahanan Worker Exception.
+
+### Tingkat 3: Mahir
+- **Tugas**: Rancang simulator partisi log terdistribusi mini berbasis konsep Apache Kafka (*Mini Partitioned Commit Log Engine*) dalam Python/Go yang mendukung penulisan pesan sekuensial append-only ke file segmen disk, pelacakan offset integer per partisi, serta pembacaan pesan konkuren oleh beberapa konsumen dalam satu kelompok konsumen (*Consumer Group*) dengan penugasan partisi deterministik.
+- **Petunjuk Perancangan Arsitektur**:
+  - Simpan pesan dalam format biner: `Length (4B) + Offset (8B) + Payload`.
+  - Simpan posisi offset konsumen yang telah dikonfirmasi (*Committed Offset*) ke tabel penyimpanan status metadata terpisah.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Penyeimbangan Partisi*: Buat 4 partisi log dan daftarkan 2 konsumen; buktikan masing-masing konsumen menerima tepat 2 partisi; tambahkan konsumen ke-3; buktikan rebalance menugaskan ulang partisi secara seimbang tanpa kehilangan offset pembacaan.
+- **Rubrik Penilaian Mandiri**: 40% Arsitektur Append-Only Log & Segment Files yang Benar, 30% Logika Penugasan Partisi Consumer Group Dinamis, 30% Manajemen Committed Offset Akurat.
 
 ## 7. Rekomendasi Sumber Belajar Standar Emas
 | Sumber Pembelajaran | Penulis / Institusi | Tautan Langsung | Fokus Materi |
 | :--- | :--- | :--- | :--- |
-| The Practical Test Pyramid | Ham Vocke & Martin Fowler | [Martin Fowler Testing Pyramid](https://martinfowler.com/articles/practical-test-pyramid.html) | Unit Tests, Integration Tests, End-to-End Tests & Anti-Patterns |
-| QuickCheck: A Lightweight Tool for Random Testing of Haskell Programs | Koen Claessen & John Hughes | [ACM ICFP 2000 Paper](https://dl.acm.org/doi/10.1145/351240.351266) | Makalah Orisinal Penemuan Property-Based Testing & Shrinking |
-| LLVM libFuzzer: A Library for In-Process Coverage-Guided Fuzz Testing | The LLVM Compiler Infrastructure | [LLVM libFuzzer Documentation](https://llvm.org/docs/LibFuzzer.html) | Coverage-Guided Fuzzing, Sanitizer Integration & Corpus Management |
-| Unit Testing Principles, Practices, and Patterns | Vladimir Khorikov (Manning) | [Manning Khorikov Book](https://www.manning.com/books/unit-testing) | Definisi Unit Test Baik vs Buruk, Mocking vs Stubs & Anti-Fragile Tests |
+| Notes on Data Base Operating Systems (Two-Phase Commit 2PC) | Jim Gray (Turing Award Winner) | [Jim Gray 1978 Classic Paper](https://www.microsoft.com/en-us/research/publication/notes-on-data-base-operating-systems/) | Makalah Orisinal Penemuan Protokol Konsensus Transaksi Two-Phase Commit |
+| Sagas: Hector Garcia-Molina & Kenneth Salem | Princeton University | [ACM SIGMOD 1987 Paper](https://www.cs.cornell.edu/andru/cs711/2002fa/reading/sagas.pdf) | Makalah Orisinal Penemuan Pola Transaksi Kompensasi Sagas |
+| Pattern: Saga (Orchestration vs Choreography) | Chris Richardson (Microservices.io) | [Microservices.io Saga Pattern](https://microservices.io/patterns/data/saga.html) | Pola Arsitektur Microservices Saga, Compensating Transactions & Outbox |
+| Transactional Outbox Pattern for Microservices | Debezium / Red Hat | [Debezium Outbox Pattern](https://debezium.io/blog/2019/02/19/reliable-microservices-data-exchange/) | Change Data Capture (CDC), Event Sourcing & Dual-Write Hazard Elimination |
 
 ---
 *Navigasi Cepat*: [Ke Tingkat 9](./README.md) | [Ke Master Index](../../INDEX.md) | *Sebelumnya*: [151. back-end-strategi-caching-multi-tingkat](./151-back-end-strategi-caching-multi-tingkat.md) | *Berikutnya*: [153. sistem-terdistribusi-keandalan-ketahanan](./153-sistem-terdistribusi-keandalan-ketahanan.md)

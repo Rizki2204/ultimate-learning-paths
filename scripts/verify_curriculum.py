@@ -107,6 +107,85 @@ def test_dag_and_root_readme():
         
     print("  -> OK: Master README.md & Prerequisites DAG diverifikasi penuh.")
 
+import re
+
+def test_anti_facade_and_authenticity():
+    print("[6/6] Verifikasi Anti-Facade & Otentisitas Kurikulum...")
+    
+    forbidden_dummy_tokens = [
+        "process_critical_payload",
+        "process_critical_payload_safe",
+        "16 thread pekerja paralel yang secara serempak melakukan 100.000 transaksi mutasi data",
+        "vektor uji acak hasil fuzzing (10 juta mutasi bit acak)",
+    ]
+    
+    hardware_only_tokens = [
+        "IR = 0xEA00_0010",
+        "ALU_OUT = 0x0000_0001",
+    ]
+    
+    snippets_seen = set()
+    traces_seen = set()
+    total_modules = len(TOPICS_METADATA)
+    
+    for t_id, slug, full_title, tier_idx in TOPICS_METADATA:
+        tier = TIERS[tier_idx]
+        filename = f"{t_id:03d}-{slug}.md"
+        filepath = os.path.join(BASE_DIR, "curriculum", tier["dir_name"], filename)
+        
+        with open(filepath, "r", encoding="utf-8") as f:
+            content = f.read()
+            
+        # Assertion 1: Zero forbidden dummy tokens
+        for token in forbidden_dummy_tokens:
+            assert token not in content, (
+                f"INTEGRITY VIOLATION: Placeholder '{token}' terdeteksi pada {filename}!"
+            )
+            
+        # Assertion 2: CPU hardware register strings forbidden in non-hardware tiers
+        if tier_idx not in [4, 5]:
+            for hw_token in hardware_only_tokens:
+                assert hw_token not in content, (
+                    f"INTEGRITY VIOLATION: CPU trace '{hw_token}' tidak valid untuk domain non-perangkat keras pada {filename}!"
+                )
+                
+        # Assertion 3: Code fence language consistency (No C syntax inside python fence)
+        c_in_python = re.findall(r"```python\s*(?:/\*|//|void |int16_t |int32_t |#include )", content)
+        assert len(c_in_python) == 0, (
+            f"SYNTAX INTEGRITY ERROR: Kode C terdeteksi di dalam blok ```python pada {filename}!"
+        )
+        
+        # Assertion 4: Uniqueness index tracking
+        # Extract Section 5 code blocks
+        sec5_match = re.search(r"## 5\. Miskonsepsi & Jebakan Industri(.*?)(?=## 6\.|$)", content, re.DOTALL)
+        if sec5_match:
+            sec5_text = sec5_match.group(1)
+            code_blocks = re.findall(r"```(?:\w+)?\n(.*?)```", sec5_text, re.DOTALL)
+            for cb in code_blocks:
+                cleaned_cb = re.sub(r"\s+", " ", cb.strip())
+                if len(cleaned_cb) > 40:
+                    snippets_seen.add(cleaned_cb)
+                    
+        # Extract Section 3 trace tables
+        sec3_match = re.search(r"## 3\. Anatomi Teknis & Cara Kerja Internal(.*?)(?=## 4\.|$)", content, re.DOTALL)
+        if sec3_match:
+            sec3_text = sec3_match.group(1)
+            table_rows = [line.strip() for line in sec3_text.splitlines() if line.startswith("|") and not line.startswith("|---")]
+            if len(table_rows) > 2:
+                traces_seen.add(" ".join(table_rows[:3]))
+
+    # Assertion 5: Diversity threshold (>85% unique snippets and traces)
+    uniqueness_ratio_snippets = len(snippets_seen) / float(total_modules)
+    uniqueness_ratio_traces = len(traces_seen) / float(total_modules)
+    
+    assert uniqueness_ratio_snippets >= 0.85, (
+        f"INTEGRITY VIOLATION: Rasio keunikan snippet post-mortem terlalu rendah ({uniqueness_ratio_snippets:.2f} < 0.85). Terindikasi copy-paste massal!"
+    )
+    assert uniqueness_ratio_traces >= 0.85, (
+        f"INTEGRITY VIOLATION: Rasio keunikan tabel eksekusi trace terlalu rendah ({uniqueness_ratio_traces:.2f} < 0.85). Terindikasi copy-paste massal!"
+    )
+    print(f"  -> OK: Anti-Facade Suite LULUS! {len(snippets_seen)} snippet unik ({uniqueness_ratio_snippets:.1%}) & {len(traces_seen)} trace unik ({uniqueness_ratio_traces:.1%}).")
+
 def run_all_tests():
     try:
         if sys.stdout.encoding.lower() != 'utf-8':
@@ -122,6 +201,7 @@ def run_all_tests():
         test_all_232_topic_modules()
         test_master_index()
         test_dag_and_root_readme()
+        test_anti_facade_and_authenticity()
         print("==================================================")
         print("[SUCCESS] SEMUA PENGUJIAN LULUS 100%! VERIFIKASI SUKSES!")
         print("==================================================")

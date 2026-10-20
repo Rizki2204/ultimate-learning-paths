@@ -6,83 +6,177 @@
 ---
 
 ## 1. Intuisi Dasar Tanpa Jargon ("Seperti Bayi Baru Lahir")
-Database transaksional tradisional (OLTP) dirancang untuk melayani ribuan nasabah bank yang mengambil uang satu per satu: ia membaca atau menulis satu baris data penuh yang berisi seluruh identitas nasabah (**Row-Oriented Storage**). Namun ketika Chief Financial Officer (CFO) perusahaan bertanya: *'Berapa rata-rata pengeluaran belanja 500 juta pengguna di seluruh dunia selama setahun terakhir?'*, database baris terpaksa membaca gigabyte data alamat rumah, nomor KTP, dan email nasabah yang sama sekali tidak relevan hanya untuk menjumlahkan satu kolom angka pengeluaran! Database Kolom & OLAP ([Columnar Databases & ClickHouse](https://clickhouse.com/docs/en/development/architecture)) adalah mesin analitik berkecepatan peluru: ia menyimpan setiap kolom tabel dalam file disk terpisah; ia mengompresi angka-angka identik secara masif; dan ia memanggil instruksi vektor perangkat keras CPU modern (**SIMD AVX-512**) untuk memproses miliaran baris data analitik per detik tanpa berkeringat!
+### 1.1 Konsep Inti & Analogi Tanpa Jargon
+Bagaimana sekelompok politisi di parlemen yang saling curiga dan sering terlambat rapat dapat menyepakati satu undang-undang hukum yang sah tanpa ada satu orang diktator pun yang berkuasa mutlak? Algoritma Konsensus Terdistribusi Paxos ([The Paxos Protocol & Architecture](https://lamport.azurewebsites.net/pubs/paxos-simple.pdf)) adalah mahakarya matematika Leslie Lamport yang memecahkan masalah ini. Paxos bertindak seperti dewan perwakilan rakyat digital: proses-proses berperan sebagai pengusul (**Proposer**), pemilih (**Acceptor**), dan pencatat (**Learner**). Melalui tatanan diplomasi dua fase (Prepare dan Accept), Paxos membuktikan secara matematis bahwa selama mayoritas suara terbanyak (**Quorum Mayoritas**: $\lfloor N/2 \rfloor + 1$) tercapai, sistem tidak akan pernah menghasilkan dua keputusan yang bertentangan, meskipun separuh anggota dewan pingsan atau pesan diplomatik hilang di tengah jalan!
+
+### 1.2 Urgensi Rekayasa & Signifikansi Sistemik
+Dalam rekayasa sistem modern, pemahaman mendalam tentang konsep ini membedakan arsitek sistem kelas dunia dari sekadar operator perkakas teknis.
 
 ## 2. Fondasi Teoretis & Aksiomatik / Matematis
-Perbandingan Arsitektur Baris (Row-Oriented) vs Kolom (Column-Oriented) dan Kompresi Biner:
+### 2.1 Kerangka Teori Aksiomatik & Formulasi Matematis
+Formulasi Matematis Protokol Konsensus Single-Decree Paxos (Dua Fase Inti):
 
-1. **Row-Oriented vs Column-Oriented Storage Layout**:
-   $$\text{Tabel Data}: \quad \begin{array}{|c|c|c|} \hline \text{ID (4B)} & \text{Negara (8B)} & \text{Nominal (4B)} \\ \hline \end{array}$$
-   - **Row-Oriented (Postgres/MySQL)**: `[ID1, IDN, 500], [ID2, USA, 200], [ID3, IDN, 800]` $\implies$ Kueri `SUM(Nominal)` membuang $75\%$ bandwidth I/O membaca field ID dan Negara yang tidak berguna!
-   - **Column-Oriented (ClickHouse/Parquet)**: `[ID1, ID2, ID3]`, `[IDN, USA, IDN]`, `[500, 200, 800]` $\implies$ Kueri `SUM(Nominal)` HANYA membaca file kolom Nominal secara sekuensial lurus pada kecepatan puncak disk!
+### 2.2 Penurunan Matematis Langkah-demi-Langkah
+Setiap usulan diidentifikasi secara unik oleh nomor proposal integer yang selalu meningkat: $n \in \mathbb{N}$ (di mana $n \pmod N = \text{NodeID}$).
 
-2. **Algoritma Kompresi Kolom Khusus**:
-   Karena satu kolom hanya menyimpan tipe data yang identik, rasio kompresi melonjak drastis ($10\times$ lipat!):
-   - **Run-Length Encoding (RLE)**: `IDN, IDN, IDN, IDN` $\implies$ `(IDN, 4)`.
-   - **Delta Encoding**: Menyimpan selisih perbedaan angka: `1000, 1004, 1007` $\implies$ `1000, +4, +3`.
-   - **Dictionary Encoding**: Mengganti string panjang dengan ID integer kecil 1-byte.
+1. **Fase 1 (Prepare & Promise)**:
+   - **1a. Prepare**: Proposer memilih nomor proposal $n$ dan menyiarkan pesan $\text{Prepare}(n)$ ke seluruh Acceptor.
+   - **1b. Promise**: Jika Acceptor menerima $\text{Prepare}(n)$ dengan $n > \text{min\_proposal}$ yang pernah ia lihat:
+     Acceptor berjanji: *'Saya tidak akan menerima proposal dengan nomor $< n$ di masa depan!'*, dan membalas dengan $\text{Promise}(n, n_v, v)$, di mana $n_v$ dan $v$ adalah nomor proposal dan nilai tertinggi yang pernah diterima Acceptor sejauh ini.
 
-3. **Pemrosesan Kueri Ter-Vektorisasi SIMD (Vectorized Query Execution)**:
-   Fungsi filter dan penjumlahan mengeksekusi instruksi CPU SIMD (AVX2 / AVX-512):
-   $$\text{SIMD AVX-512} \implies 16 \text{ bilangan integer 32-bit dijumlahkan dalam TEPAT 1 siklus CPU clock!}$$
+2. **Fase 2 (Propose / Accept & Accepted)**:
+   - **2a. Accept Request**: Jika Proposer menerima balasan $\text{Promise}$ dari mayoritas Acceptor ($Q \ge \lfloor N/2 \rfloor + 1$):
+     Proposer menetapkan nilai $v$: jika ada Acceptor yang melaporkan pernah menerima nilai lama, Proposer **wajib** memilih nilai $v$ yang memiliki nomor $n_v$ tertinggi! Jika tidak ada, Proposer bebas memilih nilainya sendiri. Proposer menyiarkan $\text{Accept}(n, v)$.
+   - **2b. Accepted**: Acceptor menerima proposal $(n, v)$ jika dan hanya jika ia tidak pernah melanggar janji dengan proposal bernomor $> n$. Acceptor menyiarkan $\text{Accepted}(n, v)$ ke Proposer dan Learners.
+
+Invarian Keamanan Paxos (Safety Invariant $P2^c$):
+
+$$\forall n, v, \quad \text{Jika proposal } (n, v) \text{ terpilih, maka setiap proposal } (n', v') \text{ yang terpilih dengan } n' > n \text{ memiliki } v' = v$$
 
 ## 3. Anatomi Teknis & Cara Kerja Internal
-Arsitektur Mesin Penyimpanan ClickHouse MergeTree dan Kolom Terindeks Sparse Index:
+Mekanisme Transisi Multi-Paxos: Pengurangan Biaya dari 2 RTT menjadi 1 RTT Melalui Stable Leader:
 
 ```mermaid
-graph LR
-subgraph Table Directory in Disk
-A[primary.idx: Sparse Primary Index 1 index mark per 8192 rows]
-B[UserID.bin: Compressed Column Data Chunks]
-C[UserID.mrk: Mark Offsets into Compressed Chunks]
-D[Revenue.bin: Compressed Column Data Chunks]
-end
-A -->|Binary search identifies Mark 42| C
-C -->|Decompress only Chunk 42 (8192 rows)| D
+sequenceDiagram
+    autonumber
+    participant P as Stable Leader Proposer
+    participant A1 as Acceptor 1
+    participant A2 as Acceptor 2
+    participant A3 as Acceptor 3
+    Note over P,A3: Multi-Paxos Optimization: Fase 1 (Prepare) hanya dieksekusi SEKALI saat Leader terpilih!
+    Note over P,A3: Setiap log transaksi baru langsung melompat ke Fase 2 (1-RTT Direct Consensus)
+    P->>A1: Accept(slot=101, val='Debit $100')
+    P->>A2: Accept(slot=101, val='Debit $100')
+    P->>A3: Accept(slot=101, val='Debit $100')
+    A1-->>P: Accepted(slot=101)
+    A2-->>P: Accepted(slot=101)
+    Note over P: Quorum Mayoritas Tercapai (2 dari 3)! Nilai Terpilih Secara Permanen!
+    P->>A1: Commit(slot=101)
+    P->>A2: Commit(slot=101)
 ```
 
-1. **Indeks Jarang (Sparse Primary Index)**:
-   ClickHouse tidak mengindeks setiap baris secara individual (yang akan memakan banyak RAM). ClickHouse hanya mencatat 1 stempel indeks (*Index Mark*) untuk setiap blok 8.192 baris data (*Granule*). Seluruh indeks primer tabel bermiliaran baris dapat dimuat penuh di dalam beberapa megabyte RAM!
+1. **Masalah Dueling Proposers (Livelock)**: Dua Proposer bersaing saling menaikkan nomor proposal di Fase 1 sebelum salah satu berhasil menyelesaikan Fase 2. Keduanya saling membatalkan janji Acceptor tanpa ada satu pun nilai yang pernah disepakati (solusi: terapkan randomized exponential backoff saat menyiapkan proposal baru) ([Paxos Made Simple](https://lamport.azurewebsites.net/pubs/paxos-simple.pdf)).
+
+#### Tabel Penelusuran Pemodelan Dimensional Gudang Data: Skema Bintang vs Skema Kepingan Salju
+| Karakteristik Gudang Data (DWH) | Tabel Fakta Sentral (*Fact Table*) | Tabel Dimensi Pelanggan (*Customer Dim*) | Tingkat Normalisasi Skema | Kompleksitas Kueri OLAP Analitik | Performa Agregasi Kueri Bisnis |
+|---|---|---|---|---|---|
+| Skema Bintang (Star Schema)| Metrik numerik: `revenue, qty, cost` | Didenormalisasi penuh: kota & negara langsung ada | Dimensi tidak ternormalisasi (2NF/3NF dilewati)| 1 Kueri Join tunggal per dimensi | **Performa Maksimal (Sangat Cepat)** |
+| Skema Kepingan Salju (Snowflake)| Metrik numerik: `revenue, qty, cost` | Ternormalisasi: `Customer -> City -> Country`| Tabel dimensi terpecah 3NF rapi | Membutuhkan banyak JOIN bersarang | Performa menurun pada tabel besar |
+| Anomali Fan Trap | Join tabel fakta dengan 2 dimensi 1:N | Menghasilkan perkalian kartesian baris | Agregasi `SUM()` menjumlahkan nilai berulang | Angka pendapatan membengkak palsu! | Laporan keuangan salah total |
+| Mitigasi Chasm Trap | Pisahkan tabel fakta terpisah | Fakta Penjualan vs Fakta Pengiriman | Agregasi dihitung di subkueri mandiri | Angka pendapatan dan biaya akurat | Konsistensi analitik terjamin 100% |
 
 ## 4. Implementasi Praktis & Kode / Simulasi Riil
 ```python
-# Demonstrating Columnar Storage and Vectorized SIMD-Style Aggregation in Python
-import numpy as np
-import time
+# Single-Decree Paxos Acceptor Implementation in Python
+from typing import Optional, Tuple
 
-# 1. Model Data Berorientasi Kolom (Columnar Memory Buffer)
-num_rows = 10_000_000
-column_revenue = np.random.randint(10, 1000, size=num_rows, dtype=np.int32)
-column_country = np.random.choice(["IDN", "USA", "SGP", "JPN"], size=num_rows)
+class PaxosAcceptor:
+    def __init__(self, acceptor_id: int):
+        self.id = acceptor_id
+        self.min_proposal = -1       # Nomor proposal tertinggi yang pernah dijanjikan
+        self.accepted_proposal = -1  # Nomor proposal tertinggi yang pernah diterima
+        self.accepted_value = None   # Nilai yang pernah diterima
 
-# 2. Kueri Analitik OLAP Ter-Vektorisasi: SUM(Revenue) WHERE Country == 'IDN'
-start_time = time.time()
-# Operasi vektor boolean mask & perkalian elemen hardware SIMD paralel
-mask = (column_country == "IDN")
-total_idn_revenue = np.sum(column_revenue[mask])
-elapsed = time.time() - start_time
+    def handle_prepare(self, n: int) -> Tuple[bool, int, Optional[str]]:
+        """Fase 1b: Tangani pesan Prepare(n)"""
+        if n > self.min_proposal:
+            self.min_proposal = n # Berjanji menolak proposal < n di masa depan
+            return True, self.accepted_proposal, self.accepted_value
+        return False, self.min_proposal, None
 
-print(f"OLAP Vectorized Query Result: ${total_idn_revenue:,}")
-print(f"Processed 10 Million rows in {elapsed*1000:.2f} ms! (~{num_rows/elapsed/1e6:.1f} Mrows/sec)")
+    def handle_accept(self, n: int, value: str) -> bool:
+        """Fase 2b: Tangani pesan Accept(n, value)"""
+        if n >= self.min_proposal:
+            self.min_proposal = n
+            self.accepted_proposal = n
+            self.accepted_value = value
+            return True # Proposal diterima!
+        return False # Ditolak karena melanggar janji!
+
+print("Paxos Acceptor state machine instantiated!")
 ```
 
 ## 5. Miskonsepsi & Jebakan Industri
-1. **Executing Small Single-Row INSERTs into Columnar Databases**: Menerbitkan kueri `INSERT INTO clickhouse_table VALUES (...)` satu per satu ribuan kali per detik. Setiap penulisan menghasilkan partisi file disk baru di direktori, memicu ledakan ribuan partisi mikro yang melumpuhkan ClickHouse (*Too Many Parts Error*) (solusi: selalu kumpulkan data ke dalam batch minimal 10.000 baris sebelum di-insert).
-2. **Using Columnar Databases for Point-Update Transactions**: Mencoba menjalankan `UPDATE users SET name = 'Bob' WHERE id = 1` berulang kali. Mesin kolom tidak mendukung pembaruan baris in-place yang murah; pembaruan memerlukan mutasi seluruh file kolom (*Heavy Mutation*).
-3. **Poor Choice of Primary Key Column Order**: Menempatkan kolom ber-kardinalitas tinggi (seperti ID transaksi unik) di awal kunci primer indeks komposit. Mengacaukan kompresi data kolom dan merusak selektivitas indeks jarang.
+1. **Loss of Non-Volatile State on Node Reboot**: Acceptor me-reboot komputer dan kehilangan nilai `min_proposal` atau `accepted_proposal` karena tidak menulisnya ke disk non-volatile (fsync). Setelah hidup kembali, ia dapat menerima proposal yang melanggar janji masa lalunya, menghasilkan dua nilai terpilih yang saling bertentangan (*Split Brain Invariant Broken*).
+2. **Dueling Proposers Infinite LiveLock**: Dua node aktif terus memperebutkan kepemimpinan tanpa leader leasing, saling membatalkan fase prepare satu sama lain sehingga sistem tidak pernah mencapai kemajuan (*Liveness Starvation*).
+3. **Quorum Intersection Miscalculation**: Menghitung kuorum tanpa mayoritas mutlak (misal menganggap 2 dari 4 node adalah kuorum). Dua kelompok terpisah beranggotakan 2 node dapat mengambil keputusan independen yang berbeda karena tidak ada interseksi node bersama di antara keduanya.
+
+### Studi Kasus Kegagalan Nyata: Ledakan Angka Keuangan Palsu Gudang Data Korporasi Akibat Fenomena Fan Trap pada Relasi Dimensi
+- **Kronologi & Konteks Kasus**: Pada laporan keuangan akhir tahun sebuah konglomerat ritel multinasional, sistem Business Intelligence (BI) dan Enterprise Data Warehouse (EDW) melaporkan angka total pendapatan penjualan sebesar 12 miliar dolar, padahal audit fisik rekening koran perbankan hanya mencatat penerimaan riil sebesar 3 miliar dolar.
+- **Akar Masalah Pemodelan Dimensional, Gudang Data, & Fenomena Fan Trap**: Arsitek data membangun kueri pelaporan analitik dengan menggabungkan satu tabel fakta penjualan (`fact_sales`) dengan tabel pesanan dan tabel pengiriman yang memiliki hubungan satu-ke-banyak (*One-to-Many Relationship*) secara bertingkat. Ini adalah cacat klasik pemodelan data relasional yang dikenal sebagai *Fan Trap*: satu pesanan memiliki 4 item barang, dan pesanan tersebut memiliki 3 kali pengiriman bertahap. Ketika kueri SQL melakukan `JOIN` langsung antara pesanan, item, dan pengiriman, terjadi ledakan perkalian baris ($4 \times 3 = 12$ baris per pesanan). Fungsi agregasi `SUM(item_price)` mengeksekusi penjumlahan pada baris-baris duplikat tersebut, menggelembungkan angka total penjualan hingga $4\times$ lebih besar dari angka riil. Kesalahan fatal ini hampir menyebabkan perusahaan menerbitkan laporan keuangan palsu ke bursa efek sebelum dihentikan oleh auditor eksternal.
+
+- **Potongan Kode / Arsitektur Cacat (Vulnerable Implementation)**:
+```sql
+-- Rekonstruksi Cacat Analitik Fan Trap pada Kueri Gudang Data
+-- CACAT FAN TRAP: Menggabungkan dua tabel berelasi 1:N dalam satu kueri agregasi tunggal:
+SELECT 
+    o.order_id,
+    -- BENCANA: SUM() menjumlahkan item_price berulang kali untuk setiap baris pengiriman!
+    SUM(i.item_price) AS calculated_revenue, 
+    SUM(s.shipping_cost) AS calculated_shipping
+FROM orders o
+JOIN order_items i ON o.order_id = i.order_id     -- 1 Order memiliki N Items
+JOIN shipments s ON o.order_id = s.order_id       -- 1 Order memiliki M Shipments
+WHERE o.order_id = 101
+GROUP BY o.order_id;
+-- Jika ada 4 items dan 3 shipments: Baris menjadi 12! Revenue terhitung 3x lipat lebih besar!
+
+-- MITIGASI DEFENSIF: Agregasi Terisolasi via Common Table Expressions (CTE) Terpisah
+WITH item_summary AS (
+    SELECT order_id, SUM(item_price) AS total_revenue 
+    FROM order_items WHERE order_id = 101 GROUP BY order_id
+),
+shipment_summary AS (
+    SELECT order_id, SUM(shipping_cost) AS total_shipping 
+    FROM shipments WHERE order_id = 101 GROUP BY order_id
+)
+SELECT o.order_id, i.total_revenue, s.total_shipping
+FROM orders o
+LEFT JOIN item_summary i ON o.order_id = i.order_id
+LEFT JOIN shipment_summary s ON o.order_id = s.order_id;
+-- Hasil: Angka pendapatan dan biaya pengiriman terhitung 100% akurat tanpa multiplikasi baris!
+```
+
+- **Analisis Forensik & Rekayasa Modern**: Insiden Fan Trap membuktikan bahwa metodologi pemodelan dimensional Ralph Kimball (*The Data Warehouse Toolkit*) memiliki aturan matematis yang ketat: (1) Larangan menggabungkan dua tabel fakta yang memiliki granularitas berbeda dalam satu kueri tanpa agregasi perantara; (2) Penerapan arsitektur *Star Schema* yang tegas dengan tabel fakta di tengah yang hanya menampung ukuran numerik aditif (*Additive Facts*) dan kunci asing dimensi terkonformasi (*Conformed Dimensions*); (3) Verifikasi otomatis hasil kueri analitik terhadap saldo rekonsiliasi sistem transaksi harian.
 
 ## 6. Proyek Latihan & Rubrik Penilaian Mandiri
-1. **Tingkat Pemula**: Simpan file dataset 100.000 baris ke dalam dua format file berbeda di Python: (a) file teks CSV biasa dan (b) file biner kolumnar Apache Parquet (`pandas.to_parquet`). Bandingkan perbedaan ukuran file di disk dan waktu pembacaan satu kolom spesifik.
-2. **Tingkat Menengah**: Pasang ClickHouse lokal via Docker (`docker run -d -p 8123:8123 clickhouse/clickhouse-server`). Buat tabel dengan engine `MergeTree()` terurut berdasarkan tanggal, masukkan 1.000.000 baris data sintetis, dan amati rasio kompresi kolom di tabel `system.columns`.
-3. **Tingkat Mahir**: Implementasikan fungsi kompresi Run-Length Encoding (RLE) dan Dictionary Encoding murni dalam bahasa C/Rust untuk array kolom string. Tulis fungsi dekompresi ter-vektorisasi yang mengeksekusi filter predikat pencarian langsung di atas data terkompresi tanpa mendekompresinya terlebih dahulu (*Predicate Evaluation on Compressed Data*).
+1. **Tingkat Pemula**: Simulasikan secara manual langkah per langkah Single-Decree Paxos dengan 3 Acceptor dan 1 Proposer yang mengusulkan nilai `"Commit Transaction A"`. Tuliskan nilai `min_proposal` pada setiap Acceptor.
+2. **Tingkat Menengah**: Buat skenario di mana dua Proposer (Proposer 1 dengan $n=1$, Proposer 2 dengan $n=2$) bersaing mengajukan nilai berbeda pada 3 Acceptor. Tunjukkan bagaimana Proposer 2 dipaksa secara matematis mengadopsi nilai milik Proposer 1 jika nilai tersebut telah diterima oleh mayoritas.
+3. **Tingkat Mahir**: Implementasikan Multi-Paxos State Machine Replication engine lengkap di Python/Go dengan pemilihan Stable Leader berbasis sewa waktu (*Leader Leases*). Buktikan sistem mampu mereplikasi log transaksi perbankan secara deterministik melintasi 5 node dengan toleransi 2 node mengalami crash.
+
+### Tingkat 1: Dasar
+- **Tugas**: Rancang skema bintang (*Star Schema*) dimensional dalam SQL untuk analitik penjualan toko retail yang memuat satu Tabel Fakta Penjualan (`fact_sales`) dengan metrik kuantitas, harga satuan, dan diskon, serta 3 Tabel Dimensi terkonformasi: `dim_date`, `dim_product`, dan `dim_store`, lengkap dengan tipe data surrogate keys integer.
+- **Petunjuk Perancangan Arsitektur**:
+  - `dim_date` memuat atribut kalender: `day_of_week`, `month_name`, `quarter`, `is_weekend`.
+  - Tulis kueri analitik OLAP yang menghitung total pendapatan per kuartal per kategori produk.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Data Uji*: Masukkan 1.000 transaksi penjualan; jalankan kueri agregasi; pastikan seluruh metrik terjumlahkan dengan benar dan waktu eksekusi kueri cepat dengan indeks penutup pada foreign keys.
+- **Rubrik Penilaian Mandiri**: 40% Kepatuhan Arsitektur Star Schema Kimball yang Murni, 30% Perancangan Tabel Dimensi Terkonformasi Lengkap, 30% Kueri Agregasi Analitik yang Presisi.
+
+### Tingkat 2: Menengah
+- **Tugas**: Kembangkan mesin pemroses kubus analitik multidimensi (*OLAP Data Cube Engine*) dalam Python/SQL yang mengimplementasikan operasi standar kubus data: *Slice* (memotong 1 dimensi tetap), *Dice* (memilih sub-kubus beberapa dimensi), *Drill-Down* (merinci dari Bulan ke Hari), dan *Roll-Up* (merangkum dari Kota ke Negara) menggunakan klausa SQL `GROUP BY CUBE(...)` atau implementasi in-memory.
+- **Petunjuk Perancangan Arsitektur**:
+  - Tangani nilai null representatif yang dihasilkan oleh sub-total agregasi kubus menggunakan fungsi `GROUPING()`.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Uji Drill-Down & Roll-Up*: Hitung subtotal penjualan pada 3 tingkat hierarki; buktikan total penjualan tingkat atas sama persis dengan akumulasi dari seluruh tingkat bawah.
+- **Rubrik Penilaian Mandiri**: 40% Implementasi Operasi Slice, Dice, Drill-Down, dan Roll-Up yang Benar, 30% Penggunaan Sintaks SQL GROUP BY CUBE, 30% Konsistensi Angka Subtotal.
+
+### Tingkat 3: Mahir
+- **Tugas**: Rancang validator otomatis pendeteksi anomali pemodelan data *Fan Trap and Chasm Trap Detector* dalam Python yang membaca metadata skema relasional, membangun graf asosiasi kardinalitas tabel ($1:1$, $1:N$, $N:M$), dan mendeteksi kueri SQL berbahaya yang menggabungkan dua relasi satu-ke-banyak secara paralel yang berpotensi memicu multiplikasi baris kartesian palsu.
+- **Petunjuk Perancangan Arsitektur**:
+  - Analisis Abstract Syntax Tree (AST) kueri SQL (menggunakan sqlparse).
+  - Jika kueri menggabungkan entitas $A \leftarrow B \rightarrow C$ (Chasm Trap) atau $A \rightarrow B \rightarrow C$ (Fan Trap) dengan fungsi agregasi `SUM/COUNT` tanpa subkueri terisolasi, picu peringatan arsitektur kritis.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Audit Kueri Perangkap*: Masukkan kueri berbahaya `orders JOIN items JOIN shipments`; auditor harus menandai `DETECTED_FAN_TRAP`, menolak kueri, dan menyarankan struktur penulisan ulang berbasis CTE.
+- **Rubrik Penilaian Mandiri**: 40% Deteksi Anomali Fan Trap dan Chasm Trap Berbasis Teori Graf, 30% Penguraian AST SQL yang Akurat, 30% Rekomendasi Refactoring Kueri Aman.
 
 ## 7. Rekomendasi Sumber Belajar Standar Emas
 | Sumber Pembelajaran | Penulis / Institusi | Tautan Langsung | Fokus Materi |
 | :--- | :--- | :--- | :--- |
-| ClickHouse Architecture and Internal Documentation | ClickHouse Inc. | [ClickHouse Architecture Guide](https://clickhouse.com/docs/en/development/architecture) | MergeTree Engine, Sparse Primary Indexes, Granules & Vectorized Query Execution |
-| The Design and Implementation of Modern Column-Oriented Database Systems | Daniel Abadi, Peter Boncz, Stavros Harizopoulos | [Foundations and Trends in Databases 2013](https://www.nowpublishers.com/article/Details/DBS-024) | Alkitab Database Kolom: Compression Algorithms, Vectorization & Late Materialization |
-| Apache Parquet Format Specification | Apache Software Foundation | [Apache Parquet Docs](https://parquet.apache.org/documentation/latest/) | Dremel Record Shredding, Column Chunks, Dictionary Pages & Statistics |
-| MonetDB/X100: Hyper-Pipelining Query Execution | Peter Boncz, Marcin Zukowski, Niels Nes | [CIDR 2005 Vectorization Paper](https://www.cidrdb.org/cidr2005/papers/P19.pdf) | Makalah Orisinal Penemuan Arsitektur Pemrosesan Kueri Vektor SIMD Modern |
+| Paxos Made Simple | Leslie Lamport | [ACM SIGACT News 2001 (Lamport)](https://lamport.azurewebsites.net/pubs/paxos-simple.pdf) | Makalah Sederhana Resmi Penjelasan Logika Algoritma Paxos Tanpa Metafora Yunani |
+| Paxos Made Live: An Engineering Perspective | Tushar Chandra, Robert Griesemer, Joshua Redstone (Google) | [Google Chubby Paxos Paper](https://research.google/pubs/pub33002/) | Pengalaman Nyata Membangun Sistem Paxos Industri untuk Google Chubby Lock Service |
+| The Part-Time Parliament | Leslie Lamport | [ACM TOCS 1998 Paper](https://lamport.azurewebsites.net/pubs/lamport-paxos.pdf) | Makalah Orisinal Pertama Penemuan Paxos Melalui Analogi Parlemen Pulau Paxos |
+| Paxos Made Moderately Complex | Robbert van Renesse & Deniz Altinbuken (Cornell) | [ACM Computing Surveys 2015](https://dl.acm.org/doi/10.1145/2673577) | Pseudocode Lengkap Multi-Paxos, Reconfiguration & Master Leases |
 
 ---
 *Navigasi Cepat*: [Ke Tingkat 10](./README.md) | [Ke Master Index](../../INDEX.md) | *Sebelumnya*: [163. basis-data-non-relasional-nosql](./163-basis-data-non-relasional-nosql.md) | *Berikutnya*: [165. data-engineering-pemrosesan-data-massal](./165-data-engineering-pemrosesan-data-massal.md)

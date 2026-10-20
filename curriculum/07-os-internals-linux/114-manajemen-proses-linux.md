@@ -6,102 +6,182 @@
 ---
 
 ## 1. Intuisi Dasar Tanpa Jargon ("Seperti Bayi Baru Lahir")
-Ketika sistem database produksi Anda di cloud tiba-tiba mengalami lonjakan latensi misterius setiap pukul dua pagi, Anda tidak bisa menghentikan sistem dengan debugger gdb atau menambahkan ratusan perintah `printk` lalu mengompilasi ulang kernel server. Tracing, Profiling & Kernel Observability ([Linux eBPF & Tracing Architecture](https://ebpf.io/)) adalah mesin sinar-X berdaya tembus tinggi yang memungkinkan Anda mengintip ke dalam perut terdalam kernel Linux pada kecepatan produksi nyata dengan overhead nyaris nol (<1%). Teknologi puncaknya—**eBPF (Extended Berkeley Packet Filter)**—adalah komputer mini revolusioner yang ditanamkan di dalam kernel Linux: ia memungkinkan Anda menyuntikkan program bytecode aman yang dapat dipasang pada sembarang pemanggilan fungsi kernel (kprobes), fungsi aplikasi pengguna (uprobes), atau paket jaringan, menyajikan metrik observabilitas telemetri secara real-time tanpa pernah memodifikasi satu baris pun kode sumber kernel!
+### 1.1 Konsep Inti & Analogi Tanpa Jargon
+Bagaimana sebuah komputer dengan hanya 8 inti CPU dapat menjalankan ratusan aplikasi secara bersamaan—mendengarkan musik di Spotify, mengunduh file besar di browser, mengedit dokumen teks, dan menjalankan kompilasi kode di terminal tanpa tersendat? Manajemen Proses & Threading OS ([Linux Process Management](https://man7.org/linux/man-pages/man2/clone.2.html)) adalah ilusi multitasking agung yang diciptakan oleh kernel sistem operasi. Proses adalah entitas hukum independen yang memiliki rumah mewahnya sendiri: ruang memori virtual terisolasi, file descriptor, dan kredensial keamanan. Thread adalah para pekerja di dalam rumah tersebut yang berbagi ruang memori yang sama. Kelahiran sebuah proses di Linux memiliki ritual magis: fungsi `fork()` membelah proses menjadi dua entitas identik kembar siam, yang kemudian menyuntikkan jiwa baru melalui `execve()` untuk menjalankan program biner yang sama sekali berbeda.
+
+### 1.2 Urgensi Rekayasa & Signifikansi Sistemik
+Dalam rekayasa sistem modern, pemahaman mendalam tentang konsep ini membedakan arsitek sistem kelas dunia dari sekadar operator perkakas teknis.
 
 ## 2. Fondasi Teoretis & Aksiomatik / Matematis
-Arsitektur Mesin Virtual eBPF dan Sistem Verifier Matematis Formal:
+### 2.1 Kerangka Teori Aksiomatik & Formulasi Matematis
+Mekanisme Kloning Proses dan Optimasi Copy-On-Write (COW):
 
-eBPF adalah mesin virtual RISC 64-bit berbasis register yang tertanam di dalam kernel Linux, memiliki 11 register 64-bit ($R0 - R10$) dan program counter $PC$. Program eBPF dikompilasi dari bahasa C menggunakan Clang/LLVM target `bpf`.
+### 2.2 Penurunan Matematis Langkah-demi-Langkah
+Ketika proses induk memanggil `fork()`:
+Kernel Linux tidak menyalin gigabyte memori fisik RAM secara naif. Kernel menduplikasi tabel halaman (Page Tables) proses induk ke proses anak, dan menandai seluruh entri halaman memori fisik sebagai **Read-Only** dengan flag proteksi `COW`:
 
-Jaminan Keamanan **eBPF Kernel In-Kernel Verifier**:
-Sebelum program eBPF diizinkan dimuat dan dieksekusi di Ring 0, Verifier menganalisis grafik kontrol aliran (CFG):
-1. **Jaminan Terminasi**: Memastikan program tidak mengandung loop tak berujung (unbounded loops). Seluruh loop wajib dibatasi secara statis.
-2. **Keamanan Memori Mutlak**: Memvalidasi bahwa setiap pembacaan/penulisan pointer berada di dalam batas struktur yang valid (out-of-bounds check) dan tidak ada akses pointer liar yang belum diinisialisasi.
-3. **Ukuran Program Maksimum**: Membatasi instruksi maksimum (hingga 1.000.000 instruksi terverifikasi) untuk mencegah monopoli CPU.
+$$\text{Parent Virtual Space} \searrow \quad \text{Shared Physical RAM Pages (Read-Only)} \quad \swarrow \text{Child Virtual Space}$$
 
-Setelah lolos verifikasi, **Just-In-Time (JIT) Compiler** menerjemahkan bytecode eBPF menjadi instruksi mesin asli x86-64 atau ARM64 untuk eksekusi pada kecepatan hardware penuh.
+Ketika salah satu proses (induk atau anak) mencoba menulis data ke halaman memori tersebut:
+1. CPU memicu hardware exception **Page Fault (Error Code Write on Read-Only Page)**.
+2. Kernel Page Fault Handler mendeteksi bahwa ini adalah halaman berstatus COW.
+3. Kernel mengalokasikan satu frame halaman fisik baru di RAM, menyalin 4 KB data halaman lama ke frame baru, mengupdate entri Page Table proses yang menulis menjadi Read-Write, dan melanjutkan kembali eksekusi instruksi secara transparan!
+
+Siklus Hidup dan Terminasi Proses (Zombie & Orphan):
+- **Zombie Process**: Proses anak telah selesai (`exit(0)`), namun proses induk belum membaca status keluaran melalui `waitpid()`. Entri `task_struct` anak tetap bertahan di kernel untuk menyimpan kode status terminasi.
+- **Orphan Process**: Proses induk mati mendahului proses anak. Proses anak otomatis diadopsi oleh proses akar `PID 1` (`init` / `systemd`), yang secara periodik membersihkan proses yatim piatu.
 
 ## 3. Anatomi Teknis & Cara Kerja Internal
-Arsitektur Observabilitas eBPF: Dari Hook Titik Kernel ke Ruang Pengguna:
+Diferensiasi Proses dan Thread di Bawah Kernel Linux via Panggilan Sistem `clone()`:
 
 ```mermaid
 graph TD
-subgraph Kernel Space Ring 0
-A[Probe Trigger: kprobe / sys_enter_execve / tracepoint] --> B[eBPF Program Sandbox]
-B --> C[BPF Maps: Hash Table / Perf Event Array / Ring Buffer]
-end
-subgraph User Space Observability Tooling
-D[BPF Loader / libbpf / bpftrace] -->|bpf syscall BPF_PROG_LOAD| E[BPF In-Kernel Verifier]
-E -->|Verified Safe!| B
-C -->|Zero-Copy Ring Buffer Read| F[Observability Dashboard: Prometheus / Grafana / BCC]
-end
+A[Syscall clone flags] --> B{Flags Mengandung CLONE_VM | CLONE_FILES | CLONE_FS?}
+B -->|Yes: Shared Resources| C[Lightweight Process / POSIX Thread (pthread)]
+B -->|No: Isolated Copy| D[Heavyweight Independent Process (fork)]
+C --> E[struct task_struct: Unique PID/TID, Shares mm_struct & files_struct]
+D --> F[struct task_struct: Unique PID, New mm_struct & files_struct Copy]
 ```
 
-1. **Kategori Instrumen Penelusuran (Tracing Probes)**:
-   - **Tracepoints**: Titik instrumentasi statis yang ditanamkan secara sengaja oleh developer kernel di lokasi kritis (stabil dan tidak berubah antarkernel release).
-   - **Kprobes / Kretprobes**: Instrumentasi dinamis yang mampu mencangkok instruksi breakpoint pada *sembarang* alamat fungsi fungsi kernel Linux saat runtime.
-   - **Uprobes / Uretprobes**: Mencangkok instruksi breakpoint pada fungsi di dalam biner aplikasi ruang pengguna (seperti melacak pemanggilan fungsi SSL `SSL_write` di openssl) ([Brendan Gregg eBPF Portal](https://www.brendangregg.com/ebpf.html)).
+1. **Linux Threads are Tasks**: Bagi kernel Linux, tidak ada perbedaan mendasar antara thread dan proses; keduanya hanyalah entitas `task_struct` yang dijadwalkan oleh Completely Fair Scheduler (CFS). Thread hanyalah task yang kebetulan berbagi pointer `mm_struct` (ruang memori virtual) yang sama ([Linux Kernel clone() Manual](https://man7.org/linux/man-pages/man2/clone.2.html)).
+2. **Completely Fair Scheduler (CFS)**: Menjadwalkan task berdasarkan waktu eksekusi virtual (*vruntime*). Task dengan *vruntime* terkecil (disimpan pada pohon Red-Black Tree penyeimbang) selalu dipilih untuk dieksekusi berikutnya guna menjamin keadilan alokasi CPU yang sempurna.
+
+#### Tabel Penelusuran Siklus Hidup Proses Linux: Dari `fork()` Copy-On-Write hingga `waitpid()`
+| Operasi Sistem Proses | State Proses Anak ($Child$) | Struktur `task_struct` | Status Tabel Halaman Virtual | Penanganan Memori Fisik | Status Deskriptor Berkas |
+|---|---|---|---|---|---|
+| 1. Pemanggilan `fork()` | State `TASK_RUNNING` | Alokasi PID baru; duplikasi atribut induk | Halaman ditandai `READ-ONLY` bersama induk | **COPY-ON-WRITE**: Nol alokasi fisik RAM instan | Duplikasi tabel FD (referensi bersama) |
+| 2. Modifikasi Data | Page Fault (`#PF`) COW | Kernel menangani fault penulisan | Buat salinan fisik 4 KiB baru untuk anak | Alokasi 1 halaman fisik RAM | Halaman anak kini `READ-WRITE` privat |
+| 3. Pemanggilan `execve()` | Mengganti image memori | Reset signal handler & peta memori | Tabel halaman lama dibuang penuh | Alokasi peta biner ELF baru | FD dengan flag `O_CLOEXEC` ditutup otomatis |
+| 4. Proses Selesai `exit(0)` | Menjadi State `EXIT_ZOMBIE` | Memori RAM dan FD dibebaskan penuh | Tabel halaman dihancurkan | 0 Byte RAM data tersisa | `task_struct` & PID ditahan untuk induk |
+| 5. Pemanggilan `waitpid()` | Pembersihan total | Induk membaca status exit code `0` | - | `task_struct` dibebaskan ke SLUB cache | PID didaur ulang untuk proses baru |
+| Cacat Induk Mengabaikan | Induk tidak memanggil `wait` | Zombie terakumulasi permanen | - | Tabel proses kernel tersumbat | **PID EXHAUSTION**: Sistem lumpuh total! |
 
 ## 4. Implementasi Praktis & Kode / Simulasi Riil
-```python
-# High-Performance Disk I/O Latency Tracing using BCC (BPF Compiler Collection)
-# Menelusuri latensi waktu eksekusi penulisan disk block I/O via eBPF kprobe
-from bcc import BPF
-from time import sleep
+```c
+// Demonstrating Process Creation, Execve Replacement, and Zombie Prevention with waitpid
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
-bpf_source = """
-#include <uapi/linux/ptrace.h>
-#include <linux/blkdev.h>
+void spawn_child_process(void) {
+    pid_t pid = fork();
 
-BPF_HASH(start_time, struct request *);
-BPF_HISTOGRAM(io_latencies);
-
-// 1. Hook saat request blok I/O diterbitkan ke driver disk hardware
-void trace_req_start(struct pt_regs *ctx, struct request *req) {
-    u64 ts = bpf_ktime_get_ns();
-    start_time.update(&req, &ts);
-}
-
-// 2. Hook saat request blok I/O selesai dieksekusi (completion callback)
-void trace_req_done(struct pt_regs *ctx, struct request *req) {
-    u64 *tsp = start_time.lookup(&req);
-    if (tsp != 0) {
-        u64 delta_us = (bpf_ktime_get_ns() - *tsp) / 1000;
-        io_latencies.increment(bpf_log2l(delta_us)); // Catat ke histogram log2 mikrodetik
-        start_time.delete(&req);
+    if (pid < 0) {
+        perror("fork failed");
+        exit(EXIT_FAILURE);
+    } else if (pid == 0) {
+        // 1. Cabang Eksekusi Proses Anak (Child Process)
+        printf("[Child] Born with PID: %d (Parent PID: %d)\n", getpid(), getppid());
+        
+        // Ganti total image memori proses anak dengan program biner '/bin/uname -a'
+        char *args[] = {"/bin/uname", "-a", NULL};
+        execve(args[0], args, NULL);
+        
+        // Kode di bawah ini HANYA dieksekusi jika execve gagal
+        perror("execve failed");
+        exit(EXIT_FAILURE);
+    } else {
+        // 2. Cabang Eksekusi Proses Induk (Parent Process)
+        printf("[Parent] Created child PID: %d, waiting for completion...\n", pid);
+        int status;
+        pid_t terminated_pid = waitpid(pid, &status, 0); // Cegah status Zombie!
+        
+        if (WIFEXITED(status)) {
+            printf("[Parent] Child %d exited cleanly with code: %d\n", 
+                   terminated_pid, WEXITSTATUS(status));
+        }
     }
 }
-"""
-
-b = BPF(text=bpf_source)
-b.attach_kprobe(event="blk_account_io_start", fn_name="trace_req_start")
-b.attach_kprobe(event="blk_account_io_done", fn_name="trace_req_done")
-
-print("Tracing block I/O latency... Hit Ctrl-C to finish and view distribution histogram.")
-try:
-    sleep(999999)
-except KeyboardInterrupt:
-    print("\nDisk I/O Latency Histogram (microsecond logarithmic buckets):")
-    b["io_latencies"].print_log2_hist("usecs")
 ```
 
 ## 5. Miskonsepsi & Jebakan Industri
-1. **BPF Verifier Rejection via Complex Pointers**: Menulis program eBPF yang melakukan pembacaan memori pointer bertingkat tanpa menggunakan pembantu kernel `bpf_probe_read_kernel()`. Verifier akan menolak memuat program dengan pesan galat `R1 invalid mem access 'inv'`.
-2. **Overhead on High-Frequency Uprobes**: Memasang uprobe pada fungsi aplikasi pengguna yang dipanggil jutaan kali per detik (misal fungsi pembanding `strcmp`). Konteks trap breakpoint x86 (`int3`) memicu overhead context switch kernel yang memperlambat aplikasi hingga puluhan persen.
-3. **Perf Event Buffer Dropped Samples**: Menggunakan buffer event penelusuran yang terlalu kecil saat melacak peristiwa jaringan dengan rate tinggi (seperti 100.000 paket per detik). Kernel akan membuang sampel (*dropped events*), menghasilkan metrik telemetri yang tidak akurat.
+1. **Fork Bomb Catastrophe (`:(){ :|:& };:`)**: Memanggil `fork()` di dalam infinite loop tanpa pembatasan process count limit (`RLIMIT_NPROC`). Tabel proses kernel (`PID max`, biasanya 32.768) akan penuh dalam hitungan detik, mengunci seluruh sistem operasi dan menolak eksekusi perintah administrator baru.
+2. **Zombie Accumulation Leaking Kernel PID Table**: Menjalankan server daemon yang men-spawn proses pekerja anak namun tidak pernah memanggil `wait()` atau mendaftarkan handler sinyal `SIGCHLD` dengan flag `SA_NOCLDWAIT`. Ribuan proses zombie akan menumpuk dan menghabiskan entri tabel task kernel.
+3. **Using Non-Async-Signal-Safe Functions in Signal Handlers**: Memanggil fungsi seperti `printf()`, `malloc()`, atau `free()` di dalam handler penanganan sinyal (`SIGINT`, `SIGCHLD`). Fungsi-fungsi tersebut memegang mutex internal; jika sinyal menyela thread yang sedang memegang mutex yang sama, program akan mengalami Deadlock permanen.
+
+### Studi Kasus Kegagalan Nyata: Kelumpuhan Server Produksi Akibat Akumulasi Zombie Process & Fork Bomb PID Exhaustion
+- **Kronologi & Konteks Kasus**: Pada platform komputasi cloud berbasis multi-tenant, sebuah mikroservis worker pemroses tugas latar belakang mengalami lonjakan pembuatan proses anak secara drastis akibat script loop yang tidak terkontrol.
+- **Akar Masalah Manajemen Proses Linux & Batas Tabel PID**: Ketika proses anak selesai mengeksekusi tugasnya dan memanggil `exit()`, sistem operasi tidak langsung menghapus seluruh keberadaannya; kernel menahan deskriptor proses (`struct task_struct`) dalam status zombie (`EXIT_ZOMBIE`) agar proses induk dapat membaca kode keluarannya via `wait()` atau `waitpid()`. Pada kasus ini, proses induk mengalami bug arsitektur di mana loop pembuat proses anak tidak pernah memanggil `waitpid()` dan mengabaikan sinyal `SIGCHLD`. Ribuan zombie process menumpuk di memori kernel hingga mencapai batas maksimum PID sistem (`/proc/sys/kernel/pid_max` = 32.768). Ketika kapasitas tabel PID habis, kernel menolak pembuatan proses baru apapun di seluruh sistem (termasuk perintah `ls`, `ps`, dan sesi login remote `ssh`), melumpuhkan server produksi secara total dan memaksa dilakukannya hard reset perangkat keras.
+
+- **Potongan Kode / Arsitektur Cacat (Vulnerable Implementation)**:
+```c
+// Rekonstruksi Cacat Akumulasi Zombie Process pada Service Worker
+#include <unistd.h>
+#include <stdlib.h>
+#include <signal.h>
+#include <sys/wait.h>
+
+// CACAT: Induk membuat ribuan proses anak tanpa pernah memanggil waitpid()
+void run_leaky_process_spawner(void) {
+    while (has_pending_jobs()) {
+        pid_t pid = fork();
+        if (pid == 0) {
+            // Proses Anak
+            execute_job();
+            exit(0); // Menjadi ZOMBIE jika induk tidak me-reap!
+        }
+        // Induk langsung lanjut loop tanpa waitpid(pid, ...)!
+    }
+}
+
+// Mitigasi Defensif: Pemanenan Otomatis Melalui Sinyal SIGCHLD Asinkron
+void sigchld_reaper_handler(int sig) {
+    // Reap seluruh proses anak yang telah selesai tanpa memblokir induk
+    while (waitpid(-1, NULL, WNOHANG) > 0);
+}
+
+void setup_safe_process_spawner(void) {
+    struct sigaction sa;
+    sa.sa_handler = sigchld_reaper_handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART | SA_NOCLDSTOP;
+    sigaction(SIGCHLD, &sa, NULL);
+}
+```
+
+- **Analisis Forensik & Rekayasa Modern**: Insiden PID exhaustion mengajarkan pentingnya isolasi sumber daya sistemik. Sistem orkestrasi kontainer modern (seperti Kubernetes dan Docker) mewajibkan: (1) Pembatasan jumlah proses maksimum via cgroups v2 (`pids.max`); (2) Pemasangan init process khusus (seperti `tini` atau `dumb-init`) sebagai PID 1 di dalam kontainer yang bertugas memanen zombie process anak piatu (*orphaned children*) secara teratur.
 
 ## 6. Proyek Latihan & Rubrik Penilaian Mandiri
-1. **Tingkat Pemula**: Gunakan utilitas baris perintah `bpftrace` untuk melacak setiap pemanggilan syscall `sys_enter_openat` secara global di sistem Linux Anda dan cetak nama file yang sedang dibuka secara real-time.
-2. **Tingkat Menengah**: Gunakan alat profiling Linux `perf record -F 99 -a -g -- sleep 10` dan `perf script` untuk mengumpulkan tumpukan panggilan fungsi (stack traces). Hasilkan visualisasi grafik api interaktif (**FlameGraph**) untuk mengidentifikasi bottleneck CPU utama pada aplikasi Anda.
-3. **Tingkat Mahir**: Tulis program eBPF lengkap menggunakan kerangka modern CO-RE (Compile Once - Run Everywhere) dengan pustaka `libbpf`. Pasang probe pada titik masuk paket jaringan (XDP - eXpress Data Path) untuk memfilter dan membuang paket serangan DDoS pada lapisan driver jaringan sebelum paket sempat menyentuh kernel network stack.
+1. **Tingkat Pemula**: Tulis program C yang membuat 3 proses anak secara berurutan. Setiap anak mencetak PID-nya sendiri dan tidur selama 2 detik sebelum keluar. Proses induk menunggu seluruh anak selesai menggunakan `wait()`.
+2. **Tingkat Menengah**: Buat program yang sengaja menghasilkan satu proses Zombie dan satu proses Orphan. Pantau status keduanya di terminal menggunakan perintah `ps -el | grep Z` dan amati proses adopsi oleh `systemd` (`PPID == 1`).
+3. **Tingkat Mahir**: Implementasikan thread pool mandiri di C menggunakan API `pthread_create`, antrian tugas (`task queue`), mutex, dan condition variable (`pthread_cond_t`). Uji throughput eksekusi 100.000 pekerjaan komputasi paralel dan ukur efisiensi utilisasi multi-core CPU.
+
+### Tingkat 1: Dasar
+- **Tugas**: Bangun program pemantau proses induk-anak dalam C yang membuat 5 proses anak paralel menggunakan `fork()`, masing-masing melakukan simulasi komputasi dengan durasi acak, dan induk menggunakan `waitpid()` dengan flag `WNOHANG` untuk memanen anak yang telah selesai tanpa memblokir proses loop utama.
+- **Petunjuk Perancangan Arsitektur**:
+  - Periksa status keluaran anak menggunakan makro `WIFEXITED` dan `WEXITSTATUS`.
+  - Pastikan setelah seluruh proses selesai, utilitas `ps aux` membuktikan tidak ada zombie process tersisa.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Siklus Lengkap*: 5 Anak berjalan selama 1-3 detik; induk mencetak kode exit setiap anak tepat waktu dan keluar secara bersih.
+- **Rubrik Penilaian Mandiri**: 40% Penggunaan waitpid Non-Blocking (WNOHANG) yang Tepat, 30% Pembersihan Seluruh Zombie Process, 30% Kerapian Logging Siklus Hidup.
+
+### Tingkat 2: Menengah
+- **Tugas**: Kembangkan implementasi Shell mini (*Mini POSIX Shell*) dalam C yang mampu mengeksekusi perintah eksternal via kombinasi `fork()` dan `execvp()`, mendukung pemindahan proses ke latar belakang (*background jobs* dengan simbol `&`), dan penanganan redireksi I/O standar (`>`, `<`).
+- **Petunjuk Perancangan Arsitektur**:
+  - Manfaatkan `dup2()` untuk mengarahkan file descriptor stdin/stdout sebelum memanggil `execvp()`.
+  - Pisahkan kelompok proses (*Process Group*) menggunakan `setpgid()` untuk mencegah sinyal `Ctrl+C` mematikan background jobs.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Redireksi dan Pipa*: Eksekusi perintah `ls -la > output.txt`; verifikasi file terbuat dengan isi yang benar dan shell kembali siap menerima perintah baru.
+- **Rubrik Penilaian Mandiri**: 40% Integrasi fork, execvp, dan dup2 Bebas Cacat, 30% Manajemen Process Group dan Job Control, 30% Ketahanan Parsing Perintah.
+
+### Tingkat 3: Mahir
+- **Tugas**: Rancang pustaka isolasi eksekusi proses aman (*Subprocess Sandbox Wrapper*) dalam C/Linux yang memanfaatkan pemanggilan sistem tingkat rendah `clone()` dengan flag isolasi namespaces (`CLONE_NEWPID | CLONE_NEWNET | CLONE_NEWNS`) dan pembatasan kuota PID maksimum menggunakan cgroups v2 untuk menggagalkan serangan Fork Bomb secara mutlak.
+- **Petunjuk Perancangan Arsitektur**:
+  - Batasi nilai `pids.max` menjadi 10 pada cgroup proses anak sebelum mengeksekusi kode yang tidak terpercaya.
+  - Sediakan mekanisme deteksi otomatis jika anak mencoba membuat proses melebihi kuota.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Serangan Fork Bomb*: Jalankan script fork bomb `:(){ :|:& };:` di dalam sandbox; buktikan sandbox membatasi proses maksimum hingga tepat 10 proses dan sistem host induk tetap berjalan stabil 100%.
+- **Rubrik Penilaian Mandiri**: 40% Penerapan clone() dengan Isolasi Namespaces yang Tepat, 30% Penegakan Batas cgroups v2 pids.max yang Efektif, 30% Kekebalan Penuh Host dari Fork Bomb.
 
 ## 7. Rekomendasi Sumber Belajar Standar Emas
 | Sumber Pembelajaran | Penulis / Institusi | Tautan Langsung | Fokus Materi |
 | :--- | :--- | :--- | :--- |
-| BPF Performance Tools: Linux System and Application Observability | Brendan Gregg (Intel/Netflix) | [Brendan Gregg BPF Book](https://www.brendangregg.com/bpf-performance-tools-book.html) | eBPF, BCC, bpftrace, CPU/Memory/Disk/Network Profiling Tools |
-| eBPF Official Documentation & Architecture Portal | eBPF Foundation / Linux Foundation | [eBPF Official Portal](https://ebpf.io/) | In-Kernel Verifier, JIT Compiler, BPF Maps & XDP Architecture |
-| Systems Performance: Enterprise and the Cloud, 2nd Edition | Brendan Gregg | [Addison-Wesley Gregg](https://www.brendangregg.com/systems-performance-2nd-edition-book.html) | Metodologi USE, Profiling, Latensi Analisis & Kernel Tracing |
-| Linux Kernel ftrace Documentation | Steven Rostedt (Linux Kernel Tracing Maintainer) | [Linux ftrace Documentation](https://www.kernel.org/doc/html/latest/trace/ftrace.html) | Function Tracer, Function Graph, Event Tracing & Dynamic Probes |
+| Linux Kernel Process Management Architecture | Robert Love | [Linux Kernel Development 3rd Edition](https://www.pearson.com/en-us/subject-catalog/p/linux-kernel-development/P200000009581) | Bab 3: Process Management, task_struct, CFS Scheduler & clone() |
+| Linux man-pages: fork(2), clone(2), waitpid(2) | Michael Kerrisk | [Linux Manual Pages](https://man7.org/linux/man-pages/man2/clone.2.html) | Spesifikasi Sistem Call Kloning, Flags & Pengendalian Status |
+| Computer Systems: A Programmer's Perspective (CS:APP) | Bryant & O'Hallaron (CMU) | [CS:APP Chapter 8: Exceptional Control Flow](http://csapp.cs.cmu.edu/) | Process Hierarchy, Context Switching, Signals & Reentrancy |
+| POSIX Threads Programming Guide | Blaise Barney (Lawrence Livermore National Lab) | [LLNL Pthreads Tutorial](https://hpc-tutorials.llnl.gov/posix/) | Thread Creation, Mutex Variables, Condition Variables & Join |
 
 ---
 *Navigasi Cepat*: [Ke Tingkat 7](./README.md) | [Ke Master Index](../../INDEX.md) | *Sebelumnya*: [113. proses-booting-linux-modern](./113-proses-booting-linux-modern.md) | *Berikutnya*: [115. penjadwalan-cpu-linux](./115-penjadwalan-cpu-linux.md)

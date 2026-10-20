@@ -6,102 +6,189 @@
 ---
 
 ## 1. Intuisi Dasar Tanpa Jargon ("Seperti Bayi Baru Lahir")
-Jika setiap program yang berjalan di komputer Anda memiliki akses langsung ke kabel memori fisik RAM, satu program nakal dapat dengan mudah membaca kata sandi browser Anda atau menimpa kode kernel sistem operasi. Arsitektur Memori Virtual Linux ([Linux Virtual Memory Architecture](https://www.kernel.org/doc/gorman/html/understand/understand005.html)) adalah benteng isolasi paling kokoh dalam sejarah rekayasa perangkat lunak. Memori virtual memberi setiap proses ilusi megah bahwa ia adalah satu-satunya penguasa memori sebesar 128 Terabyte (pada sistem 64-bit), yang bersih dan berurutan dari alamat nol. Di belakang panggung ilusi ini, unit silikon perangkat keras **MMU (Memory Management Unit)** dan kernel Linux bekerja keras menerjemahkan setiap alamat virtual menjadi pecahan halaman fisik 4 Kilobyte yang tersebar acak di RAM atau bahkan disimpan di dalam disk swap.
+### 1.1 Dari Eksekusi Bare-Metal ke Sistem Operasi Modern ([Operating Systems: Three Easy Pieces](https://pages.cs.wisc.edu/~remzi/OSTEP/))
+Pada era awal komputasi tahun 1950-an, tidak ada sistem operasi. Program komputer diserahkan dalam bentuk setumpuk kartu berlubang (*punch cards*) kepada operator. Satu program mengeksekusi langsung pada CPU dan memori perangkat keras dari awal hingga selesai (*batch processing*). Jika program mengalami *crash* atau loop tak hingga, komputer harus dimatikan secara fisik dengan saklar daya.
+
+### 1.2 Filosofi UNIX dan Perdebatan Arsitektur Kernel ([The Design of the UNIX Operating System](https://www.pearson.com/en-us/subject-catalog/p/design-of-the-unix-operating-system/P200000003254))
+Lompatan terbesar lahir pada akhir 1960-an melalui proyek Multics dan kelahiran **UNIX** di Bell Labs oleh Ken Thompson dan Dennis Ritchie. Filosofi UNIX menegaskan prinsip keabadian: "Tulis program yang melakukan satu hal dengan sangat baik, tangani teks sebagai antarmuka universal (*everything is a file*), dan rangkai program melalui pipa (*pipelines*)".
+Namun, seiring sistem berkembang, muncul perdebatan sengit dalam sains komputer (seperti Debat Tanenbaum-Torvalds 1992):
+- **Kernel Monolitik (Linux, BSD)**: Seluruh subsistem (manajemen memori, penjadwal proses, driver perangkat keras, stack jaringan, filesystem) berjalan di ruang alamat istimewa yang sama (*Ring 0*). Sangat kencang karena tidak ada *context switch*, tetapi rentan: satu bug kecil di driver Wi-Fi dapat meruntuhkan seluruh kernel (*kernel panic*).
+- **Mikrokernel (seL4, Minix, QNX)**: Hanya primitif paling mendasar (manajemen thread, alokasi memori fisik, dan IPC) yang berada di Ring 0. Driver dan filesystem dipindahkan ke *User Space* (Ring 3). Jika driver rusak, driver cukup direstart tanpa mengganggu sistem operasi.
 
 ## 2. Fondasi Teoretis & Aksiomatik / Matematis
-Arsitektur Paging Bertingkat x86-64 (4-Level & 5-Level Paging Table Walk):
+### 2.1 Dekomposisi Formal Arsitektur Ruang Alamat Kernel ([Tanenbaum - Modern Operating Systems](https://www.pearson.com/en-us/subject-catalog/p/modern-operating-systems/P200000003295))
+Secara matematis, sistem operasi memodelkan sumber daya komputasi sebagai tripel:
+$$\mathcal{S} = (\mathcal{C}, \mathcal{M}, \mathcal{I})$$
+Di mana $\mathcal{C}$ adalah unit komputasi (CPU), $\mathcal{M}$ adalah ruang alamat memori, dan $\mathcal{I}$ adalah perangkat I/O.
 
-Pada arsitektur x86-64 4-Level Paging (ruang alamat virtual 48-bit), alamat virtual 64-bit dipecah menjadi 5 field:
-$$\text{Virtual Address (48-bit)} = \underbrace{[47:39]}_{\text{PGD (9b)}} \mid \underbrace{[38:30]}_{\text{P4D / PUD (9b)}} \mid \underbrace{[29:21]}_{\text{PMD (9b)}} \mid \underbrace{[20:12]}_{\text{PTE (9b)}} \mid \underbrace{[11:0]}_{\text{Page Offset (12b)}}$$
+Pemetaan Ruang Alamat Virtual:
+Ruang alamat virtual 64-bit $\mathcal{V} = [0, 2^{64}-1]$ dibagi secara ortogonal pada Linux x86-64:
+- Ruang Pengguna (*User Space*): $[0x0000000000000000, 0x00007FFFFFFFFFFF]$ (128 TB bawah)
+- Lubang Non-Kanonikal (*Non-canonical hole*): Titik pemisah isolasi hardware
+- Ruang Kernel (*Kernel Space*): $[0xFFFF800000000000, 0xFFFFFFFFFFFFFFFF]$ (128 TB atas)
 
-Proses Translasi Alamat oleh Hardware MMU:
-1. Register CPU `CR3` memegang alamat fisik Page Global Directory (PGD).
-2. Bit [47:39] mengindeks entri PGD $\implies$ menunjuk ke Page Upper Directory (PUD).
-3. Bit [38:30] mengindeks entri PUD $\implies$ menunjuk ke Page Middle Directory (PMD).
-4. Bit [29:21] mengindeks entri PMD $\implies$ menunjuk ke Page Table Entry (PTE).
-5. Bit [20:12] membaca PTE fisik $\implies$ menghasilkan Frame Halaman Fisik (PFN).
-6. Bit [11:0] (Offset) ditambahkan langsung ke PFN:
-$$\text{Physical Address} = (\text{PFN} \ll 12) + \text{Page Offset}$$
-
-Alokator Memori Internal Kernel: **Buddy Allocator & SLUB Allocator**:
-- **Buddy Allocator**: Mengelola frame memori fisik dalam blok berukuran $2^k$ halaman ($4\text{ KB}, 8\text{ KB}, 16\text{ KB}, \dots, 4\text{ MB}$) untuk meminimalkan fragmentasi eksternal.
-- **SLUB Allocator**: Mengukir frame halaman fisik dari Buddy Allocator menjadi wadah objek-objek kecil berukuran tetap yang sering dialokasikan kernel (seperti `task_struct`, `inode`, `sk_buff`) untuk meniadakan fragmentasi internal.
+### 2.2 Model Analisis Kinerja IPC Mikrokernel vs Monolitik ([Liedtke, 1995](https://dl.acm.org/doi/10.1145/224056.224075))
+Pada arsitektur Mikrokernel, permintaan I/O melibatkan komunikasi antar-proses (*Inter-Process Communication / IPC*):
+$$T_{\text{micro}} = T_{\text{exec}} + 2 \cdot T_{\text{switch}}(\text{User} \leftrightarrow \text{Kernel}) + 2 \cdot T_{\text{switch}}(\text{Process}_A \leftrightarrow \text{Process}_B) + T_{\text{TLB-flush}}$$
+Sedangkan pada Kernel Monolitik, panggilan I/O dilakukan melalui satu instruksi system call langsung:
+$$T_{\text{mono}} = T_{\text{exec}} + 2 \cdot T_{\text{syscall}}$$
+Jochen Liedtke membuktikan dalam perancangan mikrokernel L4 bahwa biaya $T_{\text{switch}}$ dapat ditekan secara drastis dari ratusan siklus CPU menjadi hanya $\approx 40$ siklus dengan memanfaatkan register CPU untuk passing pesan kecil, membantah mitos bahwa mikrokernel pasti lambat.
 
 ## 3. Anatomi Teknis & Cara Kerja Internal
-Alur Kerja Penanganan Eksepsi Page Fault (Demand Paging & Anonymous Pages):
-
 ```mermaid
 flowchart TD
-A[CPU MMU executes Memory Instruction] --> B{PTE Present Bit == 1?}
-B -->|Yes: Cache Hit in TLB| C[Access Physical RAM directly]
-B -->|No: Present Bit == 0| D[Trigger CPU Page Fault Exception #PF (CR2 holds faulting addr)]
-D --> E[Kernel handle_mm_fault]
-E --> F{Address valid inside Virtual Memory Area VMA?}
-F -->|Invalid Address| G[Send SIGSEGV: Segmentation Fault Crash!]
-F -->|Valid VMA: Demand Paging| H{File-Backed or Anonymous Page?}
-H -->|File-Backed Page| I[Read 4KB from Disk Page Cache into RAM]
-H -->|Anonymous Heap/Stack| J[Allocate Zeroed Physical Page from Buddy Allocator]
-I --> K[Update PTE with new PFN, Set Present=1]
-J --> K
-K --> L[Flush Local TLB & Resume Instruction at same RIP!]
+    subgraph Monolithic["Arsitektur Monolitik (Linux)"]
+        UserApp1["Aplikasi Pengguna (Ring 3)"] -->|syscall| KernelSpace["Ruang Kernel Tunggal (Ring 0): Scheduler, VFS, Netfilter, GPU Driver, Ext4"]
+        KernelSpace --> HW1["Perangkat Keras Fisik"]
+    end
+    subgraph Microkernel["Arsitektur Mikrokernel (seL4 / QNX)"]
+        UserApp2["Aplikasi Pengguna (Ring 3)"] -->|IPC Message| Drivers["FS & Drivers di User Space (Ring 3)"]
+        Drivers -->|Micro-Syscall| Micro["Mikrokernel Minimal Ring 0: Threading, Paging, IPC"]
+        Micro --> HW2["Perangkat Keras Fisik"]
+    end
 ```
 
-1. **Translation Lookaside Buffer (TLB)**: Cache hardware di dalam prosesor yang menyimpan translasi alamat virtual-ke-fisik terbaru. TLB miss memaksa CPU melakukan *Page Table Walk* 4 tahap yang memakan puluhan siklus clock.
-2. **Huge Pages (2MB & 1GB)**: Menghubungkan entri PMD langsung ke blok memori fisik 2 MB kontinu tanpa level PTE, mereduksi tekanan entri TLB secara dramatis untuk beban kerja database raksasa dan virtualisasi VM.
+#### Tabel Walkthrough Siklus Transisi Hak Akses Eksekusi Syscall `read()`
+| Siklus Jam | Mode Eksekusi CPU | Instruksi CPU / Peristiwa | Status Register CPU | Ruang Alamat Aktif |
+|---|---|---|---|---|
+| C1 | Ring 3 (User) | Aplikasi memanggil `read(fd, buf, count)` | `RAX=0 (sys_read), RDI=fd, RSI=buf, RDX=count` | User Page Table |
+| C2 | Transisi | Instruksi `syscall` dieksekusi | Simpan `RIP` ke `RCX`, `RFLAGS` ke `R11` | Transisi Hardware |
+| C3 | Ring 0 (Kernel) | CPU melompat ke entry point `entry_SYSCALL_64` | Swap stack pointer `RSP` ke Kernel Stack via `swapgs` | Kernel Page Table |
+| C4 | Ring 0 (Kernel) | VFS memproses inode dan driver disk transfer buffer | Data disalin dari Page Cache ke buffer pengguna | Kernel Space |
+| C5 | Transisi | Instruksi `sysretq` dieksekusi | Pulihkan `RIP` dari `RCX`, CPU kembali ke Ring 3 | Kembali ke User |
+
+#### Tabel Penelusuran Siklus Injeksi Pintu Belakang "Trusting Trust" Ken Thompson
+| Fase Kompilasi ($t$) | File Sumber Masukan | Logika Parser / AST Kompiler | Deteksi Pola String / Fungsi | Aksi Injeksi Kode Biner Mesin | Status Biner Keluaran |
+|---|---|---|---|---|---|
+| Kompilasi Normal | `app.c` | Parsing kode aplikasi biasa | Tidak ada pola istimewa | Hasilkan kode objek standar | Biner bersih |
+| Kompilasi `login.c` | Kode sumber resmi UNIX `login.c` | Kompiler mengenali fungsi verifikasi password | Cocok dengan pola: `check_password()` | Sisipkan kode verifikasi backdoor: `if (pass == "ken") return ROOT;` | Biner login tersusupi pintu belakang! |
+| Kompilasi Ulang `cc.c` | Kode sumber bersih kompiler C | Kompiler mengenali bahwa ia sedang mengkompilasi dirinya sendiri | Cocok dengan pola: `compile_compiler()` | Sisipkan kode Trojan kedua ke dalam AST kompiler baru | Kompiler baru mewarisi kemampuan infeksi! |
+| Audit Kode Sumber | Pemeriksaan audit kode manusia | `login.c` dan `cc.c` sepenuhnya bersih | Nol jejak pada git/catatan sumber | Biner terus menghasilkan backdoor secara otomatis | Kepercayaan pada compiler terbukti rentan |
 
 ## 4. Implementasi Praktis & Kode / Simulasi Riil
 ```c
-// Demonstrating Virtual Memory Inspection via /proc/self/maps and mprotect in C
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/mman.h>
+#include <sys/syscall.h>
+#include <errno.h>
+#include <string.h>
 
-void inspect_virtual_memory(void) {
-    size_t page_size = sysconf(_SC_PAGESIZE);
-    printf("Hardware Page Size: %zu bytes\n", page_size);
+// Demonstrasi pemanggilan primitif system call level terendah
+// memotong abstraksi library standar glibc
+int main(void) {
+    const char message[] = "Halo langsung dari Kernel via raw syscall!\n";
+    size_t len = strlen(message);
 
-    // Alokasikan 2 halaman memori virtual anonim via mmap (Lazy Allocation)
-    char *addr = (char *)mmap(NULL, page_size * 2, 
-                              PROT_READ | PROT_WRITE, 
-                              MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-    if (addr == MAP_FAILED) {
-        perror("mmap failed");
-        return;
+    // Pemanggilan langsung syscall __NR_write (Syscall ID 1 pada x86-64)
+    // Parameter: fd = 1 (stdout), buf = message, count = len
+    long bytes_written = syscall(SYS_write, STDOUT_FILENO, message, len);
+
+    if (bytes_written < 0) {
+        // Tangani error defensif sesuai POSIX standard
+        fprintf(stderr, "Syscall write gagal: %s\n", strerror(errno));
+        return EXIT_FAILURE;
     }
 
-    printf("Allocated Virtual Address: %p\n", (void *)addr);
-    // Pada titik ini, BELUM ADA frame RAM fisik yang dialokasikan (Demand Paging)!
+    // Dapatkan Process ID dan Thread ID langsung dari kernel
+    long pid = syscall(SYS_getpid);
+    long tid = syscall(SYS_gettid);
+    printf("Proses ID: %ld | Thread ID: %ld (Berjalan di Ring 3 dengan isolasi kernel Ring 0)\n", pid, tid);
 
-    // Sentuh halaman pertama: memicu Page Fault hardware -> alokasi 1 frame RAM fisik
-    addr[0] = 'X';
-    printf("Touched page 1 -> Physical RAM mapped via Demand Paging!\n");
-
-    // Ubah proteksi halaman kedua menjadi Read-Only
-    mprotect(addr + page_size, page_size, PROT_READ);
-
-    // Bersihkan pemetaan memori virtual
-    munmap(addr, page_size * 2);
+    return EXIT_SUCCESS;
 }
 ```
 
 ## 5. Miskonsepsi & Jebakan Industri
-1. **Memory Overcommit and OOM Killer Annihilation**: Kernel Linux secara default mengizinkan aplikasi meminta alokasi virtual memori melampaui kapasitas RAM fisik (`vm.overcommit_memory = 0`). Ketika seluruh proses mulai menulis ke memori virtual tersebut dan RAM fisik habis total, kernel Out-Of-Memory (OOM) Killer akan terbangun dan membunuh proses secara sewenang-wenang (seringkali database PostgreSQL atau MySQL Anda!).
-2. **Excessive Minor Page Faults from Fragmented `malloc`**: Melakukan ribuan alokasi kecil yang memicu ekspansi heap via `brk`/`mmap` tanpa caching pool. Lonjakan jutaan Page Faults per detik akan melumpuhkan performa CPU karena interupsi exception berulang kali.
-3. **TLB Shootdown Storm in Multi-Core Systems**: Mengubah izin halaman memori virtual bersama pada proses multithreaded 64-core. Kernel harus mengirimkan inter-processor interrupt (IPI) ke seluruh 64 core untuk melakukan *TLB Shootdown*, membekukan komputasi paralel selama beberapa milidetik.
+### Studi Kasus Kegagalan Nyata: Outage Global Windows CrowdStrike Falcon Sensor (Juli 2024)
+- **Kronologi & Latar Belakang**: Pada 19 Juli 2024, pembaruan berkas konfigurasi *Channel File 291* pada sensor CrowdStrike Falcon menyebabkan *Blue Screen of Death (BSOD)* pada lebih dari 8,5 juta mesin Windows di seluruh dunia, melumpuhkan bandara, perbankan, dan rumah sakit dengan kerugian puluhan miliar dolar.
+- **Akar Masalah**: Sensor keamanan CrowdStrike berjalan sebagai driver *Kernel Mode* (Ring 0) monolitik di Windows (`csagent.sys`). Berkas definisi saluran memicu operasi pembacaan pointer di luar batas (*Out-of-Bounds Memory Read*) atau pembacaan pointer tidak valid (`0x9c`). Di Ring 0, akses memori ilegal tidak memicu pesan error anggun, melainkan memicu *Kernel Panic / BugCheck 0x50 (PAGE_FAULT_IN_NONPAGED_AREA)* yang langsung meruntuhkan sistem operasi.
+- **Rekomendasi Industri**: Kurangi kode pihak ketiga yang berjalan di Ring 0. Manfaatkan arsitektur sandbox kernel aman seperti **Linux eBPF** yang memverifikasi keamanan memori sebelum dieksekusi, atau pindahkan driver analitik ke *User Space* layaknya arsitektur mikrokernel.
+
+### Studi Kasus Kegagalan Nyata: Serangan 'Reflections on Trusting Trust' Ken Thompson pada Biner Kompiler UNIX (1984)
+- **Kronologi & Konteks Sejarah**: Dalam pidato penerimaan ACM Turing Award pada tahun 1984, Ken Thompson (salah satu pencipta UNIX dan bahasa pemrograman B/C) mendemonstrasikan salah satu serangan perangkat lunak paling mendalam dalam sejarah ilmu komputer: *The Trusting Trust Attack*.
+- **Akar Masalah Kepercayaan Arsitektur Sistem Operasi**: Thompson menunjukkan bahwa kita tidak dapat mempercayai kode yang belum kita buat dan audit sendiri, dan bahkan audit kode sumber 100% transparan pun tidak cukup jika rantai perkakas (*toolchain*) yang mengompilasi kode tersebut telah disusupi. Thompson menanamkan kode backdoor pada biner kompiler C: saat kompiler mendeteksi kompilasi program `login`, ia menyisipkan logika otentikasi rahasia; dan saat kompiler mendeteksi bahwa ia sedang mengompilasi kode sumber kompiler C baru, ia menyisipkan fungsi injeksi backdoor itu sendiri ke dalam biner baru. Karena kode backdoor hanya ada dalam memori biner kompiler dan tidak pernah muncul di file teks kode sumber, tidak ada audit kode sumber yang mampu mendeteksi keberadaannya.
+
+- **Potongan Kode / Arsitektur Cacat (Vulnerable Implementation)**:
+```c
+// Rekonstruksi Konseptual Logika Injeksi Trusting Trust Ken Thompson (1984)
+#include <string.h>
+
+void compile_function_ast(const char *func_name, char *code_buffer) {
+    // 1. Deteksi infeksi pada modul login sistem operasi:
+    if (strcmp(func_name, "verify_user_login") == 0) {
+        // Sisipkan backdoor ke dalam binary tanpa mengubah teks kode sumber!
+        inject_binary_payload(
+            "if (strcmp(entered_password, \"backdoor_master_key\") == 0) return USER_ROOT;"
+        );
+    }
+    
+    // 2. Deteksi replikasi diri pada saat kompiler mengompilasi dirinya sendiri:
+    if (strcmp(func_name, "compile_function_ast") == 0) {
+        // Biner baru mewarisi logika infeksi ini secara abadi!
+        inject_self_replicating_trojan();
+    }
+}
+```
+
+- **Analisis Forensik & Rekayasa Modern**: Serangan Thompson melahirkan disiplin rekayasa keamanan perangkat lunak modern: *Reproducible Builds* dan *Diverse Double-Compiling* (DDC oleh David A. Wheeler). Pada DDC, kode sumber dikompilasi oleh dua kompiler independen yang sama sekali berbeda (misal GCC dan Clang); jika biner hasil kedua kompilasi bit-for-bit identik, terbukti tidak ada kompiler yang menyisipkan backdoor siluman.
 
 ## 6. Proyek Latihan & Rubrik Penilaian Mandiri
-1. **Tingkat Pemula**: Buka file `/proc/self/maps` pada program C yang sedang berjalan. Analisis setiap rentang alamat virtual yang tercetak dan identifikasi di mana segmen `.text`, heap, memory mapped libraries, dan user stack berada.
-2. **Tingkat Menengah**: Tulis program yang memvalidasi konsep *Lazy Allocation / Demand Paging*: alokasikan 1 GB memori virtual menggunakan `mmap(MAP_ANONYMOUS)`. Pantau metrik memori virtual (VSZ) vs memori fisik residen (RSS) menggunakan `getrusage(RUSAGE_SELF, ...)` sebelum dan sesudah menyentuh memori tersebut.
-3. **Tingkat Mahir**: Implementasikan allocator memori berbasis Buddy System sederhana dalam bahasa C yang mengelola pool memori 1 MB. Implementasikan fungsi pembagian blok biner (*splitting*) dan penggabungan blok kembar (*buddy merging*) saat memori dibebaskan.
+### Level 1 (Pemula)
+- **Tugas**: Telusuri seluruh system call yang dipanggil oleh perintah bash sederhana `ls` menggunakan utilitas sistem `strace`.
+- **Petunjuk Arsitektur**: Jalankan perintah `strace -c ls` untuk menghitung frekuensi dan waktu yang dihabiskan pada setiap system call (`openat`, `mmap`, `read`, `write`).
+- **Vektor Uji**:
+  - Analisis output: Periksa apakah `write` berada di bagian akhir eksekusi untuk mencetak nama file ke terminal.
+- **Rubrik Penilaian**: Identifikasi syscall utama (50%), penjelasan arti return code (30%), ringkasan waktu (20%).
+
+### Level 2 (Menengah)
+- **Tugas**: Tulis wrapper system call arsitektur x86-64 menggunakan inline assembly GNU C (`asm volatile`) untuk memanggil `sys_getpid` tanpa fungsi bantuan `syscall()`.
+- **Petunjuk Arsitektur**: Muat nomor syscall `SYS_getpid` (39 pada Linux x86-64) ke register `rax`, eksekusi instruksi `syscall`, dan baca return value dari `rax`.
+- **Vektor Uji**:
+  - Bandingkan hasil assembly manual dengan `getpid()` bawaan `unistd.h`. Kedua nilai harus identik.
+- **Rubrik Penilaian**: Ketepatan clobbered registers (40%), register constraint assembly (`=a`) (30%), verifikasi assertion (30%).
+
+### Level 3 (Mahir)
+- **Tugas**: Rancang arsitektur konseptual server pesan IPC mikrokernel zero-copy berbasis memori bersama (*shared memory ring-buffer*) dan sinyal eventfd di C.
+- **Petunjuk Arsitektur**: Alokasikan halaman memori dengan `mmap(MAP_SHARED | MAP_ANONYMOUS)`, sinkronkan antrean produsen-konsumen dengan variabel atomik `stdatomic.h`.
+- **Vektor Uji**:
+  - Ukur latensi passing 1.000.000 pesan berukuran 64 byte antar dua proses anak (`fork`).
+  - Target latensi rata-rata: Kurang dari 500 nanodetik per pesan.
+- **Rubrik Penilaian**: Integritas antrean lock-free (40%), benchmarking performa presisi (30%), penanganan shutdown sinyal bersih (30%).
+
+### Tingkat 1: Dasar
+- **Tugas**: Tulis program shell script/Python yang memvalidasi filosofi UNIX "Do one thing and do it well" dengan menggabungkan 5 utilitas filter kecil (`cat`, `tr`, `sort`, `uniq -c`, `head`) dalam pipa pipeline untuk menghasilkan daftar 10 kata paling sering muncul dari file teks besar tanpa membuat file sementara (*zero temporary files*).
+- **Petunjuk Perancangan Arsitektur**:
+  - Gunakan standar input dan standar output stream UNIX.
+  - Tangani sinyal pipa terputus (`SIGPIPE`) secara elegan.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Data Uji*: File dokumen teks $10\text{ MB}$; verifikasi pemrosesan streaming selesai dengan konsumsi RAM konstan $< 5\text{ MB}$.
+- **Rubrik Penilaian Mandiri**: 40% Kepatuhan Filosofi Pipeline Streaming UNIX, 30% Konsumsi Memori Konstan, 30% Akurasi Frekuensi Kata.
+
+### Tingkat 2: Menengah
+- **Tugas**: Kembangkan prototipe verifikasi biner terulang (*Reproducible Build Verifier*) dalam Python yang mengompilasi proyek C multi-file dua kali di bawah variabel lingkungan yang diubah (stempel waktu `SOURCE_DATE_EPOCH`, direktori build berbeda, umask berbeda) dan membandingkan hash biner ELF menggunakan analisis diffing biner.
+- **Petunjuk Perancangan Arsitektur**:
+  - Netralkan timestamp pada file arsip (`ar`) dan path direktori absolut via flag `-ffile-prefix-map`.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Verifikasi Hash*: SHA-256 biner build 1 dan build 2 harus identik bit-for-bit (`100% byte match`).
+- **Rubrik Penilaian Mandiri**: 40% Eliminasi Non-Determinisme Build, 30% Normalisasi Metadata ELF, 30% Otomasi Pipeline Verifikasi.
+
+### Tingkat 3: Mahir
+- **Tugas**: Rancang arsitektur Microkernel mini dalam bahasa C yang hanya memuat penjadwalan CPU, IPC terisolasi, dan penanganan interupsi pada Ring 0, sementara Driver Penyimpanan dan Sistem Berkas berjalan sepenuhnya di Ring 3 (User Space) berkomunikasi via pesan sinkron (*Synchronous Message Passing IPC*).
+- **Petunjuk Perancangan Arsitektur**:
+  - Isolasi ruang memori driver menggunakan pemisahan tabel halaman virtual terpisah.
+  - Jika driver sistem berkas mengalami crash (Segmentation Fault), microkernel harus mendeteksi dan me-restart proses driver tanpa merusak integritas kernel induk.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Simulasi Crash Driver*: Kirim sinyal bunuh `SIGSEGV` ke driver FS pengguna; buktikan microkernel tetap hidup dan sistem pulih dalam $< 50\text{ ms}$.
+- **Rubrik Penilaian Mandiri**: 40% Isolasi Arsitektur Microkernel Ring 0 vs Ring 3, 30% Mekanisme IPC Sinkron Bebas Deadlock, 30% Ketahanan Self-Healing Crash Driver.
 
 ## 7. Rekomendasi Sumber Belajar Standar Emas
-| Sumber Pembelajaran | Penulis / Institusi | Tautan Langsung | Fokus Materi |
-| :--- | :--- | :--- | :--- |
-| Understanding the Linux Virtual Memory Manager | Mel Gorman | [Mel Gorman Book Online](https://www.kernel.org/doc/gorman/html/understand/understand005.html) | Buddy Allocator, SLAB/SLUB, Page Fault Handling & Swap Mechanics |
-| Linux Kernel Documentation: Memory Management | The Linux Kernel Archives | [Linux Kernel MM Guide](https://www.kernel.org/doc/html/latest/mm/index.html) | Paging, HugeTLB, Transparent Huge Pages & Page Cache Internals |
-| Computer Systems: A Programmer's Perspective (CS:APP) | Bryant & O'Hallaron (CMU) | [CS:APP Chapter 9: Virtual Memory](http://csapp.cs.cmu.edu/) | Address Translation, Hardware MMU, Dynamic Memory Allocation & Glibc |
-| What Every Programmer Should Know About Memory (Part 3 & 4) | Ulrich Drepper | [Drepper Memory Paper](https://people.freebsd.org/~lstewart/articles/cpumemory.pdf) | Page Tables, Multi-Level Paging Latency & TLB Optimization |
+| Kategori | Judul Sumber & Tautan | Penulis / Institusi | Fokus Pembahasan |
+|---|---|---|---|
+| Buku Standar | [Operating Systems: Three Easy Pieces (OSTEP)](https://pages.cs.wisc.edu/~remzi/OSTEP/) | Remzi Arpaci-Dusseau & Andrea Arpaci-Dusseau | Tiga pilar fundamental sistem operasi: Virtualisasi, Konkurensi, dan Persistensi |
+| Paper Mikrokernel | [On Micro-Kernel Construction](https://dl.acm.org/doi/10.1145/224056.224075) | Jochen Liedtke (1995) | Terobosan perancangan mikrokernel L4 berlatensi ultra-rendah |
+| Sejarah UNIX | [The Evolution of the Unix Time-sharing System](https://www.bell-labs.com/usr/dmr/www/hist.html) | Dennis M. Ritchie (Bell Labs) | Esai sejarah perancangan dan filosofi arsitektur sistem operasi UNIX pertama |
 
 ---
 *Navigasi Cepat*: [Ke Tingkat 7](./README.md) | [Ke Master Index](../../INDEX.md) | *Sebelumnya*: [109. rekayasa-kompiler-interpreter](../06-cs-core-dsa-compiler/109-rekayasa-kompiler-interpreter.md) | *Berikutnya*: [111. pemisahan-ruang-hak-akses-cpu-rings](./111-pemisahan-ruang-hak-akses-cpu-rings.md)

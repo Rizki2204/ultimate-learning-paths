@@ -6,8 +6,10 @@
 ---
 
 ## 1. Intuisi Dasar Tanpa Jargon ("Seperti Bayi Baru Lahir")
+### 1.1 Konsep Inti & Analogi Tanpa Jargon
 Bagaimana komputer bisa mengerti kata-kata manusia? Bagi komputer, sebuah kata hanyalah deretan karakter biner tanpa jiwa. Jika Anda merepresentasikan kata sebagai angka ID alfabet biasa (misal: "Kucing" = 1, "Anjing" = 2, "Pesawat" = 3), komputer tidak tahu bahwa kucing dan anjing memiliki banyak kesamaan (keduanya hewan berkaki empat berbulu), sedangkan pesawat adalah mesin terbang ([Mikolov et al. - Efficient Estimation of Word Representations in Vector Space](https://arxiv.org/abs/1301.3781)).
 
+### 1.2 Urgensi Rekayasa & Signifikansi Sistemik
 Linguis J. R. Firth (1957) merumuskan hipotesis terkenal: *"You shall know a word by the company it keeps"* (Anda akan mengenali arti suatu kata dari teman-teman kata yang sering muncul di sampingnya) ([Firth - A Synopsis of Linguistic Theory 1930-1955](https://www.jstor.org/stable/410886)).
 
 Inilah fondasi **Word Embedding (seperti Word2Vec dan GloVe)**: memetakan setiap kata menjadi panah vektor dalam ruang geometri berdimensi 300 ([Pennington et al. - GloVe: Global Vectors for Word Representation](https://nlp.stanford.edu/pubs/glove.pdf)). Dalam ruang ini, kata-kata yang bermakna mirip akan mengelompok bersama secara otomatis, dan yang menakjubkan, kita bisa melakukan perhitungan aljabar matematika pada makna konsep kata:
@@ -15,8 +17,10 @@ $$\vec{v}_{\text{Raja}} - \vec{v}_{\text{Pria}} + \vec{v}_{\text{Wanita}} \appro
 Sebelum kata bisa dipetakan ke vektor, teks harus dipotong menjadi sub-kata menggunakan algoritma **Byte Pair Encoding (BPE)** agar komputer tidak pernah bingung saat menghadapi kata baru yang belum pernah dilihat sebelumnya ([Sennrich et al. - Neural Machine Translation of Rare Words with Subword Units](https://arxiv.org/abs/1508.07909)).
 
 ## 2. Fondasi Teoretis & Aksiomatik / Matematis
+### 2.1 Kerangka Teori Aksiomatik & Formulasi Matematis
 Formulasi Matematis NLP Statistik & Representasi Vektor:
 
+### 2.2 Penurunan Matematis Langkah-demi-Langkah
 1. **Pemodelan Bahasa N-Gram & Smoothing Kneser-Ney**:
 Probabilitas sekuens kata di bawah asumsi rantai Markov orde $(n-1)$:
 $$P(w_1, \dots, w_T) = \prod_{t=1}^T P(w_t \mid w_{t-n+1}, \dots, w_{t-1})$$
@@ -46,6 +50,15 @@ flowchart LR
 ```
 
 Dengan tokenisasi sub-kata BPE, representasi kosakata tertutup rapat: kata-kata langka atau typo didekonstruksi menjadi potongan suku kata dasar tanpa pernah menghasilkan token *Out-Of-Vocabulary (OOV)* ([Sennrich et al. BPE Paper](https://arxiv.org/abs/1508.07909)).
+
+#### Tabel Penelusuran Ruang Vektor Word2Vec & Proyeksi Subruang Bias Gender
+| Langkah Pemrosesan / Token | Representasi Simbolik / Vektor | Mekanisme Atensi / Transisi State | Status Matriks KV-Cache | Probabilitas Distribusi / Logits | Keluaran / Output Linguistik |
+|---|---|---|---|---|---|
+| 1. Ingest Corpus Berita Besar | Korpus Google News (3 Juta Kata) | Pelatihan Model Word2Vec Skip-Gram | Matriks embedding $W \in \mathbb{R}^{3M \times 300}$ | Model memetakan kemunculan bersama kata | Ruang vektor semantik 300 dimensi terbentuk |
+| 2. Identifikasi Vektor Arah Gender | Pasangan Kata Biner: Pria - Wanita | Vektor selisih: $\mathbf{g} = \mathbf{v}(\text{"he"}) - \mathbf{v}(\text{"she"})$ | Dekomposisi PCA pada pasangan gender | Komponen utama ke-1 mendefinisikan sumbu gender | Sumbu $\mathbf{g}$ memotong ruang semantik |
+| 3. Aritmatika Vektor Bias Naif | Analogi: $\mathbf{v}(\text{"man"}) : \mathbf{v}(\text{"programmer"}) = \mathbf{v}(\text{"woman"}) : \mathbf{x}$ | $\mathbf{x} \approx \mathbf{v}(\text{"programmer"}) - \mathbf{v}(\text{"man"}) + \mathbf{v}(\text{"woman"})$ | Matriks tetangga terdekat Cosine Similarity | Kata terdekat: $\mathbf{x} \to \text{"homemaker"}$ | Model mereproduksi stereotipe gender budaya masa lalu |
+| 4. Deteksi Token Glitch BPE | Token Anomali: `"SolidGoldMagikarp"` | Algoritma Tokenisasi Byte-Pair Encoding | Token muncul di korpus reddit tanpa konteks wajar | Vektor embedding terisolasi di sudut ekstrem ruang laten | LLM menghasilkan halusinasi toksik saat token dipanggil |
+| 5. Mitigasi Hard Debiasing Bolukbasi | Proyeksi Ortogonal Subruang Netral | $\mathbf{w}_{\text{debiased}} = \mathbf{w} - (\mathbf{w} \cdot \mathbf{g}) \mathbf{g}$ | Netralisasi kata pekerjaan (programmer, doctor, nurse) | Sumbu gender diisolasi murni ke kata biologis (ibu, ayah) | Representasi semantik adil, seimbang, dan bebas bias asosiasi |
 
 ## 4. Implementasi Praktis & Kode / Simulasi Riil
 ```python
@@ -100,6 +113,39 @@ for tokenized_word in final_vocab.keys():
 ## 5. Miskonsepsi & Jebakan Industri
 *Ambiguitas Polisemi pada Static Word Embeddings*: Model seperti Word2Vec atau GloVe menetapkan tepat satu vektor statis untuk setiap kata. Kata seperti "bisa" (racun ular vs mampu melakukan sesuatu) atau "apel" (buah vs upacara militer) dipaksa berbagi satu titik koordinat yang sama, mencampuradukkan makna semantiknya. Keterbatasan inilah yang memicu lahirnya *Contextual Word Embeddings* (BERT, GPT, dan Transformers) di mana representasi vektor kata berubah secara dinamis sesuai konteks kalimatnya ([Peters et al. - Deep Contextualized Word Representations / ELMo](https://arxiv.org/abs/1802.05365)).
 
+### Studi Kasus Kegagalan Nyata: Skandal Bias Stereotipe Gender Word2Vec & Kerentanan Glitch Token BPE (2016/2023)
+- **Kronologi & Konteks Sejarah**: Pada tahun 2016, penelitian penting oleh Tolga Bolukbasi dkk. (Boston University & Microsoft Research) mengungkap bahwa model representasi kata paling populer di dunia saat itu, Google Word2Vec, memuat bias stereotipe gender yang sangat diskriminatif. Ketika diuji dengan operasi aritmatika vektor semantik (*"Man is to Computer Programmer as Woman is to X"*), model tersebut secara konsisten menjawab *"Homemaker"* (ibu rumah tangga), serta memetakan profesi medis seperti *"Doctor"* ke pria dan *"Nurse"* ke wanita.
+- **Akar Masalah Representasi Vektor Kata & Algoritma Tokenisasi**: Model Word2Vec Skip-Gram dan GloVe dilatih untuk memprediksi kata berdasarkan konteks kemunculan bersamanya dalam miliaran kata berita publik. Model tidak memiliki filter moral atau pemahaman sosiologis; model memproyeksikan prasangka historis teks masyarakat secara langsung ke dalam ruang geometri Euclidean. Sumbu arah gender (*gender subspace*) secara tidak sengaja mengkontaminasi kata-kata profesi netral. Fenomena kerapuhan representasi serupa terulang pada era LLM modern dalam bentuk **BPE Glitch Tokens** (2023): algoritma tokenisasi Byte-Pair Encoding menghasilkan token anomali (seperti `SolidGoldMagikarp` atau `StreamerBot`) yang sering muncul dalam dataset pengelompokan token namun jarang muncul saat pra-pelatihan model, menghasilkan vektor bobot yang tidak teratur (*untrained weights*) yang memicu respons halusinasi liar atau pengulangan kata kutukan saat pengguna memasukkan token tersebut.
+
+- **Potongan Kode / Arsitektur Cacat (Vulnerable Implementation)**:
+```python
+# Analisis Bias Geometri Vektor Semantik: Proyeksi Subruang vs Netralisasi Ortogonal
+import numpy as np
+
+# SIMULASI BIAS WORD2VEC: Menghitung proyeksi kata profesi terhadap sumbu gender
+def check_gender_bias_projection(word_vector, gender_direction_vector):
+    # gender_direction_vector: normalisasi dari v("he") - v("she")
+    g = gender_direction_vector / np.linalg.norm(gender_direction_vector)
+    
+    # Skalar proyeksi: Seberapa jauh kata profesi tertarik ke arah gender maskulin/feminin
+    bias_score = np.dot(word_vector, g)
+    return bias_score # Pada model lama: "programmer" bernilai +0.45 (Maskulin)!
+
+# MITIGASI HARD DEBIASING (Bolukbasi et al., 2016)
+def neutralize_word_embedding(word_vector, gender_direction_vector):
+    g = gender_direction_vector / np.linalg.norm(gender_direction_vector)
+    
+    # Mengeliminasi komponen vektor yang sejajar dengan sumbu gender (Proyeksi Ortogonal)
+    projection = np.dot(word_vector, g) * g
+    debiased_vector = word_vector - projection
+    
+    # Normalisasikan kembali vektor hasil:
+    debiased_vector = debiased_vector / np.linalg.norm(debiased_vector)
+    return debiased_vector # Kini ortogonal murni terhadap bias gender (bias_score = 0.0)!
+```
+
+- **Analisis Forensik & Rekayasa Modern**: Krisis bias representasi dan glitch token menghasilkan standar rekayasa NLP modern: (1) Penerapan algoritma **Hard Debiasing & Soft Debiasing** pada tahap pra-pemrosesan matriks embedding; (2) Pemeriksaan kebersihan kamus tokenisasi (*Vocabulary Pruning & Glitch Token Auditing*) sebelum pra-pelatihan dimulai untuk menghapus token anomali yang tidak memiliki representasi representatif; (3) Integrasi evaluasi penanda bias otomatis (**WEAT: Word Embedding Association Test**) dalam pipeline integrasi berkelanjutan (CI/CD) model bahasa.
+
 ## 6. Proyek Latihan & Rubrik Penilaian Mandiri
 ### Level 1 (Pemula)
 Bangun model bahasa Bi-Gram dan Tri-Gram sederhana dengan Laplace Add-1 Smoothing di Python, dan hitung nilai perplexity model pada kalimat uji baru.
@@ -112,6 +158,50 @@ Implementasikan arsitektur Continuous Bag-of-Words (CBOW) Word2Vec sederhana di 
 ### Level 3 (Mahir)
 Implementasikan algoritma penandaan urutan *Linear-Chain Conditional Random Field (CRF)* untuk Named Entity Recognition (NER) dari awal: turunkan algoritma Forward-Backward untuk menghitung fungsi partisi normalisasi $Z(x)$, implementasikan Viterbi decoding untuk inferensi urutan label optimal, dan bandingkan performa terhadap model klasifikasi independen token.
 *Rubrik*: Mengeliminasi prediksi transisi status yang tidak valid (misal: token `I-PER` tanpa diawali `B-PER`).
+
+### Tingkat 1: Dasar
+- **Tugas**: Implementasikan algoritma tokenisasi Byte-Pair Encoding (BPE) sederhana dari nol dalam Python: Buat fungsi yang menerima korpus teks pendek, memecah kata menjadi karakter individual dengan penanda akhir kata `</w>`, menghitung pasangan byte/simbol yang paling sering muncul (*Most Frequent Bigram Pair*), dan secara berulang menggabungkan pasangan tersebut selama 10 iterasi penggabungan (*merge operations*).
+- **Petunjuk Perancangan Arsitektur**:
+  - Simpan frekuensi kata dalam dictionary: `{'l o w </w>': 5, 'l o w e s t </w>': 2, ...}`.
+  - Cari bigram dengan frekuensi kemunculan tertinggi pada seluruh korpus.
+  - Ganti seluruh kemunculan pasangan tersebut dengan token gabungan baru.
+- **Test Vector & Kasus Uji**:
+  - Korpus: `"low low low low low lowest lowest newer newer newer newer wider wider"`.
+  - Pasangan frekuensi tertinggi pertama: `('e', 'r')` -> digabung menjadi `'er'`.
+  - Tampilkan daftar 10 aturan penggabungan (*Merge Rules*) yang dihasilkan secara urut.
+- **Rubrik Penilaian Objektif**:
+  - Skor 100%: Algoritma BPE presisi, kalkulasi frekuensi bigram benar, aturan merge tersimpan konsisten.
+  - Skor 50%: BPE bekerja namun salah menangani penanda akhir kata `</w>` sehingga mencampurkan batas antar kata.
+  - Skor 0%: Menggunakan pemotongan string biasa tanpa kalkulasi pasangan terpopuler.
+
+### Tingkat 2: Menengah
+- **Tugas**: Bangun modul pengujian bias semantik Word Embedding Association Test (WEAT) dari nol dalam Python menggunakan NumPy: Hitung ukuran efek (*Effect Size* $d$) dan signifikansi statistik p-value permutasi untuk menguji hipotesis asosiasi antara dua himpunan kata target (misal: Karier vs Keluarga) terhadap dua himpunan kata atribut (misal: Pria vs Wanita).
+- **Petunjuk Perancangan Arsitektur**:
+  - Cosine similarity: $s(w, A, B) = \text{mean}_{a \in A} \cos(w, a) - \text{mean}_{b \in B} \cos(w, b)$.
+  - Statistik uji diferensial: $S(X, Y, A, B) = \sum_{x \in X} s(x, A, B) - \sum_{y \in Y} s(y, A, B)$.
+  - Effect Size $d = \frac{\text{mean}_{x \in X} s(x, A, B) - \text{mean}_{y \in Y} s(y, A, B)}{\text{std}_{w \in X \cup Y} s(w, A, B)}$.
+  - Lakukan 1.000 uji permutasi acak untuk menghitung nilai p-value non-parametrik.
+- **Test Vector & Kasus Uji**:
+  - Berikan matriks embedding sintetis yang memuat bias terstruktur (kata karier memiliki cosine similarity lebih tinggi ke atribut pria).
+  - Modul WEAT harus melaporkan effect size positif yang signifikan ($d > 1.2, p < 0.01$).
+- **Rubrik Penilaian Objektif**:
+  - Skor 100%: Formulasi WEAT presisi, uji permutasi acak tepat, kalkulasi effect size Cohen's d akurat.
+  - Skor 50%: Menghitung skor asosiasi benar namun salah mengkalkulasi standar deviasi gabungan pada pembagi.
+  - Skor 0%: Mengasumsikan uji-t parametrik biasa tanpa uji permutasi non-parametrik.
+
+### Tingkat 3: Mahir
+- **Tugas**: Rancang pipeline sanitasi kosakata tokenisasi (*Token Vocabulary Auditor & Glitch Token Scanner*) dalam Python: Bangun alat diagnostik otomatis yang menerima model bahasa yang sudah dilatih (atau representasi embedding-nya) dan memindai seluruh 50.000 token dalam tokenizer untuk mendeteksi token anomalik yang memiliki: (1) Norma gradien tidak normal; (2) Jarak Euclidean ekstrem dari centroid ruang embedding; (3) Kegagalan decoding round-trip (`decode(encode(token)) != token`).
+- **Petunjuk Perancangan Arsitektur**:
+  - Hitung distribusi norma vektor embedding: $r_i = \|v_i\|_2$. Identifikasi token pencilan di atas persentil 99.9%.
+  - Lakukan kueri deteksi k-Nearest Neighbors: token glitch biasanya tidak memiliki tetangga terdekat yang memiliki relasi semantik wajar.
+  - Hasilkan dokumen rekomendasi karantina token (*Quarantine Manifest*) yang dapat di-load oleh runtime inferensi untuk memblokir token berbahaya.
+- **Test Vector & Kasus Uji**:
+  - Injeksi 5 token anomali buatan dengan norma ekstrem atau string byte tak terdefinisi ke dalam vocab.
+  - Scanner harus mendeteksi ke-5 token anomali tersebut secara tepat dengan tingkat false positive $< 0.1\%$.
+- **Rubrik Penilaian Objektif**:
+  - Skor 100%: Pipeline deteksi anomali multi-dimensi presisi, penanganan edge-case karakter Unicode byte rapi.
+  - Skor 50%: Deteksi bekerja hanya berdasarkan panjang string tanpa menganalisis sifat geometri vektor embedding.
+  - Skor 0%: Hanya mengecek round-trip string tanpa inspeksi representasi laten.
 
 ## 7. Rekomendasi Sumber Belajar Standar Emas
 | Sumber Pembelajaran | Penulis / Institusi | Tautan Langsung | Fokus Materi |

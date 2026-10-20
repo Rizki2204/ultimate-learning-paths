@@ -6,8 +6,10 @@
 ---
 
 ## 1. Intuisi Dasar Tanpa Jargon ("Seperti Bayi Baru Lahir")
+### 1.1 Konsep Inti & Analogi Tanpa Jargon
 Bayangkan Anda terbangun di dalam sebuah labirin gua raksasa yang gelap gulita dan belum pernah dipetakan oleh manusia. Anda tidak memiliki peta gua, dan Anda bahkan tidak tahu di mana posisi Anda saat ini!
 
+### 1.2 Urgensi Rekayasa & Signifikansi Sistemik
 Setiap kali Anda melangkah ke depan, Anda membuat peta kasar dari dinding gua di sekitar Anda berdasarkan apa yang bisa disentuh tangan Anda; dan saat peta itu mulai terbentuk, Anda menggunakan peta tersebut untuk mencari tahu di mana posisi tubuh Anda. Ini adalah masalah paradoks ayam-dan-telur klasik: *"Untuk membuat peta lingkungan, saya harus tahu posisi saya; namun untuk mengetahui posisi saya, saya harus memiliki peta lingkungan!"*
 
 Dalam dunia robotika otonom, masalah legendaris ini disebut **SLAM (Simultaneous Localization and Mapping)** ([Durrant-Whyte & Bailey - Simultaneous Localization and Mapping: Part I](https://ieeexplore.ieee.org/document/1638022)).
@@ -15,8 +17,10 @@ Dalam dunia robotika otonom, masalah legendaris ini disebut **SLAM (Simultaneous
 Sensor robot tidak pernah ada yang sempurna: roda encoder mengalami slip, IMU melayang hanyut (*drift*), dan sensor kamera terganggu cahaya. Dengan memadukan seluruh data sensor yang cacat tersebut melalui algoritma probabilitas **Filter Kalman Lanjutan (EKF, UKF, Particle Filter)** dan **Graph-SLAM**, robot secara bersamaan dapat merekonstruksi peta ruangan digital sekaligus menentukan koordinat lokasinya hingga ketelitian sentimeter ([Thrun, Burgard, Fox - Probabilistic Robotics](https://www.probabilistic-robotics.org/)).
 
 ## 2. Fondasi Teoretis & Aksiomatik / Matematis
+### 2.1 Kerangka Teori Aksiomatik & Formulasi Matematis
 Formulasi Matematis Fusi Sensor Probabilistik & SLAM:
 
+### 2.2 Penurunan Matematis Langkah-demi-Langkah
 1. **Extended Kalman Filter (EKF) untuk Sistem Non-Linier**:
 Model transisi status non-linier $f$ dan model pengukuran non-linier $h$:
 $$x_k = f(x_{k-1}, u_k) + w_k, \quad z_k = h(x_k) + v_k, \quad w_k \sim \mathcal{N}(0, Q_k), \quad v_k \sim \mathcal{N}(0, R_k)$$
@@ -55,6 +59,15 @@ flowchart TD
 ```
 
 Ketika *Loop Closure* terdeteksi (robot kembali ke titik awal yang pernah dikunjungi 1 jam lalu), sistem memasang pegas koreksi matematis yang menarik seluruh lintasan historis yang melenceng kembali ke posisi sejati, menghapus seluruh akumulasi *dead-reckoning drift* seketika ([Grisetti et al. 2010](https://ieeexplore.ieee.org/document/5681215)).
+
+#### Tabel Penelusuran Siklus Estimasi Status EKF & Saturasi Sensor Inersia Schiaparelli
+| Waktu Diskret (t = k·Ts) | Komponen / Tahap Estimator | Sensor Raw / Input Referensi | Transformasi Matriks / Kendali | State Estimasi (x̂, P, Error PID) | Sinyal Aktuator / PWM Output |
+|---|---|---|---|---|---|
+| t = 0.0s (Entry) | IMU Ketinggian Parasut Mars | Altimeter radar: $h = 4200$ m, Gyro: $\omega_y = 12^\circ$/s | Propagasi kovariansi: $P_{k|k-1} = F P F^T + Q$ | Ketinggian $h = 4198$ m, Kecepatan $v = -85$ m/s | Parasut supersonik mengembang sempurna |
+| t = 0.5s (Osilasi) | Parasut Berayun Hebat | Gyro laju sudut mengukur osilasi ekstrem | Kecepatan sudut riil: $\omega_y = 380^\circ$/s | Ambang batas perangkat keras IMU saturasi pada $300^\circ$/s | Sensor IMU mengunci output pada batas maksimum $300^\circ$/s |
+| t = 1.0s (Saturasi) | Integrator Estimasi Sikap EKF | Pembacaan IMU saturasi konstan 1 detik | Integrasi orientasi: $\theta = \int \omega_{sat} dt$ | Estimasi sudut orientasi berputar terbalik $180^\circ$! | Komputer mengira wahana sedang menghadap terbalik ke atas |
+| t = 1.2s (Proyeksi Kosinus) | Fusi Altimeter & Orientasi | Altimeter radar: Jarak pantul 3700 meter | Proyeksi ketinggian: $h_{est} = z_{radar} \cdot \cos(\theta_{est})$ | $\cos(180^\circ) = -1 \implies h_{est} = -50$ meter! | Komputer menyimpulkan wahana telah berada di bawah permukaan tanah! |
+| t = 1.3s (Dampak Bencana) | Modul Logika Pendaratan | Logika: "Jika $h_{est} \le 0$, lepaskan parasut & mesin" | Perintah aktivasi pemotongan kabel parasut darurat | Parasut dilepas pada ketinggian riil 3.7 km di atas tanah | Mesin pendorong menyala hanya 3 detik alih-alih 30 detik; crash 540 km/jam! |
 
 ## 4. Implementasi Praktis & Kode / Simulasi Riil
 ```python
@@ -118,6 +131,76 @@ print(f"Ketidakpastian Kovarians P (Tereduksi)  : Var(X)={cov_est[0,0]:.4f}")
 ## 5. Miskonsepsi & Jebakan Industri
 *Inkonsistensi Estimasi & Overconfidence pada EKF-SLAM*: Pada EKF-SLAM, matriks kovarians $P$ sering kali mengalami *overconfidence* (nilai varians mengecil mendekati nol secara semu padahal galat posisi riil masih besar) akibat aproksimasi linearisasi Taylor orde-1 yang membuang suku-suku non-linieritas tinggi sudut rotasi $\theta$. Jika filter menjadi overconfident, ia akan mengabaikan pengukuran sensor baru dan menolak koreksi loop closure. Gunakan pendekatan **Graph-SLAM modern berbasis faktor non-linier** untuk mengeliminasi inkonsistensi ini secara permanen ([Huang et al. - Convergence and Consistency Analysis for Metrics in SLAM](https://ieeexplore.ieee.org/document/4209562)).
 
+### Studi Kasus Kegagalan Nyata: Bencana Saturasi Sensor IMU Wahana Pendarat Mars Schiaparelli EDM (European Space Agency, 2016)
+- **Kronologi & Konteks Sejarah**: Pada 19 Oktober 2016, wahana pendarat Schiaparelli Entry, Descent, and Landing Demonstrator Module (EDM) milik European Space Agency (ESA) dan Roscosmos memasuki atmosfer Mars dalam misi ExoMars. Setelah perlambatan aerodinamis berhasil dan parasut supersonik dikembangkan pada ketinggian sekitar 12 kilometer, wahana mengalami osilasi mekanis yang hebat saat kanopi parasut berayun di atmosfer tipis Mars.
+- **Akar Masalah Rekayasa Fusi Sensor & Saturasi Inersia EKF**: Ketika parasut berayun, kecepatan sudut wahana melampaui batas pengukuran maksimum sensor *Inertial Measurement Unit* (IMU). Sensor saturasi pada batas perangkat kerasnya selama sekitar satu detik penuh. Komputer pemandu menggunakan algoritma *Extended Kalman Filter* (EKF) untuk mengintegrasikan laju putaran sudut menjadi orientasi spasial wahana tanpa memvalidasi apakah sensor mengalami saturasi atau menerapkan batas kelayakan fisika (*plausibility checks*). Akibat integrasi nilai saturasi tersebut, estimasi orientasi sudut wahana melompat salah hingga $165^\circ$, membuat komputer mempercayai bahwa wahana terbalik menghadap ke atas. Ketika radar altimeter Doppler mengukur jarak ke permukaan tanah sebesar 3,7 kilometer, sistem memproyeksikan jarak ini menggunakan sudut orientasi yang salah ($h = d \cdot \cos\theta$), menghasilkan estimasi ketinggian negatif (di bawah permukaan Mars). Perangkat lunak penerbangan secara otomatis memutuskan bahwa wahana telah mendarat dengan aman, memutuskan kabel parasut, mematikan roket pendorong setelah hanya membakar bahan bakar selama 3 detik, dan menjatuhkan modul pendarat dalam gaya bebas hingga hancur berkeping-keping di dataran Meridiani Planum pada kecepatan 540 km/jam.
+
+- **Potongan Kode / Arsitektur Cacat (Vulnerable Implementation)**:
+```python
+# Analisis Galat Fusi Sensor EKF: Kegagalan Saturasi Sensor IMU & Penolakan Outlier
+import numpy as np
+
+class SchiaparelliNavigationFilter:
+    def __init__(self):
+        self.altitude = 4000.0        # Ketinggian riil (meter)
+        self.velocity = -80.0         # Kecepatan vertikal (m/s)
+        self.attitude_pitch = 0.0     # Estimasi sudut pitch (radian)
+        self.imu_max_rate = np.radians(300.0) # Batas fisik saturasi giroskop (300 deg/s)
+
+    def update_vulnerable(self, raw_gyro_rate, radar_range_measurement, dt=0.05):
+        '''EKF RENTAN: Mengintegrasikan sensor jenuh tanpa validasi batas saturasi'''
+        # Sensor saturasi pada nilai maksimumnya
+        measured_rate = np.clip(raw_gyro_rate, -self.imu_max_rate, self.imu_max_rate)
+        
+        # Integrasi murni orientasi tanpa uji plausibilitas fisika
+        self.attitude_pitch += measured_rate * dt
+        
+        # Proyeksi jarak radar ke sumbu vertikal menggunakan estimasi orientasi
+        # BENCANA: Jika attitude_pitch menyimpang mendekati pi (180 deg), cosinus bernilai negatif!
+        estimated_altitude = radar_range_measurement * np.cos(self.attitude_pitch)
+        self.altitude = estimated_altitude
+        
+        # Logika pendaratan otomatis cacat: Mematikan mesin jika ketinggian <= 0
+        if self.altitude <= 0.0:
+            return "CUT_PARACHUTE_AND_SHUTDOWN_ENGINES" # Fatal crash dari 3.7 km!
+        return "DECELERATING_NORMAL"
+
+    def update_hardened(self, raw_gyro_rate, radar_range_measurement, dt=0.05):
+        '''EKF RESILIEN: Deteksi Saturasi, Residual Chi-Square Gating & Sanity Bounds'''
+        # 1. Deteksi Saturasi Sensor Perangkat Keras
+        is_saturated = abs(raw_gyro_rate) >= self.imu_max_rate
+        
+        if is_saturated:
+            # Tingkatkan kovariansi derau R secara masif atau abaikan update IMU ini
+            effective_rate = 0.0 # Jangan integrasikan laju saat sensor kehilangan linearitas
+        else:
+            effective_rate = raw_gyro_rate
+            
+        self.attitude_pitch += effective_rate * dt
+        
+        # 2. Batas Fisika Realistis (Sanity Bound): Wahana parasut tidak mungkin terbalik 180 deg
+        self.attitude_pitch = np.clip(self.attitude_pitch, np.radians(-45.0), np.radians(45.0))
+        
+        # 3. Proyeksi dengan jaminan non-negatif
+        projected_altitude = radar_range_measurement * np.cos(self.attitude_pitch)
+        
+        # 4. Gating Konsistensi Kecepatan vs Ketinggian
+        expected_altitude = self.altitude + self.velocity * dt
+        if projected_altitude < 0.0 or abs(projected_altitude - expected_altitude) > 500.0:
+            # Tolak pengukuran radar yang melanggar hukum gravitasi / kontinuitas fisika
+            self.altitude = expected_altitude
+        else:
+            self.altitude = 0.8 * expected_altitude + 0.2 * projected_altitude
+            
+        return "DECELERATING_NORMAL"
+```
+
+- **Mekanisme Kegagalan & Propagasi Non-Linear Sikap Pesawat**: Dalam sistem navigasi inersia strapdown (*Strapdown Inertial Navigation System*), orientasi matriks rotasi $C_b^n$ diperoleh melalui integrasi persamaan diferensial kinematik kuaternion $\dot{q} = \frac{1}{2} q \otimes \omega$. Ketika giroskop saturasi, nilai integral $\int (\omega_{riil} - \omega_{sat}) dt$ bertindak sebagai drift sudut tak terbatas. Proyeksi vektor jarak radar altimeter dari kerangka bodi wahana (*body frame*) ke kerangka inersia lokal (*navigation frame*) sangat bergantung pada cosinus kuaternion sikap. Kesalahan sudut $>90^\circ$ secara matematis membalikkan tanda komponen vertikal, mengubah jarak positif menjadi negatif.
+- **Prinsip Mitigasi & Arsitektur Resilien**:
+  1. *Saturation Flagging & Covariance Inflation*: Sensor pintar harus mengeluarkan bit status saturasi perangkat keras (*hardware clipping flag*). Saat flag aktif, filter estimasi harus mendiskontokan bobot inovasi atau menolak sampel sepenuhnya.
+  2. *Innovation Gating (Chi-Square Residual Test)*: Menolak pengukuran sensor jika jarak Mahalanobis $d^2 = \nu^T S^{-1} \nu > \gamma_{threshold}$, mencegah injeksi data yang tidak konsisten dengan batas sebaran kovariansi estimasi.
+  3. *State Sanity Check Assertions*: Logika misi tingkat tinggi (*mission executive logic*) dilarang keras mengeksekusi aksi kritis yang tidak dapat dibatalkan (melepaskan parasut pendarat) semata-mata berdasarkan keluaran satu estimator status tanpa konfirmasi silang multi-sensor independen.
+
 ## 6. Proyek Latihan & Rubrik Penilaian Mandiri
 ### Level 1 (Pemula)
 Bangun simulator pemetaan *Occupancy Grid Mapping* 2D di Python: terima data sudut dan jarak pulsa laser LiDAR, perbarui nilai log-odds okupansi sel grid menggunakan model sensor invers Bresenham ray-casting:
@@ -130,7 +213,16 @@ Implementasikan algoritma pelacakan lokasi berbasis partikel (*Monte Carlo Local
 
 ### Level 3 (Mahir)
 Bangun solver optimasi graf pose (*Pose-Graph SLAM*) 2D mini dari awal: formulasikan vektor galat residual relatif $e_{ij} \in \mathbb{R}^3$ antar pose simpul $SE(2)$, hitung matriks Jacobian non-linier analitik, selesaikan sistem persamaan linier normal $H \Delta x = -b$ via metode Gauss-Newton iteratif, dan buktikan penutupan loop berhasil meratakan galat drift lintasan lingkaran 100 meter.
-*Rubrik*: Solver mereduksi galat residual graf lebih dari $95\%$ dalam 5 iterasi.
+*Rubrik*: Solver mereduksi galat residual graf lebih dari \$95\%$ dalam 5 iterasi.
+
+### Tingkat 1: Dasar
+- **Tugas**: Jelaskan tahapan algoritma Extended Kalman Filter (Prediksi Status, Propagasi Kovariansi, Perhitungan Gain Kalman, dan Pembaruan Status) serta perbedaan utamanya dibandingkan Kalman Filter Linier standar.
+
+### Tingkat 2: Menengah
+- **Tugas**: Implementasikan skrip Python yang menerapkan Extended Kalman Filter 2D untuk fusi sensor odometri roda dan IMU, lengkap dengan uji Chi-Square Innovation Gating untuk menolak derau lonjakan impuls.
+
+### Tingkat 3: Mahir
+- **Tugas**: Rancang arsitektur perangkat lunak estimasi status wahana otonom luar angkasa dengan redundansi heterogen (IMU optik laser, radar altimeter gelombang mikro, dan kamera navigasi visual SLAM) yang tahan terhadap kebutaan sensor optik akibat debu permukaan.
 
 ## 7. Rekomendasi Sumber Belajar Standar Emas
 | Sumber Pembelajaran | Penulis / Institusi | Tautan Langsung | Fokus Materi |

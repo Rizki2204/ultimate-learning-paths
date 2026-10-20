@@ -6,87 +6,181 @@
 ---
 
 ## 1. Intuisi Dasar Tanpa Jargon ("Seperti Bayi Baru Lahir")
-Bagaimana Anda dan seseorang yang belum pernah Anda temui sebelumnya dapat menyepakati sebuah kunci rahasia melalui telepon umum yang disadap oleh seluruh agen intelijen dunia, tanpa penyerang dapat menebak kunci rahasia tersebut? Kriptografi Asimetris & Teori Bilangan ([Asymmetric Cryptography & Diffie-Hellman](https://en.wikipedia.org/wiki/Public-key_cryptography)) adalah penemuan matematika paling ajaib di abad ke-20 (Whitfield Diffie, Martin Hellman, dan RSA, 1976-1977). Alih-alih menggunakan satu kunci yang sama, ia menggunakan **Pasangan Kunci Kriptografi**: sebuah **Kunci Publik** yang disebarkan bebas ke seluruh dunia agar orang lain dapat mengunci pesan untuk Anda; dan sebuah **Kunci Privat** rahasia yang hanya Anda simpan sendiri di dalam saku untuk membuka pesan tersebut. Fondasi keamanannya berakar pada fungsi satu arah matematika (*One-Way Trapdoor Functions*): sangat mudah mengalikan dua bilangan prima raksasa, tetapi mustahil memfaktorkannya kembali dalam waktu manusia!
+### 1.1 Konsep Inti & Analogi Tanpa Jargon
+Bagaimana Anda membuktikan bahwa file instalasi sistem operasi sebesar 5 Gigabyte yang Anda unduh dari internet 100% utuh dan tidak pernah disusupi trojan oleh hacker di tengah jalan, hanya dengan membandingkan sebuah baris teks kecil sepanjang 64 karakter? Fungsi Hash Kriptografis & Integritas Pesan ([Cryptographic Hash Functions](https://en.wikipedia.org/wiki/Cryptographic_hash_function)) adalah mesin sidik jari digital matematika: ia menelan input berukuran berapa pun (dari satu huruf 'A' hingga seluruh isi perpustakaan nasional), lalu mengaduknya melalui blender matematika searah menjadi deretan bit berukuran tetap (seperti 256 bit pada SHA-256). Jika Anda mengubah satu koma kecil di dalam file 5 GB tersebut, seluruh karakter hash output akan berubah total secara acak (**Efek Longsoran / Avalanche Effect**). Dan untuk melindungi kata sandi pengguna dari pencurian massal, kita menggunakan fungsi hash lambat yang dirancang khusus menghabiskan memori RAM penyerang (**Argon2 & PBKDF2**) agar mesin hacker terbakar saat mencoba menebaknya!
+
+### 1.2 Urgensi Rekayasa & Signifikansi Sistemik
+Dalam rekayasa sistem modern, pemahaman mendalam tentang konsep ini membedakan arsitek sistem kelas dunia dari sekadar operator perkakas teknis.
 
 ## 2. Fondasi Teoretis & Aksiomatik / Matematis
-Landasan Teori Bilangan: Faktorisasi Integer RSA vs Logaritma Diskrit Kurva Eliptik (ECC):
+### 2.1 Kerangka Teori Aksiomatik & Formulasi Matematis
+Prinsip Tiga Syarat Mutlak Fungsi Hash Kriptografi dan Konstruksi Merkle-Damgård vs Sponge:
 
-1. **Sistem Kriptografi RSA (Rivest, Shamir, Adleman, 1977)**:
-   - Pilih dua bilangan prima raksasa independen $p$ dan $q$. Hitung modulus $n = p \cdot q$ dan fungsi totien Euler:
-     $$\phi(n) = (p - 1)(q - 1)$$
-   - Pilih eksponen publik $e$ sedemikian rupa sehingga $\gcd(e, \phi(n)) = 1$ (biasanya $e = 65537$).
-   - Hitung kunci privat $d$ menggunakan Algoritma Euclidean Diperluas (*Modular Multiplicative Inverse*):
-     $$d \equiv e^{-1} \pmod{\phi(n)} \iff e \cdot d \equiv 1 \pmod{\phi(n)}$$
-   - Enkripsi dan Dekripsi (Berdasarkan Teorema Kecil Fermat & Euler):
-     $$\text{Enkripsi: } c = m^e \pmod n \quad \iff \quad \text{Dekripsi: } m = c^d \pmod n$$
+### 2.2 Penurunan Matematis Langkah-demi-Langkah
+1. **Tiga Sifat Keamanan Aksiomatik Hash Kriptografis**:
+   - **Pre-image Resistance (One-Wayness)**: Diberikan nilai hash $h$, secara komputasi mustahil menemukan pesan $m$ sedemikian rupa sehingga $H(m) = h$.
+   - **Second Pre-image Resistance (Weak Collision Resistance)**: Diberikan pesan $m_1$, secara komputasi mustahil menemukan pesan berbeda $m_2 \ne m_1$ sedemikian rupa sehingga $H(m_1) = H(m_2)$.
+   - **Collision Resistance (Strong Collision Resistance)**: Secara komputasi mustahil menemukan *dua pesan sembarang* $m_1 \ne m_2$ sedemikian rupa sehingga $H(m_1) = H(m_2)$ (batas Paradoks Ulang Tahun: $\approx 2^{n/2}$ operasi).
 
-2. **Pertukaran Kunci Diffie-Hellman (DH Key Exchange)**:
-   - Alice memilih rahasia $a$, kirim $A = g^a \pmod p$. Bob memilih rahasia $b$, kirim $B = g^b \pmod p$.
-   - Kunci Rahasia Bersama: $K = B^a \pmod p = (g^b)^a \equiv (g^a)^b = A^b \pmod p$.
+2. **Konstruksi Merkle-Damgård (MD5, SHA-1, SHA-256)**:
+   Memecah pesan menjadi blok-blok berukuran tetap dan mengalirkannya ke fungsi kompresi satu arah berulang kali.
+   *Kelemahan Inheren*: Rentan terhadap **Length Extension Attack**! Penyerang yang mengetahui $H(m)$ dapat menghitung $H(m \parallel \text{padding} \parallel m')$ tanpa mengetahui isi rahasia $m$ (inilah mengapa enkripsi API wajib menggunakan **HMAC** alih-alih `hash(secret + data)`!).
 
-3. **Kriptografi Kurva Eliptik (Elliptic Curve Cryptography / ECC)**:
-   Didefinisikan di atas medan berhingga $\mathbb{F}_p$ dengan persamaan Weierstrass: $y^2 = x^3 + ax + b$.
-   Operasi Penjumlahan Titik Kurva membentuk grup Abelian. Masalah Logaritma Diskrit Kurva Eliptik (ECDLP):
-   $$Q = d \cdot G \quad (d: \text{Kunci Privat skalar}, G: \text{Generator Base Point}, Q: \text{Kunci Publik})$$
-   Sangat mudah menghitung perkalian skalar titik $dG$, namun mustahil mencari $d$ dari $Q$ dan $G$.
-   **Keunggulan ECC**: Kunci ECC 256-bit (seperti Curve25519 / Ed25519) memberikan tingkat keamanan yang setara dengan kunci RSA 3072-bit, menghemat 90% komputasi dan bandwidth!
+3. **Konstruksi Spons (Sponge Construction - Keccak / SHA-3)**:
+   Memiliki State internal berukuran lebar ($b = r + c$, di mana $r$ adalah Bitrate dan $c$ adalah Capacity).
+   - **Fase Absorbing**: Pesan di-XOR ke dalam bitrate $r$ dan diaduk via fungsi permutasi $f$.
+   - **Fase Squeezing**: Output hash diekstraksi dari bagian bitrate. Kebal mutlak terhadap Length Extension Attack!
+
+4. **Fungsi Penurunan Kunci Berorientasi Memori Keras (Memory-Hard Password Hashing: Argon2)**:
+   Pemenang Password Hashing Competition (PHC 2015). **Argon2id** dirancang untuk memaksa pengalokasian array memori RAM yang besar (puluhan megabyte), melumpuhkan chip penyerang berbasis GPU dan ASIC cracker.
 
 ## 3. Anatomi Teknis & Cara Kerja Internal
-Operasi Penjumlahan Geometris Titik pada Kurva Eliptik (Point Addition & Point Doubling):
+Konstruksi Hash-based Message Authentication Code (HMAC - RFC 2104):
 
 ```mermaid
 graph LR
-A[Titik P di Kurva] --> LINE[Tarik Garis Lurus memotong Titik Q]
-B[Titik Q di Kurva] --> LINE
-LINE --> INTERSECT[Titik Potong Ketiga R']
-INTERSECT -->|Refleksi Sumbu X| R[Titik Hasil Penjumlahan R = P + Q]
+K[Secret Key] --> XOR1((XOR with ipad 0x36)) --> H1[Inner Hash H]
+M[Message Payload] --> H1
+H1 --> H2[Outer Hash H]
+K --> XOR2((XOR with opad 0x5C)) --> H2
+H2 --> HMAC[HMAC Output Digest: Immune to Length-Extension Attacks!]
 ```
 
-1. **Ed25519 / Curve25519 (Daniel J. Bernstein / DJB)**:
-   Menggunakan kurva Twisted Edwards ($-x^2 + y^2 = 1 - (121665/121666)x^2 y^2$) di atas medan bilangan prima $2^{255} - 19$. Kebal secara matematis terhadap serangan timing channel, tidak memerlukan pengecekan titik tak terhingga, dan mengeksekusi tanda tangan digital dalam mikrodetik ([Curve25519 High-Speed Cryptography](https://cr.yp.to/ecdh.html)).
+1. **Formulasi Matematika HMAC**:
+   $$\text{HMAC}(K, m) = H\Big( (K' \oplus opad) \parallel H((K' \oplus ipad) \parallel m) \Big)$$
+   Di mana $ipad = 0x36$ diulang sepanjang ukuran blok dan $opad = 0x5C$ diulang sepanjang ukuran blok. Desain dua tingkat ini membuktikan secara matematis bahwa fungsi hash Merkle-Damgård dapat digunakan sebagai Pseudo-Random Function (PRF) yang aman.
+
+#### Tabel Penelusuran Siklus Kompresi SHA-1 & Konstruksi Tabrakan Hash (SHAttered)
+| Langkah / Putaran Kripto / Tahap Eksploit | Komponen / Lapisan Memori | Payload / Ciphertext / Input Eksploit | Transformasi Matematis / Mutasi Stack & Heap | Status Register (RIP/RSP/Canary) / S-Box State | Keluaran / Status Keamanan / Efek Eksploit |
+|---|---|---|---|---|---|
+| 1. Analisis Jalur Diferensial | CWI & Google Cluster Compute | Dua berkas PDF dengan header berbeda | Desain lintasan perbedaan bit $\Delta m = m_1 \oplus m_2$ | Kalkulasi probabilitas transisi diferensial putaran | Pola mutasi bit spesifik pada blok pesan ke-1 ditentukan |
+| 2. Near-Collision Blok 1 | Komputasi GPU (K80 Clusters) | Blok 1 Berkas PDF-A dan PDF-B | Eksekusi 80 putaran fungsi kompresi Davies-Meyer SHA-1 | State register internal $(A, B, C, D, E)$ mengalami pergeseran terkendali | Menghasilkan perbedaan state tereduksi $\Delta H_1$ |
+| 3. Eliminasi Drift Blok 2 | GPU Fuzzing 6.5 Juta Inti CPU | Blok 2 Berkas PDF-A dan PDF-B | Diferensial blok kedua dirancang untuk membatalkan $\Delta H_1$: $\Delta H_2 = -\Delta H_1$ | Vektor state internal konvergen ke nilai yang sama persis! | State register $(A, B, C, D, E)$ kembali identik sempurna! |
+| 4. Finalisasi Digest | SHA-1 Final Pad & Length Append | Header berkas PDF-A dan PDF-B berbeda | Serialisasi 160-bit hash digest | `38762cf7f55934b34d179ae6a4c80cadccbb7f0a` | Kedua file PDF berbeda menghasilkan nilai hash SHA-1 yang persis sama! |
+| 5. Verifikasi Integritas | Audit Sistem Kontrol Versi Git | Berkas PDF-A (Normal) vs PDF-B (Malicious) | Git/OpenSSL memvalidasi commit SHA-1 | SHA-1 Checksum cocok; SHA-256 membuktikan ketidakcocokan | Integritas digital SHA-1 dinyatakan resmi runtuh total! |
 
 ## 4. Implementasi Praktis & Kode / Simulasi Riil
 ```python
-# Elliptic Curve Diffie-Hellman (ECDH) Key Exchange using X25519 in Python
-from cryptography.hazmat.primitives.asymmetric import x25519
+# Secure Password Hashing using Argon2id and API Signing with HMAC-SHA256
+import hmac
+import hashlib
+import secrets
 
-# 1. Alice membangkitkan pasangan kunci privat & publik X25519
-alice_private_key = x25519.X25519PrivateKey.generate()
-alice_public_key = alice_private_key.public_key()
+# 1. Pembuatan Tanda Tangan Integritas Pesan API menggunakan HMAC-SHA256
+def sign_api_request(secret_key: bytes, message: bytes) -> str:
+    # HMAC membungkus hashing dua lapis untuk mencegah Length Extension Attacks
+    signature = hmac.new(secret_key, message, hashlib.sha256).hexdigest()
+    return signature
 
-# 2. Bob membangkitkan pasangan kunci privat & publik X25519
-bob_private_key = x25519.X25519PrivateKey.generate()
-bob_public_key = bob_private_key.public_key()
+def verify_api_request(secret_key: bytes, message: bytes, expected_signature: str) -> bool:
+    computed = sign_api_request(secret_key, message)
+    # Gunakan hmac.compare_digest untuk mencegah Timing Side-Channel Attacks!
+    return hmac.compare_digest(computed, expected_signature)
 
-# 3. Keduanya bertukar kunci publik melintasi jaringan publik yang disadap...
-# Alice menghitung Shared Secret menggunakan kunci privat Alice + kunci publik Bob:
-alice_shared_key = alice_private_key.exchange(bob_public_key)
-
-# Bob menghitung Shared Secret menggunakan kunci privat Bob + kunci publik Alice:
-bob_shared_key = bob_private_key.exchange(alice_public_key)
-
-# Jaminan Matematika: Keduanya menghasilkan kunci simetris rahasia yang 100% IDENTIK!
-assert alice_shared_key == bob_shared_key
-print(f"ECDH Shared Secret successfully derived! Length: {len(alice_shared_key)} bytes")
+key = secrets.token_bytes(32)
+payload = b"action=transfer&amount=1000&to=bob"
+sig = sign_api_request(key, payload)
+assert verify_api_request(key, payload, sig) == True
+print("HMAC-SHA256 API request verification successful!")
 ```
 
 ## 5. Miskonsepsi & Jebakan Industri
-1. **Textbook RSA without Padding Vulnerability**: Mengimplementasikan enkripsi RSA naif ($c = m^e \pmod n$) tanpa padding optimal (**OAEP** - Optimal Asymmetric Encryption Padding). Karena RSA deterministik, penyerang dapat menebak pesan pendek atau memulihkan plaintext menggunakan serangan Coppersmith / Hastad's Broadcast Attack.
-2. **ECDSA Nonce / k-value Reuse Catastrophe (Sony PS3 Hack 2010)**: Menggunakan angka acak $k$ yang sama untuk menandatangani dua pesan ECDSA yang berbeda. Penyerang dapat menghitung kunci privat pengembang secara aljabar langsung: $d = (s_1 z_2 - s_2 z_1) / (r(s_2 - s_1)) \pmod n$, meruntuhkan seluruh sistem proteksi konsol game PlayStation 3 ([Fail0verflow PS3 Hack](https://events.ccc.de/congress/2010/Fahrplan/events/4087.en.html)).
-3. **Small Subgroup Confinement Attack in Diffie-Hellman**: Tidak memvalidasi apakah kunci publik yang diterima dari pihak lawan berada di dalam grup siklik yang sah. Penyerang mengirimkan titik kurva dengan order kecil (*Small Subgroup*) untuk membocorkan bit kunci privat.
+1. **Using Fast Hashes for Password Storage (MD5 / SHA-256 for Passwords)**: Menyimpan hash kata sandi pengguna menggunakan SHA-256 atau MD5 biasa. Kartu grafis modern (GPU cluster) dapat menghitung ratusan miliar hash SHA-256 per detik, membobol seluruh kata sandi pengguna dalam beberapa jam (solusi: wajib gunakan Argon2id, bcrypt, atau PBKDF2 dengan cost factor tinggi).
+2. **Timing Attack on MAC String Comparison**: Membandingkan string tanda tangan hash menggunakan operator kesetaraan standar `if sig == expected_sig:`. Operator berhenti membandingkan pada karakter pertama yang salah, membocorkan waktu perbandingan yang dapat dieksploitasi penyerang untuk menebak signature byte-per-byte (solusi: selalu gunakan `hmac.compare_digest`).
+3. **Naive MAC via `hash(secret + message)`**: Membuat kode autentikasi pesan dengan menggabungkan kata rahasia dan pesan secara naif. Penyerang dapat mengeksploitasi *Length Extension Attack* pada SHA-256 untuk memalsukan perintah tambahan yang sah tanpa mengetahui kata rahasia.
+
+### Studi Kasus Kegagalan Nyata: Eksploitasi SHAttered & Pembuktian Tabrakan Penuh Pertama pada SHA-1 (2017)
+- **Kronologi & Konteks Sejarah**: Pada Februari 2017, tim peneliti gabungan dari CWI Amsterdam dan Google Cloud secara resmi merilis "SHAttered", demonstrasi tabrakan hash (*hash collision*) dunia nyata pertama yang berhasil memproduksi dua dokumen PDF dengan konten visual yang sama sekali berbeda namun menghasilkan nilai digest SHA-1 yang identik.
+- **Akar Masalah Kriptografis & Rekayasa Fungsi Hash**: Fungsi hash kriptografis SHA-1 yang dirancang oleh NSA pada tahun 1995 memiliki ukuran digest 160-bit, yang secara teoretis membutuhkan kompleksitas $2^{80}$ operasi matematis untuk menemukan tabrakan sesuai *Birthday Paradox*. Namun, arsitektur konstruksi Merkle-Damgård dengan fungsi kompresi linier pada SHA-1 rentan terhadap serangan analisis kriptanalisis diferensial. Tim peneliti berhasil menekan kompleksitas komputasi menjadi hanya $2^{63.1}$ evaluasi SHA-1 (setara dengan komputasi 1 GPU selama 110 tahun). Keberhasilan ini menghancurkan asumsi keamanan pada jutaan repositori Git, tanda tangan digital sertifikat SSL lama, dan sistem verifikasi integritas perangkat lunak yang masih mengandalkan SHA-1.
+
+- **Potongan Kode / Arsitektur Cacat (Vulnerable Implementation)**:
+```python
+# Verifikasi Otentik Komputasional: Dua Berkas PDF SHAttered dengan SHA-1 Identik
+import hashlib
+
+def verify_shattered_collision(pdf_bytes_1, pdf_bytes_2):
+    '''
+    Membuktikan adanya tabrakan SHA-1 pada dua dokumen berbeda
+    '''
+    # Verifikasi 1: Dokumen secara biner wajib berbeda!
+    assert pdf_bytes_1 != pdf_bytes_2, "Dokumen harus memiliki byte yang berbeda!"
+    
+    # Verifikasi 2: Hitung hash SHA-1
+    sha1_hash1 = hashlib.sha1(pdf_bytes_1).hexdigest()
+    sha1_hash2 = hashlib.sha1(pdf_bytes_2).hexdigest()
+    
+    # Bukti Tabrakan Kriptografis
+    is_collision = (sha1_hash1 == sha1_hash2)
+    
+    # Verifikasi 3: Hitung hash modern SHA-256 (yang tidak runtuh)
+    sha256_hash1 = hashlib.sha256(pdf_bytes_1).hexdigest()
+    sha256_hash2 = hashlib.sha256(pdf_bytes_2).hexdigest()
+    
+    return {
+        "is_sha1_collision": is_collision,
+        "sha1_hash": sha1_hash1,
+        "sha256_file1": sha256_hash1,
+        "sha256_file2": sha256_hash2,
+        "sha256_different": (sha256_hash1 != sha256_hash2)
+    }
+```
+
+- **Analisis Forensik & Rekayasa Modern**: Insiden SHAttered menjadi pemicu migrasi masif infrastruktur rekayasa global. Langkah mitigasi arsitektur: (1) Transisi total ke keluarga fungsi hash tahan tabrakan modern seperti SHA-256, SHA-512, atau SHA-3 (Keccak); (2) Repositori Git mengadopsi hash objek SHA-256 (Object Format Transition); (3) Pada penyimpanan kata sandi (*credential storage*), fungsi hash cepat seperti MD5/SHA-1/SHA-256 dilarang keras, dan diwajibkan menggunakan algoritma memory-hard seperti Argon2id atau scrypt yang tahan terhadap akselerasi serangan ASIC/GPU.
 
 ## 6. Proyek Latihan & Rubrik Penilaian Mandiri
-1. **Tingkat Pemula**: Hitung kunci RSA manual dengan bilangan prima kecil: pilih $p=61, q=53$. Hitung modulus $n$, totien $\phi(n)$, pilih $e=17$, dan cari kunci privat $d$ menggunakan Algoritma Euclidean Diperluas.
-2. **Tingkat Menengah**: Buat program Python yang membuktikan rumus kebocoran kunci privat ECDSA jika angka nonce $k$ digunakan ulang untuk dua tanda tangan berbeda (*Repeated Nonce Exploit*). Pulihkan kunci privat $d$ dari dua tanda tangan tersebut.
-3. **Tingkat Mahir**: Implementasikan operasi penjumlahan titik (*Point Addition*) dan penggandaan titik (*Point Doubling*) pada kurva eliptik Weierstrass $y^2 = x^3 + ax + b \pmod p$ dari nol dalam C/Python. Gunakan algoritma *Double-and-Add* untuk mengimplementasikan perkalian skalar titik $d \cdot G$.
+1. **Tingkat Pemula**: Buktikan efek longsoran (Avalanche Effect) di Python: hitung hash SHA-256 dari string `"The quick brown fox jumps over the lazy dog"`, lalu ubah satu huruf terakhir menjadi `"cog"`. Hitung berapa persen bit biner yang berubah dari kedua hash tersebut.
+2. **Tingkat Menengah**: Simulasikan serangan Length Extension Attack pada fungsi autentikasi naif `hash(secret + data)` menggunakan pustaka `hashpump`: tambahkan payload `"&admin=true"` dan buktikan Anda dapat menghasilkan hash baru yang valid tanpa mengetahui `secret`.
+3. **Tingkat Mahir**: Implementasikan fungsi kompresi SHA-256 murni di C atau Python sesuai spesifikasi NIST FIPS 180-4: terapkan fungsi logika bitwise $\text{Ch}(x,y,z)$, $\text{Maj}(x,y,z)$, $\Sigma_0(x)$, $\Sigma_1(x)$, dan jadwal pesan 64 konstanta putaran $K_t$.
+
+### Tingkat 1: Dasar
+- **Tugas**: Tulis program dalam Python untuk mengimplementasikan algoritma HMAC (Hash-based Message Authentication Code) sesuai spesifikasi RFC 2104 dari nol menggunakan fungsi hash dasar `hashlib.sha256`, membuktikan rumus $\text{HMAC}(K, m) = H((K \oplus opad) \parallel H((K \oplus ipad) \parallel m))$.
+- **Petunjuk Perancangan Arsitektur**:
+  - Ukuran blok hash SHA-256 adalah 64 byte.
+  - Konstanta padding: $ipad = \text{0x36}$ diulang 64 kali, $opad = \text{0x5C}$ diulang 64 kali.
+  - Jika kunci $K$ lebih panjang dari 64 byte, hash kunci tersebut terlebih dahulu; jika lebih pendek, pad dengan byte nol hingga 64 byte.
+- **Test Vector & Kasus Uji**:
+  - Kunci: b"Jefe", Pesan: b"what do ya want for nothing?".
+  - Nilai HMAC-SHA256 harus cocok persis dengan vektor uji RFC 4231: `5bdcc146bf60754e6a042426089575c75a003f089d2739839dec58b964ec3843`.
+- **Rubrik Penilaian Objektif**:
+  - Skor 100%: Hasil HMAC cocok persis dengan RFC 4231, penanganan kunci $>64$ byte dan $<64$ byte benar.
+  - Skor 50%: Benar untuk kunci standar namun salah dalam penanganan padding kunci panjang/pendek.
+  - Skor 0%: Program hanya memanggil fungsi bawaan `hmac.new` alih-alih membangun logika matematika dari nol.
+
+### Tingkat 2: Menengah
+- **Tugas**: Bangun implementasi Hash Tree (Merkle Tree) biner dalam Python/Rust yang mendukung penambahan data dinamis, komputasi Merkle Root, pembangkitan *Merkle Audit Proof* untuk anggota daun tertentu, dan verifikasi bukti dengan kompleksitas verifikasi $\mathcal{O}(\log N)$.
+- **Petunjuk Perancangan Arsitektur**:
+  - Terapkan pencegahan serangan *Second Preimage Attack* dengan menambahkan prefix byte domain: `0x00` untuk daun ($H(0x00 \parallel data)$) dan `0x01` untuk simpul internal ($H(0x01 \parallel left \parallel right)$).
+  - Bangun kelas `MerkleVerifier` yang memverifikasi path bukti tanpa memerlukan akses ke seluruh pohon.
+- **Test Vector & Kasus Uji**:
+  - Buat Merkle Tree dari 8 transaksi: ["tx1", "tx2", ..., "tx8"].
+  - Generate audit proof untuk "tx3". Bukti harus terdiri dari 3 simpul saudara ($\log_2 8 = 3$).
+  - Modifikasi bit pada "tx3": verifikasi bukti harus segera mengembalikan `False`.
+- **Rubrik Penilaian Objektif**:
+  - Skor 100%: Penanganan domain separation `0x00`/`0x01` sempurna, bukti audit memvalidasi integritas dengan $\mathcal{O}(\log N)$.
+  - Skor 50%: Merkle Root benar namun tidak mengimplementasikan domain separation sehingga rentan second-preimage.
+  - Skor 0%: Kompleksitas verifikasi bukti bernilai linear $\mathcal{O}(N)$.
+
+### Tingkat 3: Mahir
+- **Tugas**: Rancang sistem autentikasi kata sandi skala perusahaan menggunakan Argon2id (RFC 9106). Konfigurasikan parameter cost: $t=3$ iterasi, memori $m=64$ MB, dan paralelisme $p=4$ thread. Bangun mekanisme kalibrasi kinerja otomatis (*Auto-Tuning Benchmark*) yang mengukur waktu hashing pada mesin server target agar proses komputasi tepat memakan waktu antara $250$ s/d $500$ milidetik.
+- **Petunjuk Perancangan Arsitektur**:
+  - Gunakan pustaka standar industri (misal `argon2-cffi` di Python atau `argon2` di Rust).
+  - Pastikan salt kriptografis dibuat unik menggunakan `os.urandom(16)` per pengguna.
+  - Implementasikan verifikasi kata sandi dengan proteksi *Constant-Time Comparison* untuk mencegah timing side-channel attack.
+- **Test Vector & Kasus Uji**:
+  - Jalankan benchmark otomatis pada saat modul boot. Jika RAM server dialokasikan 8 GB, fungsi kalibrasi harus otomatis menyesuaikan memori $m$ dan iterasi $t$ agar latensi berada pada target $350\text{ ms} \pm 50\text{ ms}$.
+  - Uji verifikasi kata sandi yang salah: sistem harus mengonsumsi waktu komputasi yang identik dengan kata sandi yang benar (toleransi delta waktu $< 2\%$).
+- **Rubrik Penilaian Objektif**:
+  - Skor 100%: Parameter memory-hard optimal, auto-tuner presisi, kebal terhadap timing attack.
+  - Skor 50%: Hashing bekerja normal namun parameter statis tanpa mekanisme auto-tuning server.
+  - Skor 0%: Menggunakan salt statis atau algoritma usang non-memory-hard.
 
 ## 7. Rekomendasi Sumber Belajar Standar Emas
 | Sumber Pembelajaran | Penulis / Institusi | Tautan Langsung | Fokus Materi |
 | :--- | :--- | :--- | :--- |
-| A Method for Obtaining Digital Signatures and Public-Key Cryptosystems | R. L. Rivest, A. Shamir, L. Adleman | [ACM Communications 1978 RSA Paper](https://dl.acm.org/doi/10.1145/359340.359342) | Makalah Orisinal Penemuan Algoritma Kriptografi Kunci Publik RSA |
-| New Directions in Cryptography | Whitfield Diffie & Martin E. Hellman (Stanford) | [IEEE Transactions on IT 1976](https://ieeexplore.ieee.org/document/1055638) | Makalah Paling Bersejarah: Penemuan Pertukaran Kunci Diffie-Hellman Public Key |
-| Curve25519: High-Speed High-Security Cryptography | Daniel J. Bernstein (DJB) | [DJB Curve25519 Paper](https://cr.yp.to/ecdh/curve25519-20060209.pdf) | Spesifikasi Desain Kurva Twisted Edwards, Constant-Time & Immune to Timing Attacks |
-| Guide to Elliptic Curve Cryptography | Darrel Hankerson, Alfred Menezes, Scott Vanstone | [Springer Hankerson](https://link.springer.com/book/10.1007/b97644) | Buku Pegangan Lengkap ECC: Finite Field Arithmetic, Point Multiplication & ECDSA |
+| NIST FIPS PUB 180-4: Secure Hash Standard (SHS) | National Institute of Standards and Technology | [NIST FIPS 180-4 SHA Spec](https://csrc.nist.gov/publications/detail/fips/180-4/final) | Standar Spesifikasi Resmi Keluarga SHA-1, SHA-224, SHA-256, SHA-512 |
+| NIST FIPS PUB 202: SHA-3 Standard: Permutation-Based Hash and Extendable-Output Functions | NIST | [NIST FIPS 202 SHA-3 Spec](https://csrc.nist.gov/publications/detail/fips/202/final) | Standar Resmi Keccak Sponge Construction, Bitrate, Capacity & Permutations |
+| Argon2: The Memory-Hard Function for Password Hashing and Proof-of-Work | Alex Biryukov, Daniel Dinu, Dmitry Khovratovich | [Argon2 Research Paper](https://www.cryptolux.org/images/0/0d/Argon2.pdf) | Pemenang Password Hashing Competition: Argon2d, Argon2i & Argon2id Architecture |
+| RFC 2104: HMAC: Keyed-Hashing for Message Authentication | H. Krawczyk, M. Bellare, R. Canetti | [IETF RFC 2104](https://datatracker.ietf.org/doc/html/rfc2104) | Dokumen Standar Resmi HMAC, Desain Dua Tingkat & Analisis Keamanan Formal |
 
 ---
 *Navigasi Cepat*: [Ke Tingkat 11](./README.md) | [Ke Master Index](../../INDEX.md) | *Sebelumnya*: [170. sandi-blok-mode-operasi](./170-sandi-blok-mode-operasi.md) | *Berikutnya*: [172. kriptografi-kunci-asimetris](./172-kriptografi-kunci-asimetris.md)

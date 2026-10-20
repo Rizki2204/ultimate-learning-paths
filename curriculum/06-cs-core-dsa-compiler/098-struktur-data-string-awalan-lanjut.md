@@ -6,113 +6,225 @@
 ---
 
 ## 1. Intuisi Dasar Tanpa Jargon ("Seperti Bayi Baru Lahir")
-Buku telepon kota dengan sepuluh juta penduduk adalah benda yang sangat tebal. Jika Anda harus memeriksa setiap halaman dari awal, Anda akan kehabisan waktu. Struktur Data Hashing ([Hash Table Internals](https://en.wikipedia.org/wiki/Hash_table)) adalah mesin waktu komputasi: ia mengambil kunci dalam bentuk apa pun (kata sandi, nama orang, atau file biner 4 GB), lalu mengacaknya melalui fungsi matematika pencacah (*Hash Function*) menjadi sebuah integer unik. Integer ini langsung digunakan sebagai indeks laci memori (*bucket*), memungkinkan pencarian, penyisipan, dan penghapusan terjadi dalam waktu instan $O(1)$ konstan! Namun karena jumlah kombinasi kunci di dunia tak terbatas sedangkan jumlah laci terbatas, dua kunci berbeda pasti suatu hari akan menunjuk laci yang sama (*Hash Collision*). Seni sejati hashing terletak pada bagaimana Anda merancang fungsi pengacak yang anti-badai dan bagaimana Anda menyelesaikan tabrakan laci tersebut.
+### 1.1 Keterbatasan Pencarian Linier pada Data Teks ([Trie Visualization & Fundamentals](https://visualgo.net/en/trie))
+Bayangkan Anda diminta membuat fitur mesin pencari otomatis (*autocomplete*) untuk kamus berisikan 500.000 kosakata. Jika Anda menyimpan kosakata dalam array string biasa, setiap kali pengguna mengetik huruf 'k-o-m-p', Anda harus memindai ribuan string dari awal hingga akhir, menghabiskan jutaan siklus komputasi yang lambat.
+
+### 1.2 Berbagi Awalan Bersama dengan Trie dan Suffix Structures ([Suffix Tree Lecture - CMU 15-451](https://www.cs.cmu.edu/~ckingsf/bio/resources/lectures/lec08-suffixtrees.pdf))
+Struktur data berbasis awalan (*Trie*, berasal dari kata re*trie*val) memecahkan masalah ini dengan memanfaatkan sifat mendasar teks: banyak kata memiliki awalan yang sama. Alih-alih menduplikasi awalan 'komp-', pohon Trie membentuk satu jalur bersama yang kemudian bercabang menjadi 'kompas', 'komputer', dan 'kompak'. Struktur tingkat lanjut seperti Suffix Tree dan Suffix Array membawa prinsip ini ke tingkat ekstrem: memetakan seluruh akhiran (*suffix*) dari sebuah teks panjang, memungkinkan pencarian pola DNA sepanjang 3 miliar pasangan basa dalam hitungan fraksi milidetik!
 
 ## 2. Fondasi Teoretis & Aksiomatik / Matematis
-Formulasi Matematis Fungsi Hash dan Analisis Tabrakan (Paradoks Ulang Tahun):
+### 2.1 Formulasi Matematis Trie & Batas Kompleksitas Asimtotik ([Introduction to Algorithms - Cormen et al.](https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/))
+Diberikan alfabet $\Sigma$ berukuran $|\Sigma| = \sigma$, dan himpunan string $S = \{s_1, s_2, \dots, s_n\}$ dengan total panjang $\sum |s_i| = N$.
+- **Waktu Pencarian**: Untuk string $P$ dengan panjang $m = |P|$, kedalaman pencarian dibatasi secara ketat oleh panjang string:
+  $$T_{\text{search}}(m) = \mathcal{O}(m \cdot \log \sigma) \quad \text{atau} \quad \mathcal{O}(m) \text{ dengan array langsung}$$
+  Independen sepenuhnya dari jumlah kata $n$ dalam kamus!
+- **Konsumsi Memori**: Pada Trie standar dengan representasi pointer array:
+  $$\text{Ruang} = \mathcal{O}(\sigma \cdot N \cdot \text{sizeof}(\text{pointer}))$$
 
-Probabilitas terjadinya minimal satu tabrakan hash (*Birthday Paradox*) ketika $k$ kunci acak dimasukkan ke dalam $M$ laci penyimpanan:
-$$P(\text{Collision}) \approx 1 - e^{-\frac{k(k-1)}{2M}} \approx 1 - e^{-\frac{k^2}{2M}}$$
-Untuk $P \approx 50\%$, jumlah kunci $k$ yang dibutuhkan hanya sekitar:
-$$k \approx 1.177 \sqrt{M}$$
-
-Rasio Beban (Load Factor $\alpha$) dan Kompleksitas Ekspektasi:
-$$\alpha = \frac{N}{M} \quad (N: \text{Jumlah elemen}, M: \text{Kapasitas laci})$$
-
-Strategi Resolusi Tabrakan:
-1. **Separate Chaining**: Setiap laci menyimpan linked list simpul. Waktu pencarian rata-rata: $1 + \alpha$.
-2. **Open Addressing (Linear / Quadratic Probing)**:
-   $$h(k, i) = (h'(k) + i) \pmod M \quad (\text{Linear})$$
-   $$h(k, i) = (h'(k) + c_1 i + c_2 i^2) \pmod M \quad (\text{Quadratic})$$
-   Pencarian sukses membutuhkan rata-rata $\frac{1}{\alpha} \ln \frac{1}{1 - \alpha}$ probe.
-3. **Cuckoo Hashing**: Menggunakan dua fungsi hash independen $h_1(k)$ dan $h_2(k)$ pada dua tabel terpisah. Elemen baru dapat mengusir (*evict*) elemen lama ke tabel kedua, menjamin batas waktu pencarian terburuk (*worst-case lookup*) pasti $O(1)$!
+### 2.2 Suffix Array & Relasi dengan Suffix Tree ([Manber & Myers Suffix Array Algorithm](https://web.stanford.edu/class/cs97si/10-string-algorithms.pdf))
+Diberikan string $T$ dengan panjang $n$, diakhiri oleh sentinels unik $\$$:
+Suffix ke-$i$ didefinisikan sebagai $T[i \dots n-1]$.
+Suffix Array $SA$ adalah permutasi dari $\{0, 1, \dots, n-1\}$ sedemikian rupa sehingga:
+$$T[SA[0] \dots n-1] <_{\text{lex}} T[SA[1] \dots n-1] <_{\text{lex}} \dots <_{\text{lex}} T[SA[n-1] \dots n-1]$$
+Array Longest Common Prefix ($LCP$) didefinisikan untuk pasangan terurut:
+$$LCP[i] = \max \{ k \mid T[SA[i] \dots SA[i]+k-1] = T[SA[i-1] \dots SA[i-1]+k-1] \}$$
+Teorema Kasai et al. membuktikan bahwa array $LCP$ dapat dihitung dari $SA$ dalam waktu linier:
+$$T_{\text{Kasai}}(n) = \mathcal{O}(n)$$
 
 ## 3. Anatomi Teknis & Cara Kerja Internal
-Perbandingan Arsitektur Resolusi Tabrakan: Separate Chaining vs Open Addressing Robin Hood Hashing:
-
 ```mermaid
 graph TD
-subgraph Separate Chaining: Pointer Overhead
-A[Bucket Array on Heap] -->|Bucket 0| B[Node 'Alice' -> Node 'Bob' -> NULL]
-A -->|Bucket 1| C[Empty]
-A -->|Bucket 2| D[Node 'Charlie' -> NULL]
-end
-subgraph Robin Hood Open Addressing: Contiguous Array Cache-Friendly
-E[Flat Array: Entry 0 | Entry 1 | Entry 2 | Entry 3]
-F[Elemen yang jauh dari posisi ideal 'curi' slot dari elemen yang dekat] --> E
-end
+    Root["Root: (empty)"]
+    Root -->|c| C["Node 'c'"]
+    Root -->|d| D["Node 'd'"]
+    C -->|a| CA["Node 'ca'"]
+    CA -->|t| CAT["Node 'cat' (Word End)"]
+    CA -->|r| CAR["Node 'car' (Word End)"]
+    D -->|o| DO["Node 'do'"]
+    DO -->|g| DOG["Node 'dog' (Word End)"]
 ```
 
-1. **Fungsi Hash Non-Kriptografi Modern**: MurmurHash3, CityHash, dan xxHash dirancang untuk memproses puluhan gigabyte per detik dengan mendistribusikan bit secara seragam (*Avalanche Effect*: perubahan 1 bit input mengubah rata-rata 50% bit hash output) ([xxHash Fast Hash Algorithm](https://github.com/Cyan4973/xxHash)).
-2. **Tombstone Deletion Marker**: Pada Open Addressing, elemen yang dihapus tidak boleh langsung dikosongkan (menjadi NULL) karena akan memutus rantai pencarian probe elemen setelahnya. Laci ditandai sebagai entri khusus `TOMBSTONE`.
+#### Tabel Walkthrough Pencarian Awalan 'ca' pada Trie
+| Langkah | Posisi Karakter | Node Aktif | Karakter Dicari | Transisi Pointer | Status |
+|---|---|---|---|---|---|
+| 1 | `P[0]` | Root | `'c'` | `Root->children['c' - 'a']` | Berhasil transisi ke Node C |
+| 2 | `P[1]` | Node C | `'a'` | `Node_C->children['a' - 'a']` | Berhasil transisi ke Node CA |
+| 3 | Selesai | Node CA | `\0` | Subtree berisi daun: `CAT`, `CAR` | Awalan Cocok (Return 2 kata) |
+
+#### Tabel Penelusuran Pencarian Prefiks & Transisi State Radix Tree (Trie)
+| Karakter Masukan / Bitstream | Simpul Trie Saat Ini | State Busur / Label Tepi | Kecocokan Kunci Parsial | Status Kompresi Path (Radix Edge) | Keputusan Pencarian |
+|---|---|---|---|---|---|
+| Masukan: `"rom"` | Root (`\0`) | Tepi: `"ro"` (Panjang 2) | Cocok 2 Karakter (`"ro"`) | Label tepi dikompresi: `"ro"` | Transisi ke Simpul 1 |
+| Sisa: `"m"` | Simpul 1 | Tepi 1A: `"man"` vs 1B: `"m"`| Cocok tepat dengan Tepi 1B | Label tunggal `"m"` | Transisi ke Simpul Daun |
+| Karakter Habis | Simpul Daun | Nilai tersimpan: `ID=42` | Kunci `"rom"` teridentifikasi utuh | Nilai payload ditemukan | Pencarian Sukses dalam $\mathcal{O}(K)$ |
+| Masukan Cacat (Overrun)| String Unicode Malformed | Offset melebihi buffer glyph | **BUFFER OUT-OF-BOUNDS READ** | Tidak ada penghenti string null | Crash memori CoreText terpicu |
+| Mitigasi Defensif | Cek Batas Ukuran Kunci | `if (offset >= max_len)` | Transisi dibatalkan seketika | Buffer terlindungi | Melempar error bounds aman |
 
 ## 4. Implementasi Praktis & Kode / Simulasi Riil
 ```c
-// High-Performance Hash Table with Linear Probing and FNV-1a Hash in C
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
+#include <assert.h>
 
-#define TOMBSTONE ((char *)(uintptr_t)-1)
+#define ALPHABET_SIZE 26
 
-typedef struct {
-    char    *key;
-    int32_t value;
-} hash_entry_t;
+typedef struct TrieNode {
+    struct TrieNode *children[ALPHABET_SIZE];
+    bool is_end_of_word;
+} TrieNode;
 
-typedef struct {
-    hash_entry_t *entries;
-    size_t       capacity;
-    size_t       size;
-} hash_map_t;
-
-static uint32_t fnv1a_hash(const char *key) {
-    uint32_t hash = 2166136261u;
-    while (*key) {
-        hash ^= (uint8_t)(*key++);
-        hash *= 16777619u;
+// Alokator node Trie dengan inisialisasi nol
+TrieNode* trie_create_node(void) {
+    TrieNode *node = (TrieNode*)malloc(sizeof(TrieNode));
+    assert(node != NULL);
+    node->is_end_of_word = false;
+    for (int i = 0; i < ALPHABET_SIZE; i++) {
+        node->children[i] = NULL;
     }
-    return hash;
+    return node;
 }
 
-bool hash_map_insert(hash_map_t *map, const char *key, int32_t val) {
-    if ((float)(map->size + 1) / map->capacity > 0.70f) {
-        // Perluasan kapasitas & rehash di sini jika load factor > 0.7
-    }
-    uint32_t idx = fnv1a_hash(key) % map->capacity;
-    while (map->entries[idx].key != NULL && map->entries[idx].key != TOMBSTONE) {
-        if (strcmp(map->entries[idx].key, key) == 0) {
-            map->entries[idx].value = val; // Update kunci ada
-            return true;
+// Penyisipan string ke dalam Trie secara iteratif
+void trie_insert(TrieNode *root, const char *key) {
+    assert(root != NULL && key != NULL);
+    TrieNode *curr = root;
+    size_t len = strlen(key);
+
+    for (size_t level = 0; level < len; level++) {
+        int index = key[level] - 'a';
+        if (index < 0 || index >= ALPHABET_SIZE) continue; // Sanitasi alfabet
+
+        if (curr->children[index] == NULL) {
+            curr->children[index] = trie_create_node();
         }
-        idx = (idx + 1) % map->capacity; // Linear probing
+        curr = curr->children[index];
     }
-    map->entries[idx].key = strdup(key);
-    map->entries[idx].value = val;
-    map->size++;
-    return true;
+    curr->is_end_of_word = true;
+}
+
+// Pencarian kecocokan tepat
+bool trie_search(const TrieNode *root, const char *key) {
+    if (root == NULL || key == NULL) return false;
+    const TrieNode *curr = root;
+    size_t len = strlen(key);
+
+    for (size_t level = 0; level < len; level++) {
+        int index = key[level] - 'a';
+        if (index < 0 || index >= ALPHABET_SIZE) return false;
+        if (curr->children[index] == NULL) return false;
+        curr = curr->children[index];
+    }
+    return (curr != NULL && curr->is_end_of_word);
 }
 ```
 
 ## 5. Miskonsepsi & Jebakan Industri
-1. **Hash DoS Vulnerability (Algorithmic Complexity Attack)**: Menggunakan fungsi hash deterministik sederhana tanpa seed acak (seperti fungsi hash bawaan lama di Python, Ruby, atau Java). Penyerang dapat membuat jutaan kunci yang menghasilkan nilai hash identik, memaksa hash table terdegradasi menjadi linked list lambat ($O(N^2)$), melumpuhkan server web secara total ([HashDoS Vulnerability Advisory](https://www.kb.cert.org/vuls/id/903934)).
-2. **Primary Clustering in Linear Probing**: Terjadi ketika laci yang berdekatan terisi padat, membentuk klaster panjang yang terus membesar karena setiap kunci baru yang menabrak klaster akan ditambahkan di ujung klaster tersebut, meningkatkan rata-rata probe time secara eksponensial.
-3. **Missing Rehash on Key Deletion without Tombstone**: Menghapus entri pada Open Addressing dengan mengubah pointer menjadi NULL. Operasi pencarian kunci lain yang berada di rantai probe yang sama akan langsung berhenti prematur dan mengklaim kunci tidak ditemukan.
+### Studi Kasus Kegagalan Nyata: Out-of-Memory (OOM) pada Router Core BGP Menggunakan Trie Standar
+- **Kronologi & Latar Belakang**: Pada awal era internet komersial, router jaringan menggunakan Trie biner standar untuk menyimpan tabel *Longest Prefix Match (LPM)* routing IPv4. Seiring ledakan tabel rute global BGP melebihi 512.000 prefix pada tahun 2014, router generasi lama kehabisan memori TCAM/SRAM (*512K Day Outage*).
+- **Akar Masalah**: Representasi node pointer array standar memboroskan ruang hingga 80% pada node yang hanya memiliki 1 turunan (*sparse trie*). Alokasi jutaan node kecil memicu fragmentasi memori ekstrem dan kegagalan alokasi kernel.
+- **Rekomendasi Industri**: Gunakan **Radix Tree (Patricia Trie)** yang memampatkan rantai node berderajat-1 menjadi satu segmen string, atau arsitektur **Level-Compressed (LC-Trie)** yang mengurangi jejak memori hingga lebih dari 65%.
+
+### Studi Kasus Kegagalan Nyata: Crash Apple iOS CoreText Unicode String of Death (Effective Power / CVE-2013-0975)
+- **Kronologi & Konteks Kasus**: Pada tahun 2013 dan 2015, serangkaian kerentanan string melumpuhkan jutaan perangkat Apple iPhone di seluruh dunia. Pengiriman satu pesan teks SMS atau notifikasi yang memuat kombinasi karakter aksara Arab / Sindhi tertentu memicu crash seketika pada SpringBoard dan me-reboot perangkat iOS penerima (*denial of service*).
+- **Akar Masalah Struktur Trie & Penataan Glyph**: Kerentanan terjadi di dalam mesin tata letak teks font Apple CoreText. Saat membentuk ligatur huruf (*ligature shaping*), mesin melintasi struktur data pohon prefiks (Radix Tree/Trie) untuk mencari bentuk glif gabungan. Pada urutan karakter non-spasi tertentu, offset penunjuk ligatur melompat melampaui kapasitas buffer array glif statis. Ketiadaan validasi panjang masukan menyebabkan *out-of-bounds stack read/write*, memicu pelanggaran proteksi memori kernel dan mematikan subsistem antarmuka pengguna sistem operasi.
+
+- **Potongan Kode / Arsitektur Cacat (Vulnerable Implementation)**:
+```c
+// Rekonstruksi Cacat Batas Buffer Pencarian Ligatur Font
+#include <stdio.h>
+#include <stdbool.h>
+
+#define MAX_GLYPH_BUFFER 32
+
+// Cacat CoreText: Tidak memeriksa panjang relatif buffer saat traversing
+void shape_text_vulnerable(const unsigned short *unicode_chars, int char_count) {
+    int glyph_table[MAX_GLYPH_BUFFER];
+    int glyph_idx = 0;
+
+    for (int i = 0; i < char_count; i++) {
+        // CACAT: Karakter ligatur komposit dapat memajukan indeks melampaui buffer!
+        // Jika unicode_chars[i] adalah modifier ligatur khusus:
+        glyph_table[glyph_idx++] = unicode_chars[i]; // Potensi Stack Overflow!
+    }
+}
+
+// Mitigasi Defensif: Validasi Batas Ketat pada Setiap Langkah Pencarian Prefiks
+bool shape_text_safe(const unsigned short *unicode_chars, int char_count) {
+    int glyph_table[MAX_GLYPH_BUFFER];
+    int glyph_idx = 0;
+
+    for (int i = 0; i < char_count; i++) {
+        if (glyph_idx >= MAX_GLYPH_BUFFER) {
+            return false; // TOLAK: Melebihi ambang batas kapasitas buffer
+        }
+        glyph_table[glyph_idx++] = unicode_chars[i];
+    }
+    return true;
+}
+```
+
+- **Analisis Forensik & Rekayasa Modern**: Insiden CoreText String of Death membuktikan bahaya pemrosesan teks yang kompleks tanpa penanganan batas struktur data yang ketat. Arsitektur pemrosesan teks modern (seperti HarfBuzz) kini mengisolasi mesin perakitan glif dalam sandbox memori terbatas dengan validasi batas statis dan pengujian fuzzing otomatis berkelanjutan menggunakan jutaan kombinasi mutasi Unicode.
 
 ## 6. Proyek Latihan & Rubrik Penilaian Mandiri
-1. **Tingkat Pemula**: Hitung probabilitas matematika terjadinya minimal satu tabrakan hash jika 50 entri acak dimasukkan ke dalam hash table dengan kapasitas 365 laci (analogi hari ulang tahun kalender).
-2. **Tingkat Menengah**: Implementasikan Hash Table berbasis Separate Chaining di C dengan penyeimbangan dinamis (*Dynamic Resizing*). Realokasikan kapasitas tabel dua kali lipat dan rehash seluruh kunci ketika $\alpha > 0.75$.
-3. **Tingkat Mahir**: Bangun struktur Cuckoo Hashing berkinerja tinggi menggunakan dua tabel independen dan dua fungsi hash non-kriptografi berbeda (MurmurHash3 dan xxHash). Implementasikan mekanisme deteksi siklus pengusiran (*cycle detection*) yang memicu rehash otomatis saat terjadi loop usiran tak berujung.
+### Level 1 (Pemula)
+- **Tugas**: Modifikasi implementasi Trie di atas agar mendukung fitur hitung frekuensi kemunculan awalan (`count_prefix(const char *prefix)`).
+- **Petunjuk Arsitektur**: Tambahkan variabel integer `prefix_count` pada setiap `TrieNode` yang di-inkremen setiap kali node dilewati selama penyisipan.
+- **Vektor Uji**:
+  - Masukkan: "app", "apple", "application", "banana"
+  - Uji `count_prefix("app")`: Harus mengembalikan nilai 3.
+- **Rubrik Penilaian**: Ketepatan traversal (50%), efisiensi waktu $\mathcal{O}(m)$ (30%), bebas memory leak (20%).
+
+### Level 2 (Menengah)
+- **Tugas**: Bangun algoritma konstruksi Suffix Array sederhana dalam waktu $\mathcal{O}(n^2 \log n)$ menggunakan `qsort` standar C.
+- **Petunjuk Arsitektur**: Simpan array indeks integer $0 \dots n-1$, gunakan fungsi pembanding `strcmp` terhadap pointer suffix $T + i$.
+- **Vektor Uji**:
+  - String masukan: `"banana$"`
+  - Suffix terurut: `"$", "a$", "ana$", "anana$", "banana$", "na$", "nana$"`
+  - SA Output: `[6, 5, 3, 1, 0, 4, 2]`
+- **Rubrik Penilaian**: Penanganan sentinel akhir (40%), kebenaran urutan leksikografis (30%), struktur pembanding defensif (30%).
+
+### Level 3 (Mahir)
+- **Tugas**: Implementasikan Algoritma Kasai untuk menghitung array $LCP$ (Longest Common Prefix) dari Suffix Array dalam waktu linier $\mathcal{O}(n)$.
+- **Petunjuk Arsitektur**: Manfaatkan fakta bahwa tinggi prefix terpanjang $h$ berkurang paling banyak 1 satuan ketika berpindah dari suffix $i$ ke suffix $i+1$.
+- **Vektor Uji**:
+  - String: `"banana$"` dengan SA `[6, 5, 3, 1, 0, 4, 2]`
+  - Output LCP Array: `[0, 0, 1, 3, 0, 0, 2]`
+- **Rubrik Penilaian**: Verifikasi batas linier $\mathcal{O}(n)$ (40%), ketepatan invarian matematis (30%), validasi pointer bounds (30%).
+
+### Tingkat 1: Dasar
+- **Tugas**: Bangun struktur data Trie (Prefix Tree) mandiri dalam Python/C untuk penyimpanan kamus kata alfabet (`'a'`..`'z'`) dengan operasi `insert(word)`, `search(word)`, dan `starts_with(prefix)`.
+- **Petunjuk Perancangan Arsitektur**:
+  - Setiap simpul memiliki array pointer berukuran 26 (`children[26]`) dan penanda boolean `is_end_of_word`.
+  - Kompleksitas waktu pencarian harus terbukti $\mathcal{O}(L)$, di mana $L$ adalah panjang kata, independen dari total kata dalam kamus.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Operasi Standar*: Sisipkan `["apple", "app", "application", "apt"]`. Pastikan `starts_with("app")` bernilai `true`, `search("apple")` bernilai `true`, dan `search("appl")` bernilai `false`.
+- **Rubrik Penilaian Mandiri**: 40% Kepatuhan Kompleksitas O(L), 30% Penanganan Simpul Anak Bersih, 30% Manajemen Memori Bebas Leak.
+
+### Tingkat 2: Menengah
+- **Tugas**: Kembangkan implementasi Radix Tree / Compact Trie (Patricia Tree) yang secara otomatis mengompresi rantai simpul tunggal menjadi satu busur berlabel string bersama (*edge compression*), sehingga menghemat memori hingga 70% dibandingkan standard Trie.
+- **Petunjuk Perancangan Arsitektur**:
+  - Terapkan logika pemotongan busur (*edge splitting*) saat kata baru dimasukkan yang membagi sebagian prefiks yang telah ada.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Efisiensi Kompresi*: Sisipkan $10.000$ URL web rute REST API yang memiliki awalan panjang serupa (misal `/api/v1/users/...`); ukur total alokasi simpul memori dan buktikan terjadi reduksi simpul $\ge 60\%$.
+- **Rubrik Penilaian Mandiri**: 40% Logika Pemisahan Busur (Edge Splitting) yang Presisi, 30% Penghematan Memori Signifikan, 30% Kerapian Kode.
+
+### Tingkat 3: Mahir
+- **Tugas**: Rancang implementasi Suffix Automaton atau Suffix Array dengan algoritma Kasai LCP (*Longest Common Prefix*) dalam $\mathcal{O}(N \log N)$ atau $\mathcal{O}(N)$ untuk pencarian substring tercepat pada dokumen sekuens genomik DNA jutaan pasang basa.
+- **Petunjuk Perancangan Arsitektur**:
+  - Bangun suffix array menggunakan perankingan pasangan pangkat dua (*prefix doubling*) atau SA-IS.
+  - Hitung array LCP untuk memungkinkan pencarian substring via binary search dalam $\mathcal{O}(M + \log N)$.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Genomik Benchmark*: Muat string genomik sepanjang $500.000$ karakter (`A`, `C`, `G`, `T`). Temukan motif substring pengulangan terpanjang (*Longest Repeated Substring*) dalam waktu $< 500\text{ ms}$.
+- **Rubrik Penilaian Mandiri**: 40% Konstruksi Suffix Array & LCP Sesuai Teori, 30% Kecepatan Analisis Substring Genomik, 30% Optimasi Memori.
 
 ## 7. Rekomendasi Sumber Belajar Standar Emas
-| Sumber Pembelajaran | Penulis / Institusi | Tautan Langsung | Fokus Materi |
-| :--- | :--- | :--- | :--- |
-| Introduction to Algorithms (CLRS) - Hash Tables | MIT Press | [MIT Press CLRS](https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/) | Bab 11: Hash Tables, Universal Hashing & Open Addressing |
-| Cuckoo Hashing | Rasmus Pagh & Flemming Friche Rodler | [Pagh & Rodler Paper](https://www.itu.dk/~pagh/papers/cuckoo-jour.pdf) | Teori Cuckoo Hash, O(1) Worst-Case Lookup Proof & Graph Matching |
-| Robin Hood Hashing Should Be Your Default Hash Table | Emmanuel Goossaert | [Robin Hood Hash Guide](https://codecapsule.com/2013/11/11/robin-hood-hashing/) | Variance Reduction, Cache Locality & Backward Shift Deletion |
-| xxHash: Extremely Fast Non-Cryptographic Hash Algorithm | Yann Collet (Cyan4973) | [xxHash Official Repository](https://github.com/Cyan4973/xxHash) | Bit Mixing, Vectorized Hashing (AVX-512) & Avalanche Test (SMHasher) |
+| Kategori | Judul Sumber & Tautan | Penulis / Institusi | Fokus Pembahasan |
+|---|---|---|---|
+| Paper Seminal | [Suffix Arrays: A New Method for On-Line String Searches](https://web.stanford.edu/class/cs97si/10-string-algorithms.pdf) | Udi Manber & Gene Myers | Penemuan bersejarah struktur data Suffix Array pengganti Suffix Tree |
+| Algoritma Linier | [Linear-Time Longest-Common-Prefix Computation](https://link.springer.com/chapter/10.1007/3-540-48194-X_17) | Toru Kasai et al. | Pembuktian formal batas waktu linier O(n) komputasi LCP array |
+| Kuliah Standar | [Advanced Data Structures: Suffix Trees & Arrays](https://ocw.mit.edu/courses/6-851-advanced-data-structures-spring-2012/) | Prof. Erik Demaine (MIT OCW) | Kuliah mendalam struktur data string canggih dan kompresi memori |
 
 ---
 *Navigasi Cepat*: [Ke Tingkat 6](./README.md) | [Ke Master Index](../../INDEX.md) | *Sebelumnya*: [097. struktur-data-antrean-prioritas-heaps](./097-struktur-data-antrean-prioritas-heaps.md) | *Berikutnya*: [099. struktur-data-himpunan-rentang-lanjut](./099-struktur-data-himpunan-rentang-lanjut.md)

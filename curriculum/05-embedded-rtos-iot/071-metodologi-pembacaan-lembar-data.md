@@ -6,8 +6,10 @@
 ---
 
 ## 1. Intuisi Dasar Tanpa Jargon ("Seperti Bayi Baru Lahir")
+### 1.1 Konsep Inti & Analogi Tanpa Jargon
 Pernahkah Anda membeli perabot lemari kayu rakitan yang memiliki 500 sekrup dan 50 papan kayu? Jika Anda mencoba merakitnya tanpa membaca buku panduan manualnya, Anda pasti salah pasang sekrup dan lemari Anda akan roboh miring!
 
+### 1.2 Urgensi Rekayasa & Signifikansi Sistemik
 Dalam dunia rekayasa embedded systems, chip mikrokontroler modern memiliki dokumen manual resmi yang tebalnya bisa menembus **2.000 hingga 3.500 Halaman**!
 Dokumen ini disebut **Datasheet** dan **Reference Manual**:
 - Banyak pemula ketakutan melihat ribuan halaman bahasa teknis ini dan memilih mencari 'tutorial blog instan'. Akibatnya, saat menghadapi bug perangkat keras yang membingungkan, mereka menyerah.
@@ -15,6 +17,7 @@ Dokumen ini disebut **Datasheet** dan **Reference Manual**:
 [📚 Pelajari: EEVblog How to Read a Semiconductor Datasheet](https://www.youtube.com/watch?v=0h5G295lK1Q)
 
 ## 2. Fondasi Teoretis & Aksiomatik / Matematis
+### 2.1 Kerangka Teori Aksiomatik & Formulasi Matematis
 ### 71.1 Tiga Dokumen Wajib Produsen Semikonduktor ([STMicroelectronics Technical Documentation Guide](https://www.st.com/))
 1. **Datasheet (DS - Tipikal 100 - 200 Halaman)**:
    - Karakteristik elektrikal fisik spesifik part number: Tegangan suplai mutlak ($V_{DD\max}$), batas suhu ambien, konsumsi arus di setiap mode sleep, rating batas frekuensi maksimum.
@@ -27,6 +30,7 @@ Dokumen ini disebut **Datasheet** dan **Reference Manual**:
 3. **Errata Sheet (ES - Tipikal 30 - 60 Halaman)**:
    - Dokumentasi cacat desain silikon (*hardware bugs*) pada revisi wafer tertentu beserta instruksi solusi kerja (*workarounds* perangkat lunak).
 
+### 2.2 Penurunan Matematis Langkah-demi-Langkah
 ### 71.2 Dekonstruksi Alamat Register Hardware: Alamat Dasar + Offset ([Cortex-M Memory Map](https://developer.arm.com/))
 Setiap register kendali periferal memiliki alamat memori fisik 32-bit unik yang dihitung dengan rumus:
 $$\text{Alamat Register Fisik} = \text{Alamat Dasar Bus Periferal} + \text{Offset Modul} + \text{Offset Register}$$
@@ -58,7 +62,17 @@ Navigasi Cepat Datasheet 4-Langkah Insinyur Profesional:
 3. Buka bab periferal di Reference Manual, langsung lompat ke sub-bab *Register Description*.
 4. Telusuri dokumen Errata Sheet untuk periferal yang sedang Anda gunakan sebelum mulai menulis kode driver.
 
+#### Tabel Penelusuran Errata Silikon STM32F4 & Pembersihan Prematur Flag Interupsi DMA
+| Langkah Firmware / Transaksi HW | Register Perangkat Keras ADC / DMA | Aksi Debugger / Kode Firmware C | Status Bendera Status Register (`SR`) | Perilaku Pengontrol DMA | Dampak pada Buffer Data Sensor |
+|---|---|---|---|---|---|
+| Konversi ADC Selesai | `ADC1->SR` (End of Conversion) | Hardware menegaskan flag `EOC = 1` | `EOC = 1, STRX = 1` | DMA mendeteksi permintaan transfer | Data siap disalin ke SRAM |
+| Pembacaan Debug Tak Sengaja| `ADC1->DR` (Data Register) | Insinyur membaca `ADC1->DR` di IDE debug | `EOC` TERHAPUS OTOMATIS OLEH BACAAN! | Pembacaan register menghapus flag perangkat keras! | Permintaan transfer DMA dibatalkan prematur! |
+| DMA Kehilangan Sinyal | Pengontrol DMA Stream 0 | Menunggu sinyal pemicu dari ADC | Flag sudah bernilai 0 di `ADC1->SR` | DMA Stream macet menunggu selamanya | Alamat buffer tujuan tidak diperbarui |
+| Kaskade Errata Silikon | Konversi berikutnya tiba | `OVR = 1` (Overrun Error) | Data lama tertimpa sebelum tersalin | Aliran DMA terblokir permanen | Sampling sensor ADC berhenti total |
+| Mitigasi Sesuai Lembar Errata | Akses data dilarang keras | Pembacaan hanya boleh melalui DMA stream | Jalankan urutan pembersihan eksplisit | Flag status dijaga tetap sinkron | 100% sampel tersalin mulus ke memori |
+
 ## 4. Implementasi Praktis & Kode / Simulasi Riil
+```python
 def decode_register_bitfield(reg_value_32bit: int, bit_definitions: dict) -> dict:
     """
     Membongkar isi nilai heksadesimal 32-bit register periferal berdasarkan deskripsi lembar data Reference Manual.
@@ -90,11 +104,52 @@ result = decode_register_bitfield(0x00000085, tim_cr1_fields)
 print("Hasil Analisis Register TIMx_CR1 (Nilai: 0x0085):")
 for field, data in result.items():
     print(f" - Bit {field:5s} = {data['value_raw']} | {data['description']}")
+```
 
 ## 5. Miskonsepsi & Jebakan Industri
 1. **Ignoring Errata Workarounds**: Menghabiskan waktu 3 minggu mencoba men-debug modul hardware yang macet secara misterius menggunakan osiloskop; padahal masalah tersebut sudah terdaftar secara resmi di dokumen Errata Sheet sebagai cacat silikon pabrik yang membutuhkan 2 baris kode workaround khusus.
 2. **Writing 0 to Clear Interrupt Flags**: Menulis angka 0 ke register berstatus Write-1-to-Clear (`W1C`) dengan harapan menghapus interupsi; bendera interupsi tetap aktif membara dan CPU terjebak dalam loop pemanggilan ISR tanpa henti.
 3. **Absolute Maximum Ratings Confusion**: Mengira tabel *Absolute Maximum Ratings* adalah kondisi operasional yang diizinkan (misal tegangan $4.0	ext{ V}$ pada pin $3.3	ext{ V}$); mengoperasikan chip pada batas absolut merusak keandalan silikon secara permanen dan membatalkan garansi pabrikan.
+
+### Studi Kasus Kegagalan Nyata: Silicon Errata Mikrokontroler STM32F4 (Pembacaan Prematur Register ADC Menghapus Flag DMA)
+- **Insiden Kegagalan Firmware Akuisisi Data Industri**: Pada perancangan sistem osiloskop digital portabel berbasis mikrokontroler ARM Cortex-M4 STM32F407, pengembang mendapati modul akuisisi ADC berkecepatan tinggi berbasis DMA bekerja sempurna saat program dijalankan normal, tetapi mendadak macet total dan berhenti mengambil data setiap kali breakpoint debug dipasang di dalam IDE Keil/IAR.
+- **Akar Masalah Lembar Data vs Errata Silikon (Hardware Errata)**: Lembar data ringkas (*Datasheet*) hanya menjelaskan spesifikasi ideal, sedangkan perilaku anomali fisik silikon yang sebenarnya didokumentasikan di dalam dokumen *Silicon Errata Sheet*. Pada mikrokontroler STM32 seri awal, pembacaan register data ADC (`ADC_DR`) memiliki efek samping perangkat keras otomatis: menghapus bendera End-of-Conversion (`EOC`) pada register status `ADC_SR`. Ketika debugger IDE berhenti pada breakpoint atau membuka jendela *Watch/Peripheral Window*, antarmuka debug JTAG membaca seluruh register periferal secara otomatis untuk memperbarui tampilan layar pengguna. Pembacaan latar belakang ini menghapus bendera `EOC` sebelum unit Direct Memory Access (DMA) sempat mendeteksi sinyal permintaan transfer (*DMA request handshake*). Akibatnya, pengontrol DMA kehilangan pulsa transfer, konversi berikutnya memicu kondisi *Overrun Error* (`OVR`), dan seluruh aliran DMA terkunci permanen. Pengembang yang tidak membaca dokumen Errata menghabiskan berminggu-minggu menyalahkan bug kompilator atau sirkuit PCB.
+
+- **Potongan Kode / Arsitektur Cacat (Vulnerable Implementation)**:
+```c
+// Penanganan Sesuai Petunjuk Resmi Lembar Errata STM32F40x (DocID022063)
+#include <stdint.h>
+#include <stdbool.h>
+
+// Definisi register tiruan STM32 ADC
+typedef struct {
+    volatile uint32_t SR;   // Status Register
+    volatile uint32_t CR1;  // Control Register 1
+    volatile uint32_t CR2;  // Control Register 2
+    volatile uint32_t DR;   // Data Register
+} ADC_TypeDef;
+
+void clear_adc_overrun_errata_workaround(ADC_TypeDef *adc) {
+    // Berdasarkan Errata 2.2.3: "DMA overrun occurs if ADC_DR read unexpectedly"
+    // Urutan pemulihan resmi yang diwajibkan oleh pabrikan STMicroelectronics:
+    
+    // 1. Matikan sementara bit pemicu DMA pada ADC
+    adc->CR2 &= ~(1U << 8); // Clear bit DMA
+    
+    // 2. Hapus flag Overrun (OVR) dan End of Conversion (EOC) secara eksplisit
+    // Menuliskan 0 ke bit OVR (bit 5) dan bit EOC (bit 1)
+    adc->SR &= ~((1U << 5) | (1U << 1));
+    
+    // 3. Baca dummy satu kali untuk membersihkan sisa data FIFO internal
+    volatile uint32_t dummy = adc->DR;
+    (void)dummy;
+    
+    // 4. Hidupkan kembali transfer DMA
+    adc->CR2 |= (1U << 8); // Set bit DMA
+}
+```
+
+- **Metodologi Rekayasa Membaca Lembar Data**: Insinyur sistem tertanam profesional wajib membaca tiga dokumen penting pabrikan secara berurutan: 1) *Datasheet* untuk parameter elektrik dan pinout kemasan; 2) *Reference Manual* (RM) untuk arsitektur register internal periferal; 3) *Silicon Errata Sheet* untuk katalog cacat fisik cetakan silikon (*die silicon bugs*) beserta kode perangkat lunak solusi sementara (*workarounds*) yang diwajibkan oleh pabrikan.
 
 ## 6. Proyek Latihan & Rubrik Penilaian Mandiri
 ### Tingkat 1 (Pemula) - Ekstraksi Alamat Register Hardware dari Reference Manual
@@ -110,6 +165,37 @@ Pelajari dokumen Errata Sheet STM32F4 terkait cacat hardware "I2C bus lockup whe
 - **40% Ketepatan Perhitungan Alamat Memori**: Alamat dasar bus, offset periferal, dan offset register dihitung tepat tanpa salah alamat.
 - **30% Pemahaman Semantik Bit Register**: Membedakan fungsi bit reserved, bitfield konfigurasi multi-bit, dan mekanisme W1C.
 - **30% Validitas Solusi Rekayasa Errata**: Prosedur pemulihan bus I2C mematuhi spesifikasi pemulihan standar industri NXP I2C Bus.
+
+### Tingkat 1: Dasar
+- **Tugas**: Bangun fungsi manipulasi register bitwise aman dalam C untuk mengatur (SET), membersihkan (CLEAR), dan membalikkan (TOGGLE) bit spesifik pada register kontrol perangkat keras 32-bit tanpa merusak status bit tetangga (*Read-Modify-Write atomicity*).
+- **Petunjuk Perancangan Arsitektur**:
+  - SET: `*reg |= (1U << bit_pos);`.
+  - CLEAR: `*reg &= ~(1U << bit_pos);`.
+  - TOGGLE: `*reg ^= (1U << bit_pos);`.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Isolasi Bitmask*: Pada register `0x00FF`, lakukan CLEAR pada bit 3; verifikasi hasil tepat `0x00F7` tanpa mempengaruhi bit lain.
+  - *Bit Posisi Maksimum*: Manipulasi bit MSB (bit 31) menggunakan literal tak bertanda `1U << 31` tanpa menyebabkan undefined behavior integer overflow bertanda.
+- **Rubrik Penilaian Mandiri**: 40% Operasi Bitwise Masking Mandiri Presisi, 30% Penggunaan Literal Tak Bertanda `1U` Bebas Overflow, 30% Verifikasi Imunitas Bit Tetangga.
+
+### Tingkat 2: Menengah
+- **Tugas**: Implementasikan parser skema register peripheral berbasis SVD (System View Description) XML dalam Python yang mengekstrak definisi register, offset alamat, bit-field masks, dan atribut hak akses (Read-Only, Write-Only, Read-Write), menghasilkan file header C berekstensi `.h` dengan deklarasi `struct` terbungkus `volatile` dan konstanta bitmask otomatis.
+- **Petunjuk Perancangan Arsitektur**:
+  - Urai pohon XML SVD untuk entitas `<peripherals>`, `<registers>`, dan `<fields>`.
+  - Hitung ukuran jarak byte padding antar-register secara otomatis jika terdapat celah alamat memori.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Padding Celah Alamat*: Jika register A pada offset `0x00` dan register B pada offset `0x08`; sisipkan array padding `uint32_t RESERVED0[1];` tepat 4 byte.
+  - *Bitfield Mask*: Bangun makro definisi `REG_FIELD_Pos` dan `REG_FIELD_Msk` yang cocok dengan lebar bitfield.
+- **Rubrik Penilaian Mandiri**: 40% Ekstraksi Pohon SVD XML Presisi, 30% Perhitungan Padding Struktur Memori C Otomatis Tepat, 30% Generasi File Header Kompatibel CMSIS.
+
+### Tingkat 3: Mahir
+- **Tugas**: Rancang driver perangkat keras peripheral Timer PWM parametrik dalam C (mengikuti standar MISRA-C:2012) yang menyertakan validasi status register pra-kondisi (*precondition assertions*), mekanisme *timeout abort* pada polling flag perangkat keras untuk mencegah loop penguncian tak terhingga saat perangkat keras rusak, dan isolasi penulisan bit terkunci (*Write-Once protection register lock*).
+- **Petunjuk Perancangan Arsitektur**:
+  - Ganti seluruh perulangan polling `while (!(REG & FLAG))` dengan perulangan terikat batas waktu: `while (!(REG & FLAG)) { if (--timeout == 0) return ERR_TIMEOUT; }`.
+  - Terapkan pemeriksaan kepatuhan aturan tipe data MISRA-C (tidak ada konversi tipe implisit, tidak ada pointer casting sembarang).
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Perangkat Keras Macet*: Simulasikan register periferal yang benderanya macet tidak pernah naik; buktikan driver keluar dengan aman mengembalikan kode error `STATUS_TIMEOUT` dalam batas waktu terukur.
+  - *Verifikasi Misra-C*: Buktikan kode lolos pemindaian statis linter MISRA-C tanpa peringatan pelanggaran tipe data.
+- **Rubrik Penilaian Mandiri**: 40% Kepatuhan Ketat Aturan Standar MISRA-C:2012, 30% Penanganan Loop Polling Timeout Anti-Deadlock, 30% Manajemen Status Kesalahan Hardware yang Kokoh.
 
 ## 7. Rekomendasi Sumber Belajar Standar Emas
 | Kategori | Judul Sumber & Tautan Langsung | Deskripsi Singkat |

@@ -6,15 +6,19 @@
 ---
 
 ## 1. Intuisi Dasar Tanpa Jargon ("Seperti Bayi Baru Lahir")
+### 1.1 Konsep Inti & Analogi Tanpa Jargon
 Bagaimana komputer "melihat" dan mengenali wajah, kucing, atau rambu lalu lintas dari jutaan pixel angka? Jika Anda menganalisis gambar menggunakan jaringan saraf biasa, Anda akan memperlakukan setiap pixel secara terpisah dan kehilangan hubungan spasial: pixel hidung tidak akan tahu di mana posisi pixel mata atau mulut.
 
+### 1.2 Urgensi Rekayasa & Signifikansi Sistemik
 **Convolutional Neural Networks (CNN)** bekerja seperti kaca pembesar kecil (kernel/filter) yang digeser ke seluruh permukaan gambar ([LeCun et al. - Gradient-Based Learning Applied to Document Recognition](http://vision.stanford.edu/cs598_spring07/papers/Lecun98.pdf)). Kaca pembesar pertama mendeteksi garis lurus dan tepian tajam (*edges*). Lapisan berikutnya menggabungkan garis-garis tersebut menjadi pola bentuk (lingkaran, sudut). Lapisan yang lebih dalam menggabungkannya menjadi objek utuh (mata, roda mobil).
 
 Sementara itu, **Vision Transformers (ViT)** memotong gambar menjadi kotak-kotak puzzle kecil (patch) dan memperlakukan setiap potongan puzzle seperti kata-kata dalam sebuah kalimat, memperhatikan hubungan antar bagian gambar di mana pun posisinya menggunakan mekanisme atensi global ([Dosovitskiy et al. - An Image is Worth 16x16 Words](https://arxiv.org/abs/2010.11929)).
 
 ## 2. Fondasi Teoretis & Aksiomatik / Matematis
+### 2.1 Kerangka Teori Aksiomatik & Formulasi Matematis
 Formulasi Matematis Penglihatan Komputer:
 
+### 2.2 Penurunan Matematis Langkah-demi-Langkah
 1. **Operasi Konvolusi Diskrit 2D**:
 Untuk input citra $I \in \mathbb{R}^{H \times W}$ dan kernel filter $K \in \mathbb{R}^{k_h \times k_w}$:
 $$(I * K)(i, j) = \sum_{m=0}^{k_h-1} \sum_{n=0}^{k_w-1} I(i + m, j + n) K(m, n)$$
@@ -61,6 +65,15 @@ flowchart TD
 ```
 
 Skip connection memulihkan detail tepi spasial yang hilang akibat operasi downsampling pooling, memungkinkan segmentasi semantik hingga ke batas tepi sel terkecil ([Ronneberger et al. - U-Net](https://arxiv.org/abs/1505.04597)).
+
+#### Tabel Penelusuran Siklus Persepsi Sensor Mobil Otonom & Supresi Pengereman Darurat
+| Tahap Komputasi / Layer | Dimensi Tensor / Shape | Operasi Matematika / Kernel | Aliran Gradien / Memori | Status Parameter / Bobot | Efek Sistem / Metrik Loss |
+|---|---|---|---|---|---|
+| 1. Deteksi LiDAR/Radar t=0 | Titik Cloud 3D & Citra Kamera | Segmentasi Objek di Depan Kendaraan | Bounding box 3D terdeteksi pada jarak 60 meter | Klasifikasi awal: "Kendaraan Tak Dikenal" | Sistem melacak objek bergerak di jalur mobil |
+| 2. Perubahan Klasifikasi t=1.2s | Citra Kamera Menangkap Sepeda | CNN Detector Mengubah Label Objek | Label klasifikasi berganti: "Objek Tak Dikenal" $\to$ "Sepeda" | Reset riwayat pelacakan Kalman Filter! | Vektor kecepatan objek dihitung ulang dari nol! |
+| 3. Perubahan Kedua t=2.4s | Citra Menangkap Sosok Manusia | CNN Classifier Berganti: "Pejalan Kaki" | Bounding box label: "Pejalan Kaki Menuntun Sepeda" | State tracking kembali di-reset kedua kalinya! | Sistem gagal menyadari bahwa objek memotong lajur! |
+| 4. Deteksi Tabrakan Fatal | Sensor Jarak: Waktu Tabrakan 1.2 Detik | Collision Avoidance System (CAS) | Modul perencanaan meminta pengereman darurat maksimum | Perangkat lunak dinonaktifkan untuk mencegah pengereman palsu! | Sistem menunda intervensi darurat selama 1 detik! |
+| 5. Benturan Tak Terhindarkan | Kecepatan Kendaraan: 69 km/jam | Kendaraan Menabrak Korban Elaine Herzberg | Mobil otonom menabrak tanpa deselerasi pengereman | Supresi rem otomatis membunuh pejalan kaki | Tragedi kecelakaan fatal mobil otonom pertama di dunia! |
 
 ## 4. Implementasi Praktis & Kode / Simulasi Riil
 ```python
@@ -114,6 +127,52 @@ print(f"Output ViT Patch Tokens: {tokens.shape} (196 token visual berdimensi 768
 ## 5. Miskonsepsi & Jebakan Industri
 *Kerusakan Resolusi Spasial pada Deteksi Objek*: Melakukan pooling berlebihan hingga ukuran feature map menjadi sangat kecil ($7 \times 7$) menyebabkan model kehilangan kemampuan mendeteksi objek-objek kecil (*small objects*). Solusi standar industri: gunakan *Feature Pyramid Networks (FPN)* yang menggabungkan feature map dari berbagai skala resolusi secara multiskala ([Lin et al. - Feature Pyramid Networks for Object Detection](https://arxiv.org/abs/1612.03144)).
 
+### Studi Kasus Kegagalan Nyata: Tragedi Kecelakaan Fatal Mobil Otonom Uber ATG di Tempe, Arizona (NTSB Investigation, 2018)
+- **Kronologi & Konteks Sejarah**: Pada 18 Maret 2018, sebuah kendaraan uji otonom Uber Advanced Technologies Group (Volvo XC90) yang beroperasi dalam mode swakemudi menabrak dan menewaskan seorang pejalan kaki, Elaine Herzberg, yang sedang menuntun sepeda melintasi jalan raya di Tempe, Arizona. Insiden ini merupakan kecelakaan fatal pejalan kaki pertama di dunia yang melibatkan kendaraan swakemudi otonom.
+- **Akar Masalah Rekayasa Penglihatan Komputer & Arsitektur Pelacakan Objek**: Laporan investigasi Dewan Keselamatan Transportasi Nasional AS (NTSB) mengungkap kegagalan arsitektur perangkat lunak persepsi yang sangat fatal: Sistem persepsi Uber berhasil mendeteksi keberadaan objek 5,6 detik sebelum tabrakan. Namun, modul klasifikasi penglihatan komputer terus-menerus mengubah klasifikasi objek tersebut (berubah dari *kendaraan* menjadi *objek tak dikenal*, lalu *sepeda*, lalu *pejalan kaki*). Cacat desain fatal terletak pada modul pelacakan (*Kalman Filter Object Tracker*): setiap kali label klasifikasi objek berubah, sistem menghapus riwayat pelacakan trajektori sebelumnya dan menginisialisasi ulang vektor prediksi pergerakan dari awal. Akibatnya, sistem tidak mampu mengkalkulasi bahwa objek tersebut sedang bergerak menyeberang ke lajur mobil. Selain itu, pengereman darurat otomatis pabrikan Volvo dinonaktifkan oleh Uber, dan sistem pengereman darurat Uber diprogram dengan penundaan supresi 1 detik untuk menghindari manuver pengereman palsu (*false-positive braking*), menyebabkan mobil menabrak korban pada kecepatan 69 km/jam tanpa pengereman berarti.
+
+- **Potongan Kode / Arsitektur Cacat (Vulnerable Implementation)**:
+```python
+# Analisis Cacat Arsitektur Pelacakan Persepsi: Reset State Kalman Filter Saat Ganti Label
+class FlawedPerceptionTracker:
+    def __init__(self):
+        self.tracked_objects = {}
+        
+    def update_frame(self, detections):
+        for det in detections:
+            obj_id = det['id']
+            new_label = det['label']
+            
+            # CACAT DESAIN FATAL UBER ATG:
+            # Jika label klasifikasi berubah, hapus tracker dan reset trajektori!
+            if obj_id in self.tracked_objects:
+                current_tracker = self.tracked_objects[obj_id]
+                if current_tracker['label'] != new_label:
+                    # Menghancurkan riwayat pelacakan historis!
+                    # Mengakibatkan kecepatan diestimasi ulang sebagai 0!
+                    self.tracked_objects[obj_id] = self._create_new_tracker(det)
+                else:
+                    self._update_kalman_filter(current_tracker, det)
+            else:
+                self.tracked_objects[obj_id] = self._create_new_tracker(det)
+
+# MITIGASI MODERN: Pelacakan Geometri Agnostik Terhadap Label (Label-Agnostic Tracking)
+class RobustPerceptionTracker:
+    def __init__(self):
+        self.spatial_trackers = {} # Pelacakan murni berbasis koordinat spasial 3D
+        
+    def update_frame(self, detections):
+        # 1. Update filter Kalman spasial terlebih dahulu tanpa memedulikan label klasifikasi
+        for det in detections:
+            track = self._match_spatially(det['box_3d'])
+            track.update_kinematics(det['box_3d']) # Kecepatan dan posisi dipertahankan mulus!
+            
+            # 2. Update probabilitas label menggunakan Bayesian Filtering tanpa mereset kinematika
+            track.update_label_distribution(det['label_probabilities'])
+```
+
+- **Analisis Forensik & Rekayasa Modern**: Penyelidikan NTSB merevolusi standar keselamatan perangkat lunak kendaraan otonom (ISO 21448 SOTIF / Safety of the Intended Functionality): (1) Pemisahan ketat antara **Kinematic Object Tracking** (berbasis koordinat spasial 3D LiDAR/Radar) dengan **Semantic Label Classification**—vektor kecepatan fisik objek tidak boleh di-reset hanya karena CNN pengenal gambar mengubah labelnya; (2) Larangan menonaktifkan sistem pengereman darurat otomatis (AEB) pabrikan yang telah tersertifikasi keselamatan fungsional; (3) Integrasi sistem pemantauan pengemudi keselamatan (*Driver Monitoring Camera*) untuk mencegah *Automation Complacency*.
+
 ## 6. Proyek Latihan & Rubrik Penilaian Mandiri
 ### Level 1 (Pemula)
 Bangun CNN 3-layer sederhana di PyTorch (Conv2d, MaxPool2d, Linear) untuk mengklasifikasikan dataset Fashion-MNIST, evaluasi akurasi pengujian dan visualisasikan matriks kernel konvolusi lapisan pertama.
@@ -126,6 +185,48 @@ Bangun arsitektur deteksi objek satu tahap bergaya mini-YOLO: rancang head model
 ### Level 3 (Mahir)
 Implementasikan Vision Transformer (ViT) lengkap dari awal: rancang modul Patch Embedding, tambahkan Token [CLS] yang dapat dipelajari, Positional Embedding 1D, tumpukan Transformer Encoder dengan Multi-Head Self-Attention, dan klasifikasi Linear Head.
 *Rubrik*: Berhasil menjalankan inferensi klasifikasi citra tanpa pustaka pretrained transformer.
+
+### Tingkat 1: Dasar
+- **Tugas**: Implementasikan operasi konvolusi 2D valid ($O = I * K$) dari nol dalam Python menggunakan NumPy (tanpa pustaka OpenCV atau PyTorch), yang mendukung padding nol (`pad`) dan langkah konvolusi (`stride`).
+- **Petunjuk Perancangan Arsitektur**:
+  - Dimensi citra input: $(H, W)$, Dimensi kernel: $(K_h, K_w)$.
+  - Dimensi output: $H_{\text{out}} = \lfloor \frac{H - K_h + 2 \cdot pad}{stride} \rfloor + 1$.
+  - Terapkan padding menggunakan `np.pad(image, pad_width, mode='constant')`.
+- **Test Vector & Kasus Uji**:
+  - Citra masukan: Matriks $5 \times 5$ identitas, Kernel: Sobel horizontal $3 \times 3$ $\begin{bmatrix} -1 & -2 & -1 \\ 0 & 0 & 0 \\ 1 & 2 & 1 \end{bmatrix}$.
+  - Bandingkan hasil konvolusi dengan `scipy.signal.convolve2d(image, kernel, mode='valid')`. Hasil harus identik.
+- **Rubrik Penilaian Objektif**:
+  - Skor 100%: Perhitungan indeks padding dan stride presisi, perbandingan dengan pustaka standar cocok.
+  - Skor 50%: Konvolusi bekerja untuk stride=1 dan pad=0 namun salah saat stride $>1$ atau pad $>0$.
+  - Skor 0%: Melakukan perkalian elemen biasa tanpa operasi geser konvolusi.
+
+### Tingkat 2: Menengah
+- **Tugas**: Bangun modul pelacakan objek multi-kamera sederhana (*Object Association via Hungarian Algorithm*) dalam Python: Modul menerima daftar bounding box deteksi pada frame $t$ dan frame $t+1$, menghitung matriks biaya Intersection-over-Union (IoU), dan menggunakan algoritma Hungarian (`scipy.optimize.linear_sum_assignment`) untuk mengasosiasikan ID objek secara konsisten.
+- **Petunjuk Perancangan Arsitektur**:
+  - Hitung formula IoU: $\text{IoU} = \frac{\text{Area Intersect}}{\text{Area Union}}$.
+  - Matriks biaya asosiasi: $\text{Cost} = 1.0 - \text{IoU}$.
+  - Terapkan ambang batas pencocokan: jika $\text{IoU} < 0.3$, anggap objek hilang atau deteksi baru alih-alih memaksakan pencocokan salah.
+- **Test Vector & Kasus Uji**:
+  - Uji sekuens 5 frame dengan 3 objek bergerak: Algoritma harus mempertahankan ID objek tanpa terjadi fenomena ID-Switch (*Zero ID Switches*).
+  - Simulasikan satu objek terhalang (*occlusion*) selama 1 frame: ID objek harus pulih saat objek muncul kembali di frame berikutnya.
+- **Rubrik Penilaian Objektif**:
+  - Skor 100%: Asosiasi Hungarian presisi, kalkulasi IoU efisien, penanganan objek masuk/keluar rapi.
+  - Skor 50%: Bekerja normal namun rentan terhadap ID-switch saat dua objek berpapasan dekat.
+  - Skor 0%: Menggunakan pencocokan serakah naif jarak pusat tanpa IoU.
+
+### Tingkat 3: Mahir
+- **Tugas**: Rancang modul fusi sensor pelacak posisi kinematika 3D (*Extended Kalman Filter for 3D Tracking*) dalam C++/Python: Gabungkan pengukuran posisi sparse dari kamera monokular dengan pengukuran jarak dan kecepatan Doppler dari radar, lengkap dengan matriks kovarians derau proses $Q$ dan derau pengukuran $R$. Tunjukkan bahwa estimasi posisi EKF tetap halus meskipun kamera kehilangan deteksi selama beberapa frame.
+- **Petunjuk Perancangan Arsitektur**:
+  - State vektor: $\mathbf{x} = [x, y, z, v_x, v_y, v_z]^T$ (Model Constant Velocity).
+  - Matriks transisi keadaan: $\mathbf{F} = \begin{bmatrix} I_3 & \Delta t \cdot I_3 \\ 0_3 & I_3 \end{bmatrix}$.
+  - Pada langkah update Radar: fungsi pengukuran non-linier $h(\mathbf{x}) = [\sqrt{x^2+y^2+z^2}, \dots]^T$, hitung matriks Jacobian $\mathbf{H}_j$.
+- **Test Vector & Kasus Uji**:
+  - Masukkan trajektori pejalan kaki melintasi jalan raya dengan injeksi derau Gaussian pada sensor.
+  - Simulasikan sensor kamera mati (*drop frames*) selama 500 milidetik: EKF harus mampu mempertahankan prediksi posisi yang mulus menggunakan odometri radar dengan deviasi galat $< 0.3\text{ meter}$.
+- **Rubrik Penilaian Objektif**:
+  - Skor 100%: Formulasi EKF dan matriks Jacobian presisi, prediksi trajektori kontinu saat sensor drop, penanganan numerik stabil.
+  - Skor 50%: EKF bekerja namun menggunakan model linear tanpa Jacobian radar yang benar.
+  - Skor 0%: Estimasi melompat secara liar saat terjadi perbedaan data sensor.
 
 ## 7. Rekomendasi Sumber Belajar Standar Emas
 | Sumber Pembelajaran | Penulis / Institusi | Tautan Langsung | Fokus Materi |

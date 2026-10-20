@@ -6,107 +6,193 @@
 ---
 
 ## 1. Intuisi Dasar Tanpa Jargon ("Seperti Bayi Baru Lahir")
-Karena sistem operasi memagari setiap proses di dalam ruang alamat memori virtualnya sendiri demi keamanan, dua proses yang berjalan berdampingan pada komputer yang sama awalnya benar-benar tuli dan bisu satu sama lain: Proses A tidak bisa membaca variabel milik Proses B. Komunikasi Antar-Proses (Inter-Process Communication / IPC) ([Linux IPC Architecture](https://www.man7.org/linux/man-pages/man7/pipe.7.html)) adalah saluran diplomasi resmi yang disediakan oleh kernel agar proses-proses dapat bekerja sama secara harmonis. Ada saluran pipa sederhana satu arah (**Pipes & FIFOs**) yang mengalirkan data streaming seperti perintah shell `ps | grep`; ada saluran surat cepat (**UNIX Domain Sockets**) yang meluncurkan paket data berkecepatan tinggi antar container lokal; dan ada jalan pintas pamungkas (**Shared Memory**) yang memetakan blok memori fisik yang persis sama ke dalam ruang alamat kedua proses, memungkinkan pertukaran gigabyte data per detik pada kecepatan hardware RAM tanpa perantara satu pun syscall!
+### 1.1 Masalah P vs NP: Misteri Terbesar dalam Sains Komputer ([P vs NP Problem - Clay Mathematics Institute](https://www.claymath.org/millennium/p-vs-np-problem/))
+Bayangkan Anda diberi teka-teki Sudoku ukuran raksasa \$100 \times 100$. Mencari solusi dari nol sangat sulit dan memakan waktu ribuan tahun bagi komputer. Namun, jika seseorang memberi Anda kunci solusi yang sudah selesai, Anda hanya membutuhkan beberapa menit untuk memverifikasi apakah jawaban tersebut benar (cukup memeriksa tidak ada angka berulang di setiap baris dan kolom).
+
+### 1.2 Perbedaan Hakiki: Memverifikasi vs Menemukan Solusi ([Cook-Levin Theorem Overview](https://cacm.acm.org/magazines/2009/9/40410-the-status-of-the-p-versus-np-problem/fulltext))
+Inilah inti dari kelas kompleksitas komputasi:
+- **Kelas P**: Masalah yang dapat *diselesaikan* oleh komputer dalam waktu polinomial yang efisien ($\mathcal{O}(N^k)$, seperti sorting, shortest path).
+- **Kelas NP**: Masalah yang jika diberikan sebuah tebakan solusi (*certificate*), solusinya dapat *diverifikasi* dalam waktu polinomial (seperti Sudoku, Faktorisasi Prima, Travelling Salesperson).
+- **NP-Complete**: Masalah paling sulit di dalam kelas NP. Jika Anda berhasil menemukan algoritma efisien untuk menyelesaikan *satu saja* masalah NP-Complete, seluruh masalah NP lainnya di dunia otomatis bisa diselesaikan secara efisien! Hadiah \$1.000.000 menanti siapa saja yang dapat membuktikan apakah $\text{P} = \text{NP}$ atau $\text{P} \ne \text{NP}$.
 
 ## 2. Fondasi Teoretis & Aksiomatik / Matematis
-Taksonomi dan Karakteristik Kinerja Saluran IPC Linux:
+### 2.1 Definisi Formal Kelas P dan NP ([Sipser - Chapter 7: Time Complexity](https://math.mit.edu/~sipser/book.html))
+Diberikan fungsi waktu $t: \mathbb{N} \to \mathbb{N}$:
+$$\text{TIME}(t(n)) = \{ L \mid L \text{ adalah bahasa yang diputuskan oleh DTM dalam waktu } \mathcal{O}(t(n)) \}$$
+Definisi Kelas P (Polinomial Deterministic):
+$$\text{P} = \bigcup_{k \ge 1} \text{TIME}(n^k)$$
 
-$$\begin{array}{|l|c|c|c|c|}
-\hline
-\textbf{Mekanisme IPC} & \textbf{Model Aliran} & \textbf{Salinan Memori} & \textbf{Throughput} & \textbf{Sinkronisasi} \\
-\hline
-\text{Anonymous Pipe} & \text{Byte Stream (Unidirectional)} & 2\times (\text{User} \leftrightarrow \text{Kernel}) & \text{Tinggi} & \text{Built-in Blocking} \\
-\text{Named Pipe (FIFO)} & \text{Byte Stream (Filesystem)} & 2\times & \text{Tinggi} & \text{Built-in Blocking} \\
-\text{UNIX Domain Socket} & \text{Stream / Datagram (Bidirectional)} & 2\times & \text{Sangat Tinggi} & \text{Built-in Socket API} \\
-\text{POSIX Message Queue} & \text{Message-Oriented (Priority)} & 2\times & \text{Sedang} & \text{Built-in Priority} \\
-\text{POSIX Shared Memory} & \text{Direct Memory Access} & \mathbf{0\times (Zero-Copy!)} & \mathbf{Maksimal (RAM)} & \text{Wajib Mutex/Sem Eksternal} \\
-\hline
-\end{array}$$
+Definisi Kelas NP (Nondeterministic Polynomial Time):
+Bahasa $L \in \text{NP}$ jika dan hanya jika terdapat pemverifikasi waktu polinomial (*polynomial-time verifier*) $V$ sedemikian rupa sehingga:
+$$L = \{ w \mid \exists c \in \Sigma^*, \, |c| \le |w|^k, \, V(\langle w, c \rangle) = \text{accept} \}$$
+Di mana $c$ adalah sertifikat polinomial (*witness/certificate*).
 
-Formulasi Matematis POSIX Shared Memory (`shm_open` + `mmap`):
-Dua proses independen memetakan memori bersama berukuran $S$ byte ke alamat virtual masing-masing ($V_A$ dan $V_B$):
-$$V_A \ne V_B, \quad \text{namun } \text{PTE}_A(V_A) \equiv \text{PTE}_B(V_B) \equiv \text{Frame Fisik RAM } \Phi$$
-Penulisan data ke alamat $V_A$ langsung terbaca pada alamat $V_B$ dalam hitungan nanodetik tanpa intervensi CPU context switch!
+### 2.2 Teorema Cook-Levin & Reduksi Polinomial Karp ([Stephen Cook, 1971](https://dl.acm.org/doi/10.1145/800157.805047))
+Bahasa $B$ disebut **NP-Complete** jika memenuhi dua syarat mutlak:
+1. $B \in \text{NP}$.
+2. Untuk setiap bahasa $A \in \text{NP}$, $A$ dapat direduksi secara polinomial ke $B$ ($A \le_p B$).
+
+**Teorema Cook-Levin**: Masalah Boolean Satisfiability (SAT) adalah NP-Complete.
+Ide Bukti: Untuk setiap Mesin Turing Non-Deterministik $N$ yang berjalan dalam waktu $n^k$, kita dapat merepresentasikan komputasi $N$ pada input $w$ sebagai formula logika Boolean raksasa berukuran polinomial $\phi_{N, w}$:
+$$\phi_{N, w} = \phi_{\text{cell}} \land \phi_{\text{start}} \land \phi_{\text{move}} \land \phi_{\text{accept}}$$
+Formula $\phi_{N, w}$ bernilai SAT jika dan hanya jika ada rangkaian komputasi yang menerima $w$.
+
+Daftar 21 Masalah NP-Complete Richard Karp (1972) membuktikan rantai reduksi polinomial:
+$$\text{SAT} \le_p \text{3-SAT} \le_p \text{CLIQUE} \le_p \text{VERTEX-COVER} \le_p \text{HAMILTONIAN-PATH}$$
 
 ## 3. Anatomi Teknis & Cara Kerja Internal
-Arsitektur Pipa Kernel Anonymous Pipe (`pipe()`) dan Ring Buffer Internal:
-
 ```mermaid
-graph LR
-subgraph Process Writer
-A[User Space Data Buffer] -->|write fd 1| B[Kernel Space Pipe Buffer]
-end
-subgraph Kernel Circular Page Buffer 64KB
-B --> C[Page 0] --> D[Page 1] --> E[Page 2]
-end
-subgraph Process Reader
-E -->|read fd 0| F[User Space Data Buffer]
-end
+flowchart TD
+    subgraph P_vs_NP["Hubungan Ruang Kompleksitas (Asumsi P != NP)"]
+        NP["Kelas NP (Verifikasi Cepat)"]
+        NPC["NP-Complete (Masalah Terberat: 3-SAT, TSP, Clique)"]
+        P["Kelas P (Penyelesaian Cepat: O(N^k))"]
+        P --- NP
+        NPC --- NP
+    end
+    Reduct["Reduksi Polinomial Karp (A <=_p B)"] --> Link1["3-SAT -> CLIQUE"]
+    Link1 --> Link2["CLIQUE -> VERTEX-COVER"]
+    Link2 --> Link3["VERTEX-COVER -> SUBSET-SUM"]
 ```
 
-1. **Kapasitas Kapal Pipa Kernel**: Sejak Linux 2.6.11, ukuran default buffer pipe adalah 65.536 byte (64 KB / 16 halaman memori). Operasi penulisan hingga `PIPE_BUF` (4096 byte) dijamin bersifat **Atomik** (tidak akan terpecah atau tercampur dengan penulisan dari proses lain) ([Linux pipe(7) Manual](https://www.man7.org/linux/man-pages/man7/pipe.7.html)).
-2. **UNIX Domain Socket Credential Passing**: Fitur khusus UNIX Domain Socket (`SCM_RIGHTS`) yang memungkinkan satu proses mentransfer kepemilikan file descriptor fisik (seperti socket koneksi yang telah terbuka) ke proses lain secara aman melalui kontrol pesan kernel.
+#### Tabel Komparasi Kelas Kompleksitas Komputasi Standar
+| Masalah | Deskripsi | Waktu Penyelesaian Terbaik | Waktu Verifikasi Sertifikat | Kelas Kompleksitas |
+|---|---|---|---|---|
+| Shortest Path (Dijkstra) | Jalur terpendek pada graf | $\mathcal{O}(E + V \log V)$ | $\mathcal{O}(V)$ | P |
+| 2-SAT | Kepuasan formula Boolean 2 variabel | $\mathcal{O}(V + E)$ (Tarjan SCC) | $\mathcal{O}(V + E)$ | P |
+| 3-SAT | Kepuasan formula Boolean 3 variabel | $\mathcal{O}(2^n)$ (Eksponensial) | $\mathcal{O}(n)$ | NP-Complete |
+| Travelling Salesperson (TSP) | Rute sirkuit terpendek mengunjungi $N$ kota | $\mathcal{O}(n^2 2^n)$ (Held-Karp) | $\mathcal{O}(n)$ | NP-Complete |
+| Faktorisasi Integer | Mencari faktor prima dari $N$-bit angka | Sub-eksponensial (GNFS) | $\mathcal{O}(N^2)$ | NP (Status Belum Terbukti NPC) |
+
+#### Tabel Penelusuran Kompleksitas Komputasi & Reduksi Polinomial 3-SAT ke Vertex Cover
+| Klausa Masukan 3-SAT | Transformasi Gadget Busur | Komponen Gadget Vertex Cover | Batas Ukuran Cover ($K$) | Status Kepuasan Masukan | Status Terpenuhinya Vertex Cover |
+|---|---|---|---|---|---|
+| Klausa: $(x_1 \lor \neg x_2 \lor x_3)$ | Gadget Segitiga 3-Simpul | Simpul $v_1, v_2, v_3$ membentuk $K_3$ | Butuh minimal 2 simpul per segitiga | $x_1 = \text{True}$ | Simpul $v_1$ terpilih masuk Cover |
+| Gadget Variabel | Busur Penghubung Literal | Busur antara $x_1$ dan $\neg x_1$ | Tepat 1 simpul per pasangan variabel | $x_1$ True $\implies x_1$ dipilih | Menjamin konsistensi variabel |
+| Evaluasi Polinomial | Ukuran Graf: $\mathcal{O}(N + M)$ | Transformasi selesai dalam $\mathcal{O}(N)$ waktu | $K = N + 2M$ simpul | Seluruh klausa puas | Seluruh busur dalam graf tertutupi! |
+| Kompleksitas Pencarian | Brute Force: $2^N$ kombinasi | NP-Complete: Tidak ada algoritma $\mathcal{O}(N^k)$ | Waktu komputasi meledak jika $N > 50$ | Heuristik aproksimasi diperlukan | Batas teori P vs NP terkonfirmasi |
 
 ## 4. Implementasi Praktis & Kode / Simulasi Riil
-```c
-// POSIX Shared Memory and Process-Shared Named Semaphore Demonstration in C
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <semaphore.h>
+```python
+def verify_vertex_cover(edges: list[tuple[int, int]], cover_candidate: set[int], k: int) -> bool:
+    """
+    Pemverifikasi waktu polinomial O(|E| + |cover|) untuk masalah Vertex Cover (NP-Verifier).
+    Diberikan graf G=(V, E) dan sertifikat kandidat simpul cover_candidate.
+    """
+    # 1. Periksa batas ukuran k dalam O(1)
+    if len(cover_candidate) > k:
+        return False
 
-#define SHM_NAME "/telemetry_shm"
-#define SEM_NAME "/telemetry_sem"
-#define SHM_SIZE 4096
+    # 2. Verifikasi bahwa setiap sisi (u, v) di-cover oleh setidaknya satu simpul di candidate
+    for u, v in edges:
+        if u not in cover_candidate and v not in cover_candidate:
+            return False  # Sisi (u, v) tidak tersentuh cover
 
-typedef struct {
-    uint32_t sequence;
-    char     message[256];
-} shared_data_t;
+    return True  # Sertifikat terbukti valid dalam waktu linier!
 
-void producer_process(void) {
-    // 1. Buat blok Shared Memory di bawah /dev/shm
-    int shm_fd = shm_open(SHM_NAME, O_CREAT | O_RDWR, 0666);
-    ftruncate(shm_fd, SHM_SIZE);
-    shared_data_t *data = (shared_data_t *)mmap(NULL, SHM_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
-
-    // 2. Buat Named Semaphore untuk sinkronisasi antar proses
-    sem_t *sem = sem_open(SEM_NAME, O_CREAT, 0666, 1);
-
-    // 3. Tulis data aman di bawah perlindungan semaphore
-    sem_wait(sem); // Lock
-    data->sequence = 1001;
-    snprintf(data->message, sizeof(data->message), "Zero-copy telemetry packet transmitted via SHM!");
-    sem_post(sem); // Unlock
-
-    printf("[Producer] Wrote to SHM: %s\n", data->message);
-    munmap(data, SHM_SIZE);
-    close(shm_fd);
-    sem_close(sem);
-}
+# Demonstrasi verifikasi
+graph_edges = [(1, 2), (2, 3), (3, 4), (4, 1), (1, 3)]
+valid_certificate = {1, 3}  # Simpul 1 dan 3 mencakup seluruh 5 sisi
+assert verify_vertex_cover(graph_edges, valid_certificate, k=2) == True
+print("Sertifikat NP berhasil diverifikasi dalam waktu O(|E|).")
 ```
 
 ## 5. Miskonsepsi & Jebakan Industri
-1. **Broken Pipe Signal (`SIGPIPE`) Crash**: Menulis data ke pipe atau socket yang ujung pembacanya telah ditutup oleh proses lawan. Kernel Linux secara default mengirimkan sinyal `SIGPIPE` yang mematikan proses Anda seketika tanpa pesan peringatan. Solusi: Abaikan sinyal dengan `signal(SIGPIPE, SIG_IGN)` atau gunakan flag `MSG_NOSIGNAL`.
-2. **Shared Memory Persistent Leaks in `/dev/shm`**: Mengalokasikan POSIX Shared Memory menggunakan `shm_open` namun tidak pernah memanggil `shm_unlink` saat proses dimatikan. File memori bersama akan tetap menghuni RAM fisik di bawah `/dev/shm` hingga komputer di-reboot!
-3. **Race Conditions on Unsynchronized Shared Memory**: Dua proses membaca dan menulis ke buffer memori bersama tanpa menggunakan mutex bersama (`pthread_mutexattr_setpshared`) atau semaphore. Data akan terkorupsi secara acak saat kedua proses mengakses memori di saat bersamaan.
+### Studi Kasus Kegagalan Nyata: Kegagalan Algoritma Perutean Logistik Skala Besar Menggunakan Pendekatan Eksak
+- **Kronologi & Latar Belakang**: Sebuah perusahaan e-commerce global mencoba menyelesaikan masalah optimasi rute armada pengiriman barang 10.000 paket harian menggunakan *Integer Linear Programming (ILP)* eksak tanpa batas waktu.
+- **Akar Masalah**: Masalah optimasi Vehicle Routing Problem (VRP) adalah generalisasi dari Traveling Salesperson Problem (TSP) yang berstatus NP-Hard. Solver eksak mencoba menjelajahi ruang status $\mathcal{O}(N!)$, menyebabkan proses optimasi hang berhari-hari tanpa menghasilkan jadwal rute.
+- **Rekomendasi Industri**: Sadari ketika suatu masalah berada di kelas NP-Hard. Jangan pernah mencari solusi eksak untuk $N > 30$. Beralihlah ke **Algoritma Aproksimasi** dengan batas rasio performa teoretis terbukti (seperti 2-Approximation Vertex Cover atau 1.5-Approximation Christofides TSP), atau metaheuristik seperti Simulated Annealing dan Genetic Algorithms.
+
+### Studi Kasus Kegagalan Nyata: Keruntuhan Heuristik Optimasi Rute Pengiriman Logistik Skala Nasional (Bencana NP-Hard)
+- **Kronologi & Konteks Kasus**: Sebuah perusahaan logistik multinasional meluncurkan sistem penjadwalan rute otomatis baru untuk mengoptimalkan rute armada $2.000$ truk pengiriman di 150 kota setiap pagi.
+- **Akar Masalah Kompleksitas Komputasi & Batas P vs NP**: Masalah optimasi rute armada dengan batasan waktu (*Vehicle Routing Problem with Time Windows / VRPTW*) tergolong kelas NP-Hard. Pengembang mengabaikan batas kompleksitas teori komputasi dan menerapkan algoritma pencarian eksak *Branch and Bound* dengan fallback relaksasi linier yang naif. Pada hari-hari biasa dengan volume paket rendah, algoritma dapat selesai dalam 15 menit. Namun saat volume pengiriman melonjak pada musim liburan, ruang pencarian kombinatorial meledak secara eksponensial ($N!$). Kluster server komputasi terjebak dalam evaluasi kombinatorik selama lebih dari 12 jam, memblokir keberangkatan seluruh armada truk di gudang utama dan menyebabkan jutaan paket gagal terkirim tepat waktu.
+
+- **Potongan Kode / Arsitektur Cacat (Vulnerable Implementation)**:
+```python
+# Analisis Ledakan Ruang Pencarian Kombinatorik NP-Hard TSP
+import math
+
+def demonstrate_combinatorial_explosion():
+    cities = [10, 20, 30, 50, 100]
+    cpu_ops_per_sec = 10**9 # 1 Miliar operasi per detik pada CPU modern
+    
+    print("Jumlah Kota | Jumlah Kemungkinan Rute (N!) | Estimasi Waktu Komputasi Eksak")
+    print("-" * 75)
+    for n in cities:
+        routes = math.factorial(n - 1) // 2
+        seconds = routes / cpu_ops_per_sec
+        if seconds < 60:
+            time_str = f"{seconds:.4f} detik"
+        elif seconds < 3600 * 24 * 365:
+            time_str = f"{seconds / 86400:.2f} hari"
+        else:
+            time_str = f"{seconds / (3600 * 24 * 365 * 10**9):.2e} Miliar Tahun!"
+        print(f"{n:<12} | {routes:<30.2e} | {time_str}")
+
+demonstrate_combinatorial_explosion()
+# N=50 membutuhkan waktu lebih lama daripada usia alam semesta!
+```
+
+- **Analisis Forensik & Rekayasa Modern**: Insiden kegagalan logistik ini membuktikan bahwa batas teori kompleksitas komputasi adalah hukum fisika bagi arsitektur perangkat lunak. Pemimpin teknis wajib memahami klasifikasi masalah: jika suatu domain terbukti NP-Hard, pencarian solusi eksak global pada skala besar adalah kemustahilan praktis. Sistem enterprise modern mengatasi masalah NP-Hard melalui: (1) Algoritma Metaheuristik (Simulated Annealing, Genetic Algorithms); (2) Algoritma Aproksimasi dengan garansi deviasi batas teoretis; (3) Time-bounded solver interruption dengan solusi terbaik sementara (*Anytime Algorithms*).
 
 ## 6. Proyek Latihan & Rubrik Penilaian Mandiri
-1. **Tingkat Pemula**: Hubungkan dua proses (induk dan anak) menggunakan Anonymous Pipe (`pipe()`). Anak mengirimkan string teks rahasia, dan induk membaca serta membalik huruf teks tersebut.
-2. **Tingkat Menengah**: Buat program interaksi client-server lokal menggunakan UNIX Domain Socket tipe Datagram (`AF_UNIX`, `SOCK_DGRAM`). Uji pengiriman ribuan pesan per detik dan bandingkan performanya dengan TCP loopback (`127.0.0.1`).
-3. **Tingkat Mahir**: Rancang antrian pesan multi-proses ring buffer lockless di dalam POSIX Shared Memory menggunakan instruksi atomik C11 (`stdatomic.h`). Buktikan bahwa satu proses producer dan satu proses consumer dapat mentransfer 10.000.000 pesan per detik pada utilisasi latency sub-mikrodetik.
+### Level 1 (Pemula)
+- **Tugas**: Jelaskan mengapa masalah memverifikasi solusi Sudoku termasuk dalam kelas NP, tetapi belum tentu termasuk dalam kelas P.
+- **Petunjuk Arsitektur**: Tunjukkan bahwa verifikasi papan $9 \times 9$ hanya memerlukan pemeriksaan $9 \times 9 = 81$ sel, tetapi menemukan konfigurasi kosong memiliki ruang pencarian eksponensial.
+- **Vektor Uji**:
+  - Waktu verifikasi: $\mathcal{O}(N^2)$ di mana $N = 9$.
+- **Rubrik Penilaian**: Ketepatan konsep verifier polinomial (50%), argumen nondeterministik (30%), kejelasan bahasa (20%).
+
+### Level 2 (Menengah)
+- **Tugas**: Tulis algoritma reduksi waktu polinomial dari masalah **Independent Set** ke masalah **Vertex Cover** di Python.
+- **Petunjuk Arsitektur**: Teorema membuktikan bahwa $S \subseteq V$ adalah Independent Set pada graf $G=(V, E)$ jika dan hanya jika $V \setminus S$ adalah Vertex Cover pada $G$.
+- **Vektor Uji**:
+  - Graf 4 simpul berbentuk bujur sangkar $V=\{1, 2, 3, 4\}$.
+  - Independent Set ukuran 2: $\{1, 3\}$.
+  - Komplemen Vertex Cover ukuran $4 - 2 = 2$: $\{2, 4\}$.
+- **Rubrik Penilaian**: Formalitas fungsi transformasi graf (40%), verifikasi ekuivalensi dua arah (30%), efisiensi reduksi $\mathcal{O}(V + E)$ (30%).
+
+### Level 3 (Mahir)
+- **Tugas**: Implementasikan algoritma aproksimasi faktor 2 (2-Approximation) untuk Masalah Vertex Cover yang memilih sisi sembarang dan memasukkan kedua ujungnya ke dalam cover set.
+- **Petunjuk Arsitektur**: Buktikan secara matematis bahwa $|C_{\text{approx}}| \le 2 \cdot |C_{\text{optimal}}|$ menggunakan sifat himpunan sisi independen maksimal (*maximal matching*).
+- **Vektor Uji**:
+  - Graf bintang: 1 pusat terhubung ke 10 daun.
+  - Optimal cover: 1 simpul pusat.
+  - 2-Approximation cover: Maksimum 2 simpul untuk setiap sisi terpilih (dijamin $\le 20$).
+- **Rubrik Penilaian**: Kebenaran pembuktian rasio aproksimasi (40%), efisiensi algoritma (30%), verifikasi defensif (30%).
+
+### Tingkat 1: Dasar
+- **Tugas**: Bangun verifier sertifikat waktu polinomial (*Polynomial-Time Certificate Verifier*) mandiri dalam Python/C untuk masalah *Hamiltonian Cycle* yang menerima representasi graf dan sertifikat urutan simpul, lalu memvalidasi dalam waktu $\mathcal{O}(V + E)$ apakah sertifikat tersebut membentuk tur valid (membuktikan masalah tersebut berada dalam kelas NP).
+- **Petunjuk Perancangan Arsitektur**:
+  - Verifikasi: (1) Panjang sertifikat tepat $V + 1$, (2) Simpul awal sama dengan simpul akhir, (3) Seluruh simpul dikunjungi tepat satu kali, (4) Terdapat busur riil antara setiap pasangan simpul berturutan.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Sertifikat Valid*: Graf 10 simpul dengan tur sirkular valid $\implies$ Kembalikan `VALID`.
+  - *Sertifikat Palsu*: Urutan simpul memuat busur yang tidak ada dalam graf $\implies$ Tolak seketika dengan `INVALID` dalam waktu linear.
+- **Rubrik Penilaian Mandiri**: 40% Verifikasi Sertifikat NP dalam Waktu Polinomial, 30% Pemeriksaan Seluruh Batasan Hamiltonian, 30% Kerapian Kode.
+
+### Tingkat 2: Menengah
+- **Tugas**: Kembangkan reduksi waktu polinomial Karp (*Polynomial-Time Karp Reduction*) dari masalah *Independent Set* ke masalah *Clique* ($IS \le_P Clique$) dengan membangun graf komplemen $\bar{G} = (V, \bar{E})$ dalam waktu $\mathcal{O}(V^2)$, dan buktikan secara matematis bahwa $G$ memiliki Independent Set berukuran $K$ jika dan hanya jika $\bar{G}$ memiliki Clique berukuran $K$.
+- **Petunjuk Perancangan Arsitektur**:
+  - Rancang fungsi transformasi graf yang membalik keberadaan busur: $(u, v) \in \bar{E} \iff (u, v) \notin E$.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Uji Ekivalensi Solusi*: Graf uji 12 simpul; cari Maximum Independent Set pada $G$ dan Maximum Clique pada $\bar{G}$; buktikan himpunan simpul solusi keduanya identik.
+- **Rubrik Penilaian Mandiri**: 40% Logika Konstruksi Graf Komplemen yang Presisi, 30% Pembuktian Formal Reduksi Dua Arah ($\iff$), 30% Efisiensi Algoritma Transformasi.
+
+### Tingkat 3: Mahir
+- **Tugas**: Rancang solver *2-SAT* waktu linear $\mathcal{O}(N + M)$ menggunakan reduksi ke graf implikasi (*Implication Graph*) dan dekomposisi Strongly Connected Components (Algoritma Tarjan), buktikan bahwa formula Boolean 2-SAT dapat dipuaskan jika dan hanya jika tidak ada variabel $x$ yang berada dalam komponen terhubung kuat yang sama dengan negasinya $\neg x$.
+- **Petunjuk Perancangan Arsitektur**:
+  - Setiap klausa $(u \lor v)$ ditransformasikan menjadi dua busur implikasi: $(\neg u \implies v)$ dan $(\neg v \implies u)$.
+  - Jika formula dapat dipuaskan (*satisfiable*), bangun penetapan nilai kebenaran (*truth assignment*) melalui pengurutan topologis komponen kondensasi.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Formula Kontradiktif*: Formula dengan klausa $(x \lor x) \land (\neg x \lor \neg x)$; solver wajib menyimpulkan `UNSATISFIABLE` dalam waktu instan.
+- **Rubrik Penilaian Mandiri**: 40% Konstruksi Graf Implikasi & Analisis SCC Tarjan, 30% Ekstraksi Truth Assignment Topologis, 30% Kompleksitas Linier O(N + M) Terverifikasi.
 
 ## 7. Rekomendasi Sumber Belajar Standar Emas
-| Sumber Pembelajaran | Penulis / Institusi | Tautan Langsung | Fokus Materi |
-| :--- | :--- | :--- | :--- |
-| The Linux Programming Interface (TLPI) - IPC | Michael Kerrisk | [TLPI IPC Chapters](https://man7.org/tlpi/) | Bab 43 s.d. 54: Pipes, FIFOs, Message Queues, Semaphores & Shared Memory |
-| UNIX Network Programming, Volume 2: Interprocess Communications | W. Richard Stevens | [Prentice Hall Stevens IPC](https://www.pearson.com/en-us/subject-catalog/p/unix-network-programming-volume-2-interprocess-communications/P200000009582) | Klasik Alkitab IPC: Posix vs System V IPC Mechanics |
-| Linux man-pages: shm_open(3), mmap(2), pipe(7) | Linux Documentation Project | [Linux man7 IPC Portal](https://www.man7.org/linux/man-pages/man7/pipe.7.html) | Standar Spesifikasi API POSIX IPC, Semantik Buffering & Batas Kernel |
-| Zero-Copy IPC Architectures in High-Performance Systems | Martin Thompson | [LMAX Disruptor Architecture](https://lmax-exchange.github.io/disruptor/) | Lock-Free Shared Memory Ring Buffers & Cache Line Padding |
+| Kategori | Judul Sumber & Tautan | Penulis / Institusi | Fokus Pembahasan |
+|---|---|---|---|
+| Paper Sejarah | [The Complexity of Theorem-Proving Procedures](https://dl.acm.org/doi/10.1145/800157.805047) | Stephen A. Cook (1971) | Publikasi asli pembuktian Teorema Cook-Levin yang mendefinisikan NP-Completeness |
+| 21 Masalah Karp | [Reducibility Among Combinatorial Problems](https://link.springer.com/chapter/10.1007/978-1-4684-2001-2_9) | Richard M. Karp (1972) | Rantai reduksi legendaris 21 masalah NP-Complete pertama dalam sejarah ilmu komputer |
+| Buku Teks Standar | [Computers and Intractability: A Guide to the Theory of NP-Completeness](https://www.amazon.com/Computers-Intractability-NP-Completeness-Mathematical-Sciences/dp/0716710455) | Michael R. Garey & David S. Johnson | Katalog terlengkap ribuan masalah NP-Complete beserta teknik reduksi standar |
 
 ---
 *Navigasi Cepat*: [Ke Tingkat 6](./README.md) | [Ke Master Index](../../INDEX.md) | *Sebelumnya*: [107. teori-komputabilitas-batas-komputasi](./107-teori-komputabilitas-batas-komputasi.md) | *Berikutnya*: [109. rekayasa-kompiler-interpreter](./109-rekayasa-kompiler-interpreter.md)

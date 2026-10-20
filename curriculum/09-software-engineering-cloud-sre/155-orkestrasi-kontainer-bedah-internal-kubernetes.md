@@ -6,94 +6,172 @@
 ---
 
 ## 1. Intuisi Dasar Tanpa Jargon ("Seperti Bayi Baru Lahir")
-Di masa lalu, mengonfigurasi infrastruktur cloud—membuat puluhan server virtual, load balancer, aturan firewall, dan database terkelola di Amazon Web Services (AWS) atau Google Cloud Platform (GCP)—dilakukan dengan cara mengklik tombol-tombol di halaman web konsol browser (*ClickOps*). Satu klik yang salah pada aturan firewall dapat membuka database ke seluruh hacker dunia tanpa ada jejak siapa yang mengubahnya! Infrastructure as Code (IaC) & Cloud Native ([Terraform & Infrastructure as Code](https://developer.hashicorp.com/terraform/intro)) adalah revolusi kedisiplinan rekayasa: Anda menuliskan seluruh arsitektur data center Anda dalam file teks deklaratif (Terraform HCL). Infrastruktur Anda dapat disimpan di Git, ditinjau melalui Pull Request oleh rekan tim (*Peer Review*), diuji secara otomatis, dan dibangun kembali dari nol di belahan dunia lain dalam hitungan menit hanya dengan mengetik perintah sakti: `terraform apply`.
+### 1.1 Konsep Inti & Analogi Tanpa Jargon
+Di masa lalu, menginstal aplikasi server adalah siksaan: Anda membutuhkan pustaka Python versi 3.9, tetapi sistem operasi server hanya menyediakan versi 3.6; dan jika Anda memperbarui pustaka sistem, aplikasi lain yang berjalan di server yang sama akan crash (*Dependency Hell*). Virtualisasi & Container Orchestration ([Docker & Kubernetes Architecture](https://kubernetes.io/docs/concepts/overview/)) telah melenyapkan kutukan 'Tapi di laptop saya jalan!' untuk selamanya. **Docker** mengemas aplikasi Anda bersama seluruh pustaka dan konfigurasinya ke dalam kotak kontainer standar yang dijamin berjalan identik di laptop pengembang maupun di ribuan server cloud. Dan ketika Anda memiliki 10.000 kontainer yang berjalan serentak, **Kubernetes (K8s)** bertindak sebagai kapten kapal armada otomatis raksasa: ia memantau kontainer yang mati dan menghidupkannya kembali dalam hitungan detik (**Self-Healing**), menaikkan jumlah kontainer saat pengunjung melonjak (**Autoscaling**), dan mendistribusikan lalu lintas secara merata tanpa ada server yang kelebihan beban.
+
+### 1.2 Urgensi Rekayasa & Signifikansi Sistemik
+Dalam rekayasa sistem modern, pemahaman mendalam tentang konsep ini membedakan arsitek sistem kelas dunia dari sekadar operator perkakas teknis.
 
 ## 2. Fondasi Teoretis & Aksiomatik / Matematis
-Prinsip Pendekatan Deklaratif vs Imperatif dan Graf Ketergantungan Topologi Terraform:
+### 2.1 Kerangka Teori Aksiomatik & Formulasi Matematis
+Arsitektur Kontroler Terdistribusi Kubernetes (Control Plane vs Worker Nodes) dan Status Deklaratif:
 
-1. **Deklaratif (Terraform, OpenTofu, CloudFormation)**:
-   Anda mendeklarasikan *APA* hasil akhir yang Anda inginkan (misal: *'Tersedia 1 VPC dengan 3 Subnet Publik'*).    Engine IaC menghitung sendiri urutan langkah kerja yang dibutuhkan untuk mencapai status tersebut.
-   - **Idempoten (Idempotency)**: Menjalankan `terraform apply` sepuluh kali berturut-turut pada infrastruktur yang sudah ada menghasilkan perubahan **0 resource**.
+### 2.2 Penurunan Matematis Langkah-demi-Langkah
+Filosofi Inti Kubernetes: **Declarative Desired State vs Current Actual State**.
+Operator tidak memberi instruksi imperatif langkah-demi-langkah; operator mendeklarasikan status yang diinginkan dalam file YAML (misal: *'Saya ingin 5 buah pod berjalan'*). Loop Rekonsiliasi Pengontrol (*Reconciliation Control Loop*) terus-menerus membandingkan status aktual dengan status deklarasi:
 
-2. **Imperatif (Ansible, Bash Scripts, Chef)**:
-   Anda mendikte langkah demi langkah *BAGAIMANA* cara membangunnya (misal: *'Jalankan perintah apt-get install, lalu copy file'*).
+$$\text{Loop Rekonsiliasi}: \quad \text{Reconcile}() \implies \begin{cases} \text{Do Nothing} & \text{Actual} == \text{Desired} \\ \text{Spawn / Terminate Pods} & \text{Actual} \ne \text{Desired} \end{cases}$$
 
-3. **Siklus Hidup dan File State Terraform (`terraform.tfstate`)**:
-   File state adalah peta penghubung antara kode deklaratif Anda dengan ID sumber daya fisik di cloud vendor:
-   $$\text{Resource In Code: } \texttt{aws\_s3\_bucket.b} \xleftrightarrow{\text{State Map}} \text{Cloud Asset: } \texttt{"arn:aws:s3:::my-company-prod-bucket"}$$
-   - **Directed Acyclic Graph (DAG) Execution**: Terraform memetakan seluruh ketergantungan sumber daya ke dalam pohon DAG dan mengeksekusi pembuatan sumber daya independen secara paralel bersamaan.
+Komponen Inti Control Plane Kubernetes:
+1. **`kube-apiserver`**: Pintu gerbang REST API tunggal yang memvalidasi dan mengonfigurasi seluruh objek pod/service.
+2. **`etcd`**: Database Key-Value terdistribusi berbasis konsensus Raft yang menyimpan seluruh status kebenaran klaster.
+3. **`kube-scheduler`**: Menentukan di worker node fisik mana pod baru harus ditempatkan berdasarkan ketersediaan CPU dan RAM.
+4. **`kube-controller-manager`**: Menjalankan daemon pengendali (DeploymentController, ReplicaSetController).
+
+Komponen Worker Node Fisik:
+- **`kubelet`**: Agen kapten node yang berkomunikasi dengan container runtime (Containerd via CRI).
+- **`kube-proxy`**: Mengelola aturan firewall virtual iptables/IPVS untuk pengalihan Service IP.
 
 ## 3. Anatomi Teknis & Cara Kerja Internal
-Alur Kerja Tiga Langkah Eksekusi Terraform Core Engine:
+Hierarki Objek Orkestrasi Kubernetes: Dari Deployment ke Container RunTime:
 
 ```mermaid
-graph LR
-A[Declarative Code .tf] --> B[terraform init: Download Provider Plugins AWS/GCP]
-B --> C[terraform plan: Compare Code vs State vs Real Cloud Reality]
-C --> D{Plan Spec: Shows Exact Changes (+Add, ~Change, -Destroy)}
-D -->|User Approves| E[terraform apply: Parallel Provisioning via Cloud APIs]
-E --> F[Update Remote State Lock S3/DynamoDB Backend]
+graph TD
+A[Deployment: Rolling Update Strategy & Version Control] --> B[ReplicaSet: Ensures exact N replicas]
+B --> C[Pod 1: Smallest Deployable Unit IP Address & Shared Volume]
+B --> D[Pod 2: Replica]
+C --> E[Container 1: App Service]
+C --> F[Container 2: Sidecar Logging/Proxy]
+G[Service ClusterIP: Stable Virtual IP & Internal Load Balancer] --> C
+G --> D
 end
 ```
 
-1. **State Locking (DynamoDB / GCS / Terraform Cloud)**:
-   Mencegah dua insinyur perangkat lunak mengeksekusi `terraform apply` di saat yang sama. Engine mengunci file state (*State Lock*) saat operasi plan/apply dimulai dan melepasnya setelah proses selesai.
+1. **Pod Network Model (CNI - Container Network Interface)**:
+   Setiap Pod mendapatkan alamat IP unik yang dapat dirutekan di seluruh klaster (*Every Pod gets its own IP*). Pod dapat berkomunikasi dengan semua pod lain di node mana pun tanpa NAT port-mapping melalui jaringan overlay (Calico, Cilium berbasis eBPF) ([Kubernetes Network Model](https://kubernetes.io/docs/concepts/services-networking/)).
+
+#### Tabel Penelusuran Siklus CrashLoopBackOff & Pengusiran Pod Kubernetes (Cascading Eviction)
+| Siklus Rekonsiliasi Kubelet | Status Kontainer Pod | Konsumsi Memori Aktual vs Limit | Sinyal Kernel OS yang Dipicu | Kebijakan Restart Kubelet (*BackOff*) | Status Node Kluster Kubernetes |
+|---|---|---|---|---|---|
+| Inisialisasi Pod | Menjalankan aplikasi | $50\text{ MB} / 512\text{ MB}$ (Limit) | - | Status `Running` | Node stabil |
+| Kebocoran Memori Heap | Alokasi data tanpa batas | Naik ke $510\text{ MB} / 512\text{ MB}$ | Mendekati batas cgroup `memory.max`| - | Kubelet memantau cgroup |
+| Batas Terlampaui | Alokasi melebihi 512 MB | $513\text{ MB} > 512\text{ MB}$ | **KERNEL OOM-KILLER MENGIRIM SIGKILL (137)!**| Kontainer mati mendadak | Exit Code: 137 (OOMKilled) |
+| Siklus CrashLoop | Kubelet me-restart pod | Memori bocor berulang | Mati lagi dalam 10 detik | Waktu jeda restart eksponensial ($10\text{s} \to 300\text{s}$)| Status: `CrashLoopBackOff` |
+| Pengusiran Berantai | 50 Pod OOM bersamaan | Kubelet kehabisan memori node fisik | Tekanan memori node (*MemoryPressure*) | Kubelet mulai mengusir pod lain (*Eviction*)| Pod sehat ikut terusir! |
+| Mitigasi Arsitektur | Penyesuaian Request/Limit | Profiling memori presisi & HPA | Deteksi kebocoran memori dini | Pod direstart sebelum batas node terancam | Kluster kembali stabil |
 
 ## 4. Implementasi Praktis & Kode / Simulasi Riil
-```hcl
-# Production-Ready Terraform HCL Manifest Provisioning Secure AWS S3 Bucket
-terraform {
-  required_version = ">= 1.5.0"
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
-}
-
-provider "aws" {
-  region = "us-east-1"
-}
-
-resource "aws_s3_bucket" "secure_telemetry_storage" {
-  bucket        = "company-secure-telemetry-prod-bucket-2026"
-  force_destroy = false
-
-  tags = {
-    Environment = "Production"
-    ManagedBy   = "Terraform-IaC"
-  }
-}
-
-# Kunci seluruh akses publik untuk mencegah kebocoran data rahasia!
-resource "aws_s3_bucket_public_access_block" "block_public" {
-  bucket = aws_s3_bucket.secure_telemetry_storage.id
-
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
+```yaml
+# Production-Grade Kubernetes Deployment and Service Manifest (deployment.yaml)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: telemetry-api-deployment
+  labels:
+    app: telemetry-api
+spec:
+  replicas: 3 # Menjamin selalu ada tepat 3 Pod yang hidup mandiri
+  selector:
+    matchLabels:
+      app: telemetry-api
+  template:
+    metadata:
+      labels:
+        app: telemetry-api
+    spec:
+      containers:
+      - name: api-server
+        image: telemetry-api:v1.2.0
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: "250m" # 0.25 CPU Core jaminan minimum
+            memory: "256Mi"
+          limits:
+            cpu: "1000m" # 1.0 CPU Core batas maksimum
+            memory: "512Mi" # Mencegah Pod memakan seluruh RAM node!
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
 ```
 
 ## 5. Miskonsepsi & Jebakan Industri
-1. **Configuration Drift via Out-of-Band Console Modifications**: Administrator memodifikasi aturan security group firewall secara manual via web konsol cloud AWS tanpa memperbarui kode Terraform. Saat insinyur lain menjalankan `terraform apply`, Terraform akan mendeteksi perbedaan dan menghapus perubahan manual tersebut secara otomatis (*Drift Overwrite*).
-2. **Exposing Unencrypted Secrets in `terraform.tfstate`**: Mendefinisikan kata sandi database secara plaintext di kode Terraform. File `terraform.tfstate` menyimpan seluruh nilai rahasia dalam format JSON mentah tanpa enkripsi default jika backend state lokal tidak diamankan.
-3. **Accidental Disaster Destruction via Resource Renaming**: Mengubah nama pengenal sumber daya di kode (`resource "aws_db_instance" "db_old"` diubah menjadi `"db_new"`). Terraform menganggap Anda ingin **MENGHAPUS DATABASE LAMA** dan membuat database baru yang kosong melompong (solusi: gunakan blok `moved` di Terraform 1.1+).
+1. **Omitting Resource Requests and Limits**: Menyebarkan Pod ke Kubernetes tanpa mendefinisikan `resources.limits.memory`. Jika satu pod mengalami memory leak, pod tersebut akan menyedot seluruh RAM fisik node host, memicu OOM Killer kernel membunuh pod-pod penting tetangga (*Noisy Neighbor Problem*).
+2. **Confusing Liveness and Readiness Probes**: Mengarahkan Liveness Probe ke pemeriksaan database eksternal. Jika database downstream lambat atau down, seluruh pod Kubernetes akan menganggap dirinya rusak dan melakukan restart serentak (*Restart Death Spiral*), melumpuhkan klaster.
+3. **Running Root Containers in Production**: Menjalankan kontainer dengan pengguna bawaan `root` (UID 0). Jika penyerang berhasil melakukan container breakout, penyerang langsung memiliki hak istimewa superuser pada host fisik.
+
+### Studi Kasus Kegagalan Nyata: Reaksi Berantai Pengusiran Pod dan Keruntuhan Kluster Kubernetes Akibat OOMKilled Cascading Eviction
+- **Kronologi & Konteks Kasus**: Pada platform streaming video global yang berjalan di atas kluster Kubernetes dengan ribuan node, peluncuran versi mikroservis rekomendasi baru memicu pengusiran pod (*pod eviction*) massal yang menyebar ke seluruh kluster, meruntuhkan ratusan node komputasi dan memicu pemadaman layanan selama lebih dari dua jam.
+- **Akar Masalah Orkestrasi Kontainer, cgroups, & Kubelet Eviction Thresholds**: Pengembang mengonfigurasi batas memori kontainer (*Memory Limit*) yang sama persis dengan batas permintaan memori (*Memory Request*), namun kode baru memuat kebocoran memori (*Memory Leak*) yang cepat. Ketika penggunaan memori kontainer menyentuh batas cgroup, kernel Linux mengeksekusi OOM Killer dengan sinyal `SIGKILL 137` (*OOMKilled*). Kubelet mencoba me-restart pod tersebut berulang kali, masuk ke status `CrashLoopBackOff`. Karena puluhan pod yang bocor berjalan pada node pekerja fisik yang sama, akumulasi alokasi memori menembus ambang batas keselamatan node (*Kubelet Hard Eviction Threshold / memory.available < 100Mi*). Kubelet menandai node dengan status `MemoryPressure` dan mulai mengusir (*evict*) seluruh pod lain yang ada di node tersebut secara paksa. Pod-pod yang terusir dijadwalkan ulang oleh Kubernetes Scheduler ke node tetangga yang sehat, memindahkan beban memori bocor dan memicu reaksi berantai pengusiran node tetangga (*Cascading Eviction Storm*) hingga seluruh kluster kehabisan kapasitas.
+
+- **Potongan Kode / Arsitektur Cacat (Vulnerable Implementation)**:
+```yaml
+# Rekonstruksi Cacat Konfigurasi Pod Kubernetes yang Memicu OOMKilled
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: leaky-recommendation-service
+spec:
+  replicas: 50
+  template:
+    spec:
+      containers:
+      - name: app
+        image: recommendation:v2.1-leaky
+        resources:
+          requests:
+            memory: "512Mi" # KESALAHAN: Request terlalu mepet dengan limit
+            cpu: "250m"
+          limits:
+            memory: "512Mi" # Saat menyentuh 512Mi: KERNEL OOM KILLER MENGIRIM SIGKILL (Exit 137)!
+        # Ketiadaan Liveness Probe yang tepat menunda deteksi kebocoran memori
+```
+
+- **Analisis Forensik & Rekayasa Modern**: Insiden Cascading Eviction mengajarkan pentingnya pemahaman interaksi antara orkestrator kontainer dan subsistem kernel host. Standar arsitektur Kubernetes modern mewajibkan: (1) Penerapan *Quality of Service* (QoS) Class yang tepat (Guaranteed vs Burstable); (2) Konfigurasi *Horizontal Pod Autoscaler* (HPA) dan *Vertical Pod Autoscaler* (VPA) yang menyesuaikan alokasi sumber daya secara dinamis; (3) Pemasangan *PriorityClass* dan *PodDisruptionBudgets* (PDB) yang melindungi pod infrastruktur kritis dari pengusiran sembarangan saat node mengalami tekanan memori.
 
 ## 6. Proyek Latihan & Rubrik Penilaian Mandiri
-1. **Tingkat Pemula**: Tulis konfigurasi Terraform lokal menggunakan *Local Provider* (`hashicorp/local`) yang membuat file teks `inventory.txt` di disk lokal Anda. Eksekusi `terraform init`, `terraform plan`, dan `terraform apply`.
-2. **Tingkat Menengah**: Gunakan emulator cloud open-source LocalStack untuk mem-provisioning VPC, Subnet, dan instance VM EC2 virtual menggunakan Terraform tanpa perlu membayar akun AWS nyata.
-3. **Tingkat Mahir**: Rancang modul Terraform reusable yang menerapkan arsitektur Multi-Tier High Availability (VPC multi-AZ, Private/Public Subnets, NAT Gateways, dan Auto-Scaling Group). Konfigurasikan Remote State Backend dengan enkripsi S3 dan mekanisme State Locking menggunakan tabel DynamoDB.
+1. **Tingkat Pemula**: Bangun file `Dockerfile` multi-stage untuk aplikasi web, bangun image kontainer lokal dengan `docker build`, dan jalankan kontainer dengan pembatasan memori (`docker run -m 256m`).
+2. **Tingkat Menengah**: Pasang klaster Kubernetes lokal (menggunakan Minikube, Kind, atau K3s). Terapkan manifes Deployment 3 replika di atas, lalu matikan salah satu pod secara manual (`kubectl delete pod <name>`) dan amati bagaimana Kubernetes Controller secara otomatis menghidupkan pod baru dalam 1 detik.
+3. **Tingkat Mahir**: Konfigurasikan Horizontal Pod Autoscaler (HPA) berbasis metrik utilisasi CPU: gunakan alat benchmarking beban kueri HTTP (`hey` atau `wrk`) untuk membanjiri deployment dan amati bagaimana Kubernetes secara otomatis menskalakan pod dari 3 menjadi 10 replika secara dinamis.
+
+### Tingkat 1: Dasar
+- **Tugas**: Bangun manifes deklaratif Kubernetes (YAML) lengkap untuk aplikasi web stateless berkeandalan tinggi yang memuat Deployment (3 replika, strategi `RollingUpdate` dengan `maxSurge: 1` dan `maxUnavailable: 0`), Service bertipe `ClusterIP`, penegakan kuota `resources` (requests dan limits), serta konfigurasi pemeriksaan kesehatan *Liveness Probe* dan *Readiness Probe* berbasis HTTP endpoint.
+- **Petunjuk Perancangan Arsitektur**:
+  - Readiness probe memverifikasi kesiapan koneksi basis data sebelum menerima lalu lintas.
+  - Liveness probe mendeteksi apakah proses mengalami deadlock/hang dan me-restart kontainer otomatis.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Validasi Skema*: Uji manifes dengan utilitas linter `kubeval` atau `kubectl --dry-run=client`; pastikan seluruh atribut mematuhi skema OpenAPI Kubernetes resmi tanpa peringatan sintaks.
+- **Rubrik Penilaian Mandiri**: 40% Kelengkapan Manifes Kubernetes Sesuai Praktik Terbaik, 30% Konfigurasi Liveness/Readiness Probe yang Tepat, 30% Strategi RollingUpdate Bebas Downtime.
+
+### Tingkat 2: Menengah
+- **Tugas**: Kembangkan pengontrol rekonsiliasi mini (*Custom Kubernetes Controller / Operator Loop*) dalam Python/Go menggunakan pola *Informer & Workqueue* yang memantau pembuatan objek kustom (*Custom Resource Definition / CRD*), membandingkan status aktual terhadap status yang diinginkan, dan secara otomatis membuat Pod baru jika jumlah replika fisik kurang dari spesifikasi.
+- **Petunjuk Perancangan Arsitektur**:
+  - Terapkan fungsi rekonsiliasi idempoten: `Reconcile(Request) -> Result`.
+  - Gunakan mekanisme exponential backoff pada workqueue saat terjadi kegagalan pembaruan status.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Simulasi Self-Healing*: Hapus 1 Pod yang dikelola operator secara manual via API; buktikan kontroler mendeteksi penyimpangan status (*drift*) dan membuat 1 Pod pengganti baru secara otomatis dalam waktu $< 2\text{ detik}$.
+- **Rubrik Penilaian Mandiri**: 40% Arsitektur Reconciliation Loop Controller yang Tepat, 30% Sifat Idempoten Rekonsiliasi Status CRD, 30% Kemampuan Self-Healing Terverifikasi.
+
+### Tingkat 3: Mahir
+- **Tugas**: Rancang webhook penerimaan mutasi dan validasi (*Admission Webhook Server*) dalam Go/Python untuk Kubernetes API Server yang memeriksa setiap Pod yang akan dibuat di kluster, menolak pembuatan Pod jika tidak memiliki batas memori (*Memory Limits Validation*), dan secara otomatis menyuntikkan kontainer pendamping keamanan (*Security Sidecar Container Injection*) ke dalam spesifikasi Pod sebelum disimpan ke etcd.
+- **Petunjuk Perancangan Arsitektur**:
+  - Bangun endpoint HTTPS bertipe `MutatingAdmissionWebhook` dan `ValidatingAdmissionWebhook`.
+  - Hasilkan patch mutasi dalam format JSONPatch (RFC 6902) untuk menyuntikkan kontainer sidecar.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Penolakan Pod Cacat*: Ajukan pembuatan Pod tanpa field `resources.limits`; buktikan webhook menolak pembuatan Pod dengan pesan: `Admission denied: Seluruh kontainer wajib memiliki memory limit!`.
+- **Rubrik Penilaian Mandiri**: 40% Kepatuhan Protokol AdmissionReview Kubernetes API, 30% Penyusunan Mutasi JSONPatch RFC 6902 yang Presisi, 30% Penegakan Kebijakan Keamanan Kluster.
 
 ## 7. Rekomendasi Sumber Belajar Standar Emas
 | Sumber Pembelajaran | Penulis / Institusi | Tautan Langsung | Fokus Materi |
 | :--- | :--- | :--- | :--- |
-| Terraform: Up & Running, 3rd Edition | Yevgeniy Brikman (Gruntwork) | [O'Reilly Terraform Book](https://www.terraformupandrunning.com/) | Alkitab Terraform: Modules, State Management, Loops & Zero-Downtime Deployment |
-| Infrastructure as Code: Dynamic Systems for the Cloud Era | Kief Morris (ThoughtWorks) | [O'Reilly IaC Book](https://www.oreilly.com/library/view/infrastructure-as-code/9781098114671/) | Prinsip Dasar IaC, Immutability, Antifragile Platforms & Pipelines |
-| HashiCorp Terraform Documentation | HashiCorp / OpenTofu | [Terraform Official Documentation](https://developer.hashicorp.com/terraform/docs) | Bahasa HCL, Provider Architecture, CLI Commands & State Backends |
-| OpenTofu: Open Source Alternative to Terraform | Linux Foundation | [OpenTofu Official Portal](https://opentofu.org/) | Fork Komunitas Bebas Open-Source untuk Manajemen Infrastruktur Cloud Native |
+| Kubernetes Documentation: Concepts and Architecture | The Kubernetes Authors (CNCF) | [Kubernetes Official Docs](https://kubernetes.io/docs/concepts/overview/) | Pods, Services, Deployments, Controller Loops & Networking Models |
+| Kubernetes Up & Running: Dive into the Future of Infrastructure | Kelsey Hightower, Brendan Burns, Joe Beda | [O'Reilly Kubernetes Book](https://www.oreilly.com/library/view/kubernetes-up-and/9781098110192/) | Ditulis oleh Para Pencipta Asli K8s: Pod Lifecycle, Storage & Ingress |
+| Containerd Architecture and Core Design | CNCF Containerd Project | [Containerd Official Portal](https://containerd.io/) | OCI Runtime Standards, CRI Plugins, Snapshotters & Shim Architecture |
+| Production Kubernetes: Building Robust Systems | Josh Rosso et al. (VMware) | [O'Reilly Production K8s](https://www.oreilly.com/library/view/production-kubernetes/9781492092292/) | Multi-Cluster Networking, Cilium eBPF CNI, RBAC Security & Disaster Recovery |
 
 ---
 *Navigasi Cepat*: [Ke Tingkat 9](./README.md) | [Ke Master Index](../../INDEX.md) | *Sebelumnya*: [154. devops-cloud-infrastructure-platform-engineering](./154-devops-cloud-infrastructure-platform-engineering.md) | *Berikutnya*: [156. observabilitas-tiga-pilar-sre](./156-observabilitas-tiga-pilar-sre.md)

@@ -6,98 +6,173 @@
 ---
 
 ## 1. Intuisi Dasar Tanpa Jargon ("Seperti Bayi Baru Lahir")
-Dalam bahasa pemrograman tingkat tinggi seperti Python atau JavaScript, memori komputer diabstraksikan seperti kotak ajaib yang elastis: Anda membuat objek tanpa batas, dan runtime yang mengaturnya di belakang layar. Dalam C tingkat rendah ([C Memory Model & Pointers](https://en.cppreference.com/w/c/language/pointer)), tidak ada kotak ajaib. Memori hanyalah pita linier byte raksasa yang diberi nomor indeks mulai dari 0 hingga $2^{64}-1$. Pointer hanyalah sebuah integer biasa yang menyimpan nomor indeks (alamat) tersebut. Jika Anda menggeser pointer satu langkah ke depan (`ptr++`), langkah tersebut tidak selalu melompat satu byte—ia melompat sebesar ukuran tipe data yang ditunjuknya! Mengabaikan aturan penyelarasan fisik (alignment) atau mengakses indeks di luar batas akan memicu 'Undefined Behavior' (UB)—kondisi di mana compiler berasumsi situasi tersebut tidak pernah ada, menghapus pemeriksaan keamanan Anda, dan membuka gerbang bagi kebocoran data rahasia atau eksekusi eksploit hacker.
+### 1.1 Konsep Inti & Analogi Tanpa Jargon
+Kode C yang Anda ketik pada layar editor hanyalah barisan teks ASCII yang mati bagi prosesor silikon. Prosesor tidak mengenal variabel, loop `for`, atau fungsi `printf`; ia hanya mengenal siklus pembacaan instruksi biner beralamat heksadesimal. Toolchain kompilasi C ([GCC & Clang Toolchain Architecture](https://gcc.gnu.org/onlinedocs/gcc/)) adalah pabrik manufaktur 4 tahap: preprocessor membersihkan makro dan menyisipkan header mentah; compiler menerjemahkan logika C menjadi pohon sintaks abstrak (AST) dan mengoptimasi aliran instruksi ke bahasa assembly murni prosesor target; assembler menerjemahkan kode assembly teks menjadi kode mesin biner berekstensi `.o` (object file); dan akhirnya linker menggabungkan potongan-potongan object file yang tercerai berai dengan pustaka statis/dinamis, menjahit alamat memori lompatan fungsi (relocation), dan menghasilkan biner ELF (Executable and Linkable Format) yang siap dieksekusi sistem operasi.
+
+### 1.2 Urgensi Rekayasa & Signifikansi Sistemik
+Dalam rekayasa sistem modern, pemahaman mendalam tentang konsep ini membedakan arsitek sistem kelas dunia dari sekadar operator perkakas teknis.
 
 ## 2. Fondasi Teoretis & Aksiomatik / Matematis
-Aritmatika Pointer dan Penyelarasan Memori (Memory Alignment & Padding):
+### 2.1 Kerangka Teori Aksiomatik & Formulasi Matematis
+Fase Translasi Kompilasi Bahasa C dan Formalisme Relokasi Simbol:
 
-Diberikan pointer bertipe $T^*$ yang menunjuk alamat $A$. Operasi penambahan integer $k$ menghasilkan alamat fisik:
-$$\text{Address}(ptr + k) = A + (k \times \text{sizeof}(T))$$
+### 2.2 Penurunan Matematis Langkah-demi-Langkah
+$$\text{Source (.c)} \xrightarrow{\text{cpp}} \text{Preprocessed (.i)} \xrightarrow{\text{cc1}} \text{Assembly (.s)} \xrightarrow{\text{as}} \text{Object (.o)} \xrightarrow{\text{ld}} \text{Executable ELF}$$
 
-Aturan Penyelarasan Fisik Alamat (Natural Alignment Requirement):
-Sebuah tipe data primitif berukuran $S$ byte wajib dialokasikan pada alamat memori yang merupakan kelipatan genap dari $S$:
-$$A \pmod S = 0 \quad \iff \quad A \ \& \ (S - 1) = 0 \quad (\text{jika } S = 2^n)$$
+Formulasi Matematis Relokasi Alamat Simbol Global (Linker Symbol Relocation):
+Ketika file objek memanggil fungsi di file lain, alamat target tidak diketahui saat kompilasi. Assembler menyisipkan entri relokasi dalam tabel relokasi `.rela.text`:
 
-Kompensasi Padding pada `struct` Bahasa C:
-Compiler secara otomatis menyisipkan byte kosong (*padding bytes*) di antara anggota struct untuk memastikan setiap anggota berada pada batas alamat alaminya:
-$$\text{Total Size} = \sum_{i=1}^M \text{sizeof}(field_i) + \sum_{i=1}^M \text{padding}_i$$
-Ukuran total struct akhir selalu dibulatkan ke kelipatan terbesar dari penyelarasan anggotanya ($Alignment_{max}$).
+$$A_{\text{final}} = S + A - P \quad (\text{R\_X86\_64\_PC32})$$
+$$A_{\text{final}} = S + A \quad (\text{R\_X86\_64\_64})$$
+
+Di mana:
+- $S$: Nilai absolut alamat simbol target di memori setelah segment placement oleh linker.
+- $A$: Nilai addend (offset penambahan eksplisit yang didefinisikan dalam entri `Elf64_Rela`).
+- $P$: Alamat counter instruksi memori tempat relokasi dieksekusi (Program Counter relatif).
 
 ## 3. Anatomi Teknis & Cara Kerja Internal
-Anatomi Tata Letak Memori Struct C dan Efek Penataan Anggota (Padding vs Packed):
+Struktur Biner Eksekutabel ELF (Executable and Linkable Format) dan Peta Virtual Memory:
 
 ```mermaid
 graph TD
-subgraph Unoptimized Struct: Total 24 Bytes
-A[char a: 1 Byte at Offset 0] --> B[Padding: 7 Bytes Unused Offset 1-7]
-B --> C[double b: 8 Bytes at Offset 8-15]
-C --> D[int c: 4 Bytes at Offset 16-19]
-D --> E[Tail Padding: 4 Bytes Offset 20-23]
+subgraph ELF Binary File On Disk
+A[ELF Header 64-bit] --> B[Program Header Table]
+B --> C[.text: Machine Code Instructions]
+B --> D[.rodata: Read-Only Strings & Constants]
+B --> E[.data: Initialized Global/Static Variables]
+B --> F[.bss: Zero-Initialized Globals (Allocated at Runtime)]
+B --> G[Section Header Table & Symbol Table .symtab]
 end
-subgraph Reordered Struct: Total 16 Bytes
-F[double b: 8 Bytes at Offset 0-7] --> G[int c: 4 Bytes at Offset 8-11]
-G --> H[char a: 1 Byte at Offset 12]
-H --> I[Tail Padding: 3 Bytes Offset 13-15]
+subgraph Virtual Process Memory Map
+H[Low Memory: 0x400000] --> C
+C --> D
+D --> E
+E --> F
+F --> I[Heap: Grows Upwards via brk/sbrk/mmap]
+J[High Memory: 0x7FFFFFFF] --> K[User Stack: Grows Downwards via RSP]
 end
 ```
 
-1. **Strict Aliasing Rule**: Compiler C mengasumsikan bahwa dua pointer dengan tipe berbeda (misal `int *` dan `float *`) tidak pernah menunjuk ke lokasi memori yang sama. Melakukan cast pointer untuk membaca bit float sebagai integer melanggar strict aliasing dan dapat menghasilkan optimasi liar (gunakan `memcpy` atau `union` tipe C99) ([Strict Aliasing in C/C++](https://cellperformance.beyond3d.com/articles/2006/06/understanding-strict-aliasing.html)).
-2. **Undefined Behavior (UB)**: Mengakses pointer liar (*dangling pointer*), integer signed overflow ($2^{31}-1 + 1$), atau shifting bit melampaui lebar tipe data ($1 \ll 32$ pada 32-bit int) bukan sekadar menghasilkan angka salah, tetapi mengizinkan optimizer compiler menghapus seluruh blok kode cabang terkait.
+1. **Tabel Simbol (`.symtab`)**: Berisi daftar simbol lokal (`STB_LOCAL`) dan global (`STB_GLOBAL`). Simbol yang belum terdefinisi ditandai sebagai `SHN_UNDEF` ([System V ABI ELF Standard](https://refspecs.linuxfoundation.org/elf/gabi4+/contents.html)).
+2. **Dynamic Linker & GOT/PLT**: Pada dynamic linking (`.so`), Global Offset Table (GOT) dan Procedure Linkage Table (PLT) menyediakan pemanggilan fungsi terlambat (*lazy binding*) yang diselesaikan oleh `ld-linux.so` saat runtime pertama kali fungsi dipanggil.
+
+#### Tabel Penelusuran Siklus Hidup Eksekusi & Relokasi Linker ELF
+| Langkah / Fase Relokasi | Simbol / Relocation Entry | Offset Seksi Memori | Komputasi Simbolik Linker ($S + A - P$) | Status GOT / PLT | Status Peta Memori Virtual (VMA) |
+|---|---|---|---|---|---|
+| Fase 1: Parsing ELF | `.text`, `.data`, `.rodata` | `0x0000_1000` | Penggabungan seksi masukan objek `.o` | Simbol `extern void auth()` belum terikat | Alokasi segment VMA segmen Text & Data |
+| Fase 2: Symbol Resolve | `auth_token_secret` | `0x0000_2040` | Resolusi ODR: Simbol tunggal global terpilih | Binding: `GLOBAL DEFAULT` | Cek ODR: Tidak ada konflik multipel definisi |
+| Fase 3: Relokasi PLT | `R_X86_64_PLT32` | `0x0000_1054` | $L = \text{PLT}[\text{puts}], P = 0x1054$ | PLT[0] mengarahkan ke Linker Resolver | Alamat pemanggilan di-patch ke PLT stub |
+| Fase 4: Dynamic Binding | First Call to `puts()` | `0x0000_3018` | `_dl_runtime_resolve_xsavec` mengevaluasi libc | GOT entry di-patch ke alamat absolut `puts` | Lazy binding tuntas; panggilan selanjutnya langsung |
+| Fase 5: Memori Lock | `RELRO` Enforce | `0x0000_3000` | Proteksi proteksi GOT: `mprotect(PROT_READ)` | GOT menjadi Read-Only permanen | Mitigasi eksploitasi overwrite fungsi pointer |
 
 ## 4. Implementasi Praktis & Kode / Simulasi Riil
 ```c
-// Demonstrating Memory Alignment, Pointer Arithmetic and Safe Type Punning
+// Demonstrating C Compilation Units, Storage Classes and Linker Symbol Resolution
 #include <stdio.h>
-#include <stdint.h>
-#include <string.h>
-#include <stddef.h>
 
-typedef struct {
-    char   flag;    // 1 byte, offset 0
-                    // 3 bytes padding!
-    int32_t val;    // 4 bytes, offset 4
-    int64_t large;  // 8 bytes, offset 8
-} __attribute__((aligned(8))) telemetry_packet_t;
+// Simbol bss: tidak memakan ruang di disk file ELF, dialokasikan 0 saat mmap memori
+int global_uninitialized_var; 
 
-// Fungsi aman untuk membaca representasi bitwise float ke uint32_t tanpa melanggar strict aliasing
-uint32_t safe_float_to_raw_bits(float f) {
-    uint32_t bits;
-    memcpy(&bits, &f, sizeof(float)); // Standar C menjamin optimasi zero-cost memcpy
-    return bits;
-}
+// Simbol data: bernilai eksplisit, disimpan langsung di biner ELF
+int global_initialized_var = 0x12345678;
+
+// Simbol rodata: ditempatkan pada halaman memori read-only (segfault jika ditulis)
+const char g_firmware_banner[] = "SYS_CORE_V1.0";
+
+// Simbol lokal (static): visibilitas dibatasi hanya pada Translation Unit ini (.symtab local)
+static int internal_counter = 0;
+
+// Deklarasi simbol eksternal: diselesaikan oleh linker pada waktu tautan akhir
+extern void hardware_init_subsystem(void);
 
 int main(void) {
-    printf("Size of telemetry_packet: %zu bytes (Alignment: %zu)\n", 
-           sizeof(telemetry_packet_t), alignof(telemetry_packet_t));
-    printf("Offset of flag: %zu, val: %zu, large: %zu\n",
-           offsetof(telemetry_packet_t, flag),
-           offsetof(telemetry_packet_t, val),
-           offsetof(telemetry_packet_t, large));
-           
-    float test_val = -3.141592f;
-    uint32_t raw_ieee754 = safe_float_to_raw_bits(test_val);
-    printf("IEEE 754 raw hex of %f = 0x%08X\n", test_val, raw_ieee754);
+    internal_counter++;
+    printf("%s | Counter: %d | Data: 0x%X\n", 
+           g_firmware_banner, internal_counter, global_initialized_var);
     return 0;
 }
 ```
 
 ## 5. Miskonsepsi & Jebakan Industri
-1. **Strict Aliasing Violation via Raw Pointer Casting**: Menulis `uint32_t bits = *(uint32_t *)&my_float;`. Di bawah optimasi `-O2` atau `-O3`, GCC/Clang dapat mengeksekusi instruksi pembacaan sebelum penulisan ke float selesai karena menganggap kedua pointer independen.
-2. **Misaligned Memory Access on ARM/MIPS Architectures**: Membaca integer 32-bit dari alamat ganjil (`uint32_t *p = (uint32_t *)(buffer + 1); val = *p;`). Pada beberapa prosesor embedded (seperti ARM Cortex-M0), hal ini memicu instruksi UsageFault (*Alignment Trap*) yang menghentikan sistem seketika.
-3. **Use-After-Free**: Mengakses pointer setelah memanggil `free(ptr)`. Memori tersebut mungkin telah dialokasikan kembali oleh thread lain untuk data rahasia (seperti kunci privat kriptografi), memungkinkan eksploitasi pembacaan memori liar.
+1. **Multiple Definition Linker Error akibat Header Variables**: Mendeklarasikan variabel non-static global tanpa kata kunci `extern` di dalam file header `.h` (misal `int config_val = 10;`). Setiap file `.c` yang menyertakan `#include` tersebut akan membuat simbol global `config_val`, memicu linker error `multiple definition of 'config_val'` ([GCC Linker ODR Guide](https://gcc.gnu.org/onlinedocs/gcc/)).
+2. **Macro Side-Effects Expansion**: Menulis makro `#define SQUARE(x) (x * x)` dan memanggil `SQUARE(i++)`. Preprocessor mengekspansi menjadi `(i++ * i++)`, menghasilkan Undefined Behavior karena modifikasi ganda pada variabel tanpa sequence point.
+3. **Discarding Const Qualifier via Cast**: Melakukan casting `char *p = (char *)g_firmware_banner;` lalu menulis `*p = 'X';`. Karena `.rodata` dimapping kernel sebagai page memory dengan proteksi `PROT_READ` saja, hardware MMU akan memicu instruksi General Protection Fault (Segfault SIGSEGV).
+
+### Studi Kasus Kegagalan Nyata: Tabrakan Simbol ODR C++ & Kerentanan Dynamic Linker Symbol Interposition
+- **Kronologi & Konteks Kasus**: Pada sistem perdagangan frekuensi tinggi (HFT), dua pustaka dinamis bersama (`libfeed.so` dan `librisk.so`) masing-masing mendefinisikan struktur konfigurasi global `Config` di dalam file header bersama tanpa penandaan `static` atau anonymous namespace.
+- **Akar Masalah Linker & One Definition Rule (ODR)**: Dinamika linker ELF di Linux secara default mengekspos semua simbol non-static ke dalam global symbol table (`GLOBAL DEFAULT`). Ketika aplikasi utama me-load kedua pustaka, dynamic linker (`ld.so`) mengikat simbol `g_market_config` pada instance pertama yang ditemukan (simbol interposition). Akibatnya, `librisk.so` mengakses struktur data milik `libfeed.so` yang memiliki tata letak memori (memory layout / struct padding) berbeda. Terjadi korupsi memori fatal saat modul manajemen risiko membaca nilai limit eksposur sebagai angka sampah, yang meloloskan order jutaan dolar tanpa validasi risiko.
+
+- **Potongan Kode / Arsitektur Cacat (Vulnerable Implementation)**:
+```c
+// config.h - CACAT: Definisi variabel global dalam file header tanpa extern!
+// Menyebabkan tabrakan simbol ODR / Multiple Definition pada saat kompilasi ganda
+#ifndef CONFIG_H
+#define CONFIG_H
+
+// CACAT: Setiap .c file yang menyertakan header ini akan membuat alokasi terpisah
+int g_system_mode = 1; 
+
+// PERBAIKAN DEFENSIF (config.h):
+// Deklarasikan simbol sebagai extern dalam header
+extern int g_system_mode_safe;
+
+#endif
+
+// config.c - Definisi tunggal yang sah dalam satu unit kompilasi
+#include "config.h"
+int g_system_mode_safe = 1;
+
+// GCC Visibility Attribute untuk mencegah interposition / LD_PRELOAD hijacking:
+__attribute__((visibility("hidden"))) void internal_risk_check(void) {
+    // Fungsi ini tidak diekspos ke dynamic symbol table ELF
+}
+```
+
+- **Analisis Forensik & Rekayasa Modern**: Masalah pelanggaran ODR dan symbol interposition memicu evolusi standar kompiler modern: (1) Penerapan `-fvisibility=hidden` secara default pada seluruh build GCC/Clang; (2) Penegakan flag linker `-Wl,-Bsymbolic` untuk mengikat referensi simbol secara lokal di dalam pustaka dinamis; (3) Pemanfaatan LTO (Link-Time Optimization) untuk mendeteksi mismatch tipe simbol antar unit kompilasi independen.
 
 ## 6. Proyek Latihan & Rubrik Penilaian Mandiri
-1. **Tingkat Pemula**: Buat struct C yang berisi 5 field dengan berbagai tipe data (`char`, `int`, `short`, `double`, `char*`). Urutkan penulisan field dari yang tidak optimal hingga paling optimal untuk meminimalkan padding memori, dan cetak ukuran `sizeof` keduanya.
-2. **Tingkat Menengah**: Implementasikan fungsi alokasi memori khusus `aligned_alloc_custom(size_t alignment, size_t size)` menggunakan `malloc` standar. Pastikan pointer yang dikembalikan terisi pada batas kelipatan alignment dan buat fungsi `aligned_free_custom` yang membebaskan memori aslinya secara bersih.
-3. **Tingkat Mahir**: Tuliskan custom ring buffer biner bebas alokasi dinamis yang mem-parse header paket jaringan secara streaming. Gunakan teknik sanitasi pointer dan AddressSanitizer (`-fsanitize=address,undefined`) untuk membuktikan kode 100% bebas dari out-of-bounds read/write dan undefined behavior.
+1. **Tingkat Pemula**: Gunakan perintah `gcc -E`, `gcc -S`, dan `gcc -c` pada sebuah program C sederhana. Periksa baris keluaran file assembly `.s` dan identifikasi nama instruksi assembly yang bersesuaian dengan ekspresi aritmatika kode C Anda.
+2. **Tingkat Menengah**: Gunakan utilitas GNU `readelf -S` dan `nm -C` untuk menganalisis biner ELF yang telah dikompilasi. Temukan ukuran pasti dari bagian `.text`, `.rodata`, `.data`, dan `.bss`, serta tunjukkan alamat virtual memori masing-masing segmen saat dimuat.
+3. **Tingkat Mahir**: Tuliskan Linker Script (`linker.ld`) kustom dari awal untuk prosesor x86-64 atau ARM bare-metal. Petakan segmen `.text` pada alamat memori virtual `0x80000000`, buat boundary simbol `_sbss` dan `_ebss`, serta tuliskan fungsi inisialisasi C runtime minimal yang meng-zero-kan region `.bss` sebelum melompat ke `main()`.
+
+### Tingkat 1: Dasar
+- **Tugas**: Rancang program C dan Makefile multi-modul yang membedah fase kompilasi menjadi 4 tahap terisolasi (`gcc -E`, `gcc -S`, `gcc -c`, `gcc`), lalu periksa tabel simbol file ELF objek (`.o`) menggunakan utilitas `readelf -s` dan `nm`.
+- **Petunjuk Perancangan Arsitektur**:
+  - Pisahkan deklarasi `extern` dalam file `.h` dan definisi dalam file `.c`.
+  - Identifikasi perbedaan simbol `LOCAL`, `GLOBAL`, `UND` (undefined), dan seksi `.text`, `.data`, `.bss`.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Inspeksi Simbol*: Pastikan fungsi statis ditandai `LOCAL` dan fungsi publik ditandai `GLOBAL`.
+  - *Uji Mismatch*: Buat variabel global dengan tipe `int` di satu modul dan `double` di modul lain; amati peringatan linker atau bahaya type mismatch saat dijalankan.
+- **Rubrik Penilaian Mandiri**: 40% Pemisahan 4 Fase Kompilasi Bersih, 30% Analisis Tabel Simbol ELF, 30% Dokumentasi Pemahaman VMA vs LMA.
+
+### Tingkat 2: Menengah
+- **Tugas**: Buatlah parser biner ELF64 mandiri dalam C/Python yang membaca ELF Header, Program Header Table, dan Section Header Table dari file eksekutabel Linux, lalu memvalidasi magic bytes `0x7F 'E' 'L' 'F'`.
+- **Petunjuk Perancangan Arsitektur**:
+  - Parsing struktur data `Elf64_Ehdr`, `Elf64_Phdr`, dan `Elf64_Shdr` sesuai standar System V ABI AMD64.
+  - Ekstrak alamat Entry Point dan daftar segmen `PT_LOAD`.
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Masukan Valid*: Binary `/bin/ls` atau `/bin/bash`.
+  - *Keluaran yang Diharapkan*: Menampilkan arsitektur target (x86-64), jenis file (EXEC/DYN), dan alamat virtual memori setiap seksi dengan akurasi 100% cocok dengan `readelf -h`.
+  - *Kasus Korup*: File biner dengan magic byte cacat `0x7F 'E' 'L' 'X'`; parser harus menolak dengan kode galat terdefinisi tanpa melempar segfault.
+- **Rubrik Penilaian Mandiri**: 40% Kepatuhan ABI ELF64, 30% Validasi Integritas Struktur Header, 30% Kerapian Kode Parser.
+
+### Tingkat 3: Mahir
+- **Tugas**: Kembangkan implementasi mini dynamic linker loader dalam Linux C yang menggunakan `mmap` untuk memuat shared library `.so`, memproses tabel relokasi `R_X86_64_GLOB_DAT` dan `R_X86_64_JUMP_SLOT`, lalu mengeksekusi fungsi di dalamnya secara dinamis tanpa `dlopen`.
+- **Petunjuk Perancangan Arsitektur**:
+  - Petakan segmen `PT_LOAD` dengan proteksi memori yang tepat (`PROT_READ | PROT_EXEC`).
+  - Lakukan resolving simbol dari pustaka yang dimuat dan patch alamat Global Offset Table (GOT).
+- **Test Vector & Kasus Uji Ekstrem**:
+  - *Eksekusi Fungsi Dinamis*: Panggil fungsi sederhana `int add(int, int)` yang dikompilasi dengan `-fPIC -shared`; pastikan hasil perhitungan benar.
+  - *Proteksi Memori*: Terapkan `mprotect` untuk mengunci GOT pasca relokasi (Full RELRO).
+- **Rubrik Penilaian Mandiri**: 40% Resolusi Relokasi GOT/PLT Mandiri, 30% Proteksi Memori W^X (Write XOR Execute), 30% Ketahanan Penanganan Error.
 
 ## 7. Rekomendasi Sumber Belajar Standar Emas
 | Sumber Pembelajaran | Penulis / Institusi | Tautan Langsung | Fokus Materi |
 | :--- | :--- | :--- | :--- |
-| SEI CERT C Coding Standard | Carnegie Mellon University | [SEI CERT C Portal](https://wiki.sei.cmu.edu/confluence/display/c/) | Rules for Memory Safety, Pointer Overflow & UB Prevention |
-| What Every C Programmer Should Know About Undefined Behavior | Chris Lattner (LLVM Creator) | [LLVM Blog Series](https://blog.llvm.org/2011/05/what-every-c-programmer-should-know.html) | Anatomi Optimasi Kompilator & Eksploitasi Asumsi UB |
-| The Lost Art of Structure Packing | Eric S. Raymond | [Structure Packing Guide](http://www.catb.org/esr/structure-packing/) | Memory Alignment, Hardware Word Boundaries & Cache Line Optimization |
-| C Reference: Memory Model & Pointers | CppReference Community | [CppReference C Memory](https://en.cppreference.com/w/c/language/memory_model) | Formal Specification of Alignment, Object Lifetimes & Types |
+| System V Application Binary Interface (AMD64) | SCO / Linux Foundation | [System V ABI Specs](https://gitlab.com/x86-psABIs/x86-64-ABI) | Format ELF64, Relocation Types & Calling Conventions |
+| Linkers and Loaders | John R. Levine | [Levine Linkers Book](https://www.iecc.com/linker/) | Symbol Resolution, Dynamic Linking, GOT/PLT & Relocations |
+| Computer Systems: A Programmer's Perspective (CS:APP) | Randal E. Bryant & David R. O'Hallaron (CMU) | [CS:APP Official Site](http://csapp.cs.cmu.edu/) | Bab 7: Linking, Object Files, Relocation & Virtual Memory |
+| GCC Command Options & Internal Pipeline | Free Software Foundation | [GCC Official Manual](https://gcc.gnu.org/onlinedocs/gcc/) | Kompilasi Multi-Stage, Optimasi Flag (-O2, -O3, -Os) & Linker Flags |
 
 ---
 *Navigasi Cepat*: [Ke Tingkat 6](./README.md) | [Ke Master Index](../../INDEX.md) | *Sebelumnya*: [088. representasi-penyandian-data](./088-representasi-penyandian-data.md) | *Berikutnya*: [090. ragam-mesin-eksekusi-bahasa](./090-ragam-mesin-eksekusi-bahasa.md)

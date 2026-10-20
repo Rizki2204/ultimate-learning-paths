@@ -664,8 +664,8 @@ original_mat = np.random.randn(5, 5)
 compressed_rank2 = low_rank_svd_approximation(original_mat, rank_k=2)
 
 frobenius_error = np.linalg.norm(original_mat - compressed_rank2, 'fro')
-print(f"Matriks Asli:\n{original_mat[:2, :2]}")
-print(f"Aproksimasi Rank-2:\n{compressed_rank2[:2, :2]}")
+print(f"Matriks Asli: {original_mat[:2, :2].tolist()}")
+print(f"Aproksimasi Rank-2: {compressed_rank2[:2, :2].tolist()}")
 print(f"Galat Rekonstruksi Frobenius: {frobenius_error:.4f}")
 ''',
         "pitfalls": """
