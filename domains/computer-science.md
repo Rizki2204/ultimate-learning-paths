@@ -1,121 +1,147 @@
-# Linux & Operating Systems
+# Computer Science
 
-Linux is one of the most important technical foundations for engineering, systems, backend, cloud, security, automation, and embedded development.
+Computer Science is the technical foundation for how software and computing systems actually work. This domain is what turns a programmer into someone who can reason about systems, complexity, and architecture with clarity.
+
+## Why this domain matters
+
+A strong CS foundation is what allows you to understand:
+
+- how programs execute
+- how memory and storage work
+- why algorithms behave differently
+- how operating systems and networking work
+- how systems scale and fail
+- how software is designed under real constraints
+
+This domain sits directly between programming and systems thinking.
 
 ## Core goals
-- Learn shell, file system, process management
-- Understand how operating systems work
-- Use Linux for daily technical work
-- Understand system calls, memory, process scheduling, kernel basics
-- Build practical shell and systems skills
+
+- understand abstraction and computation deeply
+- reason about complexity and performance
+- master data structures and algorithms
+- connect software patterns to real system behavior
+- build strong problem-solving capability
+- prepare for AI, systems, security, and engineering work
 
 ## Learning sequence
 
-### Stage 1: Command-line basics
-- Shell basics
-- Directory structure
-- ls, cd, pwd, cp, mv, rm, mkdir, touch
-- Permissions and ownership
-- pipes and redirection
-- grep, awk, sed
-- find, xargs, head, tail
-- environment variables
-- networking basics in shell
+### 1. Foundations of computation
+- binary and representation
+- Boolean logic
+- automata and formal models
+- how algorithms process data
+- complexity and asymptotic reasoning
 
-### Stage 2: Linux system understanding
-- Filesystem hierarchy
-- Processes and jobs
-- Signals
-- Memory concepts
-- Program execution
-- Shell scripting
-- cron and scheduled tasks
-- systemd basics
-- package management
-- logs and debugging
+### 2. Data structures
+- arrays and dynamic arrays
+- linked lists
+- stacks and queues
+- hash tables
+- trees
+- binary search trees
+- balanced trees
+- heaps and priority queues
+- graphs
+- tries and string structures
 
-### Stage 3: Systems internals
-- Kernel vs user space
-- System calls
-- Virtual memory
-- Process scheduling
-- Inter-process communication
-- Threads and synchronization
-- File descriptors
-- Device drivers basics
-- Filesystems and storage
-- Boot process
+### 3. Algorithms
+- sorting and searching
+- recursion and divide-and-conquer
+- greedy algorithms
+- dynamic programming
+- graph traversal
+- shortest path algorithms
+- minimum spanning tree
+- flow and network problems
+- string matching and parsing basics
 
-### Stage 4: Advanced Linux
-- Kernel compilation
-- Kernel modules
-- Linux networking
-- Containers
-- Virtualization
-- Security hardening
-- Performance tuning
-- Embedded Linux
-- SELinux/AppArmor basics
+### 4. System and architecture fundamentals
+- memory model
+- CPU execution basics
+- process and scheduling basics
+- virtual memory
+- caching and locality
+- concurrency basics
+- file systems and storage basics
+- networks and communication basics
 
-## Essential tools
-- bash/zsh
-- ssh
-- grep/rg
-- awk
-- sed
-- fd/find
-- top/htop
-- ps
-- ss/netstat
-- journalctl
-- systemctl
-- Docker
-- git
-- make
-- gcc/gdb
-- valgrind
-- strace
+### 5. Programming language and compiler concepts
+- syntax vs semantics
+- runtime behavior
+- compilation and execution
+- memory management
+- types and type systems
+- interpreted vs compiled code
 
-## Linux project ideas
-- Custom shell script toolkit
-- File organizer and automation script
-- Text processing pipeline
-- Log analyzer
-- Backup and restore system
-- Process monitor dashboard
-- Simple file server
-- Local package manager simulation
-- Container basics playground
+### 6. Theory and computational limits
+- computability basics
+- complexity classes
+- NP-complete intuition
+- reductions and problem hardness
+- why some problems are hard and some are tractable
 
-## Recommended repositories
-- torvalds/linux: https://github.com/torvalds/linux
-- 0xAX/linux-insides: https://github.com/0xAX/linux-insides
+## Core concepts checklist
+
+- [ ] Understand algorithmic complexity
+- [ ] Master core data structures
+- [ ] Solve problems with recursion and iteration
+- [ ] Use graphs and trees correctly
+- [ ] Understand memory and execution model
+- [ ] Know when to use which algorithmic strategy
+- [ ] Understand trade-offs between speed, memory, and simplicity
+- [ ] Connect theory to practical software
+
+## Essential tools and resources
+
+- Python
+- C / C++ for systems exposure
+- Git
+- Linux terminal
+- algorithm practice platforms
+- textbooks and lecture notes
+
+## Project ideas
+
+- sorting visualizer
+- graph traversal explorer
+- pathfinding simulator
+- mini database or search engine
+- file system simulation
+- algorithm benchmark tool
+- scheduler simulator
+- network flow visualizer
+
+## Strong repo references
+
+- TheAlgorithms/Python: https://github.com/TheAlgorithms/Python
+- TheAlgorithms/C-Plus-Plus: https://github.com/TheAlgorithms/C-Plus-Plus
 - mit-pdos/xv6-public: https://github.com/mit-pdos/xv6-public
-- qemu/qemu: https://github.com/qemu/qemu
-- moby/moby: https://github.com/moby/moby
-- kubernetes/kubernetes: https://github.com/kubernetes/kubernetes
-- docker/cli: https://github.com/docker/cli
-- systemd/systemd: https://github.com/systemd/systemd
+- torvalds/linux: https://github.com/torvalds/linux
 
-## Key concepts checklist
-- [ ] Understand filesystem layout
-- [ ] Use shell commands efficiently
-- [ ] Write simple scripts
-- [ ] Understand process lifecycle
-- [ ] Manage permissions and ownership
-- [ ] Redirect output and pipelines
-- [ ] Understand networking basics in Linux
-- [ ] Inspect running processes and system health
-- [ ] Use logs and troubleshooting workflows
+## Recommended learning path
 
-## Suggested learning path
-- Begin with `bash`, file system, permissions, shell scripting
-- Then move to process and memory concepts
-- Then OS architecture and kernel concepts
-- Finally practice with Docker, virtualization, system services, and embedded Linux
+1. Learn data structures and complexity
+2. Practice searching, sorting, and recursion
+3. Study graph algorithms and tree structures
+4. Learn operating system and memory fundamentals
+5. Connect theory to software design and system engineering
 
-## Next domains
-- [Computer Science](computer-science.md)
+## Related domains
+
+- [Foundations](foundation.md)
+- [Programming](programming.md)
+- [Linux & OS](linux-os.md)
+- [Software Engineering](software-engineering.md)
+- [AI / ML / Data Science](ai-ml-data-science.md)
+- [Cybersecurity / Networking](cybersecurity-networking.md)
+
+## Recommended next step
+
+After this, continue into:
+
+- [AI / ML / Data Science](ai-ml-data-science.md)
 - [Software Engineering](software-engineering.md)
 - [Cybersecurity / Networking](cybersecurity-networking.md)
-- [Embedded Systems](embedded-systems.md)
+
+This is the layer where programming becomes engineering. 
