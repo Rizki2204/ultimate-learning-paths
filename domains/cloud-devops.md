@@ -1,95 +1,137 @@
-# Information Technology and Information Systems
+# Cloud / DevOps
 
-This domain focuses on how organizations use computing, data, networks, software, and infrastructure as part of information systems.
+Cloud and DevOps are the operational layer of modern engineering. They connect software delivery, infrastructure, automation, observability, and reliability.
+
+## Why this domain matters
+
+Modern products live in environments that are not static. They must be deployed, monitored, maintained, and improved continuously. Without Cloud and DevOps knowledge, a technical learner can build software, but may not be able to operate it reliably in production.
 
 ## Core goals
-- understand enterprise technology
-- connect business needs to technical systems
-- work with systems analysis, IT support, architecture, and operations
-- understand enterprise platforms and data flows
 
-## Topics
+- understand cloud infrastructure fundamentals
+- learn containerization and deployment workflows
+- automate delivery pipelines
+- understand observability, monitoring, and incident response
+- build production-oriented engineering habits
+- connect software to real operational infrastructure
 
-### Information systems fundamentals
-- information systems lifecycle
-- system analysis
-- business process modeling
-- requirements engineering
-- UML basics
-- architecture and design thinking
-- project management basics
+## Learning sequence
 
-### IT operations basics
-- IT service management
-- support workflows
-- ticketing systems
-- maintenance and uptime
-- backups and recovery
-- patch management
-- monitoring and alerts
+### 1. Linux and infrastructure foundations
+- Linux operations
+- networking basics
+- file systems and permissions
+- shell scripting
+- package management
+- SSH and remote administration
 
-### Enterprise technology areas
-- ERP
-- CRM
-- data warehouse
-- BI
-- business process management
-- digital transformation
-- governance and compliance
+### 2. Containers and deployment
+- Docker basics
+- container lifecycle
+- container orchestration concepts
+- image building and optimization
+- environment configuration
+- deployment patterns
 
-### Networks and infrastructure
-- LAN/WAN basics
-- VPNs
-- cloud and hybrid infrastructure
-- identity and access
-- endpoint management
-- security policy
+### 3. Cloud fundamentals
+- cloud computing concepts
+- virtual machines and containers
+- storage and networking in the cloud
+- IAM and identity concepts
+- security groups, networking boundaries
+- managed services and serverless basics
 
-## Skills to develop
-- requirement gathering
-- system documentation
-- user support and troubleshooting
-- business-technology mapping
-- analytical thinking
-- process mapping
-- communication with stakeholders
-- enterprise architecture awareness
+### 4. CI/CD and automation
+- GitHub Actions or GitLab CI
+- build pipelines
+- test automation
+- release workflows
+- deployment automation
+- infrastructure as code basics
 
-## Tooling and platforms
-- SQL
-- spreadsheets
-- BI tools
-- ticketing systems
-- cloud console basics
-- network monitoring
-- virtualization
-- identity platforms
+### 5. Monitoring and reliability
+- logs, metrics, traces
+- Prometheus
+- Grafana
+- health checks
+- alerting
+- uptime and service reliability
+- incident response concepts
+
+### 6. Platform and operations mindset
+- resilience
+- rollback strategies
+- configuration management
+- environment consistency
+- debugging in deployed systems
+- operational ownership
+
+## Core concepts checklist
+
+- [ ] Understand Linux operations in production contexts
+- [ ] Build and run containers
+- [ ] Understand cloud infrastructure basics
+- [ ] Use CI/CD for software delivery
+- [ ] Deploy a service or app to a working environment
+- [ ] Monitor system health and logs
+- [ ] Understand reliability and rollback patterns
+- [ ] Connect software engineering to operations
+
+## Tools and ecosystem
+
+- Docker
+- Kubernetes basics
+- Terraform
+- Ansible
+- GitHub Actions
+- GitLab CI/CD
+- AWS / Azure / GCP basics
+- Prometheus
+- Grafana
+- Linux shell
 
 ## Project ideas
-- school information system mockup
-- inventory management system
-- ticketing portal
-- internal business dashboard
-- business process automation
-- IT help desk workflow system
-- ERP/CRM mock data pipeline
 
-## Useful references
-- ITIL basics
-- PMBOK basics
-- ISO/IEC best practices
-- open-source business systems
+- deploy a full-stack app with Docker
+- Terraform-managed environment
+- basic Kubernetes deployment
+- monitoring dashboard for a service
+- automated CI/CD pipeline for a project
+- self-hosted app with logs and metrics
+- multi-service deployment lab
 
-## Milestone checklist
-- [ ] Understand IT and information systems roles
-- [ ] Explain business process and system requirements
-- [ ] Use SQL and reporting basics
-- [ ] Understand infrastructure and enterprise systems
-- [ ] Practice troubleshooting and support workflows
-- [ ] Explain how systems connect to business operations
+## Strong references
+
+- docker/docker: https://github.com/docker
+- kubernetes/kubernetes: https://github.com/kubernetes/kubernetes
+- hashicorp/terraform: https://github.com/hashicorp/terraform
+- prometheus/prometheus: https://github.com/prometheus/prometheus
+- grafana/grafana: https://github.com/grafana/grafana
+
+## Recommended learning path
+
+1. Learn Linux operations and networking
+2. Learn containerization and deployment
+3. Learn cloud fundamentals and IAM
+4. Learn CI/CD and automation
+5. Learn monitoring and reliability
+6. Build and deploy a project end-to-end
 
 ## Related domains
+
+- [Foundations](foundation.md)
+- [Programming](programming.md)
+- [Linux & OS](linux-os.md)
 - [Software Engineering](software-engineering.md)
-- [Cloud / DevOps](cloud-devops.md)
-- [Data Engineering](data-engineering.md)
 - [Cybersecurity / Networking](cybersecurity-networking.md)
+- [AI / ML / Data Science](ai-ml-data-science.md)
+
+## Recommended next step
+
+After cloud and DevOps, continue into:
+
+- [Data Engineering](data-engineering.md)
+- [Robotics / Automation](robotics-automation-mechatronics.md)
+- [AI / ML / Data Science](ai-ml-data-science.md)
+
+This is the operational layer that turns code into something real and reliable.
