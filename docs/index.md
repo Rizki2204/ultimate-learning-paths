@@ -1,13 +1,15 @@
-# Repository navigation and batch map
+# Repository navigation and learning map
 
-This repository is structured as a multi-layer learning system.
+This repository is structured as a layered learning system.
 
-## Core foundation
+## Core roadmap documents
 - [README](../README.md)
-- [Master roadmap](roadmap-0-to-professional.md)
-- [Career paths](roadmap-by-career.md)
-- [Project ladder](project-ladder.md)
+- [Master roadmap](master-roadmap.md)
+- [AI systems roadmap](ai-systems-roadmap.md)
+- [Progress checklist](progress-checklist.md)
+- [Project ladder](../projects/README.md)
 - [Ultimate learning sequence](ultimate-learning-sequence.md)
+- [Roadmap 0 to professional](roadmap-0-to-professional.md)
 
 ## Domain packs
 - [Foundations](../domains/foundation.md)
@@ -22,7 +24,6 @@ This repository is structured as a multi-layer learning system.
 - [AI / ML / Data science](../domains/ai-ml-data-science.md)
 - [Cybersecurity / networking](../domains/cybersecurity-networking.md)
 - [Robotics / automation](../domains/robotics-automation-mechatronics.md)
-- [IT / information systems](../domains/it-information-systems.md)
 - [Cloud / DevOps](../domains/cloud-devops.md)
 - [Data engineering](../domains/data-engineering.md)
 - [Telecom / networking](../domains/telecom-networking.md)
@@ -30,22 +31,13 @@ This repository is structured as a multi-layer learning system.
 - [Computational linguistics / NLP](../domains/computational-linguistics.md)
 - [Fintech](../domains/fintech.md)
 
-## Deep-dive batches
-- [Batch 1: foundations, programming, Linux, CS, software engineering](batch-1-foundations-programming-linux-cs-software.md)
-- [Batch 2: web, frontend, backend, full-stack](batch-2-web-fullstack.md)
-- [Batch 3: embedded systems, computer engineering, microelectronics](batch-3-embedded-hardware.md)
-- [Batch 4: AI, ML, data science, NLP](batch-4-ai-data-nlp.md)
-- [Batch 5: cybersecurity, networking, telecom](batch-5-cyber-networking.md)
-- [Batch 6: robotics, mechatronics, automation](batch-6-robotics-automation.md)
-- [Batch 7: IT, cloud, data, fintech, cognitive/NLP](batch-7-it-cloud-data-fintech-cognitive.md)
-
 ## How to use this repo
 
-1. Start with the master roadmap.
-2. Finish the CLI and software foundations batch.
-3. Pick a primary technical track.
-4. Use the supporting domain docs to broaden understanding.
-5. Build projects from the project ladder.
-6. Keep revisiting the roadmap and adjusting based on your goals.
+1. Read the main README.
+2. Follow the master roadmap in order.
+3. Use the progress checklist as your tracker.
+4. Build projects from the project ladder.
+5. Advance into the AI systems track as your main technical direction.
+6. Revisit the roadmap regularly as your skills deepen.
 
-This repository is intended to support a long-term technical path, not just a one-time study list.
+This repository is meant to support a long-term, strategic technical path, not a one-time study list.
