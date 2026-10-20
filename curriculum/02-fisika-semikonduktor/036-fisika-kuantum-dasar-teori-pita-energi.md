@@ -6,52 +6,83 @@
 ---
 
 ## 1. Intuisi Dasar Tanpa Jargon ("Seperti Bayi Baru Lahir")
-Secara prinsip pertama, konsep **Fisika Kuantum Dasar & Teori Pita Energi (Persamaan Schrödinger, Quantum Tunneling, Bandgap)** dapat dianalogikan sebagai mekanisme fundamental dalam Fisika Klasik & Semikonduktor yang menjembatani aturan alam murni dengan rekayasa sistem yang dapat diprediksi dan dikendalikan.
+Jika Anda melempar bola tenis ke dinding semen yang kokoh, bola tersebut akan selalu memantul kembali 100%. Bola tidak akan pernah menembus dinding secara gaib. Tetapi di dunia kuantum partikel sub-atomik, sebuah elektron tidak memiliki posisi pasti; elektron adalah 'gelombang probabilitas'. 
+
+Ketika gelombang probabilitas elektron menabrak dinding penghalang energi yang tebal, sebagian kecil dari ekor gelombang tersebut mampu merembes dan muncul di sisi lain dinding! Inilah **Quantum Tunneling**. Fenomena inilah yang membuat matahari kita bersinar (fusi nuklir pada suhu rendah) dan menjadi fondasi utama penyimpanan USB Flashdisk (NAND Flash) yang Anda gunakan setiap hari!
 
 ## 2. Fondasi Teoretis & Aksiomatik / Matematis
-Model formal untuk Fisika Kuantum Dasar & Teori Pita Energi (Persamaan Schrödinger, Quantum Tunneling, Bandgap) didasarkan pada formulasi matematika dan hukum aksiomatik berikut:
-$$\mathcal{L}_{system} = \int_0^T \left( \sum_{i=1}^N \alpha_i \cdot f_i(x) \right) dt$$
-Di mana parameter sistem memenuhi kondisi kesetimbangan dinamis dan konservasi energi dalam domain Fisika Klasik & Semikonduktor.
+### 1. Persamaan Gelombang Schrödinger (Tidak Bergantung Waktu)
+$$\hat{H} \psi(\mathbf{r}) = E \psi(\mathbf{r}) \implies -\frac{\hbar^2}{2m} \nabla^2 \psi(\mathbf{r}) + V(\mathbf{r}) \psi(\mathbf{r}) = E \psi(\mathbf{r})$$
+Di mana:
+- $\hbar = \frac{h}{2\pi} \approx 1.05457 \times 10^{-34} \text{ J}\cdot\text{s}$ (Konstanta Planck Tereduksi).
+- $|\psi(\mathbf{r})|^2$ merepresentasikan kerapatan probabilitas menemukan partikel pada koordinat $\mathbf{r}$ (Interpretasi Born).
+
+### 2. Quantum Tunneling & Teori Pita Energi Padatan
+Koefisien Transmisi Tunneling melintasi potensial penghalang $V_0 > E$ setebal $a$:
+$$T \approx 16 \frac{E}{V_0} \left( 1 - \frac{E}{V_0} \right) e^{-2 \kappa a}, \quad \kappa = \frac{\sqrt{2m(V_0 - E)}}{\hbar}$$
+Model Kronig-Penney & Pembentukan Celah Pita Energi (*Energy Bandgap* $E_g$):
+Interferensi konstruktif dan destruktif gelombang elektron Bloch di dalam kisi periodik kristal memecah tingkat energi menjadi **Pita Valensi** (terisi penuh elektron), **Bandgap** (zona terlarang energi), dan **Pita Konduksi** (elektron bebas bergerak).
+[📚 Pelajari: MIT OCW 8.04 Quantum Physics I](https://ocw.mit.edu/courses/8-04-quantum-physics-i-spring-2016/)
 
 ## 3. Anatomi Teknis & Cara Kerja Internal
 ```mermaid
 graph LR
-    Input["Input Sinyal / Parameter Awal"] --> Engine["Engine Pemroses: fisika-kuantum-dasar-teori-pita-energi"]
-    Engine --> Feedback["Loop Verifikasi & Stabilitas"]
-    Feedback --> Output["Output Terukur & Terstandarisasi"]
+    subgraph Struktur Pita Energi Padatan
+        Insulator["Isolator: Celah Pita Sangat Lebar (Eg > 5 eV) - Tidak Ada Arus"]
+        Semiconductor["Semikonduktor: Celah Pita Sedang (Eg ~ 1.1 eV Silikon) - Dapat Dituning"]
+        Conductor["Konduktor / Logam: Pita Valensi & Konduksi Saling Tumpang Tindih (Overlap)"]
+    end
 ```
-Mekanisme internal mengalir melalui tahapan dekomposisi sinyal/data, pemetaan koordinat ruang, dan eksekusi transformasi dengan akurasi numerik tinggi.
 
 ## 4. Implementasi Praktis & Kode / Simulasi Riil
 ```python
-# Demonstrasi Komputasional: fisika-kuantum-dasar-teori-pita-energi
 import numpy as np
 
-def compute_system_dynamics(steps=100):
-    t = np.linspace(0, 10, steps)
-    response = np.exp(-0.2 * t) * np.cos(2 * np.pi * 0.5 * t)
-    return t, response
+def quantum_tunneling_probability(barrier_height_ev: float, electron_energy_ev: float, barrier_width_nm: float):
+    """
+    Menghitung probabilitas transmisi Quantum Tunneling elektron melintasi potensial isolator SiO2.
+    """
+    hbar = 1.0545718e-34 # J.s
+    m_e = 9.10938356e-31 # kg (Massa elektron)
+    q_e = 1.60217663e-19 # Coulomb per eV
+    
+    V0 = barrier_height_ev * q_e
+    E = electron_energy_ev * q_e
+    a = barrier_width_nm * 1e-9
+    
+    if E >= V0:
+        return 1.0 # Di atas penghalang (propagasi klasik)
+        
+    kappa = np.sqrt(2 * m_e * (V0 - E)) / hbar
+    transmission = np.exp(-2 * kappa * a)
+    return transmission
 
-time_axis, signal = compute_system_dynamics()
-print(f"Modul 36: Simulasi dinamis fisika-kuantum-dasar-teori-pita-energi berhasil dieksekusi ({len(signal)} data points).")
+# Contoh: Tunneling elektron pada gate oxide MOSFET 3nm vs 1nm (V0=3.1 eV, E=1.0 eV)
+t_3nm = quantum_tunneling_probability(3.1, 1.0, 3.0)
+t_1nm = quantum_tunneling_probability(3.1, 1.0, 1.0)
+
+print(f"Probabilitas Tunneling pada Ketebalan 3 nm: {t_3nm:.2e}")
+print(f"Probabilitas Tunneling pada Ketebalan 1 nm: {t_1nm:.2e}")
+print(f"Kenaikan arus bocor kuantum sebesar: {t_1nm / t_3nm:.1f}x lipat saat tebal gerbang menyusut!")
 ```
 
 ## 5. Miskonsepsi & Jebakan Industri
-Kesalahan fatal umum pada Fisika Kuantum Dasar & Teori Pita Energi (Persamaan Schrödinger, Quantum Tunneling, Bandgap) adalah mengabaikan efek non-linieritas, batas saturasi fisik, atau asumsi domain tak hingga pada implementasi riil.
+1. **Subthreshold Leakage pada Chip Sub-5nm**: Ketika insinyur semikonduktor mengecilkan gate oxide transistor silikon di bawah 2 nanometer, efek quantum tunneling menyebabkan arus bocor tembus langsung dari Gate ke Channel meskipun saklar dalam kondisi OFF, membuang daya listrik baterai secara sia-sia (Solusi: Transisi dari planar MOSFET ke arsitektur 3D FinFET dan Gate-All-Around / GAAFET dengan High-K Metal Gate).
 
 ## 6. Proyek Latihan & Rubrik Penilaian Mandiri
 ### Level 1 (Dasar)
-Jelaskan prinsip inti dari Fisika Kuantum Dasar & Teori Pita Energi (Persamaan Schrödinger, Quantum Tunneling, Bandgap) menggunakan analogi fisik sehari-hari tanpa istilah akademis rumit.
+Gunakan hubungan de Broglie $\lambda = \frac{h}{p}$ untuk menghitung panjang gelombang kuantum sebuah elektron yang bergerak dengan kecepatan $10^6\text{ m/s}$.
 
 ### Level 2 (Menengah)
-Bangun simulasi numerik atau perhitungan analitik untuk memvalidasi karakteristik batas dari sistem ini.
+Selesaikan persamaan Schrödinger untuk partikel di dalam sumur potensial tak hingga 1 dimensi (*Particle in a Box*) dan turunkan kuantisasi tingkat energinya $E_n = \frac{n^2 \pi^2 \hbar^2}{2mL^2}$.
 
 ### Level 3 (Mahir)
-Rancang studi kasus integrasi industri berskala nyata yang mengimplementasikan konsep ini dengan toleransi kesalahan ketat.
+Gunakan pendekatan WKB (Wentzel-Kramers-Brillouin) untuk menghitung arus tunneling Fowler-Nordheim pada operasi penulisan gerbang apung sel memori Flash NAND.
 
 ## 7. Rekomendasi Sumber Belajar Standar Emas
-- Standar rujukan akademik internasional pada disiplin Fisika Klasik & Semikonduktor.
-- Buku teks standar emas IEEE/ACM dan paper seminal terkait.
+- [Buku Standar: Introduction to Quantum Mechanics (3rd ed.) - David J. Griffiths & Darrell F. Schroeter (Cambridge University Press)](https://www.cambridge.org/highereducation/books/introduction-to-quantum-mechanics/30B37CA5E7E8B8B5B1BA799B7F76313C)
+- [Kuliah Video Terbuka: Barton Zwiebach - Quantum Physics I (MIT OpenCourseWare)](https://ocw.mit.edu/courses/8-04-quantum-physics-i-spring-2016/)
+- [Simulasi Interaktif: PhET Interactive Simulations - Quantum Tunneling and Wave Packets](https://phet.colorado.edu/en/simulations/quantum-tunneling)
 
 ---
 *Navigasi Cepat*: [Ke Tingkat 2](./README.md) | [Ke Master Index](../../INDEX.md) | *Sebelumnya*: [035. elektrokimia-baterai-penyimpanan-energi](./035-elektrokimia-baterai-penyimpanan-energi.md) | *Berikutnya*: [037. fisika-semikonduktor-rekayasa-silikon](./037-fisika-semikonduktor-rekayasa-silikon.md)

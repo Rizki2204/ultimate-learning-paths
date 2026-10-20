@@ -6,38 +6,37 @@
 ---
 
 ## 1. Intuisi Dasar Tanpa Jargon ("Seperti Bayi Baru Lahir")
-Bayangkan otak Anda seperti sebuah komputer dengan RAM terbatas dan hard drive yang sangat besar. Ketika Anda membaca buku atau menonton video tutorial, informasi baru hanya masuk ke "RAM sementara" (working memory). Jika RAM tidak segera disimpan ke hard drive permanen (Long-Term Memory) melalui metode yang tepat, informasi tersebut akan lenyap tersapu dalam waktu kurang dari 24 jam (Fenomena Ebbinghaus Forgetting Curve).
+Bayangkan otak Anda seperti sebuah komputer dengan RAM terbatas (Working Memory: 4-7 bongkah informasi) dan hard drive raksasa (Long-Term Memory). Ketika Anda hanya membaca ulang buku (*passive reading*) atau menandai teks dengan stabilo (*highlighting*), Anda hanya meletakkan informasi di RAM sementara. Tanpa proses pemindahan terstruktur, 80% informasi tersebut akan terhapus dalam waktu kurang dari 24 jam (Kurva Lupa Ebbinghaus).
 
-Meta-learning adalah ilmu tentang "bagaimana cara merancang BIOS dan algoritma kompresi data terbaik untuk otak Anda sendiri". Bukannya menghafal secara pasif (re-reading) yang menimbulkan ilusi kompetensi (*illusion of explanatory depth*), meta-learning memaksa otak melakukan penarikan informasi aktif (*active recall*) dan konsolidasi sinapsis terencana.
+Meta-learning adalah sains merancang "BIOS dan algoritma kompresi data" untuk otak Anda. Alih-alih belajar secara acak, Anda menggunakan **Active Recall** (memaksa otak menarik data dari ketiadaan) dan **Spaced Repetition** (mengulang tepat saat memori hampir pudar) sehingga sinapsis saraf mengalami *Long-Term Potentiation (LTP)* permanen.
 
 ## 2. Fondasi Teoretis & Aksiomatik / Matematis
-### 1. Kurva Retensi Ebbinghaus & Spaced Repetition
-Retensi memori manusia dimodelkan secara matematis dengan fungsi eksponensial negatif:
+### 1. Kurva Retensi Memori Ebbinghaus & Spaced Repetition
+Retensi memori dimodelkan secara matematis dengan fungsi eksponensial negatif:
 $$R(t) = e^{-\frac{t}{S}}$$
 Di mana:
-- $R(t)$ adalah probabilitas mengingat kembali (*retrieval probability*) pada waktu $t$.
-- $S$ adalah kekuatan memori (*memory stability*), yang berbanding lurus dengan jumlah pengulangan aktif pada interval waktu yang tepat.
-
-Ketika pengulangan dilakukan tepat saat $R(t) \approx 0.9$, kekuatan stabilitas baru $S_{n+1}$ melonjak secara eksponensial:
+- $R(t)$ adalah probabilitas mengingat (*retrieval probability*) pada interval waktu $t$.
+- $S$ adalah stabilitas memori (*memory stability*), yang melonjak setiap kali proses penarikan aktif (*active retrieval*) berhasil dilakukan tepat saat $R(t) \approx 0.90$:
 $$S_{n+1} = S_n \cdot (1 + a \cdot e^{-b \cdot R})$$
 
 ### 2. Algoritma SM-2 (SuperMemo-2)
-Algoritma penjadwalan kartu memori Spaced Repetition mendasarkan perhitungan interval $I(n)$ dan faktor kemudahan (*Ease Factor* $EF$):
-$$EF' = EF + (0.1 - (5 - q) \cdot (0.08 + (5 - q) \cdot 0.02))$$
-$$I(1) = 1, \quad I(2) = 6, \quad I(n) = I(n-1) \times EF$$
-Di mana $q \in [0, 5]$ adalah skor kualitas penarikan memori pengguna.
+Perhitungan interval hari pengulangan $I(n)$ dan faktor kemudahan (*Ease Factor* $EF$):
+$$EF' = EF + (0.1 - (5 - q) \cdot (0.08 + (5 - q) \cdot 0.02)), \quad EF' \ge 1.3$$
+$$I(1) = 1, \quad I(2) = 6, \quad I(n) = I(n-1) \times EF'$$
+Di mana $q \in [0, 5]$ adalah nilai kualitas penarikan memori pengguna.
+[📚 Pelajari Teori SM-2: SuperMemo Official Algorithm](https://www.supermemo.com/en/blog/application-of-a-computer-to-improve-the-results-of-obtaining-photographic-memory)
 
 ## 3. Anatomi Teknis & Cara Kerja Internal
 ```mermaid
 flowchart TD
-    A["Stimulus Belajar Baru"] --> B["Sensory Memory (< 1 detik)"]
-    B --> C["Working Memory (RAM Otak: 4-7 Chunks)"]
-    C -->|Passive Reading| D["Lupa / Overwritten (< 24 jam)"]
-    C -->|Feynman Technique + Active Retrieval| E["Hippocampus (Encoding)"]
-    E -->|Spaced Repetition Sleep Cycles| F["Neocortex (Long-Term Memory Sinaptik)"]
+    A["Informasi Baru"] --> B["Sensory Memory (< 1 dtk)"]
+    B --> C["Working Memory (RAM Otak: Prefrontal Cortex)"]
+    C -->|Passive Re-reading| D["Lupa / Terhapus (< 24 Jam)"]
+    C -->|Active Recall + Feynman Technique| E["Hippocampus (Encoding Synaptic LTP)"]
+    E -->|Spaced Repetition Sleep Consolidation| F["Neocortex (Penyimpanan Permanen Jangka Panjang)"]
     F -->|Retrieval Practice| C
 ```
-Proses biologis konsolidasi memori bergantung pada **Long-Term Potentiation (LTP)** di mana reseptor NMDA diaktifkan, memicu masuknya ion kalsium $Ca^{2+}$, yang menginstruksikan sintesis protein untuk memperkuat koneksi sinapsis antar neuron.
+Proses *Long-Term Potentiation (LTP)* melibatkan aktivasi reseptor NMDA post-sinaptik akibat ion kalsium $Ca^{2+}$, memicu kaskade enzim CaMKII yang menanamkan lebih banyak reseptor AMPA pada membran sinaptik, membuat jalur neuron tersebut semakin konduktif dan permanen.
 
 ## 4. Implementasi Praktis & Kode / Simulasi Riil
 ```python
@@ -52,21 +51,18 @@ class FlashcardReview:
 
 def calculate_sm2(quality: int, card: FlashcardReview) -> FlashcardReview:
     """
-    Implementasi murni algoritma SuperMemo-2 (SM-2) untuk spaced repetition.
+    Implementasi murni algoritma SuperMemo-2 (SM-2) untuk Spaced Repetition.
     quality: 0 (blackout total) s/d 5 (sempurna tanpa jeda)
     """
-    if quality < 0 or quality > 5:
+    if not (0 <= quality <= 5):
         raise ValueError("Skor kualitas harus antara 0 dan 5.")
         
-    # Perbarui Ease Factor
     new_ef = card.ease_factor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02))
-    new_ef = max(1.3, new_ef)  # Batas bawah stabilitas SM-2
+    new_ef = max(1.3, new_ef)
     
     if quality < 3:
-        # Gagal mengingat: reset siklus repetisi
         return FlashcardReview(repetition=0, interval_days=1.0, ease_factor=new_ef)
     else:
-        # Berhasil mengingat
         if card.repetition == 0:
             next_interval = 1.0
         elif card.repetition == 1:
@@ -80,34 +76,33 @@ def calculate_sm2(quality: int, card: FlashcardReview) -> FlashcardReview:
             ease_factor=new_ef
         )
 
-# Contoh Simulasi Pembelajaran 4 Putaran
+# Simulasi jadwal review
 card = FlashcardReview(repetition=0, interval_days=1.0, ease_factor=2.5)
-ratings = [4, 5, 4, 5]
-print("Simulasi Penjadwalan Pengulangan (Spaced Repetition):")
-for day_idx, score in enumerate(ratings, 1):
+for day, score in enumerate([4, 5, 4, 5], 1):
     card = calculate_sm2(score, card)
-    print(f"Sesi {day_idx}: Nilai={score} -> Interval Berikutnya: {card.interval_days:.0f} hari (EF={card.ease_factor:.2f})")
+    print(f"Review {day}: Nilai={score} -> Interval Berikutnya: {card.interval_days:.0f} hari (EF={card.ease_factor:.2f})")
 ```
 
 ## 5. Miskonsepsi & Jebakan Industri
-1. **The Highlighting / Re-reading Trap**: Menstabilkan teks buku atau menonton video ulang berulang kali hanya memicu *fluency illusion* (merasa paham karena konten tampak familiar, padahal neuron otak tidak mampu merekonstruksi konsep tersebut tanpa melihat teks).
-2. **Cramming (Belajar Semalam Suntuk)**: Menumpuk 10 jam dalam 1 malam menciptakan spiking memori instan yang akan terhapus 85% dalam 72 jam karena tidak ada fase konsolidasi tidur REM dan *slow-wave sleep*.
-3. **Chunking Failure**: Mencoba menghafal detail mikroskopis sebelum memahami kerangka pohon pengetahuan (*knowledge tree*) secara holistik.
+1. **The Fluency Illusion**: Mengira sudah paham materi hanya karena teks atau video terasa familiar saat dibaca ulang.
+2. **Cramming (Begadang Semalam Suntuk)**: Memadatkan 10 jam dalam 1 malam memicu memori dangkal yang hilang 85% dalam 72 jam karena tidak melewati siklus tidur REM untuk konsolidasi memori.
+3. **Passive Highlighting**: Menggarisbawahi buku secara pasif tidak melatih jalur penarikan sinaptik (*retrieval pathways*).
 
 ## 6. Proyek Latihan & Rubrik Penilaian Mandiri
 ### Level 1 (Dasar)
-Gunakan teknik Feynman untuk menjelaskan konsep `Pointer di Bahasa C` atau `Resistansi Listrik` kepada anak berusia 10 tahun tanpa menggunakan istilah teknis sama sekali. Tulis dalam 3 paragraf sederhana.
+Ambil konsep teknis (misal: "Pointer C" atau "Hukum Ohm"), lalu jelaskan secara tertulis menggunakan analogi anak usia 10 tahun tanpa satu pun istilah teknis (Teknik Feynman).
 
 ### Level 2 (Menengah)
-Bangun sistem pelacakan Spaced Repetition mandiri menggunakan Python CLI atau Anki deck yang mengimplementasikan pemisahan kartu memori menjadi "Konsep Teoretis", "Algoritma", dan "Perintah Shell".
+Bangun program CLI Python flashcard yang menyimpan status kartu ke file JSON dan menghitung interval hari berikutnya berdasarkan algoritma SM-2.
 
 ### Level 3 (Mahir)
-Rancang arsitektur sistem *knowledge retrieval engine* pribadi berbasis Obsidian / Markdown berkoneksi dua arah (bi-directional linking / Zettelkasten) yang mengintegrasikan pengujian aktif harian otomatis via skrip Python.
+Rancang arsitektur sistem manajemen pengetahuan pribadi (PKM) menggunakan Obsidian / Zettelkasten dengan prinsip keterhubungan dua arah (*bi-directional links*) dan integrasi audit pengujian harian otomatis.
 
 ## 7. Rekomendasi Sumber Belajar Standar Emas
-- Brown, P. C., Roediger, H. L., & McDaniel, M. A. (2014). *Make It Stick: The Science of Successful Learning*. Harvard University Press.
-- Oakley, B. (2014). *A Mind for Numbers: How to Excel at Math and Science*. TarcherPerigee.
-- Wozniak, P. A. (1990). *Optimization of learning: A new approach to spaced repetition*. University of Technology in Poznan.
+- [Buku Standar: Make It Stick - Peter C. Brown](https://www.hup.harvard.edu/books/9780674729018)
+- [Kuliah Terbuka: Learning How to Learn - Dr. Barbara Oakley (Coursera/UC San Diego)](https://www.coursera.org/learn/learning-how-to-learn)
+- [Paper Seminal: The Spacing Effect: A Case Study in the Failure to Apply the Results of Psychological Research - Frank N. Dempster (1988)](https://journals.sagepub.com/doi/10.3102/00346543058004627)
+- [Software Open-Source: Anki Spaced Repetition Engine Documentation](https://faqs.ankiweb.net/what-algorithm-does-anki-use.html)
 
 ---
 *Navigasi Cepat*: [Ke Tingkat 0](./README.md) | [Ke Master Index](../../INDEX.md) | *Sebelumnya*: *Awal Kurikulum* | *Berikutnya*: [002. first-principles-thinking](./002-first-principles-thinking.md)

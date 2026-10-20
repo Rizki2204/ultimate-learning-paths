@@ -6,52 +6,83 @@
 ---
 
 ## 1. Intuisi Dasar Tanpa Jargon ("Seperti Bayi Baru Lahir")
-Secara prinsip pertama, konsep **Geometri Analitik & Trigonometri (Sistem Koordinat 3D Spasial & Proyeksi Vektor)** dapat dianalogikan sebagai mekanisme fundamental dalam Fondasi Matematika Komprehensif yang menjembatani aturan alam murni dengan rekayasa sistem yang dapat diprediksi dan dikendalikan.
+Bagaimana game 3D seperti Cyberpunk atau simulator pesawat menghitung sudut pandang pilot ketika pesawat menukik, berputar 45 derajat, dan menembakkan rudal ke arah target yang bergerak? Game engine tidak menebak-nebak: game engine menggunakan **Geometri Analitik & Trigonometri Spasial**. 
+
+Setiap titik di dunia virtual adalah koordinat $(x, y, z)$. Vektor adalah panah yang menunjukkan arah dan kecepatan. Proyeksi vektor menghitung 'bayangan' rudal di atas tanah, dan perkalian silang (*cross product*) menemukan arah tegak lurus sempurna untuk memantulkan cahaya dari permukaan poligon!
 
 ## 2. Fondasi Teoretis & Aksiomatik / Matematis
-Model formal untuk Geometri Analitik & Trigonometri (Sistem Koordinat 3D Spasial & Proyeksi Vektor) didasarkan pada formulasi matematika dan hukum aksiomatik berikut:
-$$\mathcal{L}_{system} = \int_0^T \left( \sum_{i=1}^N \alpha_i \cdot f_i(x) \right) dt$$
-Di mana parameter sistem memenuhi kondisi kesetimbangan dinamis dan konservasi energi dalam domain Fondasi Matematika Komprehensif.
+### 1. Vektor Spasial & Operasi Dasar di $\mathbb{R}^3$
+- Vektor posisi: $\mathbf{v} = [x, y, z]^T$, Panjang (Norma Euclidean): $\|\mathbf{v}\| = \sqrt{x^2 + y^2 + z^2}$.
+- **Dot Product (Hasil Kali Titik)**:
+  $$\mathbf{a} \cdot \mathbf{b} = \|\mathbf{a}\| \|\mathbf{b}\| \cos \theta = a_x b_x + a_y b_y + a_z b_z$$
+  Proyeksi Ortogonal $\mathbf{a}$ pada $\mathbf{b}$:
+  $$\text{proj}_{\mathbf{b}} \mathbf{a} = \frac{\mathbf{a} \cdot \mathbf{b}}{\|\mathbf{b}\|^2} \mathbf{b}$$
+- **Cross Product (Hasil Kali Silang)**:
+  $$\mathbf{a} \times \mathbf{b} = \det \begin{bmatrix} \mathbf{i} & \mathbf{j} & \mathbf{k} \\ a_x & a_y & a_z \\ b_x & b_y & b_z \end{bmatrix} = \|\mathbf{a}\| \|\mathbf{b}\| \sin \theta \; \mathbf{n}$$
+  Menghasilkan vektor yang tegak lurus terhadap kedua vektor $\mathbf{a}$ dan $\mathbf{b}$ (aturan tangan kanan).
+[📚 Pelajari: 3Blue1Brown - Essence of Linear Algebra (Dot & Cross Product)](https://www.3blue1brown.com/lessons/dot-products)
 
 ## 3. Anatomi Teknis & Cara Kerja Internal
 ```mermaid
 graph LR
-    Input["Input Sinyal / Parameter Awal"] --> Engine["Engine Pemroses: geometri-analitik-trigonometri"]
-    Engine --> Feedback["Loop Verifikasi & Stabilitas"]
-    Feedback --> Output["Output Terukur & Terstandarisasi"]
+    Model["Koordinat Model Lokal (Objek 3D)"] --> World["Transformasi World (Posisi Global)"]
+    World --> View["Transformasi Kamera (LookAt Matrix)"]
+    View --> Proj["Transformasi Proyeksi Perspektif (Frustum Frustrum)"]
+    Proj --> Screen["Viewport Transform (Pixel Monitor 2D)"]
 ```
-Mekanisme internal mengalir melalui tahapan dekomposisi sinyal/data, pemetaan koordinat ruang, dan eksekusi transformasi dengan akurasi numerik tinggi.
 
 ## 4. Implementasi Praktis & Kode / Simulasi Riil
 ```python
-# Demonstrasi Komputasional: geometri-analitik-trigonometri
 import numpy as np
 
-def compute_system_dynamics(steps=100):
-    t = np.linspace(0, 10, steps)
-    response = np.exp(-0.2 * t) * np.cos(2 * np.pi * 0.5 * t)
-    return t, response
+def compute_surface_normal_and_projection(v1, v2, light_vector):
+    """
+    Menghitung vektor normal permukaan poligon 3D dan intensitas pencahayaan Lambertian.
+    """
+    v1 = np.array(v1, dtype=float)
+    v2 = np.array(v2, dtype=float)
+    light = np.array(light_vector, dtype=float)
+    light_norm = light / np.linalg.norm(light)
+    
+    # Cross product untuk mencari vektor normal bidang
+    normal = np.cross(v1, v2)
+    normal_unit = normal / np.linalg.norm(normal)
+    
+    # Dot product untuk menghitung pencahayaan (Hukum Kosinus Lambert)
+    intensity = max(0.0, np.dot(normal_unit, -light_norm))
+    
+    # Proyeksi vektor cahaya pada normal
+    proj_light = (np.dot(light, normal_unit)) * normal_unit
+    
+    return normal_unit, intensity, proj_light
 
-time_axis, signal = compute_system_dynamics()
-print(f"Modul 10: Simulasi dinamis geometri-analitik-trigonometri berhasil dieksekusi ({len(signal)} data points).")
+# Segitiga 3D pada bidang XY
+edge1 = [1.0, 0.0, 0.0]
+edge2 = [0.0, 1.0, 0.0]
+cahaya = [0.0, 0.0, -1.0] # Datang dari atas sumbu Z
+
+norm_vec, light_intensity, proj = compute_surface_normal_and_projection(edge1, edge2, cahaya)
+print("Vektor Normal Permukaan:", norm_vec)
+print("Intensitas Cahaya Permukaan:", light_intensity)
 ```
 
 ## 5. Miskonsepsi & Jebakan Industri
-Kesalahan fatal umum pada Geometri Analitik & Trigonometri (Sistem Koordinat 3D Spasial & Proyeksi Vektor) adalah mengabaikan efek non-linieritas, batas saturasi fisik, atau asumsi domain tak hingga pada implementasi riil.
+1. **Gimbal Lock**: Memutar rotasi 3D menggunakan 3 sudut Euler $(pitch, yaw, roll)$ dapat memicu hilangnya 1 derajat kebebasan saat sumbu rotasi sejajar. Solusi standar industri game/robotika: selalu gunakan **Unit Quaternion** $\mathbf{q} = w + xi + yj + zk$.
 
 ## 6. Proyek Latihan & Rubrik Penilaian Mandiri
 ### Level 1 (Dasar)
-Jelaskan prinsip inti dari Geometri Analitik & Trigonometri (Sistem Koordinat 3D Spasial & Proyeksi Vektor) menggunakan analogi fisik sehari-hari tanpa istilah akademis rumit.
+Hitung sudut antara dua vektor 3D $\mathbf{a} = [1, 2, 3]$ dan $\mathbf{b} = [4, -1, 2]$ menggunakan rumus dot product.
 
 ### Level 2 (Menengah)
-Bangun simulasi numerik atau perhitungan analitik untuk memvalidasi karakteristik batas dari sistem ini.
+Bangun fungsi kamera `look_at(eye, target, up)` yang menghasilkan matriks rotasi dan translasi kamera $4 \times 4$ untuk grafika 3D.
 
 ### Level 3 (Mahir)
-Rancang studi kasus integrasi industri berskala nyata yang mengimplementasikan konsep ini dengan toleransi kesalahan ketat.
+Implementasikan deteksi tabrakan ray-triangle intersection (algoritma Möller-Trumbore) berbasis proyeksi vektor dan koordinat barisentrik.
 
 ## 7. Rekomendasi Sumber Belajar Standar Emas
-- Standar rujukan akademik internasional pada disiplin Fondasi Matematika Komprehensif.
-- Buku teks standar emas IEEE/ACM dan paper seminal terkait.
+- [Buku Standar: Real-Time Rendering (4th ed.) - Tomas Akenine-Möller et al. (CRC Press)](https://www.realtimerendering.com/)
+- [Kuliah Terbuka: UC Berkeley CS184 Computer Graphics and Imaging](https://cs184.org/lectures)
+- [Simulator Interaktif: Desmos 3D Graphing Calculator](https://www.desmos.com/3d)
 
 ---
 *Navigasi Cepat*: [Ke Tingkat 1](./README.md) | [Ke Master Index](../../INDEX.md) | *Sebelumnya*: [009. aljabar-abstrak](./009-aljabar-abstrak.md) | *Berikutnya*: [011. aljabar-linier-teori-matriks](./011-aljabar-linier-teori-matriks.md)

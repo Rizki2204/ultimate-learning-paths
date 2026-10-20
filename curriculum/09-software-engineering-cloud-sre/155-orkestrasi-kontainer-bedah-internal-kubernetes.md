@@ -6,73 +6,94 @@
 ---
 
 ## 1. Intuisi Dasar Tanpa Jargon ("Seperti Bayi Baru Lahir")
-Menjalankan ribuan aplikasi kontainer di cloud seperti mengelola ratusan kapal kontainer raksasa di pelabuhan tersibuk di dunia. Siapa yang memastikan kapal tidak saling bertabrakan? Siapa yang memindahkan muatan jika satu kapal bocor dan tenggelam di tengah malam? Kubernetes adalah nahkoda pelabuhan otonom: Anda cukup menulis deklarasi 'Saya ingin 10 salinan aplikasi toko online selalu aktif', dan Kubernetes akan terus memantau, menghidupkan kembali pod yang mati, dan mendistribusikan beban secara otomatis!
+Di masa lalu, mengonfigurasi infrastruktur cloud—membuat puluhan server virtual, load balancer, aturan firewall, dan database terkelola di Amazon Web Services (AWS) atau Google Cloud Platform (GCP)—dilakukan dengan cara mengklik tombol-tombol di halaman web konsol browser (*ClickOps*). Satu klik yang salah pada aturan firewall dapat membuka database ke seluruh hacker dunia tanpa ada jejak siapa yang mengubahnya! Infrastructure as Code (IaC) & Cloud Native ([Terraform & Infrastructure as Code](https://developer.hashicorp.com/terraform/intro)) adalah revolusi kedisiplinan rekayasa: Anda menuliskan seluruh arsitektur data center Anda dalam file teks deklaratif (Terraform HCL). Infrastruktur Anda dapat disimpan di Git, ditinjau melalui Pull Request oleh rekan tim (*Peer Review*), diuji secara otomatis, dan dibangun kembali dari nol di belahan dunia lain dalam hitungan menit hanya dengan mengetik perintah sakti: `terraform apply`.
 
 ## 2. Fondasi Teoretis & Aksiomatik / Matematis
-Arsitektur Control Plane & Node Kubernetes:
-1. **Control Plane**:
-   - `kube-apiserver`: Pusat komunikasi REST dan gerbang validasi state cluster.
-   - `etcd`: Penyimpanan key-value terdistribusi yang konsisten dan berkonsensus Raft.
-   - `kube-scheduler`: Memilih node pekerja terbaik berdasarkan resource requests/limits, tolerations, dan affinity rules.
-   - `kube-controller-manager`: Menjalankan loop rekonsiliasi (*control loop*) untuk mencapai status aktual yang sesuai dengan *desired state*.
-2. **Worker Node**:
-   - `kubelet`: Agen pekerja yang berkomunikasi dengan container runtime via Container Runtime Interface (CRI).
-   - `kube-proxy`: Mengelola aturan forwarding paket IP (iptables / IPVS) untuk abstraksi Kubernetes Service.
+Prinsip Pendekatan Deklaratif vs Imperatif dan Graf Ketergantungan Topologi Terraform:
+
+1. **Deklaratif (Terraform, OpenTofu, CloudFormation)**:
+   Anda mendeklarasikan *APA* hasil akhir yang Anda inginkan (misal: *'Tersedia 1 VPC dengan 3 Subnet Publik'*).    Engine IaC menghitung sendiri urutan langkah kerja yang dibutuhkan untuk mencapai status tersebut.
+   - **Idempoten (Idempotency)**: Menjalankan `terraform apply` sepuluh kali berturut-turut pada infrastruktur yang sudah ada menghasilkan perubahan **0 resource**.
+
+2. **Imperatif (Ansible, Bash Scripts, Chef)**:
+   Anda mendikte langkah demi langkah *BAGAIMANA* cara membangunnya (misal: *'Jalankan perintah apt-get install, lalu copy file'*).
+
+3. **Siklus Hidup dan File State Terraform (`terraform.tfstate`)**:
+   File state adalah peta penghubung antara kode deklaratif Anda dengan ID sumber daya fisik di cloud vendor:
+   $$\text{Resource In Code: } \texttt{aws\_s3\_bucket.b} \xleftrightarrow{\text{State Map}} \text{Cloud Asset: } \texttt{"arn:aws:s3:::my-company-prod-bucket"}$$
+   - **Directed Acyclic Graph (DAG) Execution**: Terraform memetakan seluruh ketergantungan sumber daya ke dalam pohon DAG dan mengeksekusi pembuatan sumber daya independen secara paralel bersamaan.
 
 ## 3. Anatomi Teknis & Cara Kerja Internal
-Loop Rekonsiliasi Inti Kubernetes: `for { actual_state = observe(); if actual_state != desired_state { reconcile(actual_state, desired_state) } }`. Jika sebuah container crash, kubelet mendeteksinya melalui liveness probe dan secara otomatis merestart container.
+Alur Kerja Tiga Langkah Eksekusi Terraform Core Engine:
+
+```mermaid
+graph LR
+A[Declarative Code .tf] --> B[terraform init: Download Provider Plugins AWS/GCP]
+B --> C[terraform plan: Compare Code vs State vs Real Cloud Reality]
+C --> D{Plan Spec: Shows Exact Changes (+Add, ~Change, -Destroy)}
+D -->|User Approves| E[terraform apply: Parallel Provisioning via Cloud APIs]
+E --> F[Update Remote State Lock S3/DynamoDB Backend]
+end
+```
+
+1. **State Locking (DynamoDB / GCS / Terraform Cloud)**:
+   Mencegah dua insinyur perangkat lunak mengeksekusi `terraform apply` di saat yang sama. Engine mengunci file state (*State Lock*) saat operasi plan/apply dimulai dan melepasnya setelah proses selesai.
 
 ## 4. Implementasi Praktis & Kode / Simulasi Riil
-```yaml
-# Manifes Kubernetes Produksi: Deployment dengan Rolling Update & Resource Constraints
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: high-availability-api
-  labels:
-    app: api-server
-spec:
-  replicas: 3
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
-  selector:
-    matchLabels:
-      app: api-server
-  template:
-    metadata:
-      labels:
-        app: api-server
-    spec:
-      containers:
-      - name: api-container
-        image: my-registry/api-server:v1.2.0
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: 8080
-          initialDelaySeconds: 5
-          periodSeconds: 10
+```hcl
+# Production-Ready Terraform HCL Manifest Provisioning Secure AWS S3 Bucket
+terraform {
+  required_version = ">= 1.5.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = "us-east-1"
+}
+
+resource "aws_s3_bucket" "secure_telemetry_storage" {
+  bucket        = "company-secure-telemetry-prod-bucket-2026"
+  force_destroy = false
+
+  tags = {
+    Environment = "Production"
+    ManagedBy   = "Terraform-IaC"
+  }
+}
+
+# Kunci seluruh akses publik untuk mencegah kebocoran data rahasia!
+resource "aws_s3_bucket_public_access_block" "block_public" {
+  bucket = aws_s3_bucket.secure_telemetry_storage.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
 ```
 
 ## 5. Miskonsepsi & Jebakan Industri
-Tidak mendefinisikan Resource Requests dan Limits: pod yang mengalami kebocoran memori (memory leak) dapat memakan seluruh RAM pada worker node hingga memicu kernel Linux OOM Killer untuk mematikan proses sistem kritis node tersebut.
+1. **Configuration Drift via Out-of-Band Console Modifications**: Administrator memodifikasi aturan security group firewall secara manual via web konsol cloud AWS tanpa memperbarui kode Terraform. Saat insinyur lain menjalankan `terraform apply`, Terraform akan mendeteksi perbedaan dan menghapus perubahan manual tersebut secara otomatis (*Drift Overwrite*).
+2. **Exposing Unencrypted Secrets in `terraform.tfstate`**: Mendefinisikan kata sandi database secara plaintext di kode Terraform. File `terraform.tfstate` menyimpan seluruh nilai rahasia dalam format JSON mentah tanpa enkripsi default jika backend state lokal tidak diamankan.
+3. **Accidental Disaster Destruction via Resource Renaming**: Mengubah nama pengenal sumber daya di kode (`resource "aws_db_instance" "db_old"` diubah menjadi `"db_new"`). Terraform menganggap Anda ingin **MENGHAPUS DATABASE LAMA** dan membuat database baru yang kosong melompong (solusi: gunakan blok `moved` di Terraform 1.1+).
 
 ## 6. Proyek Latihan & Rubrik Penilaian Mandiri
-Level 1: Tulis manifes Kubernetes Service dan Ingress untuk mengekspos aplikasi web ke internet publik. Level 2: Bangun Custom Resource Definition (CRD) dan Kubernetes Operator sederhana menggunakan Python (Kopf) atau Go. Level 3: Rancang konfigurasi Istio Service Mesh untuk menerapkan mutual TLS (mTLS) dan circuit breaking antar pod.
+1. **Tingkat Pemula**: Tulis konfigurasi Terraform lokal menggunakan *Local Provider* (`hashicorp/local`) yang membuat file teks `inventory.txt` di disk lokal Anda. Eksekusi `terraform init`, `terraform plan`, dan `terraform apply`.
+2. **Tingkat Menengah**: Gunakan emulator cloud open-source LocalStack untuk mem-provisioning VPC, Subnet, dan instance VM EC2 virtual menggunakan Terraform tanpa perlu membayar akun AWS nyata.
+3. **Tingkat Mahir**: Rancang modul Terraform reusable yang menerapkan arsitektur Multi-Tier High Availability (VPC multi-AZ, Private/Public Subnets, NAT Gateways, dan Auto-Scaling Group). Konfigurasikan Remote State Backend dengan enkripsi S3 dan mekanisme State Locking menggunakan tabel DynamoDB.
 
 ## 7. Rekomendasi Sumber Belajar Standar Emas
-- Burns, B., Beda, J., & Hightower, K. (2019). *Kubernetes: Up and Running (2nd ed.)*. O'Reilly Media.
-- Beyer, B., Jones, C., Petoff, J., & Murphy, N. R. (2016). *Site Reliability Engineering*. O'Reilly Media.
+| Sumber Pembelajaran | Penulis / Institusi | Tautan Langsung | Fokus Materi |
+| :--- | :--- | :--- | :--- |
+| Terraform: Up & Running, 3rd Edition | Yevgeniy Brikman (Gruntwork) | [O'Reilly Terraform Book](https://www.terraformupandrunning.com/) | Alkitab Terraform: Modules, State Management, Loops & Zero-Downtime Deployment |
+| Infrastructure as Code: Dynamic Systems for the Cloud Era | Kief Morris (ThoughtWorks) | [O'Reilly IaC Book](https://www.oreilly.com/library/view/infrastructure-as-code/9781098114671/) | Prinsip Dasar IaC, Immutability, Antifragile Platforms & Pipelines |
+| HashiCorp Terraform Documentation | HashiCorp / OpenTofu | [Terraform Official Documentation](https://developer.hashicorp.com/terraform/docs) | Bahasa HCL, Provider Architecture, CLI Commands & State Backends |
+| OpenTofu: Open Source Alternative to Terraform | Linux Foundation | [OpenTofu Official Portal](https://opentofu.org/) | Fork Komunitas Bebas Open-Source untuk Manajemen Infrastruktur Cloud Native |
 
 ---
 *Navigasi Cepat*: [Ke Tingkat 9](./README.md) | [Ke Master Index](../../INDEX.md) | *Sebelumnya*: [154. devops-cloud-infrastructure-platform-engineering](./154-devops-cloud-infrastructure-platform-engineering.md) | *Berikutnya*: [156. observabilitas-tiga-pilar-sre](./156-observabilitas-tiga-pilar-sre.md)

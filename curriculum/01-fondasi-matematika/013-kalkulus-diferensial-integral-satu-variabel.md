@@ -6,52 +6,76 @@
 ---
 
 ## 1. Intuisi Dasar Tanpa Jargon ("Seperti Bayi Baru Lahir")
-Secara prinsip pertama, konsep **Kalkulus Diferensial & Integral Satu Variabel (Limit Infinitesimal, Deret Taylor)** dapat dianalogikan sebagai mekanisme fundamental dalam Fondasi Matematika Komprehensif yang menjembatani aturan alam murni dengan rekayasa sistem yang dapat diprediksi dan dikendalikan.
+Bagaimana Anda mengukur kecepatan mobil Anda tepat pada satu detik tertentu saat Anda menginjak pedal gas? Jika Anda membagi jarak dengan waktu ($v = \Delta s / \Delta t$), dan Anda ingin tahu kecepatan saat waktu $\Delta t = 0$, Anda akan mendapatkan pembagian mustahil $0/0$! 
+
+**Kalkulus Satu Variabel** lahir dari keajaiban 'limit infinitesimal': kita tidak membiarkan waktu menjadi nol mutlak, melainkan mendekati nol sekecil mungkin ($dt \to 0$). Turunan (*derivative*) mengukur laju perubahan seketika (kecepatan), sedangkan Integral mengumpulkan akumulasi potongan-potongan infinitesimal tersebut menjadi luas area atau jarak tempuh total!
 
 ## 2. Fondasi Teoretis & Aksiomatik / Matematis
-Model formal untuk Kalkulus Diferensial & Integral Satu Variabel (Limit Infinitesimal, Deret Taylor) didasarkan pada formulasi matematika dan hukum aksiomatik berikut:
-$$\mathcal{L}_{system} = \int_0^T \left( \sum_{i=1}^N \alpha_i \cdot f_i(x) \right) dt$$
-Di mana parameter sistem memenuhi kondisi kesetimbangan dinamis dan konservasi energi dalam domain Fondasi Matematika Komprehensif.
+### 1. Definisi Formal Limit $(\epsilon - \delta)$ & Turunan
+$$\lim_{x \to c} f(x) = L \iff \forall \epsilon > 0, \exists \delta > 0 \text{ sedemikian sehingga } 0 < |x - c| < \delta \implies |f(x) - L| < \epsilon$$
+Definisi Turunan (Laju Perubahan Sesaat):
+$$f'(x) = \frac{df}{dx} = \lim_{h \to 0} \frac{f(x + h) - f(x)}{h}$$
+Teorema Dasar Kalkulus (Fundamental Theorem of Calculus):
+Jika $f$ kontinu pada $[a, b]$ dan $F'(x) = f(x)$:
+$$\int_a^b f(x) dx = F(b) - F(a)$$
+[📚 Pelajari: MIT OCW 18.01 Single Variable Calculus](https://ocw.mit.edu/courses/18-01-single-variable-calculus-fall-2006/)
+
+### 2. Deret Taylor & Ekspansi Deret Pangkat
+Setiap fungsi yang dapat diturunkan tak hingga kali ($C^\infty$) di sekitar $x = a$ dapat direpresentasikan sebagai deret polinomial:
+$$f(x) = \sum_{n=0}^{\infty} \frac{f^{(n)}(a)}{n!} (x - a)^n = f(a) + f'(a)(x - a) + \frac{f''(a)}{2!}(x - a)^2 + \dots$$
+Contoh ekspansi di sekitar $x = 0$ (Deret Maclaurin):
+$$e^x = 1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + \dots, \quad \sin x = x - \frac{x^3}{3!} + \frac{x^5}{5!} - \dots$$
 
 ## 3. Anatomi Teknis & Cara Kerja Internal
 ```mermaid
-graph LR
-    Input["Input Sinyal / Parameter Awal"] --> Engine["Engine Pemroses: kalkulus-diferensial-integral-satu-variabel"]
-    Engine --> Feedback["Loop Verifikasi & Stabilitas"]
-    Feedback --> Output["Output Terukur & Terstandarisasi"]
+graph TD
+    Func["Fungsi Non-Linier Kompleks f(x)"] --> Taylor1["Aproksimasi Orde-1 (Garis Tangen Linier)"]
+    Taylor1 --> Taylor2["Aproksimasi Orde-2 (Parabola Kelengkungan / Hessian)"]
+    Taylor2 --> TaylorN["Deret Taylor Lengkap (Aproksimasi Analitik Sempurna)"]
 ```
-Mekanisme internal mengalir melalui tahapan dekomposisi sinyal/data, pemetaan koordinat ruang, dan eksekusi transformasi dengan akurasi numerik tinggi.
+Dalam chip FPU dan GPU hardware, fungsi transendental (`sin`, `cos`, `exp`, `log`) tidak dihitung dengan rumus analitik, melainkan diaproksimasi menggunakan deret Taylor atau algoritma CORDIC (*Coordinate Rotation Digital Computer*) berbasis bit-shift.
 
 ## 4. Implementasi Praktis & Kode / Simulasi Riil
 ```python
-# Demonstrasi Komputasional: kalkulus-diferensial-integral-satu-variabel
-import numpy as np
+import math
 
-def compute_system_dynamics(steps=100):
-    t = np.linspace(0, 10, steps)
-    response = np.exp(-0.2 * t) * np.cos(2 * np.pi * 0.5 * t)
-    return t, response
+def taylor_series_exp(x: float, terms: int = 10) -> float:
+    """
+    Aproksimasi e^x menggunakan Deret Taylor Maclaurin.
+    """
+    result = 0.0
+    for n in range(terms):
+        term = (x ** n) / math.factorial(n)
+        result += term
+    return result
 
-time_axis, signal = compute_system_dynamics()
-print(f"Modul 13: Simulasi dinamis kalkulus-diferensial-integral-satu-variabel berhasil dieksekusi ({len(signal)} data points).")
+# Evaluasi e^(1.5)
+x_val = 1.5
+exact_val = math.exp(x_val)
+approx_val = taylor_series_exp(x_val, terms=8)
+
+print(f"Nilai Eksak math.exp({x_val}): {exact_val:.10f}")
+print(f"Aproksimasi Deret Taylor (8 suku): {approx_val:.10f}")
+print(f"Galat Absolut: {abs(exact_val - approx_val):.2e}")
 ```
 
 ## 5. Miskonsepsi & Jebakan Industri
-Kesalahan fatal umum pada Kalkulus Diferensial & Integral Satu Variabel (Limit Infinitesimal, Deret Taylor) adalah mengabaikan efek non-linieritas, batas saturasi fisik, atau asumsi domain tak hingga pada implementasi riil.
+1. **Lupa Memeriksa Radius Konvergensi**: Mengira deret Taylor berlaku untuk semua nilai $x$. Contoh: Deret untuk $\frac{1}{1 - x} = 1 + x + x^2 + \dots$ hanya konvergen jika $|x| < 1$. Jika Anda memasukkan $x = 2$, deret akan meledak ke tak hingga!
 
 ## 6. Proyek Latihan & Rubrik Penilaian Mandiri
 ### Level 1 (Dasar)
-Jelaskan prinsip inti dari Kalkulus Diferensial & Integral Satu Variabel (Limit Infinitesimal, Deret Taylor) menggunakan analogi fisik sehari-hari tanpa istilah akademis rumit.
+Turunkan rumus turunan dari $f(x) = x^3$ menggunakan definisi limit formal $\lim_{h \to 0} \frac{(x+h)^3 - x^3}{h}$.
 
 ### Level 2 (Menengah)
-Bangun simulasi numerik atau perhitungan analitik untuk memvalidasi karakteristik batas dari sistem ini.
+Gunakan ekspansi deret Taylor orde 3 untuk mengaproksimasi nilai $\sqrt{4.1}$ di sekitar $a = 4$ dan hitung batas atas galatnya dengan sisa Lagrange.
 
 ### Level 3 (Mahir)
-Rancang studi kasus integrasi industri berskala nyata yang mengimplementasikan konsep ini dengan toleransi kesalahan ketat.
+Implementasikan metode integrasi numerik Adaptif Simpson's Rule dalam Python yang secara otomatis membagi interval saat gradien fungsi curam.
 
 ## 7. Rekomendasi Sumber Belajar Standar Emas
-- Standar rujukan akademik internasional pada disiplin Fondasi Matematika Komprehensif.
-- Buku teks standar emas IEEE/ACM dan paper seminal terkait.
+- [Buku Standar: Calculus - James Stewart (Cengage Learning)](https://www.cengage.com/c/calculus-9e-stewart/)
+- [Kuliah Video Terbuka: Essence of Calculus - 3Blue1Brown](https://www.3blue1brown.com/topics/calculus)
+- [Simulator Interaktif: Desmos Calculus Interactive Visualizer](https://www.desmos.com/calculator)
 
 ---
 *Navigasi Cepat*: [Ke Tingkat 1](./README.md) | [Ke Master Index](../../INDEX.md) | *Sebelumnya*: [012. matematika-diskrit-kombinatorika-graf](./012-matematika-diskrit-kombinatorika-graf.md) | *Berikutnya*: [014. kalkulus-multivariabel-vektor](./014-kalkulus-multivariabel-vektor.md)

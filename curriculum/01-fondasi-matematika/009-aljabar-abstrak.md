@@ -6,52 +6,84 @@
 ---
 
 ## 1. Intuisi Dasar Tanpa Jargon ("Seperti Bayi Baru Lahir")
-Secara prinsip pertama, konsep **Aljabar Abstrak (Grup, Ring, Medan, dan Galois Fields GF(2^n) untuk Kriptografi)** dapat dianalogikan sebagai mekanisme fundamental dalam Fondasi Matematika Komprehensif yang menjembatani aturan alam murni dengan rekayasa sistem yang dapat diprediksi dan dikendalikan.
+Pernahkah Anda memutar rubik's cube? Setiap putaran adalah sebuah aksi. Jika Anda memutar 90 derajat searah jarum jam, selalu ada aksi kebalikannya (putar 90 derajat berlawanan jarum jam) untuk mengembalikannya ke posisi semula. Tidak peduli urutan putaran apa yang Anda lakukan, kubus tetap utuh dan setiap kombinasi putaran menghasilkan status kubus yang sah.
+
+**Aljabar Abstrak** adalah ilmu tentang "struktur simetri murni". Alih-alih hanya berurusan dengan angka, aljabar abstrak mengamati objek matematika apa pun (himpunan, simetri, matriks, rotasi) yang memiliki aturan operasi tertentu. Struktur Grup, Ring, Medan (*Field*), dan *Galois Field* $GF(2^n)$ adalah jantung penggerak dari enkripsi AES di smartphone Anda dan kode koreksi kesalahan di satelit luar angkasa!
 
 ## 2. Fondasi Teoretis & Aksiomatik / Matematis
-Model formal untuk Aljabar Abstrak (Grup, Ring, Medan, dan Galois Fields GF(2^n) untuk Kriptografi) didasarkan pada formulasi matematika dan hukum aksiomatik berikut:
-$$\mathcal{L}_{system} = \int_0^T \left( \sum_{i=1}^N \alpha_i \cdot f_i(x) \right) dt$$
-Di mana parameter sistem memenuhi kondisi kesetimbangan dinamis dan konservasi energi dalam domain Fondasi Matematika Komprehensif.
+### 1. Hierarki Struktur Aljabar
+- **Grup $(G, \star)$**: Himpunan dengan satu operasi biner yang memenuhi 4 aksioma:
+  1. Penutupan (*Closure*): $\forall a, b \in G, a \star b \in G$
+  2. Asosiatif: $(a \star b) \star c = a \star (b \star c)$
+  3. Elemen Identitas ($e$): $\exists e \in G, a \star e = e \star a = a$
+  4. Elemen Invers: $\forall a \in G, \exists a^{-1} \in G, a \star a^{-1} = e$
+  (Jika komutatif $a \star b = b \star a$, disebut Grup Abelian).
+- **Ring $(R, +, \cdot)$**: Grup Abelian di bawah penjumlahan $(+)$, asosiatif di bawah perkalian $(\cdot)$, dan distributif.
+- **Medan / Field $(\mathbb{F}, +, \cdot)$**: Ring komutatif di mana setiap elemen non-nol memiliki invers perkalian.
+
+### 2. Galois Field $GF(p^n)$ (Medan Berhingga)
+Medan berhingga dengan $q = p^n$ elemen ($p$ prima).
+Untuk kriptografi perangkat keras (AES): $GF(2^8) = \mathbb{Z}_2[x] / \langle m(x) \rangle$ dengan polinomial tak tereduksi Rijndael:
+$$m(x) = x^8 + x^4 + x^3 + x + 1 \quad (\text{0x11B})$$
+Penjumlahan di $GF(2^n)$ adalah operasi bitwise XOR $(\oplus)$, sedangkan perkalian adalah perkalian polinomial modulo $m(x)$.
+[📚 Pelajari: Harvard Math 122 Abstract Algebra Notes](https://abel.math.harvard.edu/~gross/m122/)
 
 ## 3. Anatomi Teknis & Cara Kerja Internal
 ```mermaid
-graph LR
-    Input["Input Sinyal / Parameter Awal"] --> Engine["Engine Pemroses: aljabar-abstrak"]
-    Engine --> Feedback["Loop Verifikasi & Stabilitas"]
-    Feedback --> Output["Output Terukur & Terstandarisasi"]
+graph TD
+    A["Himpunan + 1 Operasi"] --> B["Semigroup (Asosiatif)"]
+    B --> C["Monoid (+ Identitas)"]
+    C --> D["Group (+ Invers)"]
+    D --> E["Abelian Group (+ Komutatif)"]
+    E --> F["Ring (+ Operasi Kedua Distributif)"]
+    F --> G["Field (+ Invers Perkalian untuk Setiap Elemen Non-Nol)"]
+    G --> H["Galois Field GF(2^8) - Dasar Enkripsi AES"]
 ```
-Mekanisme internal mengalir melalui tahapan dekomposisi sinyal/data, pemetaan koordinat ruang, dan eksekusi transformasi dengan akurasi numerik tinggi.
 
 ## 4. Implementasi Praktis & Kode / Simulasi Riil
 ```python
-# Demonstrasi Komputasional: aljabar-abstrak
-import numpy as np
+def gf28_multiply(a: int, b: int, irreducible_poly: int = 0x11B) -> int:
+    """
+    Perkalian dua elemen pada Galois Field GF(2^8) modulo polinomial Rijndael (AES).
+    Implementasi algoritma 'Russian Peasant Multiplication' berbasis bitwise.
+    """
+    p = 0
+    for _ in range(8):
+        if b & 1:
+            p ^= a # Penjumlahan di GF(2) adalah XOR
+        high_bit_set = a & 0x80
+        a = (a << 1) & 0xFF
+        if high_bit_set:
+            a ^= (irreducible_poly & 0xFF) # Reduksi modulo polinomial
+        b >>= 1
+    return p
 
-def compute_system_dynamics(steps=100):
-    t = np.linspace(0, 10, steps)
-    response = np.exp(-0.2 * t) * np.cos(2 * np.pi * 0.5 * t)
-    return t, response
-
-time_axis, signal = compute_system_dynamics()
-print(f"Modul 9: Simulasi dinamis aljabar-abstrak berhasil dieksekusi ({len(signal)} data points).")
+# Contoh Perkalian AES SubBytes: 0x57 * 0x83 = 0xC1 di GF(2^8)
+val1 = 0x57
+val2 = 0x83
+result = gf28_multiply(val1, val2)
+print(f"Perkalian Galois Field GF(2^8): 0x{val1:02X} * 0x{val2:02X} = 0x{result:02X}")
+assert result == 0xC1
+print("Hasil Sesuai Standar FIPS-197 AES NIST!")
 ```
 
 ## 5. Miskonsepsi & Jebakan Industri
-Kesalahan fatal umum pada Aljabar Abstrak (Grup, Ring, Medan, dan Galois Fields GF(2^n) untuk Kriptografi) adalah mengabaikan efek non-linieritas, batas saturasi fisik, atau asumsi domain tak hingga pada implementasi riil.
+1. **Mengira Operasi Perkalian di Medan Berhingga Sama dengan Aritmatika Biasa**: Mengalikan $0x57 \times 0x83$ di CPU menghasilkan $0x2C55$, tetapi di $GF(2^8)$ hasilnya adalah $0xC1$. Mengabaikan reduksi polinomial adalah penyebab utama kegagalan implementasi kriptografi manual.
 
 ## 6. Proyek Latihan & Rubrik Penilaian Mandiri
 ### Level 1 (Dasar)
-Jelaskan prinsip inti dari Aljabar Abstrak (Grup, Ring, Medan, dan Galois Fields GF(2^n) untuk Kriptografi) menggunakan analogi fisik sehari-hari tanpa istilah akademis rumit.
+Buktikan bahwa himpunan bilangan bulat $\mathbb{Z}$ di bawah operasi perkalian biasa BUKAN sebuah grup (identifikasi aksioma yang gagal).
 
 ### Level 2 (Menengah)
-Bangun simulasi numerik atau perhitungan analitik untuk memvalidasi karakteristik batas dari sistem ini.
+Bangun tabel perkalian lengkap (Cayley Table) untuk grup simetri segitiga sama sisi $S_3$ (orde 6) dan tentukan semua subgrup normalnya.
 
 ### Level 3 (Mahir)
-Rancang studi kasus integrasi industri berskala nyata yang mengimplementasikan konsep ini dengan toleransi kesalahan ketat.
+Implementasikan tabel log dan antilog (tabel eksponensial) untuk $GF(2^8)$ guna melakukan perkalian medan berhingga dalam waktu $O(1)$ tanpa branch/percabangan (konstan waktu).
 
 ## 7. Rekomendasi Sumber Belajar Standar Emas
-- Standar rujukan akademik internasional pada disiplin Fondasi Matematika Komprehensif.
-- Buku teks standar emas IEEE/ACM dan paper seminal terkait.
+- [Buku Standar: Abstract Algebra - David S. Dummit & Richard M. Foote (Wiley)](https://www.wiley.com/en-us/Abstract+Algebra%2C+3rd+Edition-p-9780471433347)
+- [Kuliah Terbuka: MIT OCW 18.701 Algebra I - Michael Artin](https://ocw.mit.edu/courses/18-701-algebra-i-fall-2010/)
+- [Dokumentasi Standar NIST: FIPS PUB 197 Advanced Encryption Standard (AES)](https://csrc.nist.gov/publications/detail/fips/197/final)
 
 ---
 *Navigasi Cepat*: [Ke Tingkat 1](./README.md) | [Ke Master Index](../../INDEX.md) | *Sebelumnya*: [008. teori-bilangan-aritmatika-modular](./008-teori-bilangan-aritmatika-modular.md) | *Berikutnya*: [010. geometri-analitik-trigonometri](./010-geometri-analitik-trigonometri.md)
