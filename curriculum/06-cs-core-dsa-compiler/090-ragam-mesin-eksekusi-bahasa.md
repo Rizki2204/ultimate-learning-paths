@@ -65,7 +65,7 @@ private:
 
 public:
     // Constructor Alokasi RAII
-    explicit DynamicBuffer(size_t size) : m_size(size), m_data(new uint8_t[size]()) {
+    explicit DynamicBuffer(size_t size) : m_size(size), m_data(new uint8_t[size]{}) {
         std::cout << "Allocated buffer: " << m_size << " bytes\n";
     }
 

@@ -11,6 +11,11 @@ Selama puluhan tahun, dunia database dikunci dalam cetakan tabel relasional kaku
 ## 2. Fondasi Teoretis & Aksiomatik / Matematis
 Arsitektur In-Memory Single-Threaded Redis dan Mesin Penyimpanan MongoDB WiredTiger:
 
+Dinamika rasio beban (*load factor*) tabel hash Redis: $\alpha = \frac{\text{used}}{\text{size}}$. Rehashing progresif memperluas tabel ke dimensi $2^n$ dengan biaya teramortisasi $\mathcal{O}(1)$:
+$$\lim_{N \to \infty} \mathbb{E}[T_{\text{lookup}}] = \mathcal{O}(1), \quad T_{\text{rehash}} = \mathcal{O}(N)$$
+Distribusi probabilitas pemotongan memori acak (*Probabilistic LRU Eviction*):
+$$P(\text{Evict}_i) \propto \left( t_{\text{current}} - t_{\text{last\_access}}(i) \right)$$
+
 1. **Kejeniusan Arsitektur Single-Threaded Event Loop Redis (Salvatore Sanfilippo)**:
    Mengapa Redis memilih berjalan pada satu thread CPU tunggal alih-alih multi-threading?
    - **Zero Lock Contention**: Meniadakan seluruh overhead mutex, semaphores, context-switching antar-thread, dan bahaya deadlock.

@@ -826,6 +826,10 @@ DATA_TIER_7_PART1 = {
         ),
         "theory": (
             "Model Perangkat Linux (Linux Device Model) dan Interaksi Driver:\n\n"
+            "Secara formal, identifikasi perangkat kernel direpresentasikan oleh bilangan bulat 32-bit `dev_t`:\n"
+            "$$\\text{dev\\_t} = (\\text{Major} \\ll 20) \\mid \\text{Minor}, \\quad \\text{Major} \\in [0, 2^{12}-1], \\quad \\text{Minor} \\in [0, 2^{20}-1]$$\n"
+            "Verifikasi integritas tabel partisi GPT dan Device Tree Blob (DTB) menggunakan polinomial siklik CRC32 standar IEEE 802.3:\n"
+            "$$P(x) = x^{32} + x^{26} + x^{23} + x^{22} + x^{16} + x^{12} + x^{11} + x^{10} + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1$$\n\n"
             "Linux mengklasifikasikan perangkat keras menjadi tiga jenis utama:\n"
             "1. **Character Devices (Char Dev)**: Mengalirkan data byte-per-byte tanpa buffering acak (Keyboard, Serial Port, Sensor I2C/SPI, GPU Direct Access). Diidentifikasi oleh pasangan nomor **Major** (identitas driver) dan **Minor** (identitas instans fisik perangkat).\n"
             "2. **Block Devices**: Mengakses data dalam unit blok berukuran tetap dengan dukungan caching Page Cache intensif (Hard disk, SSD NVMe, USB Flash Drive).\n"

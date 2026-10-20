@@ -502,6 +502,11 @@ DATA_TIER_10_PART1 = {
         ),
         "theory": (
             "Arsitektur In-Memory Single-Threaded Redis dan Mesin Penyimpanan MongoDB WiredTiger:\n\n"
+            "Dinamika rasio beban (*load factor*) tabel hash Redis: $\\alpha = \\frac{\\text{used}}{\\text{size}}$. "
+            "Rehashing progresif memperluas tabel ke dimensi $2^n$ dengan biaya teramortisasi $\\mathcal{O}(1)$:\n"
+            "$$\\lim_{N \\to \\infty} \\mathbb{E}[T_{\\text{lookup}}] = \\mathcal{O}(1), \\quad T_{\\text{rehash}} = \\mathcal{O}(N)$$\n"
+            "Distribusi probabilitas pemotongan memori acak (*Probabilistic LRU Eviction*):\n"
+            "$$P(\\text{Evict}_i) \\propto \\left( t_{\\text{current}} - t_{\\text{last\\_access}}(i) \\right)$$\n\n"
             "1. **Kejeniusan Arsitektur Single-Threaded Event Loop Redis (Salvatore Sanfilippo)**:\n"
             "   Mengapa Redis memilih berjalan pada satu thread CPU tunggal alih-alih multi-threading?\n"
             "   - **Zero Lock Contention**: Meniadakan seluruh overhead mutex, semaphores, context-switching antar-thread, dan bahaya deadlock.\n"

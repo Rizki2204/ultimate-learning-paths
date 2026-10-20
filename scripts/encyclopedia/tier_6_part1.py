@@ -246,7 +246,7 @@ DATA_TIER_6_PART1 = {
             "    uint8_t *m_data;\n\n"
             "public:\n"
             "    // Constructor Alokasi RAII\n"
-            "    explicit DynamicBuffer(size_t size) : m_size(size), m_data(new uint8_t[size]()) {\n"
+            "    explicit DynamicBuffer(size_t size) : m_size(size), m_data(new uint8_t[size]{}) {\n"
             "        std::cout << \"Allocated buffer: \" << m_size << \" bytes\\n\";\n"
             "    }\n\n"
             "    // 1. Destructor\n"
