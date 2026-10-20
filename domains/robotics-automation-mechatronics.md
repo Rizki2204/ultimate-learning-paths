@@ -1,107 +1,127 @@
-# Cybersecurity / Hacking / Networking
+# Robotics, Automation, and Mechatronics
 
-Cybersecurity and networking are essential for trusted systems, secure architecture, cloud systems, IT operations, and engineering reliability.
+Robotics adalah domain yang menggabungkan software, kontrol, sensor, mekanika, dan dunia nyata. Ini adalah salah satu bidang paling kuat untuk inovasi karena menggabungkan banyak skill sekaligus.
 
-## Core learning sequence
+## Mengapa domain ini penting
 
-### 1. Networking basics
-- OSI model
-- TCP/IP
-- HTTP, HTTPS
-- DNS, DHCP, NAT
-- routing and switching
-- subnets
-- IPv4/IPv6
-- VLANs
-- Wi-Fi basics
+Robotika bukan hanya tentang robot. Ini adalah tentang bagaimana mesin memahami lingkungan, bergerak, berinteraksi, dan membuat keputusan berbasis sensor dan kontrol.
 
-### 2. Security fundamentals
-- CIA triad
-- authentication vs authorization
-- confidentiality
-- integrity
-- availability
-- threat modeling
-- risk analysis
-- identity and access control
+Bidang ini membutuhkan kombinasi dari:
 
-### 3. Application and web security
-- OWASP Top 10
-- SQL injection
-- XSS
-- CSRF
-- SSRF
-- deserialization vulnerabilities
-- secure session handling
-- secure defaults
+- elektronik
+- kontrol
+- mekanika
+- pemrograman
+- sensor fusion
+- AI dan perception
+- sistem real-time
+- software engineering
 
-### 4. Cryptography
-- symmetric/asymmetric encryption
-- hash functions
-- signatures
-- PKI/X.509
-- TLS
-- key exchange
-- password hashing
+## Tujuan utama
 
-### 5. Defensive security
-- firewall basics
-- intrusion detection
-- IDS/IPS
-- SIEM basics
-- logging and monitoring
-- incident response
-- vulnerability management
-- patching
-- secure coding
+- memahami bagaimana sistem bergerak dan dikendalikan
+- memahami sensor, aktuator, dan kontrol loop tertutup
+- belajar robot kinematics dan dynamics dasar
+- memahami ROS2 dan framework robotika modern
+- membangun proyek robot yang bisa berfungsi nyata
 
-### 6. Offensive security basics
-- recon and enumeration
-- scanning
-- exploitation basics
-- privilege escalation
-- web exploitation
-- malware basics
-- reverse engineering basics
+## Urutan belajar
 
-## Tools
-- Wireshark: https://github.com/wireshark/wireshark
-- Nmap: https://github.com/nmap/nmap
-- Metasploit: https://github.com/rapid7/metasploit-framework
-- OWASP Cheat Sheet Series: https://github.com/OWASP/CheatSheetSeries
-- Burp Suite (community edition)
-- Scapy: https://github.com/secdev/scapy
+### 1. Dasar mekanika dan kontrol
+- gaya, gerak, dan sistem dinamis
+- PID control
+- stabilitas sistem
+- feedback loop
+- sensor dan akuisisi data
 
-## Important learning paths
-- network engineering
-- system security
-- app security
-- offensive security
-- cloud security
-- blue team / SOC
-- red team / pentesting
+### 2. Elektronika robotika
+- motor DC, stepper, BLDC
+- driver motor
+- encoder
+- H-bridge
+- power distribution
+- battery management dasar
 
-## Project ideas
-- network scanner
-- packet analyzer
-- secure API project
-- vulnerability assessment lab
-- simple honeypot or monitoring stack
-- secure auth service
-- password hashing lab
-- attack simulation environment
+### 3. Sensor dan persepsi
+- IMU
+- encoder
+- LiDAR
+- kamera
+- ultrasonic dan proximity sensor
+- sensor fusion dasar
 
-## Milestone checklist
-- [ ] Learn OSI/TCP-IP basics
-- [ ] Understand IP addressing and subnetting
-- [ ] Learn HTTP concepts and TLS basics
-- [ ] Understand web security risks
-- [ ] Use Wireshark
-- [ ] Learn basic cryptography and PKI
-- [ ] Understand patching and vulnerability handling
+### 4. Kinematika dan perencanaan gerak
+- joint space dan task space
+- rotasi dan transformasi
+- kinematics dasar
+- trajectory planning
+- path planning
+- obstacle avoidance
 
-## Next domains
+### 5. Robot software
+- ROS2 basics
+- nodes, topics, services, actions
+- URDF
+- simulation tools
+- localization dan navigation
+- mapping dasar
+
+### 6. AI untuk robotika
+- perception
+- computer vision dasar
+- reinforcement learning dasar
+- object tracking
+- autonomous behavior
+
+## Konsep inti checklist
+
+- [ ] Memahami PID dan kontrol loop
+- [ ] Mengerti motor dan driver
+- [ ] Memahami sensor robotika
+- [ ] Bisa membaca data sensor dan memprosesnya
+- [ ] Memahami kinematics dasar
+- [ ] Mampu membangun robot sederhana
+- [ ] Mengerti ROS2 dan arsitektur robot software
+- [ ] Menyambungkan hardware dan software ke aksi nyata
+
+## Tools dan ekosistem
+
+- Arduino / ESP32 / STM32
+- Raspberry Pi
+- ROS2
+- Gazebo / RViz / simulation stack
+- OpenCV
+- Python
+- C++
+- CAD atau desain mekanis dasar
+- IMU, encoder, lidar, kamera
+
+## Ide proyek
+
+- line follower robot
+- obstacle avoidance robot
+- robot arm sederhana
+- autonomous mobile robot
+- drone controller mini
+- smart warehouse robot prototype
+- robotic sensor platform
+- mobile manipulator sederhana
+
+## Domain terkait
+
+- [Foundations](foundation.md)
+- [Programming](programming.md)
 - [Linux & OS](linux-os.md)
+- [Embedded Systems](embedded-systems.md)
+- [AI / ML / Data Science](ai-ml-data-science.md)
+- [Cybersecurity / Networking](cybersecurity-networking.md)
+
+## Langkah berikutnya
+
+Setelah robotics, lanjut ke:
+
 - [Software Engineering](software-engineering.md)
-- [Cloud / DevOps](fintech-it-systems.md)
-- [Robotics / Mechatronics](robotics-automation-mechatronics.md)
+- [Cloud / DevOps](cloud-devops.md)
+- [AI / ML / Data Science](ai-ml-data-science.md)
+
+Robotics adalah salah satu bidang paling kuat untuk menggabungkan hardware, software, AI, dan sistem nyata.
