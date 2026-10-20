@@ -1,124 +1,125 @@
-# Foundations
+# Programming and Python
 
-This is the starting layer for all technical domains. If your math, logic, and programming basics are weak, every advanced domain becomes harder than it should be.
+This domain is the first major technical execution layer after foundations. It is where abstract reasoning becomes real software ability.
+
+## Why this domain matters
+
+Programming is how you turn ideas into tools, systems, automation, and intelligent products. For this roadmap, Python is the primary language because it is ideal for:
+
+- scripting and automation
+- data science and AI
+- backend prototyping
+- tooling and experiments
+- system integration
+- rapid validation
 
 ## Core goals
-- Understand how computers actually work
-- Learn problem-solving and logical thinking
-- Learn at least one language deeply
-- Learn shell, Git, and tools
-- Build discipline for debugging and documentation
 
-## Foundation sequence
+- build strong programming habits
+- learn problem solving through code
+- understand data structures and algorithms
+- write readable and maintainable Python
+- debug effectively and systematically
+- connect programming to real technical work
 
-### 1. Math and logic
-- Arithmetic and number systems
-- Algebra basics
-- Logic and truth tables
-- Set theory
-- Relations and functions
-- Graph basics
-- Probability basics
-- Statistics basics
-- Binary, hexadecimal, bit operations
-- Linear algebra basics
-- Discrete math fundamentals
+## Learning sequence
 
-### 2. Computers and digital systems basics
-- Data representation
-- CPU, memory, storage
-- Operating system roles
-- Input/output
-- Networks basics
-- Software and hardware layers
+### 1. Python basics
+- syntax and semantics
+- variables, data types, operators
+- conditionals and loops
+- functions
+- modules and packages
+- file handling
+- exceptions
+- list comprehensions
+- iterators and generators
 
-### 3. Programming fundamentals
-- Variables, types, operators
-- Control flow
-- Functions and recursion
-- Data structures basics
-- Error handling
-- File I/O
-- Testing and debugging
-- Version control basics
+### 2. Data structures
+- lists
+- tuples
+- sets
+- dictionaries
+- stacks and queues
+- trees
+- graphs
+- hash maps
+- complexity awareness
 
-### 4. Tooling basics
-- Git/GitHub
-- Shell scripting
-- VS Code / editors
-- Terminal usage
-- Package managers
-- Build tools
+### 3. Algorithms and problem solving
+- search
+- sort
+- recursion
+- backtracking
+- divide and conquer
+- greedy reasoning
+- dynamic programming basics
+- complexity analysis
 
-## Programming languages to learn early
+### 4. Dynamic and practical programming
+- debugging patterns
+- testing basics
+- CLI tool design
+- modular project structure
+- writing readable code
+- version control with Git
 
-### Beginner-friendly language
+### 5. Python for engineering work
+- automation scripts
+- ETL pipeline scripting
+- data analysis tools
+- API client scripts
+- model prototyping
+- scientific workflows
+
+## Core concepts checklist
+
+- [ ] Write clean Python functions
+- [ ] Understand list/dict/set behavior deeply
+- [ ] Solve basic algorithm problems
+- [ ] Use debugging tools effectively
+- [ ] Write small scripts that automate real tasks
+- [ ] Structure code into modules and reusable functions
+- [ ] Write tests for core logic
+- [ ] Understand complexity trade-offs
+
+## Tools and ecosystem
+
 - Python
+- pip
+- venv / virtualenv
+- Jupyter Notebook
+- pytest
+- black
+- ruff
+- mypy
+- Git and GitHub
 
-### Systems language
-- C
+## Recommended project ideas
 
-### General engineering and productivity
-- JavaScript / TypeScript
-- Bash
-- SQL
+- file organizer CLI
+- note-taking manager
+- expense tracker
+- data analysis script
+- simple API client
+- ML prototype pipeline
+- task manager with persistence
+- file search and processing utility
 
-### Optional later
-- C++
-- Java
-- Go
-- Rust
+## Related domains
 
-## Essential topics to master before specialization
-- Logic and abstraction
-- Data structures
-- Algorithms
-- Git
-- Linux basics
-- Shell commands
-- Debugging
-- Problem solving
-- Reading technical documentation
-
-## Suggested beginner projects
-- Calculator
-- Todo list app
-- Number guessing game
-- Basic file organizer script
-- Blog/post generator
-- Basic shell tool
-- Quiz application
-- Student roster manager
-- Expense tracker
-
-## Recommended resources
-
-### Learning resources
-- Python docs: https://docs.python.org/3/
-- Learn Git branching: https://learngitbranching.js.org/
-- Linux command line: https://linuxjourney.com/
-- freeCodeCamp: https://www.freecodecamp.org/
-- OSSU CS: https://github.com/ossu/computer-science
-
-### Repositories
-- Python: https://github.com/python/cpython
-- TheAlgorithms/Python: https://github.com/TheAlgorithms/Python
-- EbookFoundation/free-programming-books: https://github.com/EbookFoundation/free-programming-books
-- git/git: https://github.com/git/git
-
-## Milestone checklist
-
-- [ ] Understand binary, decimal, hexadecimal
-- [ ] Write loops, functions, conditions
-- [ ] Use Git and GitHub
-- [ ] Use shell commands efficiently
-- [ ] Debug code logically
-- [ ] Understand arrays, lists, dictionaries, sets
-- [ ] Solve basic algorithmic tasks
-- [ ] Read and explain technical docs
-
-## Next domains after foundation
-- [Programming](programming.md)
+- [Foundations](foundation.md)
 - [Linux & OS](linux-os.md)
 - [Computer Science](computer-science.md)
+- [AI / ML / Data Science](ai-ml-data-science.md)
 - [Software Engineering](software-engineering.md)
+
+## Recommended next step
+
+After this domain, continue to:
+
+- [Linux & OS](linux-os.md)
+- [Computer Science](computer-science.md)
+- [AI / ML / Data Science](ai-ml-data-science.md)
+
+This is the layer where code becomes capability.
