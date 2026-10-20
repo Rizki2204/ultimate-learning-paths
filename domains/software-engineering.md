@@ -1,122 +1,152 @@
-# Computer Science
+# Software Engineering
 
-Computer Science is the deeper theoretical backbone behind software, systems, AI, networking, security, and architecture.
+Software engineering is the discipline of building software that is maintainable, testable, reliable, understandable, and scalable. It goes beyond writing code: it is about turning technical ideas into systems that work in real life.
 
-## Core domains in CS
-- Algorithms and data structures
-- Programming languages
-- Computer architecture
-- Operating systems
-- Databases
-- Networking
-- Compilers and theory of computation
-- Artificial intelligence
-- Security
-- Distributed systems
-- Software engineering
+## Why this domain matters
 
-## Recommended CS learning order
+Without software engineering, a learner can write scripts, but may still struggle to build durable systems. This domain teaches how to:
 
-### 1. Fundamentals of computation
-- logic
-- functions and models
-- complexity theory basics
-- computability basics
-- finite state machines
-- automata
+- write clean and maintainable code
+- think in terms of architecture and trade-offs
+- test systems properly
+- manage complexity
+- design APIs and data flows
+- build real products with reliability in mind
 
-### 2. Programming and abstraction
-- syntax, semantics, data models
-- procedural and object-oriented design
-- recursion and modularity
-- language runtime concepts
+## Core goals
 
-### 3. Data structures and algorithms
-- arrays, linked lists, stacks, queues
-- trees, graphs, heaps
-- hash tables
-- sorting and searching
-- dynamic programming
-- greedy algorithms
-- graphs and traversal
-- string algorithms
+- understand software lifecycle and engineering thinking
+- write maintainable code
+- design systems with clear boundaries
+- use testing and CI/CD properly
+- build backend and product systems with structure
+- integrate software, data, and deployment into one workflow
 
-### 4. Systems and architecture
-- CPU, memory, caches
-- I/O and buses
-- instruction sets
-- pipelining
-- multiprocessing
-- parallelism
-- virtual memory
+## Learning sequence
 
-### 5. OS and software systems
-- processes, threads, synchronization
-- system calls
-- scheduling
-- file systems
-- IPC
-- networking stack
+### 1. Code quality and maintainability
+- naming and readability
+- modularity
+- refactoring
+- clean code principles
+- comments and documentation
+- code review habits
+- technical debt awareness
 
-### 6. Databases and distributed systems
-- transactions
-- consistency
-- indexing
-- query plans
+### 2. Architecture and design thinking
+- layered architecture
+- separation of concerns
+- modular design
+- client-server models
+- monolith vs microservices
+- clean architecture and hexagonal patterns
+- interfaces and contracts
+
+### 3. API and data design
+- HTTP and REST
+- GraphQL basics
+- API contracts
+- request/response design
+- authentication and authorization
+- input validation
+- database integration design
+
+### 4. Testing and reliability
+- unit testing
+- integration testing
+- end-to-end testing
+- test-driven development
+- mocks and fixtures
+- performance testing basics
+- reliability and failure handling
+
+### 5. Production engineering basics
+- CI/CD
+- observability
+- logging
+- tracing
+- monitoring
+- deployment pipelines
+- release practices
+- rollback and recovery
+
+### 6. Scaling and distributed systems basics
+- caching
+- load balancing
 - replication
-- sharding
-- eventual consistency
-- consensus basics
+- partitioning
+- queueing and async systems
+- distributed system trade-offs
+- resilience patterns
 
-### 7. Security, software quality, and engineering
-- secure code
-- testing
-- design patterns
-- build systems
-- debugging
-- software lifecycle
+## Core concepts checklist
 
-## Strong repository set
-- ossu/computer-science: https://github.com/ossu/computer-science
-- TheAlgorithms/Python: https://github.com/TheAlgorithms/Python
-- TheAlgorithms/C-Plus-Plus: https://github.com/TheAlgorithms/C-Plus-Plus
-- jwasham/coding-interview-university: https://github.com/jwasham/coding-interview-university
-- donnemartin/system-design-primer: https://github.com/donnemartin/system-design-primer
-- benawad/codex: (example repos) — not a core CS repo, but use caution
+- [ ] Write readable and maintainable code
+- [ ] Build a small production-style app
+- [ ] Use testing for validation
+- [ ] Design APIs with clear boundaries
+- [ ] Understand architecture trade-offs
+- [ ] Use logging, monitoring, and deployment concepts
+- [ ] Understand reliability and failure handling
+- [ ] Connect software design to real product constraints
 
-## Must-master CS topics checklist
-- [ ] Complexity analysis
-- [ ] Sorting and searching
-- [ ] Trees and graphs
-- [ ] Hash maps and sets
-- [ ] Recursion and DP
-- [ ] OOP and software design
-- [ ] OS fundamentals
-- [ ] Networking basics
-- [ ] SQL and databases
-- [ ] Data representation and architecture
+## Tools and ecosystem
 
-## Advanced ideas
-- formal languages
-- complexity classes
-- compiler design
-- distributed consensus
-- concurrent programming
-- database internals
-- secure systems
-- algorithmic trade-offs
+- Git / GitHub
+- Docker
+- Postman / Insomnia
+- OpenAPI / Swagger
+- pytest / unittest / Jest / Vitest
+- CI tools like GitHub Actions / GitLab CI
+- PostgreSQL
+- Redis
+- FastAPI / Django / Express / NestJS
+- Prometheus / Grafana
 
 ## Project ideas
-- algorithm visualizer
-- route planner with graph algorithms
-- mini compiler
-- simplified database engine
-- OS simulation
-- scheduler simulation
-- mini distributed key-value store
 
-## Next domains
-- [Software Engineering](software-engineering.md)
+- expense tracker backend
+- task management SaaS
+- authentication service
+- inventory and billing system
+- event-driven notification service
+- internal analytics dashboard
+- blog or CMS backend
+- job queue and worker system
+
+## Strong repositories and references
+
+- donnemartin/system-design-primer: https://github.com/donnemartin/system-design-primer
+- google/eng-practices: https://github.com/google/eng-practices
+- fastapi/fastapi: https://github.com/tiangolo/fastapi
+- expressjs/express: https://github.com/expressjs/express
+- spring-projects/spring-framework: https://github.com/spring-projects/spring-framework
+
+## Recommended learning path
+
+1. Learn clean code and maintainability
+2. Learn API and data design
+3. Learn testing and reliability
+4. Learn CI/CD and deployment
+5. Learn architecture trade-offs and scaling basics
+6. Build a real application with documentation and tests
+
+## Related domains
+
+- [Foundations](foundation.md)
+- [Programming](programming.md)
 - [Linux & OS](linux-os.md)
-- [Embedded Systems](embedded-systems.md)
+- [Computer Science](computer-science.md)
 - [AI / ML / Data Science](ai-ml-data-science.md)
+- [Cybersecurity / Networking](cybersecurity-networking.md)
+- [Cloud / DevOps](cloud-devops.md)
+
+## Recommended next step
+
+After software engineering, continue into:
+
+- [Cybersecurity / Networking](cybersecurity-networking.md)
+- [Cloud / DevOps](cloud-devops.md)
+- [Data Engineering](data-engineering.md)
+
+This is the layer where coding becomes engineering systems.
