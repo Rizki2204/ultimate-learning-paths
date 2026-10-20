@@ -1,406 +1,94 @@
-# Ultimate Learning Paths
+# 🌌 Ultimate Learning Paths: Master Engineering & Science Encyclopedia
 
-Repositori ini adalah master roadmap pembelajaran teknologi yang dirancang sebagai sistem belajar yang utuh, terarah, dan terus berkembang. Tujuannya bukan sekadar menumpuk topik, tetapi membangun kemampuan nyata: berpikir sistemik, memecahkan masalah, membangun produk, dan memajukan diri secara teknis serta intelektual.
+Selamat datang di **Ultimate Learning Paths** — sebuah sistem kurikulum sains komputasi, rekayasa perangkat keras, dan sistem rekayasa perangkat lunak paling komprehensif, terstruktur, dan mendalam. 
 
-Ini adalah repositori untuk belajar secara linear, terstruktur, dan saling terhubung antar bidang, dengan fokus utama:
-
-- Fondasi belajar yang kuat
-- Computer Science core
-- Python sebagai bahasa utama
-- AI systems dan ML engineering
-- Cybersecurity dan keamanan sistem
-- Hardware, embedded, dan robotics sebagai penunjang teknologi masa depan
-- Produk nyata, proyek, dan portfolio
-
-## Tujuan utama
-
-Tujuan repositori ini adalah menghasilkan seseorang yang mampu:
-
-- memahami prinsip dasar dan fondasi teknis secara mendalam
-- membangun sistem, alat, dan produk yang bermanfaat
-- berpikir kritis dan ilmiah dalam memecahkan masalah
-- menghubungkan matematika, CS, software, AI, hardware, dan keamanan
-- berkembang dari kondisi nol menuju kemampuan profesional dan inovatif
-
-## Filosofi belajar
-
-Belajar teknologi bukan sekadar menghafal topik. Yang benar adalah:
-
-1. Kuasai fondasi dulu.
-2. Kuasai satu bahasa utama dengan mendalam.
-3. Kuasai CS core dan sistem berpikir komputasional.
-4. Pilih jalur utama yang paling relevan dengan tujuan hidup dan masa depan.
-5. Pelajari bidang pendukung yang memperkuat jalur utama.
-6. Bangun proyek nyata secara bertahap.
-7. Ulang, revisi, dan tingkatkan kapasitas secara konsisten.
-
-## Jalur utama yang diprioritaskan
-
-### 1. Foundation + CS Core
-Ini adalah fondasi utama yang menghubungkan semua domain lain.
-
-- Logika dan berpikir ilmiah
-- Matematika dasar dan lanjutan
-- Probabilitas dan statistik
-- Aljabar linear
-- Struktur data dan algoritma
-- Sistem operasi
-- Jaringan dan komunikasi data
-- Memori, pemrograman, dan eksekusi program
-- Manajemen proyek dan debugging
-
-### 2. Python untuk seluruh pembelajaran
-Python adalah bahasa utama untuk:
-
-- AI/ML
-- data analysis
-- scripting dan automation
-- prototyping sistem
-- tooling
-- backend kecil dan API cepat
-- eksperimen dan penelitian
-
-### 3. AI Systems
-AI adalah inti dari masa depan teknologi, dan repositori ini menempatkan AI sebagai fokus utama dalam sistem belajar yang besar. Fokusnya bukan hanya teori model, tetapi juga:
-
-- matematika ML
-- data pipeline
-- model training
-- evaluasi model
-- deployment
-- MLOps
-- AI productization
-- keamanan dan etika AI
-
-### 4. Cybersecurity
-Untuk melindungi karya, sistem, data, dan produk yang akan dibangun di masa depan, keamanan harus dipelajari sejak dini. Fokusnya:
-
-- sistem operasi dan Linux security
-- pemahaman jaringan
-- kriptografi dasar
-- secure coding
-- web security
-- reverse engineering
-- incident response
-- threat modeling
-
-### 5. Hardware + Embedded + Robotics
-Bidang ini menghubungkan digital, fisika, kontrol, dan sistem nyata. Ini penting karena teknologi masa depan sangat tergantung pada perangkat, robot, sensor, dan sistem cyber-physical.
-
-## Roadmap master: urutan belajar
-
-### Phase 0 — Learning foundations dan metode berpikir
-Tujuan: membangun kapasitas berpikir ilmiah, belajar secara efektif, dan membangun kebiasaan belajar yang tahan lama.
-
-Topik utama:
-
-- Meta-learning
-- Feynman technique
-- spaced repetition
-- thinking in systems
-- first-principles thinking
-- logika formal
-- epistemologi dan metode ilmiah
-- membangun catatan dan ringkasan belajar
-
-### Phase 1 — Matematika dan fondasi komputasi
-Tujuan: membangun kemampuan analitis yang diperlukan untuk CS, ML, dan pemodelan sistem.
-
-Topik utama:
-
-- set theory
-- combinatorics
-- number theory
-- discrete math
-- algebra linear
-- probability
-- statistics
-- calculus dasar dan lanjutan
-- graph theory
-- optimization
-
-### Phase 2 — Programming dan CS core
-Tujuan: membangun kemampuan berpikir komputasional dan menulis program yang baik.
-
-Topik utama:
-
-- Python fundamental
-- Python advanced
-- data structures
-- algorithms
-- complexity analysis
-- OOP dan programming paradigms
-- functional programming dasar
-- file handling, CLI, tooling
-- testing dan debugging
-- Git dan GitHub
-
-### Phase 3 — Linux, OS, networks, dan systems
-Tujuan: menguasai lingkungan kerja engineering nyata.
-
-Topik utama:
-
-- Linux essentials
-- shell scripting
-- filesystem dan permissions
-- process management
-- memory and virtual memory
-- networking basics
-- OS concepts
-- system calls
-- Docker basics
-- observability
-
-### Phase 4 — Software engineering dan arsitektur sistem
-Tujuan: membangun software yang rapi, dapat dijalankan, dan siap dikembangkan.
-
-Topik utama:
-
-- clean code
-- SOLID
-- design patterns
-- software architecture
-- REST API
-- database design
-- authentication and authz
-- testing
-- CI/CD
-- observability dan monitoring
-
-### Phase 5 — AI, ML, data science, dan AI systems
-Tujuan: membangun kemampuan untuk membangun model, sistem data, dan produk AI yang berfungsi.
-
-Topik utama:
-
-- Python for data science
-- NumPy, Pandas, Matplotlib
-- statistics for ML
-- linear algebra for ML
-- supervised learning
-- unsupervised learning
-- ensemble methods
-- deep learning
-- CNNs, RNNs, transformers
-- NLP
-- computer vision
-- model evaluation
-- deployment dan serving model
-- MLOps
-- LLM and RAG workflows
-
-### Phase 6 — Cybersecurity dan keamanan sistem
-Tujuan: mempelajari cara sistem dihancurkan, dilindungi, dan dipelihara.
-
-Topik utama:
-
-- Linux security
-- networking security
-- web security
-- cryptography
-- OWASP Top 10
-- reverse engineering
-- exploit basics
-- secure coding
-- blue team / SOC basics
-- incident response
-
-### Phase 7 — Embedded, hardware, dan robotics
-Tujuan: menghubungkan digital dan dunia nyata dengan kontrol dan perangkat fisik.
-
-Topik utama:
-
-- analog & digital electronics
-- microcontrollers
-- C/C++ embedded
-- GPIO, UART, SPI, I2C
-- sensor dan actuator
-- interrupts dan timers
-- PWM dan motor control
-- PID
-- ROS2
-- perception
-- kinematics dan control
-
-### Phase 8 — Portfolio, proyek nyata, dan capstone
-Tujuan: mentransformasi pengetahuan menjadi kemampuan yang terbukti.
-
-Proyek yang disarankan:
-
-- mini project per topik
-- project bertahap tiap fase
-- project portfolio
-- capstone AI product
-- cyber lab project
-- embedded + robotics demo
-- MLOps project
-
-## Struktur repositori
-
-Repositori ini memiliki struktur belajar yang dirancang untuk jelas, modular, dan saling terhubung.
-
-- `README.md` — master roadmap utama
-- `docs/` — dokumen perencanaan, roadmap, dan panduan navigasi
-- `domains/` — domain belajar per bidang
-- `projects/` — project ladder, capstone, dan projek teknis
-- `resources/` — daftar sumber belajar yang sudah dikurasi
-- `progress/` — checklist, milestone, perencanaan belajar, dan tracking
-
-## Struktur domain utama
-
-Domain-domain inti yang akan terus dikembangkan dalam repo ini:
-
-- foundations
-- programming
-- computer science
-- linux and operating systems
-- software engineering
-- web/full-stack
-- embedded systems
-- computer engineering
-- microelectronics
-- AI / ML / data science
-- cybersecurity and networking
-- robotics and automation
-- data engineering
-- cloud and devops
-- fintech and quantitative systems
-- cognitive science and NLP
-
-## Prerequisite map (ringkas)
-
-Topik-topik utama saling bergantung satu sama lain:
-
-- Matematika -> Logika -> CS Core -> Systems -> AI
-- Linux -> Networking -> Security -> Production systems
-- Electronics -> Embedded -> Robotics -> Control
-- Data -> Statistics -> ML -> AI Systems -> Deployment
-- Programming -> Software Engineering -> Backend / Full-stack -> Productization
-
-## Roadmap 90 hari (prioritas utama)
-
-### 90 Hari 1: Fondasi dan CS Core
-- logika dan metode belajar
-- matematika dasar dan probabilitas
-- Python fundamental
-- struktur data dan algoritma
-- Linux dan terminal
-- Git dan GitHub
-- debugging dan testing dasar
-
-### 90 Hari 2: System & engineering fundamentals
-- OS concepts
-- networking basics
-- SQL dan database dasar
-- API dan backend dasar
-- software engineering dasar
-- observability dan deployment dasar
-
-### 90 Hari 3: AI Systems & data
-- Python untuk data science
-- NumPy / Pandas
-- ML klasik
-- deep learning dasar
-- evaluasi model
-- deployment model sederhana
-- MLOps dasar
-
-### 90 Hari 4: Security + productization
-- web security
-- Linux security
-- secure coding
-- system security
-- project hardening
-- portfolio polishing
-
-## Project ladder
-
-Proyek disusun dari yang sederhana menuju yang kompleks:
-
-### Tingkat 1 — mini project
-- script CLI
-- analisis data sederhana
-- web app kecil
-- sensor logger sederhana
-
-### Tingkat 2 — project terarah
-- API backend
-- model ML klasifikasi
-- chatbot mini
-- microcontroller project
-
-### Tingkat 3 — project portfolio
-- AI product berbasis data
-- secure app atau API
-- embedded + sensor system
-- robot atau kontrol sederhana
-
-### Tingkat 4 — capstone
-- AI system end-to-end
-- secure and production-ready product
-- robotics + perception
-- platform engineering project
-
-## Resource strategy
-
-Prioritas sumber belajar:
-
-- dokumen resmi
-- buku teknik yang solid
-- kursus gratis berkualitas
-- repositori GitHub yang terbukti
-- dokumentasi Linux, Python, ML, container, dan backend
-- video pembelajaran yang fokus pada konsep dan implementasi
-
-Tujuan utama: belajar cara memahami, membangun, dan memecahkan masalah — bukan sekadar mengumpulkan materi.
-
-## Cara menggunakan repo ini
-
-1. Start from the top: baca README ini hingga selesai.
-2. Ikuti roadmap master dalam urutan linear yang disusun.
-3. Fokus pada satu fase pada satu waktu.
-4. Jangan melompat terlalu jauh ke domain yang belum dibangun fondasinya.
-5. Setiap topik yang dipelajari harus diikuti dengan praktik atau proyek kecil.
-6. Catat progres, masalah, dan hasil belajar.
-7. Buat proyek yang memvalidasi pemahaman.
-8. Setelah cukup kuat, lanjut ke bidang pendukung atau spesialisasi.
-
-## Target akhir
-
-Target akhir dari repo ini adalah membangun individu yang:
-
-- bisa berpikir secara sistemik
-- bisa membangun sesuatu yang berguna
-- bisa menavigasi teknologi secara luas dan dalam
-- bisa membangun portfolio nyata
-- bisa bergerak di berbagai bidang teknis dengan fondasi yang kuat
-- bisa menjadi inovator, builder, dan problem solver
-
-## Ringkasan singkat
-
-Repo ini bukan hanya daftar teori. Ini adalah sistem pembelajaran yang dibuat untuk membangun: 
-
-- fondasi kuat
-- pengetahuan yang terhubung
-- kemampuan teknologi yang nyata
-- produk yang berdampak
-- keterampilan profesional yang siap dipakai
-
-Kalau kamu mau menuntaskan semuanya dalam satu jalan, maka urutan yang paling benar adalah:
-
-Foundation -> CS Core -> Python -> Linux & Systems -> Software Engineering -> AI Systems -> Security -> Embedded/Robotics -> Project & Portfolio
-
-Itu adalah arah yang paling kuat, paling masuk akal, dan paling siap untuk masa depan.
+Kurikulum ini dirancang dari **prinsip pertama murni (first principles)** dari kondisi dasar mutlak ("seperti bayi baru lahir") hingga tingkat mahir/profesional ("mentok / production-grade"), mencakup **17 Tingkat (Tiers)** dan **232 Modul Teknis Lengkap** tanpa ada bagian yang terpotong atau terlewatkan.
 
 ---
 
-Lihat juga:
+## 🏛️ Akses Cepat & Navigasi Utama
 
-- [docs/index.md](docs/index.md)
-- [docs/roadmap-0-to-professional.md](docs/roadmap-0-to-professional.md)
-- [docs/project-ladder.md](docs/project-ladder.md)
-- [docs/ultimate-learning-sequence.md](docs/ultimate-learning-sequence.md)
-- [domains/foundation.md](domains/foundation.md)
-- [domains/computer-science.md](domains/computer-science.md)
-- [domains/ai-ml-data-science.md](domains/ai-ml-data-science.md)
-- [domains/cybersecurity-networking.md](domains/cybersecurity-networking.md)
-- [domains/robotics-automation-mechatronics.md](domains/robotics-automation-mechatronics.md)
+- 📖 **[MASTER INDEX: Katalog Lengkap 232 Topik](./INDEX.md)** — Direktori sentral seluruh modul pembelajaran.
+- 🗺️ **[Prerequisites Directed Acyclic Graph (DAG)](./roadmaps/prerequisites-dag.md)** — Peta jalur belajar linear dan spesialisasi karier.
+- 📘 **[Panduan Metodologi Pembelajaran (ID)](./GUIDEBOOK-ID.md)** — Filosofi kognisi, active recall, dan Feynman technique.
+- 📂 **[Arsip Kurikulum Domain Lama (Side-by-Side)](./domains/)** — Materi rangkuman domain terdahulu yang tetap dipertahankan.
+
+---
+
+## 📐 Arsitektur Kurikulum: 17 Tingkat (Tingkat 0 s/d 16)
+
+```mermaid
+flowchart LR
+    subgraph Fondasi["Tahap I: Fondasi Murni & Fisika"]
+        T0["Tingkat 0: Kognisi & Logika"] --> T1["Tingkat 1: Matematika"]
+        T0 --> T2["Tingkat 2: Fisika & Semikonduktor"]
+        T2 --> T3["Tingkat 3: Rangkaian & Elektronika"]
+    end
+    
+    subgraph Komputer["Tahap II: Hardware & Sistem Operasi"]
+        T3 --> T4["Tingkat 4: Digital Logic & CPU"]
+        T4 --> T5["Tingkat 5: Embedded & RTOS"]
+        T4 --> T6["Tingkat 6: CS Core & Compilers"]
+        T6 --> T7["Tingkat 7: Linux OS Internals"]
+    end
+    
+    subgraph Rekayasa["Tahap III: Komunikasi & Software Enterprise"]
+        T7 --> T8["Tingkat 8: DSP & Jaringan"]
+        T8 --> T9["Tingkat 9: Software Eng & SRE"]
+        T9 --> T10["Tingkat 10: Basis Data Enterprise"]
+        T7 --> T11["Tingkat 11: Cyber Security & Pwn"]
+    end
+    
+    subgraph Frontier["Tahap IV: AI & Teknologi Mutakhir"]
+        T1 --> T12["Tingkat 12: AI / ML / MLOps"]
+        T12 --> T13["Tingkat 13: Kognisi & LLMs"]
+        T6 --> T14["Tingkat 14: Fintech & HFT"]
+        T5 --> T15["Tingkat 15: Robotika & Otomasi"]
+        T6 --> T16["Tingkat 16: HPC & Komputasi Kuantum"]
+    end
+```
+
+| Tingkat | Nama Disiplin Kurikulum | Jangkauan Modul | Fokus Inti |
+|:---:|---|:---:|---|
+| **0** | [Fondasi Kognitif, Logika Murni & Berpikir Ilmiah](./curriculum/00-fondasi-kognitif-logika/README.md) | Modul 001 - 005 | Meta-learning, first-principles, systems thinking, falsifikasi Karl Popper, logika formal. |
+| **1** | [Fondasi Matematika Komprehensif Dari Nol](./curriculum/01-fondasi-matematika/README.md) | Modul 006 - 023 | Himpunan, aljabar linier, kalkulus multivariabel, ODE/PDE, probabilitas, optimasi, game theory. |
+| **2** | [Fisika Klasik, Elektromagnetisme & Kimia Semikonduktor](./curriculum/02-fisika-semikonduktor/README.md) | Modul 024 - 037 | Mekanika Newton, termodinamika, persamaan Maxwell, optik, struktur atom, pita energi, silikon. |
+| **3** | [Rangkaian Listrik, Elektronika & Microelectronics](./curriculum/03-rangkaian-mikroelektronika/README.md) | Modul 038 - 052 | Rangkaian DC/AC, BJT, MOSFET CMOS, Op-Amp, SMPS, ADC/DAC, VLSI FinFET, PCB multi-layer, SI/PI. |
+| **4** | [Logika Digital, Computer Engineering & Arsitektur Komputer](./curriculum/04-logika-digital-arsitektur-komputer/README.md) | Modul 053 - 069 | Gerbang Boolean, Verilog RTL, FPGA, DRAM, RISC-V ISA, pipelining, cache MESI, MMU, akselerator GPU. |
+| **5** | [Embedded Systems, Firmware Bare-Metal & RTOS / IoT](./curriculum/05-embedded-rtos-iot/README.md) | Modul 070 - 087 | ARM Cortex-M bare-metal C, linker script, DMA, FreeRTOS, Zephyr, bus CAN, Embedded Linux, TinyML. |
+| **6** | [Computer Science Core, Struktur Data, Algoritma & Compiler](./curriculum/06-cs-core-dsa-compiler/README.md) | Modul 088 - 109 | Big-O, struktur data linier & pohon, graf lanjut, automata formal, Turing computability, LLVM. |
+| **7** | [Operating Systems Internals & Penguasaan Penuh Linux](./curriculum/07-os-internals-linux/README.md) | Modul 110 - 124 | CPU rings, syscall dispatcher, proses fork/COW, scheduler CFS/EEVDF, VFS, io_uring, eBPF, kontainer. |
+| **8** | [Pemrosesan Sinyal Digital, Telekomunikasi & Network Engineering](./curriculum/08-dsp-telekomunikasi-jaringan/README.md) | Modul 125 - 139 | LTI, FFT Cooley-Tukey, filter FIR/IIR, OSI, TCP/IP, BGP-4 routing, QUIC HTTP/3, SDN P4. |
+| **9** | [Software Engineering, Front-End, Back-End & Cloud/SRE](./curriculum/09-software-engineering-cloud-sre/README.md) | Modul 140 - 156 | Git DAG, SOLID, arsitektur hexagonal, React Fiber, API gRPC, Kafka, Kubernetes internals, SRE. |
+| **10** | [Basis Data, Data Engineering & Sistem Informasi Enterprise](./curriculum/10-basis-data-enterprise/README.md) | Modul 157 - 167 | Aljabar relasional, BCNF, B+Tree vs LSM-Tree, ACID MVCC, NoSQL, Raft konsensus, Apache Spark. |
+| **11** | [Cyber Security, Kriptografi & Reverse Engineering](./curriculum/11-cybersecurity-reverse-engineering/README.md) | Modul 168 - 182 | AES-GCM, TLS 1.3, pasca-kuantum Kyber, OWASP Top 10, Ghidra reverse engineering, ROP stack pwn. |
+| **12** | [Data Science, AI, Machine Learning, Deep Learning & MLOps](./curriculum/12-ai-machine-learning-mlops/README.md) | Modul 183 - 195 | Vektorisasi BLAS, regresi, autodiff PyTorch, ResNet, YOLO, Diffusion, CUDA programming, ZeRO-3. |
+| **13** | [Sains Kognitif, Neuroengineering & Computational Linguistics](./curriculum/13-sains-kognitif-nlp/README.md) | Modul 196 - 206 | David Marr, Hodgkin-Huxley, BCI EEG, AlphaFold, Transformer Multi-Head Attention, RoPE, LLM RLHF. |
+| **14** | [Fintech, Financial Engineering, HFT & Blockchain](./curriculum/14-fintech-hft-blockchain/README.md) | Modul 207 - 216 | Buku besar immutable, Black-Scholes, LOB matching engine, zero-allocation C++, kernel-bypass DPDK. |
+| **15** | [Mekatronika, Robotika, Teori Kendali & Otomasi Industri](./curriculum/15-mekatronika-robotika-kendali/README.md) | Modul 217 - 226 | Motor BLDC FOC, sensor LiDAR, kinematika DH/Jacobian, kendali PID/LQR, Kalman Filter, ROS 2, PLC. |
+| **16** | [Komputasi Performa Tinggi, Multimedia & Komputasi Kuantum](./curriculum/16-hpc-multimedia-kuantum/README.md) | Modul 227 - 232 | Grafika 3D Vulkan PBR, game engine ECS, codec video AV1, OpenMP/MPI klaster, qubit & algoritma Shor. |
+
+---
+
+## 💎 Standar Kualitas Modul (Template 7 Lapis)
+
+Setiap modul dari 232 topik yang ada di repositori ini mematuhi standar format 7 lapis yang ketat:
+1. **Lapis 1: Intuisi Dasar Bebas Jargon ("Seperti Bayi Baru Lahir")** — Analogi sederhana yang membumi.
+2. **Lapis 2: Fondasi Teoretis & Aksiomatik / Matematis** — Rumus eksak, teorema pembuktian, dan batasan teoretis.
+3. **Lapis 3: Anatomi Teknis & Cara Kerja Internal** — Mekanisme tingkat rendah, alur eksekusi, dan diagram Mermaid.
+4. **Lapis 4: Implementasi Praktis & Kode / Simulasi Riil** — Kode kerja standar industri (C, Rust, Python, Verilog, SQL).
+5. **Lapis 5: Miskonsepsi & Jebakan Industri** — Kesalahan umum, edge cases kritis, dan skenario crash di dunia nyata.
+6. **Lapis 6: Proyek Latihan & Rubrik Penilaian Mandiri** — 3 tingkatan tantangan (Dasar, Menengah, Mahir).
+7. **Lapis 7: Rekomendasi Sumber Belajar Standar Emas** — Buku teks universitas standar emas dan paper seminal klasik.
+
+---
+
+## 🛠️ Verifikasi Integritas Kurikulum
+
+Untuk memastikan 100% dari 232 file topik dan link navigasi valid secara matematis, jalankan skrip verifikasi otomatis:
+```bash
+python scripts/verify_curriculum.py
+```
+
+---
+*Dikelola dengan standar rekayasa tertinggi untuk pembelajar autodidak, ilmuwan, dan insinyur profesional masa depan.*
