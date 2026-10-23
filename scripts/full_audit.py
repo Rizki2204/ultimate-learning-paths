@@ -25,6 +25,12 @@ FORBIDDEN_PHRASES = [
 
 topic_files = []
 for root, dirs, files in os.walk(CURRICULUM_DIR):
+    # Only inspect top-level tier directories directly under CURRICULUM_DIR.
+    # Prune subtopic directories (e.g. modular chapters in 011-aljabar-linier-teori-matriks/)
+    # so subtopic files are not counted against the top-level 232 module count.
+    if root == CURRICULUM_DIR:
+        continue
+    dirs.clear()
     for f in files:
         if f.endswith(".md") and f != "README.md":
             topic_files.append(os.path.join(root, f))
