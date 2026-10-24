@@ -337,23 +337,27 @@ Norma Residu: 9.93e-16
 ---
 
 ## 5. Miskonsepsi Umum & Post-Mortem Kegagalan Industri
-Tautan Rujukan Kuliah: [MIT OCW 18.06 Kuliah 2 & 5](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-2-elimination-with-matrices/) | [GAO Report: Patriot Missile Software Problem](https://www.gao.gov/products/imtec-92-26)
+Tautan Rujukan Kuliah: [MIT OCW 18.06 Kuliah 2 & 5](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-2-elimination-with-matrices/) | [Prof. Douglas Arnold: Patriot Missile Roundoff Disaster Analysis](https://www-users.cse.umn.edu/~arnold/disasters/patriot.html)
 
 ### 5.1 Miskonsepsi Kritis: Menghitung Invers Matriks Eksplisit `inv(A) @ b`
 Salah satu kesalahan pemula yang paling sering dilakukan dalam kode komersial adalah memanggil fungsi invers langsung:
 ```python
-# SANGAT BURUK & DILARANG DALAM PRODUKSI:
-x = np.linalg.inv(A) @ b
+import numpy as np
 
-# PRAKTIK TERBAIK INDUSTRI:
+A = np.array([[2.0, 1.0], [5.0, 7.0]], dtype=np.float64)
+b = np.array([11.0, 13.0], dtype=np.float64)
+
+# PRAKTIK TERBAIK INDUSTRI: gunakan solve() berbasis dekomposisi LU
 x = np.linalg.solve(A, b)
+assert np.allclose(A @ x, b)
+print("Solusi stabil via solve():", x)
 ```
 **Mengapa `inv(A)` berbahaya?**
 1. **Biaya Flops**: Menghitung $A^{-1}$ secara eksplisit membutuhkan $2n^3$ flops (tiga kali lebih lambat daripada eliminasi $LU$ yang hanya memerlukan $\frac{2}{3}n^3$ flops).
 2. **Ketidakstabilan Numerik**: Mengalikan matriks $A^{-1}$ yang telah terkontaminasi galat pembulatan floating-point dengan vektor $\mathbf{b}$ akan menggandakan kesalahan numerik sebanding dengan kuadrat bilangan kondisi $\kappa(A)$. Sebaliknya, algoritma Gaussian elimination dengan *partial pivoting* dijamin stabil secara numerik mundur (*backward stable*).
 
 ### 5.2 Post-Mortem Bencana Nyata: Tragedi Rudal Patriot Dhahran (1991)
-Pada tanggal 25 Februari 1991, baterai sistem pertahanan udara rudal Patriot di Dhahran, Arab Saudi, gagal mencegat rudal Scud Irak yang masuk, menewaskan 28 prajurit. Laporan resmi dari [U.S. General Accounting Office (GAO/IMTEC-92-26)](https://www.gao.gov/products/imtec-92-26) mengungkapkan bahwa kegagalan tersebut disebabkan oleh galat akumulasi floating-point aritmatika biner:
+Pada tanggal 25 Februari 1991, baterai sistem pertahanan udara rudal Patriot di Dhahran, Arab Saudi, gagal mencegat rudal Scud Irak yang masuk, menewaskan 28 prajurit. Laporan analisis komputasi resmi dari [Prof. Douglas Arnold: Patriot Missile Failure Analysis](https://www-users.cse.umn.edu/~arnold/disasters/patriot.html) mengungkapkan bahwa kegagalan tersebut disebabkan oleh galat akumulasi floating-point aritmatika biner:
 - Waktu internal sistem dihitung dalam kelipatan 0,1 detik.
 - Namun, pecahan desimal $1/10$ memiliki representasi biner berulang tak-hingga:
   $$0{,}1_{10} = 0{,}00011001100110011001100\dots_2$$

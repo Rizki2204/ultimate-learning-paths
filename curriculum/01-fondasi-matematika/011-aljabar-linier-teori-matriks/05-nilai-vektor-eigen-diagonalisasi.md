@@ -420,7 +420,7 @@ Rasio keduanya adalah $0.832050 / 0.554700 = 1.500000$, yang presisi sama persis
   Ketika kecepatan angin melintasi ambang batas kritis, interaksi aerodinamis antara pusaran angin (*Von Kármán vortex shedding*) dan penampang jembatan menghasilkan redaman efektif negatif. Hal ini mendorong bagian riil dari salah satu nilai eigen mode torsi melintasi sumbu imajiner menjadi bernilai positif ($\alpha_{\text{torsi}} > 0$).
 - **Dampak Bencana**: Solusi getaran $u(t) \propto e^{\alpha_{\text{torsi}} t} \sin(\omega t)$ mengalami pertumbuhan amplitudo secara eksponensial tak terbatas hingga kabel penggantung jembatan putus dan struktur dek runtuh total ke dalam selat.
 - **Pelajaran Rekayasa**: Seluruh perancangan struktur modern (jembatan, sayap pesawat terbang Airbus/Boeing, dan gedung pencakar langit) wajib melakukan simulasi analisis nilai eigen aeroelastik (*flutter eigenvalue analysis*) untuk memastikan seluruh $\text{Re}(\lambda_i) < 0$ pada seluruh rentang kecepatan fluida operasional.
-- Rujukan: [Billah & Scanlan: Resonance, Tacoma Narrows bridge failure (Am. J. Phys. 1991)](https://doi.org/10.1119/1.16590)
+- Rujukan: [MIT OCW 18.03: Differential Equations & Structural Resonance](https://ocw.mit.edu/courses/18-03-differential-equations-spring-2010/)
 
 #### Kasus 2: Perangkap Laba-laba (Spider Traps & Dead Ends) pada Algoritma Awal Google PageRank (1998)
 - **Latar Belakang**: Ketika Larry Page dan Sergey Brin mengembangkan algoritma PageRank di Stanford University, mereka memodelkan penjelajahan web sebagai rantai Markov dengan matriks tautan $\mathbf{H}$.

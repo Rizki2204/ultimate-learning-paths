@@ -361,16 +361,25 @@ class Pilot011Verifier:
 
             # Detect corrupted LaTeX patterns from past bugs
             corrupt_patterns = [
-                (r"\x07lpha", "corrupted \alpha (ASCII Bell)"),
-                (r"\x08eta", "corrupted \beta (ASCII Backspace)"),
-                (r"\tlpha|\teta|\theta", "tab-corrupted LaTeX macro"),
+                (r"\x07lpha", "corrupted \\alpha (ASCII Bell)"),
+                (r"\x08eta", "corrupted \\beta (ASCII Backspace)"),
+                (r"\x09(?:alpha|beta|theta)", "tab-corrupted LaTeX macro"),
                 (r"\$512\s*\\times\s*512", "improperly escaped currency $ in math"),
-                (r"\$\s*\$", "empty inline math block"),
-                (r"\$\$\s*\$\$", "empty display math block"),
             ]
             for pat, desc in corrupt_patterns:
                 if re.search(pat, content):
                     katex_errors.append(f"{rel}: found {desc}")
+
+            # Check for genuine empty inline math $ $ (not $$)
+            if re.search(r"(?<!\$)\$(?!\$)\s*(?<!\$)\$(?!\$)", inline_text):
+                katex_errors.append(f"{rel}: found empty inline math block")
+
+            # Check for genuine empty display math $$ $$
+            display_blocks = re.findall(r"\$\$([\s\S]*?)\$\$", text_without_code)
+            for db in display_blocks:
+                if not db.strip():
+                    katex_errors.append(f"{rel}: found empty display math block")
+                    break
 
         if katex_errors:
             self.record_result(TestResult(
