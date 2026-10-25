@@ -924,3 +924,154 @@ Penguasaan prinsip kognitif, penalaran first-principles, logika proposisional/pr
 **Kategori**: `Spectral Graph Theory`
 
 ---
+
+
+## Modul 013: Kalkulus Diferensial & Integral Satu Variabel
+
+### Kartu 54: Modul 013: Definisi Formal Limit Epsilon-Delta
+**Pertanyaan Cloze (Anki Text)**:
+> Pernyataan limit \lim_{x \to a} f(x) = L bermakna bahwa untuk setiap \varepsilon > 0, selalu terdapat {{c1::\delta > 0}} sedemikian rupa sehingga jika {{c2::0 < |x - a| < \delta}}, maka berlaku {{c3::|f(x) - L| < \varepsilon}}.
+
+**Tampilan Jawaban Terbuka**:
+> Pernyataan limit \lim_{x \to a} f(x) = L bermakna bahwa untuk setiap \varepsilon > 0, selalu terdapat **[\delta > 0]** sedemikian rupa sehingga jika **[0 < |x - a| < \delta]**, maka berlaku **[|f(x) - L| < \varepsilon]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> \varepsilon adalah toleransi galat output dan \delta adalah batas jarak input di sekitar titik singgah a.
+
+**Tags**: `tier-01::matematika math::calculus limits epsilon-delta`  
+**Kategori**: `Calculus Limits`
+
+---
+
+### Kartu 55: Modul 013: Turunan Pertama & Prinsip Pertama
+**Pertanyaan Cloze (Anki Text)**:
+> Turunan pertama f'(x) mewakili {{c1::laju perubahan sesaat keluaran terhadap masukan}}, yang didefinisikan secara aksiomatik sebagai limit rasio diferensial {{c2::\lim_{h \to 0} \frac{f(x + h) - f(x)}{h}}}.
+
+**Tampilan Jawaban Terbuka**:
+> Turunan pertama f'(x) mewakili **[laju perubahan sesaat keluaran terhadap masukan]**, yang didefinisikan secara aksiomatik sebagai limit rasio diferensial **[\lim_{h \to 0} \frac{f(x + h) - f(x)}{h}]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Beda terpusat numerik (central difference) memiliki orde akurasi O(h^2), jauh lebih presisi dibanding beda maju berorde O(h).
+
+**Tags**: `tier-01::matematika math::calculus differentiation derivatives`  
+**Kategori**: `Differentiation`
+
+---
+
+### Kartu 56: Modul 013: Aturan Rantai & AutoDiff
+**Pertanyaan Cloze (Anki Text)**:
+> Pada fungsi komposisi y = f(g(x)), aturan rantai Leibniz menyatakan \frac{dy}{dx} = {{c1::\frac{dy}{du} \cdot \frac{du}{dx}}}, yang menjadi mekanisme inti komputasi gradien pada algoritma {{c2::Backpropagation Deep Learning}}.
+
+**Tampilan Jawaban Terbuka**:
+> Pada fungsi komposisi y = f(g(x)), aturan rantai Leibniz menyatakan \frac{dy}{dx} = **[\frac{dy}{du} \cdot \frac{du}{dx}]**, yang menjadi mekanisme inti komputasi gradien pada algoritma **[Backpropagation Deep Learning]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Mode mundur diferensiasi otomatis (Reverse-Mode AutoDiff) mengevaluasi seluruh gradien skalar terhadap miliaran parameter dalam satu kali jalan mundur.
+
+**Tags**: `tier-01::matematika math::calculus chain-rule autodiff`  
+**Kategori**: `Differentiation`
+
+---
+
+### Kartu 57: Modul 013: Teorema Nilai Rata-rata (MVT)
+**Pertanyaan Cloze (Anki Text)**:
+> Teorema Nilai Rata-rata (MVT) menjamin bahwa jika f kontinu pada [a, b] dan terdiferensialkan pada (a, b), terdapat titik c \in (a, b) sedemikian rupa sehingga {{c1::f'(c) = \frac{f(b) - f(a)}{b - a}}}.
+
+**Tampilan Jawaban Terbuka**:
+> Teorema Nilai Rata-rata (MVT) menjamin bahwa jika f kontinu pada [a, b] dan terdiferensialkan pada (a, b), terdapat titik c \in (a, b) sedemikian rupa sehingga **[f'(c) = \frac{f(b) - f(a)}{b - a}]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Garis singgung kurva di c sejajar sempurna dengan garis sekan yang menghubungkan kedua titik ujung (a, f(a)) dan (b, f(b)).
+
+**Tags**: `tier-01::matematika math::calculus mvt mean-value-theorem`  
+**Kategori**: `Differential Calculus`
+
+---
+
+### Kartu 58: Modul 013: Teorema Dasar Kalkulus (FTC 1 & 2)
+**Pertanyaan Cloze (Anki Text)**:
+> FTC Bagian 1 menyatakan \frac{d}{dx} \left[ \int_{a}^{x} f(t) dt \right] = {{c1::f(x)}}, sedangkan FTC Bagian 2 menyatakan \int_{a}^{b} f(x) dx = {{c2::F(b) - F(a)}} di mana F'(x) = f(x).
+
+**Tampilan Jawaban Terbuka**:
+> FTC Bagian 1 menyatakan \frac{d}{dx} \left[ \int_{a}^{x} f(t) dt \right] = **[f(x)]**, sedangkan FTC Bagian 2 menyatakan \int_{a}^{b} f(x) dx = **[F(b) - F(a)]** di mana F'(x) = f(x).
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Teorema Dasar Kalkulus membuktikan bahwa diferensiasi dan integrasi adalah dua operasi matematika yang saling membatalkan (invers satu sama lain).
+
+**Tags**: `tier-01::matematika math::calculus integration ftc`  
+**Kategori**: `Integral Calculus`
+
+---
+
+### Kartu 59: Modul 013: Integrasi Parsial
+**Pertanyaan Cloze (Anki Text)**:
+> Berasal dari aturan perkalian turunan, formula integrasi parsial dinyatakan sebagai \int u \, dv = {{c1::u v - \int v \, du}}.
+
+**Tampilan Jawaban Terbuka**:
+> Berasal dari aturan perkalian turunan, formula integrasi parsial dinyatakan sebagai \int u \, dv = **[u v - \int v \, du]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Pilihan prioritas fungsi u mengikuti aturan LIATE: Logaritma, Inverse Trigonometri, Aljabar, Trigonometri, Eksponensial.
+
+**Tags**: `tier-01::matematika math::calculus integration integration-by-parts`  
+**Kategori**: `Integration Techniques`
+
+---
+
+### Kartu 60: Modul 013: Integral Tak Wajar & Gabriel's Horn
+**Pertanyaan Cloze (Anki Text)**:
+> Benda putar Terompet Gabriel yang dibentuk dari y = 1/x pada [1, \infty) memiliki volume terhingga {{c1::V = \pi}}, namun memiliki luas permukaan tak hingga {{c2::A = \infty}}.
+
+**Tampilan Jawaban Terbuka**:
+> Benda putar Terompet Gabriel yang dibentuk dari y = 1/x pada [1, \infty) memiliki volume terhingga **[V = \pi]**, namun memiliki luas permukaan tak hingga **[A = \infty]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Menunjukkan bahwa integral tak wajar dengan integran bernilai positif dapat konvergen pada dimensi 3 namun divergen pada dimensi 2.
+
+**Tags**: `tier-01::matematika math::calculus improper-integrals gabriel-horn`  
+**Kategori**: `Improper Integrals`
+
+---
+
+### Kartu 61: Modul 013: Uji Rasio Deret Tak Hingga (d'Alembert)
+**Pertanyaan Cloze (Anki Text)**:
+> Pada deret \sum a_n, jika limit rasio L = \lim_{n \to \infty} \left| \frac{a_{n+1}}{a_n} \right| bernilai {{c1::L < 1}}, maka deret konvergen mutlak; jika {{c2::L > 1}}, deret divergen; dan jika {{c3::L = 1}}, uji gagal / inkonklusif.
+
+**Tampilan Jawaban Terbuka**:
+> Pada deret \sum a_n, jika limit rasio L = \lim_{n \to \infty} \left| \frac{a_{n+1}}{a_n} \right| bernilai **[L < 1]**, maka deret konvergen mutlak; jika **[L > 1]**, deret divergen; dan jika **[L = 1]**, uji gagal / inkonklusif.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Uji rasio sangat efektif untuk deret yang memuat suku faktorial n! dan fungsi eksponensial a^n.
+
+**Tags**: `tier-01::matematika math::calculus series ratio-test`  
+**Kategori**: `Infinite Series`
+
+---
+
+### Kartu 62: Modul 013: Deret Taylor & Sisa Lagrange
+**Pertanyaan Cloze (Anki Text)**:
+> Polinomial Taylor derajat n di sekitar a adalah P_n(x) = \sum_{k=0}^{n} \frac{f^{(k)}(a)}{k!} (x - a)^k, dengan batas sisa galat Lagrange bernilai {{c1::R_n(x) = \frac{f^{(n+1)}(\xi)}{(n+1)!} (x - a)^{n+1}}} untuk suatu \xi di antara a dan x.
+
+**Tampilan Jawaban Terbuka**:
+> Polinomial Taylor derajat n di sekitar a adalah P_n(x) = \sum_{k=0}^{n} \frac{f^{(k)}(a)}{k!} (x - a)^k, dengan batas sisa galat Lagrange bernilai **[R_n(x) = \frac{f^{(n+1)}(\xi)}{(n+1)!} (x - a)^{n+1}]** untuk suatu \xi di antara a dan x.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Bentuk sisa Lagrange memberikan garansi batas toleransi galat numerik pemotongan (truncation error) pada representasi floating-point.
+
+**Tags**: `tier-01::matematika math::calculus taylor-series lagrange-remainder`  
+**Kategori**: `Taylor Series`
+
+---
+
+### Kartu 63: Modul 013: Metode Newton-Raphson
+**Pertanyaan Cloze (Anki Text)**:
+> Skema pencarian akar numerik Newton-Raphson x_{k+1} = {{c1::x_k - \frac{f(x_k)}{f'(x_k)}}} memiliki laju konvergensi {{c2::kuadratik (quadratic, e_{k+1} \propto e_k^2)}}, namun dapat gagal jika menabrak titik {{c3::f'(x_k) = 0 atau osilasi siklus tertutup}}.
+
+**Tampilan Jawaban Terbuka**:
+> Skema pencarian akar numerik Newton-Raphson x_{k+1} = **[x_k - \frac{f(x_k)}{f'(x_k)}]** memiliki laju konvergensi **[kuadratik (quadratic, e_{k+1} \propto e_k^2)]**, namun dapat gagal jika menabrak titik **[f'(x_k) = 0 atau osilasi siklus tertutup]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Metode Brent mengatasi kegagalan ini dengan menggabungkan Newton-Raphson dan Biseksi sebagai jaring pengaman stabilitas 100%.
+
+**Tags**: `tier-01::matematika math::calculus numerical-methods newton-raphson`  
+**Kategori**: `Computational Calculus`

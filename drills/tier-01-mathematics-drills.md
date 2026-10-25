@@ -2430,3 +2430,583 @@ Karena $\lambda_2 = 2 > 0$, graf dijamin terhubung kokoh. Vektor eigen Fiedler $
 - Modul 018: [Statistika Inferensial & Desain Eksperimen](../curriculum/01-fondasi-matematika/018-statistika-inferensial-desain-eksperimen.md)
 - Modul 021: [Metode Numerik & Analisis Galat](../curriculum/01-fondasi-matematika/021-metode-numerik-analisis-galat.md)
 - Spaced Repetition: [`deck-01-cognitive-logic-math.md`](../flashcards/deck-01-cognitive-logic-math.md)
+
+
+## Modul 013: Kalkulus Diferensial & Integral Satu Variabel
+
+Bagian ini menyajikan rangkaian latihan diagnostik Sokratik mendalam yang disinkronkan secara presisi dengan silabus komprehensif pada [Modul 013: Kalkulus Diferensial & Integral Satu Variabel](../curriculum/01-fondasi-matematika/013-kalkulus-diferensial-integral-satu-variabel.md). Setiap butir soal menguji batas pemahaman intuisi infinitesimal, fondasi aksiomatik limit, kekontinuan, teorema dasar kalkulus, deret tak hingga, dan kalkulus komputasional dari prinsip pertama.
+
+---
+
+### Soal 013.1: Limit Infinitesimal, Pembuktian Formal $\varepsilon-\delta$, dan Singularitas Floating-Point
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Mengapa intuisi "mendekati" tidak cukup dalam sains presisi? Bagaimana kita membuktikan tanpa keraguan sedikit pun bahwa limit sebuah fungsi benar-benar menuju suatu angka, dan bagaimana pembagian dengan bilangan infinitesimal memicu kehancuran presisi numerik pada CPU komputer?
+
+1. Buktikan secara formal menggunakan definisi limit Cauchy $\varepsilon-\delta$ bahwa:
+   $$\lim_{x \to 2} (3x - 1) = 5$$
+   Tentukan nilai $\delta(\varepsilon)$ eksplisit yang menjamin pertidaksamaan terpenuhi untuk sembarang $\varepsilon > 0$.
+2. Dalam rekayasa grafika komputer 3D, ekspresi $g(x) = \frac{1 - \cos x}{x^2}$ sering dievaluasi untuk sudut rotasi sangat kecil ($x \approx 0$). Jelaskan mengapa evaluasi naif ekspresi ini pada prosesor IEEE 754 *double precision* memicu pembatalan katastropik (*catastrophic cancellation*) dan hasil $0{,}0$ atau NaN, padahal nilai limit analitisnya adalah $\frac{1}{2}$.
+3. Tuliskan reformulasi aljabar stabil dan ekspansi deret Taylor dari $g(x)$ yang kebal terhadap pembatalan katastropik untuk $|x| < 10^{-4}$.
+
+<details>
+<summary>💡 Petunjuk Bertahap (Hint)</summary>
+
+- **Petunjuk 1 (Analisis Formal):** Mulai dari ketidaksamaan target $|f(x) - L| < \varepsilon$. Manipulasi ekspresi $|(3x - 1) - 5| = |3x - 6| = 3|x - 2|$. Hubungkan langsung $|x - 2|$ dengan $\delta$.
+- **Petunjuk 2 (Floating-Point):** Ketika $x = 10^{-8}$, $x^2 = 10^{-16}$. Pada presisi 53-bit IEEE 754, $1 - \cos(10^{-8}) \approx 1 - (1 - \frac{x^2}{2})$. Angka $1 - 10^{-16}$ dibulatkan menjadi $1{,}0$, menghasilkan $1{,}0 - 1{,}0 = 0{,}0$.
+- **Petunjuk 3 (Identitas Trigonometri):** Gunakan rumus sudut ganda $1 - \cos x = 2 \sin^2(x/2)$, atau deret Taylor $\cos x \approx 1 - \frac{x^2}{2!} + \frac{x^4}{4!} - \dots$.
+</details>
+
+<details>
+<summary>✅ Pembahasan & Solusi Lengkap</summary>
+
+**Langkah 1: Pembuktian Formal Epsilon-Delta**
+Diberikan $\varepsilon > 0$ sembarang. Kita harus menemukan $\delta > 0$ sedemikian rupa sehingga:
+$$0 < |x - 2| < \delta \implies |(3x - 1) - 5| < \varepsilon$$
+Sederhanakan pertidaksamaan keluaran:
+$$|(3x - 1) - 5| = |3x - 6| = 3|x - 2|$$
+Kita menghendaki $3|x - 2| < \varepsilon$, yang setara dengan:
+$$|x - 2| < \frac{\varepsilon}{3}$$
+Pilih $\delta = \frac{\varepsilon}{3}$.
+**Verifikasi Formal**:
+Untuk setiap $x$ yang memenuhi $0 < |x - 2| < \delta = \frac{\varepsilon}{3}$, berlaku:
+$$|(3x - 1) - 5| = 3|x - 2| < 3 \left(\frac{\varepsilon}{3}\right) = \varepsilon$$
+Dengan demikian, terbukti bahwa $\lim_{x \to 2} (3x - 1) = 5$. $\blacksquare$
+
+**Langkah 2: Analisis Pembatalan Katastropik Floating-Point**
+Nilai limit analitis fungsi:
+$$\lim_{x \to 0} \frac{1 - \cos x}{x^2} = \lim_{x \to 0} \frac{\sin x}{2x} = \frac{1}{2}$$
+Namun pada komputer, tipe `float64` hanya memiliki 53 bit mantissa (~15-17 digit desimal signifikan).
+Jika $|x| < 10^{-8}$, maka $\cos x \approx 1 - \frac{x^2}{2} = 1 - 5 \times 10^{-17}$. Karena $5 \times 10^{-17} < \epsilon_{\text{machine}} \approx 2{,}22 \times 10^{-16}$, komputer membulatkan $\cos x$ menjadi tepat $1{,}0$.
+Pengurangan $1 - 1{,}0$ menghasilkan $0{,}0$ mutlak. Pembagian $0{,}0 / x^2$ menghasilkan keluaran keliru $0{,}0$, bukan $0{,}5$.
+
+**Langkah 3: Solusi Numerik Stabil**
+1. **Identitas Trigonometri Sudut Ganda**:
+   $$1 - \cos x = 2 \sin^2\left(\frac{x}{2}\right) \implies \frac{1 - \cos x}{x^2} = \frac{2 \sin^2(x/2)}{x^2} = \frac{1}{2} \left( \frac{\sin(x/2)}{x/2} \right)^2$$
+   Rumus ini tidak melibatkan pengurangan dua bilangan yang hampir sama, sehingga kebal pembatalan katastropik.
+2. **Ekspansi Deret Taylor Orde 4**:
+   $$\cos x = 1 - \frac{x^2}{2} + \frac{x^4}{24} - \mathcal{O}(x^6)$$
+   $$\frac{1 - \cos x}{x^2} = \frac{1}{2} - \frac{x^2}{24} + \mathcal{O}(x^4)$$
+   Untuk $|x| < 10^{-4}$, mengevaluasi $\frac{1}{2} - \frac{x^2}{24}$ memberikan presisi hingga 16 digit desimal penuh tanpa galat pembulatan.
+</details>
+
+---
+
+### Soal 013.2: Turunan Laju Perubahan, Diferensiasi Implisit, dan Aturan Rantai AutoDiff Backpropagation
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Bagaimana jika variabel input dan output saling bertaut erat dalam satu persamaan rumit yang tidak bisa diisolasi? Dan bagaimana Aturan Rantai turunan menjadi mesin penggerak utama kecerdasan buatan dalam memperbarui miliaran parameter bobot jaringan syaraf?
+
+1. Kurva geometris Folium Descartes didefinisikan oleh persamaan implisit:
+   $$x^3 + y^3 = 6xy$$
+   Tentukan persamaan garis singgung kurva ini pada titik $(3, 3)$.
+2. Dalam pelatihan jaringan syaraf tiruan (*Deep Learning*), fungsi galat $L$ terhadap input $x$ didefinisikan melalui rantai operasi:
+   $$z = W_1 x + b_1, \quad a = \sigma(z) = \frac{1}{1 + e^{-z}}, \quad \hat{y} = W_2 a + b_2, \quad L = \frac{1}{2}(\hat{y} - y)^2$$
+   Terapkan Aturan Rantai (*Chain Rule*) untuk menurunkan gradien analitis $\frac{\partial L}{\partial W_1}$ dari prinsip pertama kalkulus diferensial.
+3. Jelaskan mengapa pendekatan Diferensiasi Otomatis mode mundur (*Reverse-Mode AutoDiff / Backpropagation*) memiliki kompleksitas waktu $\mathcal{O}(1)$ terhadap ukuran output fungsi objektif skalar, jauh melampaui pendekatan beda hingga numerik $\mathcal{O}(N)$ pada model AI modern.
+
+<details>
+<summary>💡 Petunjuk Bertahap (Hint)</summary>
+
+- **Petunjuk 1 (Diferensiasi Implisit):** Turunkan kedua ruas terhadap $x$, ingat bahwa $y$ adalah fungsi dari $x$ ($y = y(x)$), sehingga $\frac{d}{dx}[y^3] = 3y^2 \frac{dy}{dx}$ dan gunakan aturan perkalian pada ruas kanan: $\frac{d}{dx}[6xy] = 6y + 6x \frac{dy}{dx}$.
+- **Petunjuk 2 (Turunan Sigmoid):** Perhatikan sifat istimewa fungsi aktivasi sigmoid: $\sigma'(z) = \sigma(z)(1 - \sigma(z)) = a(1 - a)$.
+- **Petunjuk 3 (Reverse Mode):** Modus mundur merambatkan gradien dari skalar $L$ ke belakang melalui perkalian vektor-Jacobi, mengevaluasi semua gradien terhadap $N$ parameter dalam satu kali jalan (*single pass*).
+</details>
+
+<details>
+<summary>✅ Pembahasan & Solusi Lengkap</summary>
+
+**Langkah 1: Diferensiasi Implisit Folium Descartes**
+Persamaan kurva: $x^3 + y^3 - 6xy = 0$.
+Diferensialkan kedua ruas terhadap $x$:
+$$\frac{d}{dx}[x^3] + \frac{d}{dx}[y^3] - 6\frac{d}{dx}[xy] = 0$$
+$$3x^2 + 3y^2 \frac{dy}{dx} - 6\left(y + x \frac{dy}{dx}\right) = 0$$
+$$3x^2 - 6y + (3y^2 - 6x)\frac{dy}{dx} = 0$$
+Isolasi $\frac{dy}{dx}$:
+$$\frac{dy}{dx} = \frac{6y - 3x^2}{3y^2 - 6x} = \frac{2y - x^2}{y^2 - 2x}$$
+Evaluasi gradien di titik $(3, 3)$:
+$$m = \left.\frac{dy}{dx}\right|_{(3, 3)} = \frac{2(3) - 3^2}{3^2 - 2(3)} = \frac{6 - 9}{9 - 6} = \frac{-3}{3} = -1$$
+Persamaan garis singgung bergradien $m = -1$ melalui $(3, 3)$:
+$$y - 3 = -1(x - 3) \implies y - 3 = -x + 3 \implies y = -x + 6 \quad \text{atau} \quad x + y = 6$$
+
+**Langkah 2: Penurunan Gradien Backpropagation Jaringan Saraf**
+Berdasarkan Aturan Rantai multivariabel:
+$$\frac{\partial L}{\partial W_1} = \frac{\partial L}{\partial \hat{y}} \cdot \frac{\partial \hat{y}}{\partial a} \cdot \frac{\partial a}{\partial z} \cdot \frac{\partial z}{\partial W_1}$$
+Evaluasi masing-masing turunan parsial:
+1. $\frac{\partial L}{\partial \hat{y}} = \frac{\partial}{\partial \hat{y}} \left[ \frac{1}{2}(\hat{y} - y)^2 \right] = (\hat{y} - y)$
+2. $\frac{\partial \hat{y}}{\partial a} = W_2$
+3. $\frac{\partial a}{\partial z} = \sigma'(z) = \sigma(z)(1 - \sigma(z)) = a(1 - a)$
+4. $\frac{\partial z}{\partial W_1} = x$
+Gabungkan seluruh komponen:
+$$\frac{\partial L}{\partial W_1} = (\hat{y} - y) \cdot W_2 \cdot [a(1 - a)] \cdot x^T$$
+Persamaan ini adalah formula pembaruan bobot layer tersembunyi pada algoritma backpropagation klasik.
+
+**Langkah 3: Efisiensi Komputasional AutoDiff**
+Jika jaringan syaraf memiliki $N = 10^{11}$ parameter bobot (seperti LLM modern), metode beda hingga numerik $\frac{L(W + h \cdot e_i) - L(W)}{h}$ membutuhkan $N$ kali evaluasi *forward pass* ($10^{11}$ kali inferensi), yang membutuhkan waktu ribuan tahun.
+Sebaliknya, *Reverse-Mode AutoDiff* merambatkan gradien dari skalar tunggal $L$ ke belakang memanfaatkan rantai perkalian Jacobi-vektor, menghitung seluruh gradien terhadap $10^{11}$ parameter hanya dalam satu kali jalan (*single backward pass*), dengan kompleksitas waktu proporsional terhadap *forward pass* ($\approx 2-3 \times \text{Cost}_{\text{forward}}$).
+</details>
+
+---
+
+### Soal 013.3: Teorema Rolle, Teorema Nilai Rata-rata (MVT), dan Karakterisasi Kecekungan Optimasi Konveks
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Mengapa Teorema Nilai Rata-rata (MVT) disebut sebagai "senjata paling mematikan" dalam analisis matematika? Bagaimana MVT membuktikan bahwa fungsi yang memiliki turunan kedua selalu positif pasti membentuk mangkuk cembung dengan titik minimum global tunggal?
+
+1. Nyatakan Teorema Nilai Rata-rata (MVT) Lagrange dan jelaskan secara geometris hubungannya dengan Teorema Rolle.
+2. Buktikan menggunakan Teorema Nilai Rata-rata: Jika fungsi $f: \mathbb{R} \to \mathbb{R}$ terdiferensialkan dua kali dan $f''(x) > 0$ untuk setiap $x \in \mathbb{R}$, maka fungsi $f$ terletak di atas garis singgungnya di sembarang titik $x_0$:
+   $$f(x) \ge f(x_0) + f'(x_0)(x - x_0), \quad \forall x \in \mathbb{R}$$
+   dengan kesamaan berlaku jika dan hanya jika $x = x_0$.
+3. Berdasarkan pertidaksamaan di atas, buktikan bahwa jika $x^*$ adalah titik kritis di mana $f'(x^*) = 0$, maka $x^*$ dijamin merupakan **titik minimum global mutlak** dari fungsi $f$ pada $\mathbb{R}$.
+
+<details>
+<summary>💡 Petunjuk Bertahap (Hint)</summary>
+
+- **Petunjuk 1 (Rolle ke MVT):** Definisikan fungsi pembantu selisih garis sekan: $h(x) = f(x) - \left[ f(a) + \frac{f(b)-f(a)}{b-a}(x - a) \right]$. Perhatikan bahwa $h(a) = h(b) = 0$.
+- **Petunjuk 2 (MVT pada Turunan):** Terapkan Teorema Taylor dengan suku sisa Lagrange orde 1: $f(x) = f(x_0) + f'(x_0)(x - x_0) + \frac{f''(\xi)}{2}(x - x_0)^2$ untuk suatu $\xi$ di antara $x$ dan $x_0$.
+- **Petunjuk 3 (Minimum Global):** Substitusikan $x_0 = x^*$ ke dalam pertidaksamaan kecekungan dan gunakan fakta bahwa $f'(x^*) = 0$.
+</details>
+
+<details>
+<summary>✅ Pembahasan & Solusi Lengkap</summary>
+
+**Langkah 1: Hubungan Teorema Rolle & Teorema Nilai Rata-rata**
+- **Teorema Rolle**: Jika $h: [a, b] \to \mathbb{R}$ kontinu pada $[a, b]$, terdiferensialkan pada $(a, b)$, dan $h(a) = h(b)$, maka terdapat setidaknya satu titik $c \in (a, b)$ sedemikian rupa sehingga $h'(c) = 0$.
+- **Penurunan MVT dari Rolle**:
+  Definisikan fungsi selisih vertikal antara kurva $f(x)$ dan tali busur sekan:
+  $$h(x) = f(x) - f(a) - \frac{f(b) - f(a)}{b - a}(x - a)$$
+  Evaluasi titik ujung:
+  $$h(a) = f(a) - f(a) - 0 = 0$$
+  $$h(b) = f(b) - f(a) - \frac{f(b) - f(a)}{b - a}(b - a) = 0$$
+  Karena $h(a) = h(b) = 0$ dan $h$ memenuhi syarat Rolle, terdapat $c \in (a, b)$ dengan $h'(c) = 0$:
+  $$h'(c) = f'(c) - \frac{f(b) - f(a)}{b - a} = 0 \implies f'(c) = \frac{f(b) - f(a)}{b - a}$$
+  Secara geometris, garis singgung pada kurva di $x = c$ sejajar sempurna dengan garis sekan yang menghubungkan titik ujung $(a, f(a))$ dan $(b, f(b))$.
+
+**Langkah 2: Pembuktian Karakterisasi Fungsi Konveks Tingkat Pertama**
+Berdasarkan Teorema Taylor dengan suku sisa Lagrange derajat $n = 1$, untuk sembarang $x \ne x_0$, terdapat titik $\xi$ yang terletak di antara $x_0$ dan $x$ sedemikian rupa sehingga:
+$$f(x) = f(x_0) + f'(x_0)(x - x_0) + \frac{f''(\xi)}{2!}(x - x_0)^2$$
+Karena diberikan bahwa $f''(t) > 0$ untuk setiap $t \in \mathbb{R}$, maka $f''(\xi) > 0$.
+Selain itu, karena $x \ne x_0$, kuadrat jarak $(x - x_0)^2 > 0$.
+Akibatnya:
+$$\frac{f''(\xi)}{2}(x - x_0)^2 > 0$$
+Sehingga:
+$$f(x) - \big[ f(x_0) + f'(x_0)(x - x_0) \big] = \frac{f''(\xi)}{2}(x - x_0)^2 > 0$$
+$$f(x) > f(x_0) + f'(x_0)(x - x_0) \quad \forall x \ne x_0$$
+Untuk $x = x_0$, kedua ruas bernilai persis $f(x_0)$, sehingga $f(x) \ge f(x_0) + f'(x_0)(x - x_0)$ terbukti untuk semua $x \in \mathbb{R}$. $\blacksquare$
+
+**Langkah 3: Pembuktian Titik Kritis Menjamin Minimum Global Mutlak**
+Misalkan $x^*$ adalah titik kritis sehingga $f'(x^*) = 0$.
+Terapkan pertidaksamaan yang telah dibuktikan pada Langkah 2 dengan memilih $x_0 = x^*$:
+$$f(x) \ge f(x^*) + f'(x^*)(x - x^*) \quad \forall x \in \mathbb{R}$$
+Karena $f'(x^*) = 0$, suku linier lenyap:
+$$f(x) \ge f(x^*) + 0 \cdot (x - x^*) \implies f(x) \ge f(x^*) \quad \forall x \in \mathbb{R}$$
+Pertidaksamaan ini menyatakan bahwa untuk sembarang nilai $x$ di alam semesta bilangan riil, nilai fungsi $f(x)$ tidak pernah lebih kecil dari $f(x^*)$.
+Dengan demikian, $x^*$ terbukti merupakan titik minimum global mutlak dari fungsi $f$. Inilah fondasi matematis mengapa seluruh masalah optimasi konveks (seperti regresi linier, SVM, dan regresi logistik) dijamin konvergen ke optimum global tanpa terjebak di jebakan lokal. $\blacksquare$
+</details>
+
+---
+
+### Soal 013.4: Jumlahan Riemann, Integrabilitas Darboux, dan Teorema Dasar Kalkulus (FTC 1 & 2)
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Bagaimana jutaan kepingan persegi panjang tipis yang tampaknya kasar dapat menghasilkan nilai luas eksak mulus tanpa galat? Dan bagaimana kita menyelesaikan limit deret tak hingga rumit hanya dengan mengubahnya menjadi integral tentu?
+
+1. Hitung nilai eksak limit deret berikut dengan mengidentifikasikannya sebagai limit Jumlahan Riemann dari suatu integral tentu:
+   $$L = \lim_{n \to \infty} \sum_{i=1}^{n} \frac{n}{n^2 + i^2}$$
+2. Berikan contoh fungsi diskontinu terintegralkan Riemann pada $[0, 1]$ dan buktikan mengapa fungsi Dirichlet $f(x) = \mathbf{1}_{\mathbb{Q}}(x)$ tidak terintegralkan Riemann menggunakan jumlah atas dan bawah Darboux.
+3. Turunkan turunan fungsi akumulator berikut terhadap $x$ menggunakan Teorema Dasar Kalkulus dan Aturan Rantai:
+   $$G(x) = \int_{x^2}^{x^3} \sqrt{1 + t^4} \, dt$$
+
+<details>
+<summary>💡 Petunjuk Bertahap (Hint)</summary>
+
+- **Petunjuk 1 (Bentuk Riemann):** Faktorkan $n^2$ dari penyebut: $\frac{n}{n^2(1 + (i/n)^2)} = \frac{1}{1 + (i/n)^2} \cdot \frac{1}{n}$. Kenali $x_i = \frac{i}{n}$ dan $\Delta x = \frac{1}{n}$.
+- **Petunjuk 2 (Darboux Dirichlet):** Di antara setiap dua bilangan riil terdapat bilangan rasional dan irasional. Berapakah supremum dan infimum fungsi Dirichlet pada sembarang subinterval?
+- **Petunjuk 3 (Turunan Batas Peubah):** Pecah integral menjadi $\int_{0}^{x^3} - \int_{0}^{x^2}$ dan terapkan aturan rantai: $\frac{d}{dx} \int_a^{u(x)} f(t) dt = f(u(x)) \cdot u'(x)$.
+</details>
+
+<details>
+<summary>✅ Pembahasan & Solusi Lengkap</summary>
+
+**Langkah 1: Transformasi Deret ke Integral Riemann**
+Tinjau suku dalam deret:
+$$\frac{n}{n^2 + i^2} = \frac{n}{n^2 \left( 1 + \left(\frac{i}{n}\right)^2 \right)} = \frac{1}{1 + \left(\frac{i}{n}\right)^2} \cdot \frac{1}{n}$$
+Limit deret menjadi:
+$$L = \lim_{n \to \infty} \sum_{i=1}^{n} \frac{1}{1 + \left(\frac{i}{n}\right)^2} \cdot \frac{1}{n}$$
+Bentuk ini adalah definisi limit Jumlahan Riemann kanan untuk fungsi $f(x) = \frac{1}{1 + x^2}$ pada interval $[0, 1]$ dengan partisi seragam $\Delta x = \frac{1}{n}$ dan titik sampel $x_i = \frac{i}{n}$:
+$$L = \int_{0}^{1} \frac{1}{1 + x^2} \, dx$$
+Evaluasi antiturunan analitis:
+$$\int_{0}^{1} \frac{1}{1 + x^2} \, dx = \left[ \arctan(x) \right]_{0}^{1} = \arctan(1) - \arctan(0) = \frac{\pi}{4} - 0 = \frac{\pi}{4}$$
+Maka nilai limit eksak adalah $\frac{\pi}{4}$.
+
+**Langkah 2: Integrabilitas Darboux Fungsi Dirichlet**
+Fungsi Dirichlet:
+$$f(x) = \begin{cases} 1, & \text{jika } x \in \mathbb{Q} \\ 0, & \text{jika } x \notin \mathbb{Q} \end{cases}$$
+Tinjau sembarang partisi $P = \{x_0, x_1, \dots, x_n\}$ dari $[0, 1]$.
+Pada setiap subinterval $[x_{k-1}, x_k]$, karena himpunan $\mathbb{Q}$ dan $\mathbb{R} \setminus \mathbb{Q}$ keduanya rapat dalam $\mathbb{R}$, selalu terdapat bilangan rasional dan bilangan irasional.
+Maka:
+$$M_k = \sup_{x \in [x_{k-1}, x_k]} f(x) = 1, \quad m_k = \inf_{x \in [x_{k-1}, x_k]} f(x) = 0$$
+Jumlah Atas Darboux:
+$$U(f, P) = \sum_{k=1}^n M_k \Delta x_k = 1 \cdot \sum \Delta x_k = 1 \cdot (1 - 0) = 1$$
+Jumlah Bawah Darboux:
+$$L(f, P) = \sum_{k=1}^n m_k \Delta x_k = 0 \cdot \sum \Delta x_k = 0$$
+Integral Atas Darboux $\overline{\int_0^1} f = \inf_P U(f, P) = 1$.
+Integral Bawah Darboux $\underline{\int_0^1} f = \sup_P L(f, P) = 0$.
+Karena $\underline{\int_0^1} f \ne \overline{\int_0^1} f$ ($0 \ne 1$), kriteria keterintegralan Riemann/Darboux dilanggar. Fungsi Dirichlet **tidak terintegralkan secara Riemann**.
+
+**Langkah 3: Diferensiasi Akumulator dengan Batas Peubah Ganda**
+Pecah integral menggunakan titik acuan sembarang (misal 0):
+$$G(x) = \int_{x^2}^{0} \sqrt{1 + t^4} \, dt + \int_{0}^{x^3} \sqrt{1 + t^4} \, dt = \int_{0}^{x^3} \sqrt{1 + t^4} \, dt - \int_{0}^{x^2} \sqrt{1 + t^4} \, dt$$
+Misalkan $u = x^3$ dan $v = x^2$. Terapkan Teorema Dasar Kalkulus dan Aturan Rantai:
+$$\frac{d}{dx} \left[ \int_{0}^{u(x)} f(t) \, dt \right] = f(u(x)) \cdot u'(x)$$
+Turunan suku pertama:
+$$\sqrt{1 + (x^3)^4} \cdot \frac{d}{dx}[x^3] = 3x^2 \sqrt{1 + x^{12}}$$
+Turunan suku kedua:
+$$\sqrt{1 + (x^2)^4} \cdot \frac{d}{dx}[x^2] = 2x \sqrt{1 + x^8}$$
+Hasil akhir:
+$$G'(x) = 3x^2 \sqrt{1 + x^{12}} - 2x \sqrt{1 + x^8}$$
+</details>
+
+---
+
+### Soal 013.5: Integrasi Parsial Berulang (Tabular Integration) dan Dekomposisi Pecahan Parsial Sistem Dinamis
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Bagaimana insinyur memecahkan integral perkalian fungsi berulang tanpa tersesat dalam belantara tanda plus-minus? Dan bagaimana fungsi alih sistem kendali dipreteli menjadi komponen-komponen dasar yang mudah dipahami respons frekuensinya?
+
+1. Selesaikan integral tentu berikut menggunakan metode tabular (*Tabular Integration by Parts*):
+   $$I = \int_{0}^{1} x^4 e^{-2x} \, dx$$
+2. Dalam rekayasa kontrol sistem kendali, fungsi transfer lup terbuka diberikan oleh fungsi rasional:
+   $$H(s) = \frac{3s^2 + 11s + 14}{(s + 1)(s^2 + 2s + 5)}$$
+   Lakukan dekomposisi pecahan parsial lengkap dari $H(s)$ ke dalam komponen linier dan kuadratik tak tereduksi.
+3. Tentukan invers transformasi Laplace dari masing-masing komponen pecahan parsial tersebut untuk menemukan respons impuls ranah waktu $h(t)$.
+
+<details>
+<summary>💡 Petunjuk Bertahap (Hint)</summary>
+
+- **Petunjuk 1 (Metode Tabular):** Buat tabel dengan kolom tanda ($\pm$), kolom diferensiasi $u = x^4$ (turunkan hingga 0), dan kolom integrasi $dv = e^{-2x} dx$ (integrasikan berulang kali).
+- **Petunjuk 2 (Bentuk Parsial):** Tuliskan bentuk $\frac{A}{s+1} + \frac{Bs + C}{s^2 + 2s + 5}$. Kalikan kedua ruas dengan penyebut bersama dan cari konstanta dengan menyamakan koefisien suku-suku sejenis.
+- **Petunjuk 3 (Kuadrat Sempurna):** Lengkapi kuadrat pada penyebut kuadratik: $s^2 + 2s + 5 = (s + 1)^2 + 2^2$. Kenali bentuk eksponensial sinus dan kosinus.
+</details>
+
+<details>
+<summary>✅ Pembahasan & Solusi Lengkap</summary>
+
+**Langkah 1: Integrasi Parsial Tabular**
+Pilih $u = x^4$ dan $dv = e^{-2x} dx$. Susun tabel diferensiasi-integrasi:
+
+| Tanda | Diferensiasi $D[u]$ | Integrasi $\int dv$ |
+|:---:|---|---|
+| $(+)$ | $x^4$ | $-\frac{1}{2}e^{-2x}$ |
+| $(-)$ | $4x^3$ | $\frac{1}{4}e^{-2x}$ |
+| $(+)$ | $12x^2$ | $-\frac{1}{8}e^{-2x}$ |
+| $(-)$ | $24x$ | $\frac{1}{16}e^{-2x}$ |
+| $(+)$ | $24$ | $-\frac{1}{32}e^{-2x}$ |
+| $(-)$ | $0$ | $\frac{1}{64}e^{-2x}$ |
+
+Kalikan baris diagonal:
+$$\int x^4 e^{-2x} \, dx = -e^{-2x} \left[ \frac{x^4}{2} + \frac{4x^3}{4} + \frac{12x^2}{8} + \frac{24x}{16} + \frac{24}{32} \right] + C$$
+Sederhanakan pecahan di dalam kurung:
+$$\int x^4 e^{-2x} \, dx = -e^{-2x} \left[ \frac{1}{2}x^4 + x^3 + \frac{3}{2}x^2 + \frac{3}{2}x + \frac{3}{4} \right] + C$$
+Faktorkan $\frac{1}{4}$:
+$$= -\frac{e^{-2x}}{4} \left[ 2x^4 + 4x^3 + 6x^2 + 6x + 3 \right] + C$$
+Evaluasi batas integral dari 0 ke 1:
+- Pada batas atas $x = 1$:
+  $$-\frac{e^{-2}}{4} [2(1) + 4(1) + 6(1) + 6(1) + 3] = -\frac{21}{4}e^{-2}$$
+- Pada batas bawah $x = 0$:
+  $$-\frac{e^{0}}{4} [0 + 0 + 0 + 0 + 3] = -\frac{3}{4}$$
+Hasil integrasi:
+$$I = \left( -\frac{21}{4}e^{-2} \right) - \left( -\frac{3}{4} \right) = \frac{3}{4} - \frac{21}{4}e^{-2} \approx 0{,}75 - 0{,}71048 = 0{,}03952$$
+
+**Langkah 2: Dekomposisi Pecahan Parsial**
+Bentuk dekomposisi:
+$$\frac{3s^2 + 11s + 14}{(s + 1)(s^2 + 2s + 5)} = \frac{A}{s + 1} + \frac{Bs + C}{s^2 + 2s + 5}$$
+Kalikan kedua ruas dengan $(s + 1)(s^2 + 2s + 5)$:
+$$3s^2 + 11s + 14 = A(s^2 + 2s + 5) + (Bs + C)(s + 1)$$
+Gunakan metode substitusi cerdas:
+- Pilih $s = -1$:
+  $$3(-1)^2 + 11(-1) + 14 = A((-1)^2 + 2(-1) + 5) + 0$$
+  $$3 - 11 + 14 = A(1 - 2 + 5) \implies 6 = 4A \implies A = \frac{6}{4} = \frac{3}{2} = 1{,}5$$
+- Samakan koefisien $s^2$:
+  $$3 = A + B \implies B = 3 - 1{,}5 = 1{,}5 = \frac{3}{2}$$
+- Samakan konstanta bebas ($s = 0$):
+  $$14 = 5A + C \implies 14 = 5(1{,}5) + C \implies 14 = 7{,}5 + C \implies C = 6{,}5 = \frac{13}{2}$$
+Maka bentuk pecahan parsialnya adalah:
+$$H(s) = \frac{3/2}{s + 1} + \frac{\frac{3}{2}s + \frac{13}{2}}{s^2 + 2s + 5}$$
+
+**Langkah 3: Transformasi Laplace Balik (Ranah Waktu)**
+Tulis ulang suku kedua dengan melengkapkan kuadrat penyebut: $s^2 + 2s + 5 = (s + 1)^2 + 2^2$.
+Ubah pembilang menjadi kelipatan $(s + 1)$ dan $2$:
+$$\frac{3}{2}s + \frac{13}{2} = \frac{3}{2}(s + 1) + 5 = \frac{3}{2}(s + 1) + \frac{5}{2}(2)$$
+Maka:
+$$H(s) = \frac{3}{2} \cdot \frac{1}{s + 1} + \frac{3}{2} \cdot \frac{s + 1}{(s + 1)^2 + 2^2} + \frac{5}{2} \cdot \frac{2}{(s + 1)^2 + 2^2}$$
+Invers transformasi Laplace menghasilkan respons impuls ranah waktu $h(t)$:
+$$h(t) = \frac{3}{2} e^{-t} + \frac{3}{2} e^{-t} \cos(2t) + \frac{5}{2} e^{-t} \sin(2t), \quad t \ge 0$$
+</details>
+
+---
+
+### Soal 013.6: Integral Tak Wajar, Konvergensi Singularitas, dan Terompet Gabriel (Gabriel's Horn Paradox)
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Bagaimana mungkin sebuah benda dapat menampung sejumlah cat terhingga (volumenya berhingga), tetapi Anda tidak akan pernah bisa mengecat seluruh permukaan luar benda tersebut sampai kiamat (luas permukaannya tak hingga)?
+
+1. Definisikan Terompet Gabriel (*Gabriel's Horn / Torricelli's Trumpet*) sebagai benda putar yang diperoleh dengan memutar kurva $y = \frac{1}{x}$ pada interval $[1, \infty)$ mengelilingi sumbu-$x$.
+2. Buktikan secara matematis bahwa volume terompet tersebut konvergen ke suatu nilai terhingga:
+   $$V = \pi$$
+3. Buktikan bahwa luas permukaan terompet tersebut divergen menuju tak hingga:
+   $$A = \infty$$
+   dan jelaskan penyelesaian paradoks fisikawan abad ke-17 ini menggunakan konsep ketebalan infinitesimal partikel cat.
+
+<details>
+<summary>💡 Petunjuk Bertahap (Hint)</summary>
+
+- **Petunjuk 1 (Volume Cakram):** Gunakan metode cakram: $V = \pi \int_{1}^{\infty} y^2 dx = \pi \lim_{b \to \infty} \int_1^b \frac{1}{x^2} dx$.
+- **Petunjuk 2 (Luas Permukaan):** Gunakan rumus luas permukaan benda putar: $A = 2\pi \int_{1}^{\infty} y \sqrt{1 + (y')^2} dx$. Tunjukkan bahwa $\sqrt{1 + (y')^2} > 1$, sehingga integrannya lebih besar dari $\frac{1}{x}$, yang mengarah ke deret harmonik divergen $\ln b \to \infty$.
+- **Petunjuk 3 (Resolusi Fisik):** Mengecat permukaan membutuhkan lapisan cat berketebalan molekuler $\epsilon > 0$. Pada diameter terompet yang lebih kecil dari ukuran atom cat, cat tidak bisa masuk lagi.
+</details>
+
+<details>
+<summary>✅ Pembahasan & Solusi Lengkap</summary>
+
+**Langkah 1: Perhitungan Volume Benda Putar**
+Berdasarkan metode cakram tegak lurus sumbu-$x$, elemen volume cakram adalah $dV = \pi y^2 dx = \pi \left(\frac{1}{x}\right)^2 dx$.
+Volume total dihitung melalui integral tak wajar:
+$$V = \lim_{b \to \infty} \pi \int_{1}^{b} \frac{1}{x^2} \, dx$$
+Evaluasi antiturunan:
+$$\int_{1}^{b} x^{-2} \, dx = \left[ -\frac{1}{x} \right]_{1}^{b} = -\frac{1}{b} - (-1) = 1 - \frac{1}{b}$$
+Ambil limit saat $b \to \infty$:
+$$V = \pi \lim_{b \to \infty} \left(1 - \frac{1}{b}\right) = \pi (1 - 0) = \pi$$
+Volume terompet **konvergen secara terhingga tepat sebesar $\pi$ satuan volume**.
+
+**Langkah 2: Perhitungan Luas Permukaan Benda Putar**
+Elemen panjang busur kurva adalah $ds = \sqrt{1 + (y')^2} dx$.
+Dengan $y = \frac{1}{x}$, maka $y' = -\frac{1}{x^2}$, sehingga:
+$$ds = \sqrt{1 + \left(-\frac{1}{x^2}\right)^2} \, dx = \sqrt{1 + \frac{1}{x^4}} \, dx$$
+Rumus luas permukaan benda putar terhadap sumbu-$x$:
+$$A = 2\pi \int_{1}^{\infty} y \, ds = 2\pi \lim_{b \to \infty} \int_{1}^{b} \frac{1}{x} \sqrt{1 + \frac{1}{x^4}} \, dx$$
+Perhatikan bahwa untuk setiap $x \ge 1$:
+$$1 + \frac{1}{x^4} > 1 \implies \sqrt{1 + \frac{1}{x^4}} > 1$$
+Maka kita dapat menggunakan Uji Perbandingan Langsung (*Direct Comparison Test*):
+$$\frac{1}{x} \sqrt{1 + \frac{1}{x^4}} > \frac{1}{x}$$
+Evaluasi integral pembanding:
+$$\int_{1}^{b} \frac{1}{x} \, dx = \ln(b) - \ln(1) = \ln(b)$$
+Saat $b \to \infty$, $\ln(b) \to \infty$.
+Karena fungsi pembanding divergen menuju tak hingga, maka berdasarkan uji perbandingan:
+$$A = 2\pi \int_{1}^{\infty} \frac{1}{x} \sqrt{1 + \frac{1}{x^4}} \, dx > 2\pi \lim_{b \to \infty} \ln(b) = \infty$$
+Luas permukaan terompet **divergen mutlak menuju $\infty$**.
+
+**Langkah 3: Resolusi Paradoks Fisik**
+Paradoks ini menyatakan: *"Kita bisa mengisi penuh terompet dengan $\pi$ liter cat, tetapi cat tersebut tidak cukup untuk mewarnai dinding luarnya!"*
+Resolusi matematis dan fisik:
+1. **Asumsi Ketebalan Nol**: Dalam matematika murni, luas permukaan adalah kuantitas 2 dimensi (tanpa ketebalan), sedangkan volume adalah kuantitas 3 dimensi. Tidak ada kontradiksi matematis antara integral luas berukuran tak hingga dan integral volume terhingga.
+2. **Realitas Fisika Materi Atom**: Dalam dunia nyata, molekul cat memiliki ketebalan finite tertentu ($d_{\text{molekul}} \approx 10^{-9}\text{ m}$). Ketika jari-jari corong terompet mengecil hingga $r(x) = \frac{1}{x} < d_{\text{molekul}}$ (untuk $x > 10^9$), molekul cat tidak dapat lagi menembus ke dalam ujung terompet. Jadi volume cat nyata tidak akan pernah bisa mengisi ujung terompet yang berdimensi subatomik.
+</details>
+
+---
+
+### Soal 013.7: Barisan & Deret Tak Hingga, Uji Rasio d'Alembert, dan Konvergensi Mutlak vs Bersyarat
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Mengapa mengubah urutan penjumlahan matematika pada deret tak hingga dapat menghasilkan angka berapa pun sesuka hati Anda? Dan mengapa sifat konvergensi bersyarat adalah jebakan berbahaya dalam komputasi paralel *multi-core*?
+
+1. Selidiki konvergensi mutlak (*absolute convergence*) dan konvergensi bersyarat (*conditional convergence*) dari deret berikut menggunakan Uji Deret Bolak-Balik Leibniz dan Uji Integral:
+   $$\sum_{n=2}^{\infty} \frac{(-1)^n}{n \ln(n)}$$
+2. Tentukan radius konvergensi $R$ dan interval konvergensi lengkap (termasuk pemeriksaan kedua titik ujung) dari deret kuasa (*power series*):
+   $$\sum_{n=1}^{\infty} \frac{(x - 3)^n}{n \cdot 2^n}$$
+3. Jelaskan Teorema Penataan Ulang Riemann (*Riemann Rearrangement Theorem*) untuk deret konvergen bersyarat. Mengapa operasi penjumlahan floating-point pada komputasi paralel asinkron (seperti reduksi OpenMP atau MPI) bersifat non-deterministik jika deret yang dijumlahkan tidak konvergen mutlak?
+
+<details>
+<summary>💡 Petunjuk Bertahap (Hint)</summary>
+
+- **Petunjuk 1 (Uji Leibniz & Integral):** Periksa tiga syarat Leibniz: $a_n > 0$, suku menurun monoton $a_{n+1} \le a_n$, dan $\lim a_n = 0$. Untuk konvergensi mutlak, evaluasi $\int_2^\infty \frac{1}{x \ln x} dx$ dengan substitusi $u = \ln x$.
+- **Petunjuk 2 (Uji Rasio):** Hitung limit rasio $\lim_{n \to \infty} \left| \frac{a_{n+1}}{a_n} \right| = \lim \frac{|x-3|}{2} \frac{n}{n+1} = \frac{|x-3|}{2} < 1$. Cek titik ujung $x = 1$ dan $x = 5$ secara terpisah.
+- **Petunjuk 3 (Non-Asosiatif):** Penjumlahan floating-point komputer tidak asosiatif ($(a+b)+c \ne a+(b+c)$). Jika urutan penjadwalan thread thread-pool bervariasi pada deret konvergen bersyarat, hasil akhir akan berfluktuasi pada setiap kali eksekusi (*race condition*).
+</details>
+
+<details>
+<summary>✅ Pembahasan & Solusi Lengkap</summary>
+
+**Langkah 1: Analisis Konvergensi Deret Alternating**
+Deret target: $\sum_{n=2}^{\infty} (-1)^n b_n$ dengan $b_n = \frac{1}{n \ln n}$.
+1. **Uji Deret Bolak-Balik (Leibniz)**:
+   - Suku positif: $b_n > 0$ untuk semua $n \ge 2$.
+   - Monoton turun: Fungsi $f(x) = \frac{1}{x \ln x}$ memiliki turunan $f'(x) = -\frac{\ln x + 1}{(x \ln x)^2} < 0$ untuk $x \ge 2$, sehingga $b_{n+1} < b_n$.
+   - Limit menuju nol: $\lim_{n \to \infty} \frac{1}{n \ln n} = 0$.
+   Karena ketiga syarat Leibniz terpenuhi, deret ini **konvergen**.
+2. **Uji Konvergensi Mutlak**:
+   Tinjau deret nilai mutlak: $\sum_{n=2}^{\infty} \frac{1}{n \ln n}$.
+   Gunakan Uji Integral:
+   $$\int_{2}^{\infty} \frac{1}{x \ln x} \, dx$$
+   Substitusi $u = \ln x$, $du = \frac{1}{x} dx$:
+   $$\int_{\ln 2}^{\infty} \frac{1}{u} \, du = \lim_{b \to \infty} [\ln u]_{\ln 2}^{b} = \lim_{b \to \infty} \ln(b) - \ln(\ln 2) = \infty$$
+   Karena integral divergen, deret nilai mutlaknya divergen.
+   Kesimpulan: Deret tersebut **konvergen bersyarat (*conditionally convergent*)**.
+
+**Langkah 2: Radius & Interval Konvergensi Deret Kuasa**
+Deret kuasa: $\sum_{n=1}^{\infty} c_n (x - 3)^n$ di mana $c_n = \frac{1}{n \cdot 2^n}$.
+Gunakan Uji Rasio d'Alembert:
+$$L = \lim_{n \to \infty} \left| \frac{a_{n+1}}{a_n} \right| = \lim_{n \to \infty} \left| \frac{(x - 3)^{n+1}}{(n+1) 2^{n+1}} \cdot \frac{n \cdot 2^n}{(x - 3)^n} \right|$$
+$$L = \lim_{n \to \infty} \frac{|x - 3|}{2} \cdot \frac{n}{n+1} = \frac{|x - 3|}{2}$$
+Deret konvergen mutlak jika $L < 1$:
+$$\frac{|x - 3|}{2} < 1 \implies |x - 3| < 2 \implies -2 < x - 3 < 2 \implies 1 < x < 5$$
+Radius konvergensi adalah $R = 2$.
+Pemeriksaan Titik Ujung:
+- **Titik Ujung $x = 1$**:
+  $$\sum_{n=1}^{\infty} \frac{(1 - 3)^n}{n \cdot 2^n} = \sum_{n=1}^{\infty} \frac{(-2)^n}{n \cdot 2^n} = \sum_{n=1}^{\infty} \frac{(-1)^n}{n}$$
+  Ini adalah Deret Harmonik Bolak-Balik, yang terbukti konvergen bersyarat berdasarkan uji Leibniz. Titik $x = 1$ **termasuk** dalam interval ($[$).
+- **Titik Ujung $x = 5$**:
+  $$\sum_{n=1}^{\infty} \frac{(5 - 3)^n}{n \cdot 2^n} = \sum_{n=1}^{\infty} \frac{2^n}{n \cdot 2^n} = \sum_{n=1}^{\infty} \frac{1}{n}$$
+  Ini adalah Deret Harmonik biasa ($p$-series dengan $p = 1$), yang terbukti divergen. Titik $x = 5$ **tidak termasuk** dalam interval ($)$).
+Maka Interval Konvergensi Lengkap adalah:
+$$I = [1, 5)$$
+
+**Langkah 3: Teorema Penataan Ulang Riemann & Komputasi Paralel**
+- **Teorema Riemann**: Jika sebuah deret tak hingga konvergen bersyarat (bukan konvergen mutlak), maka untuk sembarang bilangan riil target $M \in \mathbb{R}$ (atau bahkan $\pm \infty$), suku-suku deret tersebut dapat ditata ulang (*rearranged*) urutannya sedemikian rupa sehingga jumlah deret yang ditata ulang sama persis dengan $M$.
+- **Dampak pada Komputasi Paralel**:
+  Pada sistem terdistribusi atau multi-threading (seperti GPU compute kernels atau MPI reduce), urutan penjadwalan thread yang menyelesaikan tugas bersifat non-deterministik bergantung pada beban latensi inti prosesor (*race condition*).
+  Karena aritmetika floating-point IEEE 754 tidak asosiatif ($(A + B) + C \ne A + (B + C)$), menjumlahkan suku-suku deret dengan urutan penataan berbeda menghasilkan akumulasi galat pembulatan yang berbeda drastis. Jika deret hanya konvergen bersyarat, hasil agregasi multi-core akan menghasilkan angka acak berbeda pada setiap kali dijalankan.
+</details>
+
+---
+
+### Soal 013.8: Deret Taylor-Maclaurin, Penurunan Formula Euler, dan Batas Galat Lagrange pada Floating-Point
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Bagaimana satu rumus menyatukan lima konstanta paling penting di semesta ($e, i, \pi, 1, 0$)? Dan bagaimana prosesor floating-point menjamin bahwa aproksimasi fungsi rumit tidak pernah menyimpang lebih dari batas toleransi sebutir debu?
+
+1. Turunkan deret Maclaurin dari tiga fungsi elementer: $e^x$, $\sin x$, dan $\cos x$.
+2. Dengan mensubstitusikan variabel kompleks $x = i\theta$ (di mana $i^2 = -1$) ke dalam deret Maclaurin untuk $e^x$, turunkan secara rigor **Formula Euler**:
+   $$e^{i\theta} = \cos\theta + i\sin\theta$$
+   dan buktikan identitas paling indah dalam matematika: $e^{i\pi} + 1 = 0$.
+3. Gunakan Teorema Sisa Lagrange (*Lagrange Remainder Bound*) untuk menentukan derajat minimum polinomial Taylor $P_n(x)$ di sekitar $a = 0$ yang dibutuhkan untuk mengaproksimasi $\cos(0{,}5)$ dengan garansi galat mutlak lebih kecil dari $10^{-10}$:
+   $$|R_n(0{,}5)| < 10^{-10}$$
+
+<details>
+<summary>💡 Petunjuk Bertahap (Hint)</summary>
+
+- **Petunjuk 1 (Deret Standar):** $e^x = \sum \frac{x^n}{n!}$, $\sin x = \sum (-1)^k \frac{x^{2k+1}}{(2k+1)!}$, $\cos x = \sum (-1)^k \frac{x^{2k}}{(2k)!}$.
+- **Petunjuk 2 (Pangkat Bilangan Imajiner):** Hitung siklus pangkat dari $i$: $i^0 = 1, i^1 = i, i^2 = -1, i^3 = -i, i^4 = 1$. Pisahkan suku-suku berindeks genap (riil) dan suku berindeks ganjil (imajiner).
+- **Petunjuk 3 (Batas Lagrange):** $|R_n(x)| = \frac{|f^{(n+1)}(\xi)|}{(n+1)!} |x|^{n+1}$. Karena semua turunan kosinus dibatasi oleh $|\cos| \le 1$ dan $|\sin| \le 1$, gunakan batas atas $\frac{1}{(n+1)!} (0{,}5)^{n+1} < 10^{-10}$.
+</details>
+
+<details>
+<summary>✅ Pembahasan & Solusi Lengkap</summary>
+
+**Langkah 1: Penurunan Deret Maclaurin Dasar**
+Untuk $a = 0$, deret Maclaurin didefinisikan sebagai $\sum_{k=0}^{\infty} \frac{f^{(k)}(0)}{k!} x^k$.
+1. **Fungsi Eksponensial $f(x) = e^x$**:
+   Semua turunan ke-$k$ bernilai $f^{(k)}(0) = e^0 = 1$.
+   $$e^x = 1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + \frac{x^4}{4!} + \frac{x^5}{5!} + \dots = \sum_{k=0}^{\infty} \frac{x^k}{k!}$$
+2. **Fungsi Sinus $f(x) = \sin x$**:
+   $f(0) = 0$, $f'(0) = 1$, $f''(0) = 0$, $f'''(0) = -1$, $f^{(4)}(0) = 0, \dots$
+   $$\sin x = x - \frac{x^3}{3!} + \frac{x^5}{5!} - \frac{x^7}{7!} + \dots = \sum_{k=0}^{\infty} (-1)^k \frac{x^{2k+1}}{(2k+1)!}$$
+3. **Fungsi Kosinus $f(x) = \cos x$**:
+   $f(0) = 1$, $f'(0) = 0$, $f''(0) = -1$, $f'''(0) = 0$, $f^{(4)}(0) = 1, \dots$
+   $$\cos x = 1 - \frac{x^2}{2!} + \frac{x^4}{4!} - \frac{x^6}{6!} + \dots = \sum_{k=0}^{\infty} (-1)^k \frac{x^{2k}}{(2k)!}$$
+
+**Langkah 2: Penurunan Formula Euler**
+Substitusikan $x = i\theta$ ke dalam ekspansi deret $e^x$:
+$$e^{i\theta} = 1 + (i\theta) + \frac{(i\theta)^2}{2!} + \frac{(i\theta)^3}{3!} + \frac{(i\theta)^4}{4!} + \frac{(i\theta)^5}{5!} + \frac{(i\theta)^6}{6!} + \dots$$
+Hitung pangkat dari satuan imajiner $i$:
+$$i^1 = i, \quad i^2 = -1, \quad i^3 = -i, \quad i^4 = 1, \quad i^5 = i, \quad i^6 = -1, \quad \dots$$
+Substitusikan kembali:
+$$e^{i\theta} = 1 + i\theta - \frac{\theta^2}{2!} - i\frac{\theta^3}{3!} + \frac{\theta^4}{4!} + i\frac{\theta^5}{5!} - \frac{\theta^6}{6!} + \dots$$
+Kelompokkan suku-suku riil dan suku-suku imajiner secara terpisah:
+$$e^{i\theta} = \left( 1 - \frac{\theta^2}{2!} + \frac{\theta^4}{4!} - \frac{\theta^6}{6!} + \dots \right) + i \left( \theta - \frac{\theta^3}{3!} + \frac{\theta^5}{5!} - \dots \right)$$
+Kenali ekspansi deret Maclaurin yang telah diturunkan pada Langkah 1:
+$$e^{i\theta} = \cos\theta + i\sin\theta$$
+Pilih $\theta = \pi$:
+$$e^{i\pi} = \cos(\pi) + i\sin(\pi) = -1 + i(0) = -1$$
+Pindahkan ruas:
+$$e^{i\pi} + 1 = 0 \quad \blacksquare$$
+
+**Langkah 3: Batas Galat Lagrange untuk Aproksimasi Kosinus**
+Berdasarkan Teorema Sisa Lagrange:
+$$R_n(x) = \frac{f^{(n+1)}(\xi)}{(n+1)!} x^{n+1}$$
+untuk suatu $\xi \in (0, x)$.
+Untuk fungsi $f(x) = \cos x$, turunan ke-$(n+1)$ adalah salah satu dari $\pm \sin\xi$ atau $\pm \cos\xi$.
+Karena $|\sin\xi| \le 1$ dan $|\cos\xi| \le 1$ untuk semua bilangan riil $\xi$, kita memiliki batas atas mutlak seragam:
+$$|f^{(n+1)}(\xi)| \le 1$$
+Maka batas galat untuk $x = 0{,}5$ adalah:
+$$|R_n(0{,}5)| \le \frac{1}{(n+1)!} (0{,}5)^{n+1}$$
+Kita menghendaki:
+$$\frac{(0{,}5)^{n+1}}{(n+1)!} < 10^{-10} \iff \frac{1}{2^{n+1} (n+1)!} < 10^{-10} \iff 2^{n+1} (n+1)! > 10^{10}$$
+Uji nilai $n$ secara bertahap:
+- Untuk $n = 6$: $n+1 = 7 \implies 2^7 \times 7! = 128 \times 5.040 = 645.120 < 10^{10}$.
+- Untuk $n = 8$: $n+1 = 9 \implies 2^9 \times 9! = 512 \times 362.880 \approx 1{,}85 \times 10^8 < 10^{10}$.
+- Untuk $n = 9$: $n+1 = 10 \implies 2^{10} \times 10! = 1.024 \times 3.628.800 \approx 3{,}71 \times 10^9 < 10^{10}$.
+- Untuk $n = 10$: $n+1 = 11 \implies 2^{11} \times 11! = 2.048 \times 39.916.800 \approx 8{,}17 \times 10^{10} > 10^{10}$.
+Karena $\cos x$ adalah fungsi genap, suku-suku berderajat ganjil memiliki koefisien nol ($P_9(x) = P_8(x)$).
+Untuk menjamin batas galat mutlak $< 10^{-10}$, derajat polinomial Taylor yang cukup adalah **$n = 8$** (atau $n = 10$ untuk batas sisa ke-11).
+Evaluasi pada $n = 8$:
+$$P_8(0{,}5) = 1 - \frac{(0{,}5)^2}{2!} + \frac{(0{,}5)^4}{4!} - \frac{(0{,}5)^6}{6!} + \frac{(0{,}5)^8}{8!}$$
+Galat pemotongan suku sisa dijamin secara matematis $< 10^{-10}$.
+</details>
+
+---
+
+### Soal 013.9: Kalkulus Komputasional, Algoritma Newton-Raphson vs Kuadratur Simpson/Romberg
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Bagaimana komputer memecahkan persamaan yang tidak mungkin diselesaikan secara analitis oleh manusia terhebat sekalipun? Dan kapan metode Newton-Raphson yang terkenal kilat tiba-tiba terjebak dalam kepanikan berulang tak berujung (*chaotic oscillation*)?
+
+1. Turunkan skema iterasi metode Newton-Raphson dari ekspansi deret Taylor linier derajat 1, dan buktikan bahwa metode ini memiliki laju konvergensi kuadratik (*quadratic convergence*) di sekitar akar sederhana:
+   $$e_{k+1} \approx \frac{f''(r)}{2f'(r)} e_k^2$$
+2. Tinjau fungsi $f(x) = x^3 - x - 3$. Terapkan metode Newton-Raphson dengan tebakan awal $x_0 = 1{,}5$ sebanyak dua iterasi manual dan hitung galat relatifnya terhadap akar sebenarnya.
+3. Berikan contoh spesifik di mana metode Newton-Raphson gagal konvergen total akibat:
+   - Terjebak dalam osilasi siklus tertutup 2-siklus (*limit cycle*).
+   - Menabrak titik stasioner turunan bernilai nol ($f'(x_k) = 0$).
+   Jelaskan bagaimana algoritma *hybrid* seperti Metode Brent (*Brent's Method*) menggabungkan biseksi dengan Newton-Raphson untuk memberikan garansi konvergensi 100% pada sistem perangkat lunak industri.
+
+<details>
+<summary>💡 Petunjuk Bertahap (Hint)</summary>
+
+- **Petunjuk 1 (Deret Taylor Linier):** Dekati $f(x_{k+1}) \approx f(x_k) + f'(x_k)(x_{k+1} - x_k) = 0$. Untuk laju kuadratik, gunakan Taylor derajat 2 di sekitar akar eksak $r$ di mana $f(r) = 0$.
+- **Petunjuk 2 (Iterasi Manual):** Rumus iterasi: $x_{k+1} = x_k - \frac{x_k^3 - x_k - 3}{3x_k^2 - 1}$. Evaluasi untuk $x_0 = 1{,}5$.
+- **Petunjuk 3 (Kegagalan Newton):** Fungsi $f(x) = x^3 - 5x$ dengan $x_0 = 1$ memantul bolak-balik antara $1$ dan $-1$. Metode Brent menggunakan biseksi sebagai jaring pengaman jika langkah Newton meloncat keluar interval kurung.
+</details>
+
+<details>
+<summary>✅ Pembahasan & Solusi Lengkap</summary>
+
+**Langkah 1: Penurunan Newton-Raphson & Bukti Konvergensi Kuadratik**
+1. **Penurunan Skema Iterasi**:
+   Aproksimasi $f(x)$ di sekitar tebakan $x_k$ menggunakan deret Taylor orde 1:
+   $$f(x) \approx f(x_k) + f'(x_k)(x - x_k)$$
+   Kita menghendaki titik berikutnya $x_{k+1}$ menjadi akar ($f(x_{k+1}) = 0$):
+   $$0 = f(x_k) + f'(x_k)(x_{k+1} - x_k) \implies x_{k+1} - x_k = -\frac{f(x_k)}{f'(x_k)}$$
+   $$x_{k+1} = x_k - \frac{f(x_k)}{f'(x_k)}$$
+2. **Pembuktian Konvergensi Kuadratik**:
+   Misalkan $r$ adalah akar eksak ($f(r) = 0$) dan definisikan galat pada iterasi ke-$k$ sebagai $e_k = x_k - r$.
+   Ekspansi Taylor $f(r)$ di sekitar $x_k$:
+   $$0 = f(r) = f(x_k - e_k) = f(x_k) - e_k f'(x_k) + \frac{e_k^2}{2} f''(\xi_k)$$
+   Bagi kedua ruas dengan $f'(x_k)$:
+   $$0 = \frac{f(x_k)}{f'(x_k)} - e_k + \frac{e_k^2}{2} \frac{f''(\xi_k)}{f'(x_k)}$$
+   Substitusikan definisi iterasi Newton $\frac{f(x_k)}{f'(x_k)} = x_k - x_{k+1}$:
+   $$0 = (x_k - x_{k+1}) - e_k + \frac{e_k^2}{2} \frac{f''(\xi_k)}{f'(x_k)}$$
+   Karena $x_k - e_k = r$, maka:
+   $$x_{k+1} - r = \frac{f''(\xi_k)}{2f'(x_k)} e_k^2 \implies e_{k+1} \approx \frac{f''(r)}{2f'(r)} e_k^2$$
+   Persamaan ini membuktikan bahwa galat pada langkah berikutnya berbanding lurus dengan kuadrat galat sebelumnya ($e_{k+1} \propto e_k^2$). Jumlah digit presisi benar berlipat ganda pada setiap iterasi!
+
+**Langkah 2: Iterasi Numerik Manual $f(x) = x^3 - x - 3$**
+Fungsi turunan: $f'(x) = 3x^2 - 1$.
+Rumus iterasi:
+$$x_{k+1} = x_k - \frac{x_k^3 - x_k - 3}{3x_k^2 - 1}$$
+- **Iterasi 0**: $x_0 = 1{,}5$.
+  $f(1{,}5) = (1{,}5)^3 - 1{,}5 - 3 = 3{,}375 - 1{,}5 - 3 = -1{,}125$.
+  $f'(1{,}5) = 3(1{,}5)^2 - 1 = 3(2{,}25) - 1 = 6{,}75 - 1 = 5{,}75$.
+  $$x_1 = 1{,}5 - \frac{-1{,}125}{5{,}75} = 1{,}5 + 0{,}195652 = 1{,}695652$$
+- **Iterasi 1**: $x_1 = 1{,}695652$.
+  $f(1{,}695652) \approx 4{,}8753 - 1{,}69565 - 3 = 0{,}17965$.
+  $f'(1{,}695652) = 3(1{,}695652)^2 - 1 \approx 3(2{,}8752) - 1 = 7{,}6257$.
+  $$x_2 = 1{,}695652 - \frac{0{,}17965}{7{,}6257} \approx 1{,}695652 - 0{,}023558 = 1{,}672094$$
+Akar sebenarnya adalah $r \approx 1{,}67169988$. Hanya dalam 2 langkah, tebakan sudah akurat hingga 3 digit desimal!
+
+**Langkah 3: Kasus Kegagalan & Solusi Metode Hybrid Brent**
+1. **Osilasi Siklus Tertutup (2-Cycle Trap)**:
+   Tinjau fungsi $f(x) = x^3 - 5x$.
+   Turunannya $f'(x) = 3x^2 - 5$.
+   Jika tebakan awal dipilih $x_0 = 1$:
+   $$x_1 = 1 - \frac{1 - 5}{3(1)^2 - 5} = 1 - \frac{-4}{-2} = 1 - 2 = -1$$
+   Pada langkah berikutnya dengan $x_1 = -1$:
+   $$x_2 = -1 - \frac{(-1)^3 - 5(-1)}{3(-1)^2 - 5} = -1 - \frac{4}{-2} = -1 - (-2) = 1$$
+   Algoritma terjebak selamanya memantul bolak-balik antara $1 \to -1 \to 1 \to -1$ tanpa pernah mencapai akar di $0$ atau $\pm \sqrt{5}$.
+2. **Turunan Nol (Division by Zero)**:
+   Jika pada suatu langkah $x_k$ bertepatan dengan titik stasioner ($f'(x_k) = 0$), seperti $x = \pm \sqrt{5/3}$ pada fungsi di atas, pembagian menghasilkan penyebut nol yang memicu eksepsi floating-point `ZeroDivisionError` atau nilai $\pm \infty$.
+3. **Solusi Standar Industri: Metode Brent**:
+   Metode Brent menggabungkan kecepatan super konvergensi kuadratik Newton/Sekan dengan keandalan mutlak metode Biseksi.
+   Algoritma selalu memelihara interval kurung $[a, b]$ di mana akar dijamin berada ($f(a) \cdot f(b) < 0$).
+   Pada setiap langkah, ia mencoba melakukan interpolasi kuadratik terbalik atau langkah sekan/Newton. Namun jika langkah tersebut melompat ke luar interval kurung atau laju konvergensinya melambat, algoritma otomatis beralih (*fallback*) ke langkah Biseksi. Metode Brent menjamin konvergensi 100% stabil pada semua fungsi kontinu di pustaka standar seperti `scipy.optimize.brentq`.
+</details>
