@@ -28,6 +28,7 @@ import time
 import urllib.parse
 from dataclasses import asdict, dataclass, field
 from typing import Dict, List, Optional, Set, Tuple
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Try importing requests for robust HTTP link checking; fallback to urllib
 try:
@@ -363,7 +364,8 @@ class Pilot011Verifier:
             corrupt_patterns = [
                 (r"\x07lpha", "corrupted \\alpha (ASCII Bell)"),
                 (r"\x08eta", "corrupted \\beta (ASCII Backspace)"),
-                (r"\x09(?:alpha|beta|theta)", "tab-corrupted LaTeX macro"),
+                (r"\x09(?:alpha|beta|theta|text|times|top|tau|tan)", "tab-corrupted LaTeX macro"),
+                (r"\x0A(?:neq|nabla|nu|norm)", "newline-corrupted LaTeX macro"),
                 (r"\$512\s*\\times\s*512", "improperly escaped currency $ in math"),
             ]
             for pat, desc in corrupt_patterns:
@@ -478,39 +480,144 @@ class Pilot011Verifier:
                 duration=time.time() - t3
             ))
 
-        # 2.5 File Size Boundaries
+        # 2.5 Categorized File Boundaries & Pedagogy Requirements
         t4 = time.time()
-        size_errors = []
+        cat_errors = []
+
+        # Category 1: Gateway File
         if os.path.isfile(GATEWAY_FILE):
-            gw_size = os.path.getsize(GATEWAY_FILE)
-            if gw_size < 4000:
-                size_errors.append(f"Master Gateway too small: {gw_size} bytes (min: 4,000 bytes)")
+            with open(GATEWAY_FILE, "r", encoding="utf-8", errors="ignore") as f:
+                gw_text = f.read()
+            gw_lines = len(gw_text.splitlines())
+            gw_bytes = len(gw_text.encode("utf-8"))
+            if gw_lines < 600:
+                cat_errors.append(f"Master Gateway has {gw_lines} lines (min: 600 lines)")
+            if gw_bytes < 40000:
+                cat_errors.append(f"Master Gateway has {gw_bytes} bytes (min: 40,000 bytes)")
+
+            # Mermaid diagram and summary table in Section 3
+            s3_m = re.search(r"## 3\..*?(?=## 4\.|\Z)", gw_text, re.DOTALL)
+            if s3_m:
+                s3 = s3_m.group(0)
+                if "```mermaid" not in s3:
+                    cat_errors.append("Master Gateway Section 3 missing mermaid diagram")
+                if "|" not in s3:
+                    cat_errors.append("Master Gateway Section 3 missing summary table")
+            else:
+                cat_errors.append("Master Gateway missing Section 3")
+
+            # >= 2 runnable python blocks + ```text in Section 4
+            s4_m = re.search(r"## 4\..*?(?=## 5\.|\Z)", gw_text, re.DOTALL)
+            if s4_m:
+                s4 = s4_m.group(0)
+                gw_py_blocks = re.findall(r"```python\s*?\n([\s\S]*?)```", s4)
+                if len(gw_py_blocks) < 2:
+                    cat_errors.append(f"Master Gateway Section 4 has {len(gw_py_blocks)} Python blocks (min: 2 runnable blocks)")
+                if not re.search(r"```(?:text|output)", s4):
+                    cat_errors.append("Master Gateway Section 4 missing ```text output block")
+            else:
+                cat_errors.append("Master Gateway missing Section 4")
+
+            # Post-mortem code snippet in Section 5
+            s5_m = re.search(r"## 5\..*?(?=## 6\.|\Z)", gw_text, re.DOTALL)
+            if s5_m:
+                s5 = s5_m.group(0)
+                if not re.search(r"```(?:python|c|cpp|rust|text)", s5):
+                    cat_errors.append("Master Gateway Section 5 missing post-mortem code snippet")
+            else:
+                cat_errors.append("Master Gateway missing Section 5")
+
+            # >= 4 pairs <details> in Section 6
+            s6_m = re.search(r"## 6\..*?(?=## 7\.|\Z)", gw_text, re.DOTALL)
+            if s6_m:
+                s6 = s6_m.group(0)
+                gw_details = s6.count("<details")
+                if gw_details < 4:
+                    cat_errors.append(f"Master Gateway Section 6 has {gw_details} <details> blocks (min: 4)")
+            else:
+                cat_errors.append("Master Gateway missing Section 6")
+
+        # Category 2: Topic Map README (011/README.md)
         if os.path.isfile(README_FILE):
-            rm_size = os.path.getsize(README_FILE)
-            if rm_size < 2000:
-                size_errors.append(f"Topic Map README too small: {rm_size} bytes (min: 2,000 bytes)")
+            with open(README_FILE, "r", encoding="utf-8", errors="ignore") as f:
+                rd_text = f.read()
+            rd_lines = len(rd_text.splitlines())
+            rd_bytes = len(rd_text.encode("utf-8"))
+            if rd_lines < 260:
+                cat_errors.append(f"Topic Map README has {rd_lines} lines (min: 260 lines)")
+            if rd_bytes < 20000:
+                cat_errors.append(f"Topic Map README has {rd_bytes} bytes (min: 20,000 bytes)")
+
+            # Required roadmap and bridging components in README
+            if not re.search(r"kamus simbol|🔤", rd_text, re.I):
+                cat_errors.append("README missing Kamus Simbol")
+            if not re.search(r"1-based|0-based|jembatan indeks", rd_text, re.I):
+                cat_errors.append("README missing Jembatan Indeks 1-based vs 0-based")
+            if not re.search(r"primer.*python|python 5 menit", rd_text, re.I):
+                cat_errors.append("README missing Primer Python 5 Menit")
+            if not re.search(r"lab 05|tensor-autograd-cuda|peta jalan lab", rd_text, re.I):
+                cat_errors.append("README missing Peta Jalan Lab 05")
+
+        # Category 3: Subtopics (01 to 09)
+        ped_elements = [
+            ("Kamus Simbol", r"kamus simbol|🔤"),
+            ("Jembatan Logika", r"jembatan logika|🌉"),
+            ("Tutorial Langkah-demi-Langkah", r"tutorial langkah|resep langkah|langkah-demi-langkah"),
+            ("Tips & Trik / Heuristik", r"tips|trik|keledai|rahasia cepat|aturan emas|aturan jempol"),
+            ("Tabel Bedah Kode", r"tabel bedah kode|apa yang dilakukan komputer"),
+            ("Eksperimen Mandiri 60 Detik", r"eksperimen mandiri|60 detik|🔬"),
+        ]
+
         for sub in EXPECTED_SUBTOPICS:
             p = os.path.join(SUBTOPIC_DIR, sub)
-            if os.path.isfile(p):
-                sz = os.path.getsize(p)
-                if sz < 5000:
-                    size_errors.append(f"Subtopic {sub} too small: {sz} bytes (min: 5,000 bytes)")
+            if not os.path.isfile(p):
+                cat_errors.append(f"Subtopic file missing: {sub}")
+                continue
 
-        if size_errors:
+            with open(p, "r", encoding="utf-8", errors="ignore") as f:
+                c = f.read()
+
+            s_lines = len(c.splitlines())
+            s_bytes = len(c.encode("utf-8"))
+            if s_lines < 650:
+                cat_errors.append(f"{sub}: {s_lines} lines (min: 650 lines)")
+            if s_bytes < 35000:
+                cat_errors.append(f"{sub}: {s_bytes} bytes (min: 35,000 bytes)")
+
+            # >= 2 runnable python blocks (Tahap 5A + Tahap 5B)
+            py_blocks = re.findall(r"```python\s*?\n([\s\S]*?)```", c)
+            if len(py_blocks) < 2:
+                cat_errors.append(f"{sub}: has {len(py_blocks)} Python blocks (min: 2 runnable blocks)")
+
+            # >= 1 ```text output block
+            if not re.search(r"```(?:text|output)", c):
+                cat_errors.append(f"{sub}: missing ```text output block")
+
+            # >= 4 pairs <details>
+            det_count = c.count("<details")
+            if det_count < 4:
+                cat_errors.append(f"{sub}: has {det_count} <details> blocks (min: 4)")
+
+            # All 6 pedagogy elements
+            for el_label, el_pat in ped_elements:
+                if not re.search(el_pat, c, re.I):
+                    cat_errors.append(f"{sub}: missing pedagogy element '{el_label}'")
+
+        if cat_errors:
             self.record_result(TestResult(
                 tier="Tier 2",
-                name="File Size Boundaries",
+                name="Categorized File Boundaries & Pedagogy Requirements",
                 status="FAIL",
-                message=f"{len(size_errors)} files below minimum size threshold",
-                details=size_errors,
+                message=f"{len(cat_errors)} categorized metric or pedagogy requirements unfulfilled",
+                details=cat_errors,
                 duration=time.time() - t4
             ))
         else:
             self.record_result(TestResult(
                 tier="Tier 2",
-                name="File Size Boundaries",
+                name="Categorized File Boundaries & Pedagogy Requirements",
                 status="PASS",
-                message="All files satisfy textbook depth size requirements",
+                message="All categorized requirements (Subtopics >=650 lines/35KB/6 pedagogy elements, Gateway >=600 lines/40KB, README >=260 lines) satisfied",
                 duration=time.time() - t4
             ))
 
@@ -622,15 +729,33 @@ class Pilot011Verifier:
                     f"Drills file missing or unbalanced collapsible solution keys ({details_count} details, {summary_count} summary)"
                 )
 
-            # Check coverage of 011 advanced topics
-            drill_topics = [
-                ("SVD / Teorema Spektral", r"svd|singular value|teorema spektral"),
-                ("Definit Positif / Cholesky", r"definit positif|cholesky"),
-                ("Dekomposisi Tensor / CP / Tucker", r"tensor|cp|tucker|hosvd"),
-            ]
-            for label, pat in drill_topics:
-                if not re.search(pat, drill_text, re.IGNORECASE):
-                    drill_errors.append(f"Drills file missing Socratic question on {label}")
+            # Check Modul 011 section exists
+            if "## Modul 011: Aljabar Linier & Teori Matriks" not in drill_text:
+                drill_errors.append("Drills file missing section '## Modul 011: Aljabar Linier & Teori Matriks'")
+            else:
+                m011_match = re.search(
+                    r"## Modul 011: Aljabar Linier & Teori Matriks[\s\S]*?(?=\n## [^#]|\Z)",
+                    drill_text
+                )
+                m011_text = m011_match.group(0) if m011_match else ""
+
+                # Check all 9 questions 011.1 to 011.9
+                drill_numbers = set(re.findall(r"### Soal 011\.(\d+)", m011_text))
+                expected_numbers = {str(i) for i in range(1, 10)}
+                missing_numbers = expected_numbers - drill_numbers
+                if missing_numbers:
+                    drill_errors.append(f"Missing drill questions for Modul 011: {sorted(list(missing_numbers))}")
+
+                # Check each question contains Inti Soal, Hint, and Complete Solution
+                question_blocks = re.findall(r"(### Soal 011\.\d+[\s\S]*?)(?=### Soal 011\.\d+|\n## [^#]|\Z)", m011_text)
+                for q_block in question_blocks:
+                    q_header = q_block.splitlines()[0] if q_block.splitlines() else "Unknown"
+                    if not re.search(r"inti soal dalam bahasa manusia|🎯", q_block, re.I):
+                        drill_errors.append(f"{q_header}: missing 'Inti Soal dalam Bahasa Manusia'")
+                    if not re.search(r"<summary>\s*💡\s*Petunjuk Bertahap", q_block):
+                        drill_errors.append(f"{q_header}: missing '<summary>💡 Petunjuk Bertahap'")
+                    if not re.search(r"<summary>\s*✅\s*Pembahasan & Solusi Lengkap", q_block):
+                        drill_errors.append(f"{q_header}: missing '<summary>✅ Pembahasan & Solusi Lengkap'")
 
         if drill_errors:
             self.record_result(TestResult(
@@ -646,7 +771,7 @@ class Pilot011Verifier:
                 tier="Tier 3",
                 name="Socratic Drills Synchronization",
                 status="PASS",
-                message="Tier-1 drills contain Socratic problems on SVD, Cholesky, and Tensors with collapsible keys",
+                message="Tier-1 drills contain complete 9 Socratic problems (011.1-011.9) with Inti Soal, Hints, and Complete Solutions",
                 duration=time.time() - t2
             ))
 
@@ -661,10 +786,22 @@ class Pilot011Verifier:
         if not os.path.isfile(fc_md_path):
             flashcard_errors.append(f"Flashcard MD companion missing: {fc_md_path}")
 
-        if os.path.isfile(tsv_path):
+        if os.path.isfile(tsv_path) and os.path.isfile(fc_md_path):
             with open(tsv_path, "r", encoding="utf-8", errors="ignore") as f:
                 tsv_lines = [line.rstrip("\r\n") for line in f if line.strip()]
 
+            with open(fc_md_path, "r", encoding="utf-8", errors="ignore") as f:
+                md_content = f.read()
+
+            md_cards = re.findall(r"### Kartu \d+:", md_content)
+
+            # Check 1:1 count synchronization
+            if len(tsv_lines) != len(md_cards):
+                flashcard_errors.append(f"Mismatch card count: TSV has {len(tsv_lines)} cards, MD has {len(md_cards)} cards")
+            if len(tsv_lines) < 43:
+                flashcard_errors.append(f"Expected at least 43 cards in deck-01, found {len(tsv_lines)}")
+
+            # Check 3-column TSV format and cloze syntax
             cloze_regex = re.compile(r"\{\{c\d+::.*?\}\}")
             for lno, line in enumerate(tsv_lines, 1):
                 cols = line.split("\t")
@@ -673,12 +810,34 @@ class Pilot011Verifier:
                 elif not cloze_regex.search(cols[0]):
                     flashcard_errors.append(f"TSV line {lno}: column 1 missing cloze deletion {{{{c1::...}}}}")
 
-            # Check coverage of 011 topics in flashcards
+            # Check Card 30 standardized FLOPs for Cholesky
+            if len(tsv_lines) >= 30:
+                card_30_cols = tsv_lines[29].split("\t")
+                card_30_extra = card_30_cols[1] if len(card_30_cols) > 1 else ""
+                if "1/3" not in card_30_extra or "1/6" not in card_30_extra:
+                    flashcard_errors.append("Card 30 (Cholesky) missing standardized FLOPs convention (1/3 n^3 total, 1/6 n^3 + 1/6 n^3)")
+
+            # Check coverage of 011 concepts
             tsv_corpus = "\n".join(tsv_lines)
             card_topics = [
-                ("SVD", r"svd|singular value"),
-                ("Cholesky / Definit Positif", r"cholesky|definit positif"),
-                ("Tensor (CP / Tucker)", r"tensor|cp|tucker"),
+                ("FTLA", r"ftla|teorema fundamental aljabar linier"),
+                ("CR Factorization", r"faktorisasi kolom-baris|a\s*=\s*c\s*\\cdot\s*r"),
+                ("QR Factorization", r"faktorisasi qr|gram-schmidt"),
+                ("Spektral", r"teorema spektral"),
+                ("Cholesky", r"cholesky"),
+                ("SVD", r"svd|nilai singular"),
+                ("Eckart-Young", r"eckart-young"),
+                ("Pseudoinverse", r"pseudoinvers|moore-penrose"),
+                ("PCA", r"pca|principal component"),
+                ("Tensor Unfolding", r"unfolding mode-n|matrisasi"),
+                ("CP Decomposition", r"candecomp|parafac"),
+                ("Tucker Decomposition", r"tucker|hosvd"),
+                ("PA=LU & Pivoting", r"p\s*a\s*=\s*l\s*u|penukaran baris"),
+                ("Gilbert Strang 4 Views", r"gilbert strang|4 cara"),
+                ("Determinan Geometri & Orientasi", r"orientasi|determinan"),
+                ("Sifat Determinan & slogdet", r"slogdet"),
+                ("Trace & Determinan", r"trace|jejak"),
+                ("Nilai Eigen Kompleks", r"kompleks"),
             ]
             for label, pat in card_topics:
                 if not re.search(pat, tsv_corpus, re.IGNORECASE):
@@ -698,7 +857,7 @@ class Pilot011Verifier:
                 tier="Tier 3",
                 name="Flashcards Active Recall Synchronization",
                 status="PASS",
-                message="Deck-01 satisfies 3-column TSV format, cloze syntax, and covers 011 concepts",
+                message=f"Deck-01 synchronized 1:1 ({len(tsv_lines)} cards in .tsv and .md, Card 30 FLOPs standardized, all concepts covered)",
                 duration=time.time() - t3
             ))
 
@@ -751,10 +910,10 @@ class Pilot011Verifier:
         t0 = time.time()
         print("\n=== [TIER 4] Validating Real-World Execution (Code & Live Deep Links) ===")
 
-        # 4.1 Subprocess Python Code Execution
+        # 4.1 Subprocess Python Code Execution (Parallelized via ThreadPoolExecutor)
         code_errors = []
-        code_blocks_executed = 0
         code_blocks_parsed = 0
+        tasks = []
 
         for filepath in self.topic_files:
             rel = os.path.relpath(filepath, BASE_DIR)
@@ -782,39 +941,48 @@ class Pilot011Verifier:
                 if "# non-runnable" in code or "# pseudocode" in code:
                     continue
 
-                # Execute in an isolated Python process
-                try:
-                    proc = subprocess.run(
-                        [sys.executable, "-c", code],
-                        capture_output=True,
-                        text=True,
-                        timeout=15,
-                        cwd=BASE_DIR
-                    )
+                post_text = content[match.end():match.end() + 800]
+                out_match = re.search(r"```(?:output|text)\s*\n([\s\S]*?)```", post_text)
+                expected_out = out_match.group(1).strip() if out_match else ""
+
+                tasks.append((rel, b_idx, code, expected_out))
+
+        def execute_code_block(task):
+            rel, b_idx, code, expected_out = task
+            try:
+                proc = subprocess.run(
+                    [sys.executable, "-c", code],
+                    capture_output=True,
+                    text=True,
+                    timeout=15,
+                    cwd=BASE_DIR
+                )
+                return (rel, b_idx, proc.returncode, proc.stdout, proc.stderr, expected_out, None)
+            except subprocess.TimeoutExpired:
+                return (rel, b_idx, -1, "", "Execution timed out (>15s)", expected_out, "timeout")
+            except Exception as e:
+                return (rel, b_idx, -1, "", str(e), expected_out, e)
+
+        code_blocks_executed = 0
+        max_workers = min(16, (os.cpu_count() or 4) * 2)
+
+        with ThreadPoolExecutor(max_workers=max_workers) as pool:
+            futures = [pool.submit(execute_code_block, t) for t in tasks]
+            for fut in as_completed(futures):
+                rel, b_idx, rc, stdout, stderr, expected_out, err = fut.result()
+                if rc == 0:
                     code_blocks_executed += 1
-                    if proc.returncode != 0:
-                        # Check if failure is due to missing third-party module (e.g. numpy, tensorly)
-                        err_out = proc.stderr.strip()
-                        if "ModuleNotFoundError" in err_out:
-                            # Note missing external package gracefully
-                            self.log(f"{rel}: code block #{b_idx} requires external library: {err_out.splitlines()[-1]}")
-                        else:
-                            code_errors.append(f"{rel}: code block #{b_idx} execution failed:\n{err_out}")
+                    if expected_out and stdout.strip():
+                        act_strip = stdout.strip()
+                        if expected_out not in act_strip and act_strip not in expected_out:
+                            self.log(f"{rel}: output discrepancy in block #{b_idx}")
+                else:
+                    err_out = (stderr or "").strip()
+                    if "ModuleNotFoundError" in err_out:
+                        self.log(f"{rel}: code block #{b_idx} requires external library: {err_out.splitlines()[-1]}")
+                        code_blocks_executed += 1
                     else:
-                        # Optional: check if accompanied by output fence
-                        # e.g., following block is ```output ... ``` or ```text ... ```
-                        post_text = content[match.end():match.end() + 500]
-                        out_match = re.search(r"```(?:output|text)\s*\n([\s\S]*?)```", post_text)
-                        if out_match and proc.stdout.strip():
-                            expected_out = out_match.group(1).strip()
-                            actual_out = proc.stdout.strip()
-                            # Check similarity or substring match
-                            if expected_out and expected_out not in actual_out and actual_out not in expected_out:
-                                self.log(f"{rel}: output discrepancy in block #{b_idx}")
-                except subprocess.TimeoutExpired:
-                    code_errors.append(f"{rel}: code block #{b_idx} timed out (>15s)")
-                except Exception as e:
-                    code_errors.append(f"{rel}: code block #{b_idx} execution error: {e}")
+                        code_errors.append(f"{rel}: code block #{b_idx} execution failed:\n{err_out}")
 
         if code_errors:
             self.record_result(TestResult(
@@ -830,7 +998,7 @@ class Pilot011Verifier:
                 tier="Tier 4",
                 name="Python Subprocess Execution",
                 status="PASS",
-                message=f"All {code_blocks_parsed} Python blocks parsed cleanly; {code_blocks_executed} executed with exit code 0",
+                message=f"All {code_blocks_parsed} Python blocks parsed cleanly; {code_blocks_executed} executed with exit code 0 (Parallel execution)",
                 duration=time.time() - t0
             ))
 

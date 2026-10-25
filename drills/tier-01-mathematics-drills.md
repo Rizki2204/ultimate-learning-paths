@@ -376,7 +376,89 @@ Bagian ini menyajikan rangkaian latihan diagnostik Sokratik mendalam yang disink
 
 ---
 
-### Soal 011.1: Ortogonalitas Empat Subruang Fundamental dan Teorema Fundamental Aljabar Linier (FTLA)
+### Soal 011.1: Eliminasi Gaussian, Permutasi Parsial, dan Faktorisasi $PA=LU$
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Mengapa eliminasi Gauss naif ($A=LU$) bisa runtuh di komputer ketika bertemu angka nol atau angka amat kecil sebagai pivot? Bagaimana menukar baris (*partial pivoting*) menggunakan matriks permutasi $P$ ($PA=LU$) menyelamatkan komputasi dari pembatalan katastropik, dan berapa biaya operasi komputasinya (*FLOPs*)?
+
+Tinjau sistem persamaan linier $A\mathbf{x} = \mathbf{b}$ dengan $A \in \mathbb{R}^{n \times n}$ non-singular.
+1. Buktikan secara aljabar bahwa setiap langkah penukaran baris terwakili oleh matriks permutasi elementer $P_{ij}$, dan tunjukkan bahwa matriks permutasi total $P$ bersifat ortogonal ($P^T P = I$).
+2. Jelaskan mekanisme *partial pivoting* dalam membatasi pertumbuhan elemen (*element growth factor* $\rho_n \le 2^{n-1}$) dengan memilih $|a_{ik}| = \max_{j \ge i} |a_{jk}|$, serta tunjukkan bahwa elemen pengali matriks $L$ dijamin memenuhi $|\ell_{ij}| \le 1$.
+3. Buktikan secara analitis bahwa total operasi aritmatika floating-point (*FLOPs*) untuk eliminasi $LU$ pada matriks $n \times n$ adalah $\frac{2}{3}n^3$ total operasi ($\frac{1}{3}n^3$ penjumlahan/pengurangan + $\frac{1}{3}n^3$ perkalian), diikuti substitusi maju $L\mathbf{y}=P\mathbf{b}$ ($n^2$ FLOPs) dan substitusi balik $U\mathbf{x}=\mathbf{y}$ ($n^2$ FLOPs).
+
+<details>
+<summary>💡 Petunjuk Bertahap (Hint)</summary>
+
+- **Petunjuk 1 (Mengapa Butuh Pivoting):** Bayangkan membagi dengan $10^{-16}$; angka kecil pada pembagi meledakkan galat pembulatan dan memusnahkan bit mantissa signifikan. Penukaran baris (*partial pivoting*) menjamin pembagi selalu merupakan angka terbesar di kolomnya.
+- **Petunjuk 2 (Batas Pengali):** Karena baris pivot ditukar sehingga elemen diagonal memiliki magnitudo maksimum $|a_{ii}| \ge |a_{ji}|$ untuk semua $j > i$, maka pengali $\ell_{ji} = a_{ji} / a_{ii}$ dijamin memenuhi $|\ell_{ji}| \le 1$.
+- **Petunjuk 3 (Menghitung FLOPs):** Pada eliminasi kolom ke-$k$, kita mengeliminasi submatriks berukuran $(n-k) \times (n-k)$. Setiap entri memerlukan 1 perkalian dan 1 pengurangan (2 FLOPs). Evaluasi deret jumlahan $\sum_{k=1}^{n-1} 2(n-k)^2 \approx 2 \int_0^n x^2 dx = \frac{2}{3}n^3$.
+</details>
+
+<details>
+<summary>✅ Pembahasan & Solusi Lengkap</summary>
+
+**Langkah 1: Matriks Permutasi Elementer & Sifat Ortogonalitas $P^T P = I$**
+1. **Representasi Matriks Permutasi $P_{ij}$**:
+   Penukaran baris ke-$i$ dan baris ke-$j$ pada matriks $A$ dapat dinyatakan sebagai perkalian dari kiri oleh matriks permutasi elementer $P_{ij} \in \mathbb{R}^{n \times n}$, yang dibentuk dari matriks identitas $I_n$ dengan menukar baris ke-$i$ dan baris ke-$j$:
+   $$(P_{ij})_{kl} = \begin{cases} 
+   1 & \text{jika } k=i, l=j \text{ atau } k=j, l=i \\
+   1 & \text{jika } k=l \notin \{i, j\} \\
+   0 & \text{lainnya}
+   \end{cases}$$
+2. **Ortogonalitas $P$**:
+   Karena $P_{ij}$ simetris ($P_{ij}^T = P_{ij}$) dan menerapkan penukaran baris dua kali mengembalikan susunan baris ke posisi semula ($P_{ij} P_{ij} = I$), maka $P_{ij}^{-1} = P_{ij} = P_{ij}^T$.
+   Matriks permutasi total $P$ merupakan hasil kali berurutan dari permutasi-permutasi parsial:
+   $$P = P_{n-1} P_{n-2} \dots P_1$$
+   Transpos dari $P$ adalah:
+   $$P^T = (P_{n-1} \dots P_1)^T = P_1^T \dots P_{n-1}^T = P_1 \dots P_{n-1}$$
+   Maka:
+   $$P^T P = (P_1 \dots P_{n-1})(P_{n-1} \dots P_1) = P_1 \dots (P_{n-1} P_{n-1}) \dots P_1 = I$$
+   Terbukti bahwa matriks permutasi total $P$ bersifat ortogonal sempurna ($P^T P = P P^T = I$).
+
+**Langkah 2: Mekanisme Partial Pivoting & Batas Pengali $|\ell_{ij}| \le 1$**
+1. **Strategi Pemilihan Pivot**:
+   Pada langkah eliminasi ke-$k$, algoritma mencari baris $p \ge k$ sedemikian hingga:
+   $$|a_{pk}^{(k-1)}| = \max_{j \ge k} |a_{jk}^{(k-1)}|$$
+   Jika $p \ne k$, baris ke-$k$ dan baris ke-$p$ ditukar menggunakan $P_{kp}$. Elemen pivot baru memenuhi $|a_{kk}^{(k-1)}| \ge |a_{jk}^{(k-1)}|$ untuk setiap $j > k$.
+2. **Jaminan Nilai Pengali**:
+   Pengali eliminasi Gaussian didefinisikan sebagai rasio:
+   $$\ell_{jk} = \frac{a_{jk}^{(k-1)}}{a_{kk}^{(k-1)}} \quad (j > k)$$
+   Karena penyebut adalah elemen maksimum absolut di bawah kolom ke-$k$, maka:
+   $$|\ell_{jk}| = \frac{|a_{jk}^{(k-1)}|}{|a_{kk}^{(k-1)}|} \le 1$$
+   Batas ini mencegah meledaknya magnitudo entri matriks pengali $L$.
+3. **Faktor Pertumbuhan Elemen (*Growth Factor*)**:
+   Nilai elemen baru pada submatriks aktif dihitung via:
+   $$a_{ij}^{(k)} = a_{ij}^{(k-1)} - \ell_{ik} a_{kj}^{(k-1)}$$
+   Dengan ketaksamaan segitiga:
+   $$|a_{ij}^{(k)}| \le |a_{ij}^{(k-1)}| + |\ell_{ik}| |a_{kj}^{(k-1)}| \le \max |a^{(k-1)}| + 1 \cdot \max |a^{(k-1)}| = 2 \max |a^{(k-1)}|$$
+   Secara induktif setelah $n-1$ langkah, rasio pembesaran maksimum dibatasi oleh $\rho_n \le 2^{n-1}$. Meskipun dalam skenario terburuk teoritis pertumbuhan ini eksponensial, dalam komputasi praktis dunia nyata $\rho_n$ hampir selalu bernilai moderat ($\rho_n \sim n$).
+
+**Langkah 3: Penurunan Kompleksitas Aritmatika Komputasi FLOPs**
+1. **Faktorisasi $PA = LU$**:
+   Pada langkah ke-$k$ ($k = 1, \dots, n-1$):
+   - Menghitung $n-k$ buah pengali $\ell_{jk}$: $(n-k)$ pembagian.
+   - Memperbarui submatriks berukuran $(n-k) \times (n-k)$: untuk setiap entri $(j, l)$, dilakukan 1 perkalian dan 1 pengurangan: $a_{jl} \leftarrow a_{jl} - \ell_{jk} a_{kl}$. Ini memerlukan $2(n-k)^2$ operasi floating-point.
+   Total operasi eliminasi:
+   $$\text{FLOPs}_{\text{elim}} = \sum_{k=1}^{n-1} 2(n-k)^2 = 2 \sum_{m=1}^{n-1} m^2 = 2 \left( \frac{(n-1)n(2n-1)}{6} \right) = \frac{2n^3 - 3n^2 + n}{3} \approx \frac{2}{3}n^3 \text{ FLOPs}$$
+   Rincian terstandarisasi: tepat $\frac{1}{3}n^3$ operasi perkalian dan $\frac{1}{3}n^3$ operasi penjumlahan/pengurangan.
+2. **Substitusi Maju $L\mathbf{y} = P\mathbf{b}$**:
+   Karena matriks $L$ adalah matriks unit segitiga bawah ($L_{ii} = 1$):
+   $$y_1 = (Pb)_1, \quad y_i = (Pb)_i - \sum_{j=1}^{i-1} \ell_{ij} y_j \quad (i = 2, \dots, n)$$
+   Jumlah operasi: $\sum_{i=1}^n 2(i-1) = 2 \frac{(n-1)n}{2} = n^2 - n \approx n^2 \text{ FLOPs}$.
+3. **Substitusi Balik $U\mathbf{x} = \mathbf{y}$**:
+   Karena matriks $U$ adalah segitiga atas dengan diagonal umum $U_{ii} \ne 1$:
+   $$x_n = \frac{y_n}{U_{nn}}, \quad x_i = \frac{1}{U_{ii}} \left( y_i - \sum_{j=i+1}^n U_{ij} x_j \right)$$
+   Jumlah operasi: $\sum_{i=1}^n (2(n-i) + 1) = n^2 \text{ FLOPs}$.
+4. **Total Komputasi Solusi $A\mathbf{x} = \mathbf{b}$**:
+   $$\text{Total} = \frac{2}{3}n^3 + 2n^2 \text{ FLOPs}$$
+   Untuk $n$ berdimensi besar, suku $\frac{2}{3}n^3$ mendominasi, menunjukkan keunggulan drastis dibanding menghitung invers matriks eksplisit $A^{-1}$ ($2n^3$ FLOPs).
+</details>
+
+---
+
+### Soal 011.2: Ortogonalitas Empat Subruang Fundamental dan Teorema Fundamental Aljabar Linier (FTLA)
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Mengapa ruang baris matriks selalu tegak lurus $90^\circ$ terhadap ruang nolnya? Bagaimana pemetaan matriks $A$ bekerja seperti jembatan dua arah yang sempurna (isomorfisma) antara ruang baris dan ruang kolom, dan mengapa solusi dengan norma terpendek selalu hidup murni di dalam ruang baris?
+
 Tinjau pemetaan linier yang direpresentasikan oleh matriks $A \in \mathbb{R}^{m \times n}$ dengan $\text{rank}(A) = r \le \min(m, n)$.
 1. Definisikan secara formal keempat subruang fundamental yang diasosiasikan dengan matriks $A$: Ruang Kolom $C(A)$, Ruang Nol / Kernel $N(A)$, Ruang Baris $C(A^T)$, dan Ruang Nol Kiri / Kokernel $N(A^T)$, beserta dimensi dan ruang semesta asalnya ($\mathbb{R}^n$ atau $\mathbb{R}^m$).
 2. Buktikan secara analitis dari prinsip pertama hasil kali dalam (*inner product*) bahwa Ruang Baris $C(A^T)$ adalah komplemen ortogonal langsung dari Ruang Nol $N(A)$ di dalam $\mathbb{R}^n$:
@@ -385,7 +467,15 @@ Tinjau pemetaan linier yang direpresentasikan oleh matriks $A \in \mathbb{R}^{m 
 3. Berdasarkan dekomposisi ortogonal semesta $\mathbb{R}^n = C(A^T) \oplus N(A)$, buktikan bahwa pemetaan $A: C(A^T) \to C(A)$ adalah isomorfisma bijektif (satu-ke-satu dan pada). Tunjukkan bahwa untuk setiap $b \in C(A)$, terdapat vektor unik $x_r \in C(A^T)$ sedemikian hingga $A x_r = b$, dan jelaskan mengapa komponen nullspace $x_n \in N(A)$ mewakili redundansi informasi.
 
 <details>
-<summary>Solusi Lengkap & Analisis Matematis</summary>
+<summary>💡 Petunjuk Bertahap (Hint)</summary>
+
+- **Petunjuk 1 (Menguji Tegak Lurus):** Ambil sembarang vektor $x \in N(A)$. Berdasarkan definisi, $Ax = \mathbf{0}$. Artinya setiap baris dari matriks $A$ dikalikan titik (*dot product*) dengan $x$ menghasilkan angka nol. Karena setiap vektor di ruang baris $C(A^T)$ adalah kombinasi linier dari baris-baris $A$, maka hasil kali dalamnya dengan $x$ pasti selalu nol.
+- **Petunjuk 2 (Dekomposisi Jumlah Langsung):** Untuk membuktikan $\mathbb{R}^n = C(A^T) \oplus N(A)$, buktikan terlebih dahulu bahwa satu-satunya vektor yang hidup bersamaan di kedua ruang tersebut adalah vektor nol ($C(A^T) \cap N(A) = \{\mathbf{0}\}$), lalu gunakan Teorema Rank-Nullity untuk mencocokkan jumlah dimensinya ($r + (n - r) = n$).
+- **Petunjuk 3 (Solusi Norma Terkecil):** Tulis sembarang solusi $Ax=b$ sebagai $x = x_r + x_n$. Kuadrat norma Euclidean adalah $\|x\|_2^2 = \|x_r\|_2^2 + \|x_n\|_2^2 + 2x_r^T x_n$. Karena $x_r \perp x_n$, suku silang lenyap, menyisakan $\|x\|_2^2 = \|x_r\|_2^2 + \|x_n\|_2^2 \ge \|x_r\|_2^2$.
+</details>
+
+<details>
+<summary>✅ Pembahasan & Solusi Lengkap</summary>
 
 **Langkah 1: Definisi Formal & Dimensi Empat Subruang Fundamental**
 Diberikan transformasi linier $T_A: \mathbb{R}^n \to \mathbb{R}^m$ yang direpresentasikan oleh matriks $A \in \mathbb{R}^{m \times n}$ ber-rank $r$:
@@ -448,19 +538,29 @@ Diberikan transformasi linier $T_A: \mathbb{R}^n \to \mathbb{R}^m$ yang direpres
    $$\|x\|_2^2 = \|x_r\|_2^2 + \|x_n\|_2^2 \ge \|x_r\|_2^2$$
    Kesetaraan terjadi jika dan hanya jika $x_n = 0$.
    Artinya, komponen $x_n \in N(A)$ merepresentasikan redundansi / derajat kebebasan ekstra yang tidak berkontribusi apa pun terhadap pembentukan output $b$, namun semata-mata meningkatkan energi/norma solusi. Vektor $x_r \in C(A^T)$ adalah solusi unik ber-norma minimum ($x^+ = A^+ b$).
-
 </details>
 
 ---
 
-### Soal 011.2: Stabilitas Numerik Gram-Schmidt Klasik (CGS) vs Termodifikasi (MGS) dan Faktorisasi QR
+### Soal 011.3: Stabilitas Numerik Gram-Schmidt Klasik (CGS) vs Termodifikasi (MGS) dan Faktorisasi QR
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Mengapa algoritma Gram-Schmidt klasik yang diajarkan di SMA/kuliah awal sering gagal total di komputer ketika dua vektor hampir berhimpit? Bagaimana modifikasi sederhana MGS menyelamatkan ortogonalitas, dan mengapa insinyur dilarang mengalikan $A^T A$ saat mencari regresi kuadrat terkecil?
+
 Diberikan matriks berukuran $A \in \mathbb{R}^{m \times n}$ ($m \ge n$) dengan kolom-kolom bebas linier $a_1, a_2, \dots, a_n$.
 1. Tuliskan formulasi matematis dari algoritma Gram-Schmidt Klasik (CGS) dan Gram-Schmidt Termodifikasi (MGS).
 2. Analisis fenomena *loss of orthogonality* pada komputasi floating-point presisi terhingga: Jelaskan mengapa pada matriks dengan *Condition Number* buruk ($\kappa(A) \gg 1$), algoritma CGS dapat menghasilkan matriks $Q$ yang kehilangan ortogonalitas secara katastropik ($\|Q^T Q - I\|_2 \sim \epsilon_{\text{mach}} \kappa(A)^2$), sedangkan MGS mempertahankan batas ortogonalitas pada orde $\|Q^T Q - I\|_2 \sim \epsilon_{\text{mach}} \kappa(A)$.
 3. Tunjukkan bagaimana faktorisasi $A = QR$ menyelesaikan persoalan regresi kuadrat terkecil linier $\min_x \|Ax - b\|_2^2$ secara stabil tanpa membentuk persamaan normal $A^T A x = A^T b$, dan jelaskan bahaya pengkuadratan rasio kondisi $\kappa(A^T A) = \kappa(A)^2$.
 
 <details>
-<summary>Solusi Lengkap & Analisis Matematis</summary>
+<summary>💡 Petunjuk Bertahap (Hint)</summary>
+
+- **Petunjuk 1 (Pembatalan Katastropik):** Pada CGS, jika vektor $a_1$ dan $a_2$ hampir searah, $q_2^* = a_2 - (q_1^T a_2)q_1$ menghasilkan pengurangan dua angka yang hampir persis sama. Sebagian besar bit presisi float64 musnah. Saat dinormalisasi dengan membaginya dengan bilangan sangat kecil $\|q_2^*\|$, galat pembulatan meledak ke atas.
+- **Petunjuk 2 (Pembersihan Galat MGS):** Pada MGS, proyeksi dilakukan secara *in-place* terhadap sisa residual terbaru. Komponen galat yang bocor dari langkah sebelumnya secara langsung dikurangi pada proyeksi berikutnya, mencegah akumulasi kuadratik.
+- **Petunjuk 3 (Bahaya Persamaan Normal):** Mengalikan $A^T$ dengan $A$ mengkuadratkan nilai-nilai singular. Jika $\kappa(A) = 10^9$, maka $\kappa(A^T A) = 10^{18}$, yang melampaui kemampuan resolusi float64 ($10^{16}$), sehingga matriks menjadi singular numerik total.
+</details>
+
+<details>
+<summary>✅ Pembahasan & Solusi Lengkap</summary>
 
 **Langkah 1: Formulasi Algoritma CGS vs MGS**
 Tujuan faktorisasi QR adalah mendekomposisi $A = QR$, di mana $Q \in \mathbb{R}^{m \times n}$ memiliki kolom ortonormal ($Q^T Q = I_n$) dan $R \in \mathbb{R}^{n \times n}$ segitiga atas invertibel.
@@ -510,21 +610,204 @@ Tujuan faktorisasi QR adalah mendekomposisi $A = QR$, di mana $Q \in \mathbb{R}^
    Jika sistem memiliki rasio kondisi awal $\kappa(A) = 10^9$:
    - Pada Faktorisasi QR: Perhitungan berlangsung dengan rasio kondisi $\kappa(A) = 10^9$. Pada IEEE 754 float64 (presisi 16 digit desimal), solusi kuadrat terkecil masih menyisakan $16 - 9 = 7$ digit signifikan yang sahih.
    - Pada Persamaan Normal: Membentuk $A^T A$ menghasilkan rasio kondisi $\kappa(A^T A) = 10^{18} > 10^{16} = 1/\epsilon_{\text{mach}}$. Matriks $A^T A$ mengalami degenerasi menjadi matriks singular numerik total. Perhitungan Cholesky atau LU pada $A^T A$ akan menghasilkan *NaN* atau galat relatif $100\%$ murni.
-
 </details>
 
 ---
 
-### Soal 011.3: Kriteria Sylvester, Bentuk Kuadratik, dan Algoritma Faktorisasi Cholesky $A = L L^T$
+### Soal 011.4: Geometri Determinan, Sifat Multiplikatif, dan Perubahan Orientasi Volume Ruang
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Mengapa determinan matriks $2 \times 2$ sama persis dengan luas jajar genjang ($ad-bc$)? Apa arti fisik dari determinan bernilai negatif, mengapa $\det(AB)=\det(A)\det(B)$, dan mengapa insinyur AI dilarang keras menguji keterbalikan matriks dengan memeriksa $\det(A) == 0$?
+
+Tinjau matriks bujur sangkar $A, B \in \mathbb{R}^{n \times n}$.
+1. Turunkan rumus determinan matriks $2 \times 2$ ($ad-bc$) murni secara geometris dari luas jajar genjang yang dibentuk oleh vektor $\mathbf{u} = [a, c]^T$ dan $\mathbf{v} = [b, d]^T$ di bidang kartesius (melalui prinsip luas kotak pembungkus dikurangi luas segitiga-segitiga luar).
+2. Jelaskan interpretasi tanda aljabar determinan terhadap orientasi ruang: tunjukkan mengapa $\det(A) > 0$ mempertahankan orientasi aturan tangan kanan (*right-handed system*), sedangkan $\det(A) < 0$ merefleksikan ruang seperti cermin.
+3. Buktikan sifat multiplikatif $\det(AB) = \det(A)\det(B)$ melalui faktorisasi matriks elementer $A = E_k \dots E_1$.
+4. Analisis stabilitas floating-point: Buktikan bahwa matriks diagonal $A = 0.1 \times I_{100}$ memiliki determinan $\det(A) = 10^{-100}$ yang mengalami *underflow* ke $0.0$ pada IEEE 754 float64, namun memiliki rasio kondisi $\kappa(A) = 1$ (sangat stabil untuk diinversi). Jelaskan mengapa fungsi `slogdet` ($\ln |\det(A)|$) digunakan di produksi.
+
+<details>
+<summary>💡 Petunjuk Bertahap (Hint)</summary>
+
+- **Petunjuk 1 (Geometri Jajar Genjang):** Gambar persegi panjang pembungkus berukuran $(a+b) \times (c+d)$ yang melingkupi jajar genjang dengan titik sudut $(0,0), (a,c), (b,d),$ dan $(a+b, c+d)$. Kurangi luas persegi panjang tersebut dengan luas 4 segitiga siku-siku dan 2 persegi panjang kecil di luar jajar genjang.
+- **Petunjuk 2 (Orientasi & Refleksi):** Matriks refleksi terhadap sumbu-$x$ adalah $\begin{bmatrix}1 & 0 \\ 0 & -1\end{bmatrix}$ yang memiliki determinan $-1$. Rotasi murni memiliki determinan $+1$. Determinan negatif membalik urutan jari pada aturan tangan kanan.
+- **Petunjuk 3 (Underflow & Kondisi Matriks):** Evaluasi $(0.1)^{100} = 10^{-100}$. Angka terkecil terdenormalisasi pada float64 adalah $\sim 5 \times 10^{-324}$ dan presisi normal berhenti di $\sim 2.2 \times 10^{-308}$, namun perhatikan bahwa nilai singular terbesar dan terkecil dari $A$ identik ($\sigma_{\max} = \sigma_{\min} = 0.1$) sehingga $\kappa(A) = \sigma_{\max}/\sigma_{\min} = 1.0$.
+</details>
+
+<details>
+<summary>✅ Pembahasan & Solusi Lengkap</summary>
+
+**Langkah 1: Penurunan Geometris Luas Jajar Genjang $2 \times 2$**
+1. **Kotak Pembungkus Bidang Kartesius**:
+   Tinjau jajar genjang yang direntang oleh vektor $\mathbf{u} = [a, c]^T$ dan $\mathbf{v} = [b, d]^T$ di kuadran pertama ($a, b, c, d > 0$ dan kemiringan $d/b > c/a$).
+   Titik-titik sudut jajar genjang adalah:
+   $$O(0, 0), \quad U(a, c), \quad V(b, d), \quad W(a+b, c+d)$$
+   Buat kotak persegi panjang pembungkus yang sejajar sumbu koordinat dengan sudut kiri-bawah di $(0,0)$ dan kanan-atas di $(a+b, c+d)$. Luas kotak pembungkus adalah:
+   $$\text{Luas}_{\text{kotak}} = (a + b)(c + d) = ac + ad + bc + bd$$
+2. **Pengurangan Area Luar**:
+   Area di luar jajar genjang di dalam kotak pembungkus terdiri atas:
+   - Dua segitiga siku-siku di bawah dan atas berukuran alas $a$ dan tinggi $c$:
+     $$2 \times \left( \frac{1}{2} ac \right) = ac$$
+   - Dua segitiga siku-siku di kiri dan kanan berukuran alas $b$ dan tinggi $d$:
+     $$2 \times \left( \frac{1}{2} bd \right) = bd$$
+   - Dua persegi panjang kecil berukuran alas $b$ dan tinggi $c$:
+     $$2 \times (bc) = 2bc$$
+3. **Kalkulasi Luas Bersih Jajar Genjang**:
+   $$\text{Luas} = \text{Luas}_{\text{kotak}} - (ac + bd + 2bc) = (ac + ad + bc + bd) - ac - bd - 2bc = ad - bc$$
+   Luas jajar genjang terorientasi ini persis adalah determinan matriks $A = \begin{bmatrix} a & b \\ c & d \end{bmatrix}$:
+   $$\det(A) = ad - bc$$
+
+**Langkah 2: Interpretasi Orientasi Ruang & Tanda Aljabar Determinan**
+1. **Aturan Tangan Kanan (*Right-Handed Orientation*)**:
+   Urutan vektor kolom $[\mathbf{u}, \mathbf{v}]$ membentuk basis terorientasi.
+   - Jika $\det([\mathbf{u}, \mathbf{v}]) > 0$: Sudut putar terpendek dari $\mathbf{u}$ ke $\mathbf{v}$ berlawanan arah jarum jam (*counter-clockwise*), orientasi asli tangan kanan dipertahankan.
+   - Jika $\det([\mathbf{u}, \mathbf{v}]) < 0$: Sudut putar searah jarum jam (*clockwise*), artinya transformasi mencerminkan ruang dan membalik orientasi.
+2. **Generalisasi Hiper-Volume di $\mathbb{R}^n$**:
+   Secara umum di $\mathbb{R}^n$, $|\det(A)|$ adalah faktor ekspansi volume hiper-kubus satuan menjadi paralelopiped hasil transformasi $A([0,1]^n)$, sedangkan $\text{sign}(\det(A))$ menentukan apakah refleksi topologis terjadi (+1 jika tidak ada pembalikan orientasi, -1 jika orientasi terbalik).
+
+**Langkah 3: Pembuktian Sifat Multiplikatif Determinan $\det(AB) = \det(A)\det(B)$**
+1. **Kasus Matriks Singular**:
+   Jika $A$ atau $B$ singular, maka $\text{rank}(AB) \le \min(\text{rank}(A), \text{rank}(B)) < n$.
+   Maka $AB$ juga singular, sehingga $\det(AB) = 0$. Di sisi lain, $\det(A)\det(B) = 0$. Persamaan bernilai identik.
+2. **Dekomposisi Matriks Elementer**:
+   Jika $A$ tak-singular, $A$ dapat difaktorkan menjadi hasil kali terhingga matriks-matriks operasi baris elementer:
+   $$A = E_k E_{k-1} \dots E_1$$
+   Terdapat 3 jenis matriks elementer:
+   - Skalar baris $E_{\text{scale}}(c)$: $\det(E_{\text{scale}} B) = c \det(B) = \det(E_{\text{scale}}) \det(B)$.
+   - Tukar baris $E_{\text{swap}}$: $\det(E_{\text{swap}} B) = -\det(B) = \det(E_{\text{swap}}) \det(B)$.
+   - Eliminasi baris $E_{\text{add}}(c)$: $\det(E_{\text{add}} B) = \det(B) = \det(E_{\text{add}}) \det(B)$ (karena $\det(E_{\text{add}}) = 1$).
+   Secara induktif:
+   $$\det(AB) = \det(E_k \dots E_1 B) = \det(E_k) \dots \det(E_1) \det(B) = \det(E_k \dots E_1) \det(B) = \det(A) \det(B)$$
+   Terbukti bahwa sifat multiplikatif berlaku secara universal.
+
+**Langkah 4: Analisis Stabilitas Floating-Point & Formulasi `slogdet`**
+1. **Kegagalan Determinan Menguji Singularitas**:
+   Tinjau matriks diagonal $A = 0.1 \times I_{100}$. Determinan analitisnya adalah:
+   $$\det(A) = \prod_{i=1}^{100} 0.1 = (0.1)^{100} = 10^{-100}$$
+   Pada sistem komputasi berdimensi $1000$, $(0.1)^{1000} = 10^{-1000}$ yang mengalami *underflow* seketika menjadi $0.0$ di bawah limit float64 ($10^{-308}$).
+   Namun, invers matriksnya adalah $A^{-1} = 10 \times I_{100}$ yang sangat stabil dan mudah dihitung.
+   Rasio kondisi matriks $A$ adalah:
+   $$\kappa(A) = \|A\|_2 \|A^{-1}\|_2 = 0.1 \times 10 = 1.0$$
+   Rasio kondisi 1.0 adalah matriks paling ideal di alam semesta. Menguji keterbalikan matriks melalui `det(A) == 0` adalah kesalahan fatal yang sering memicu crash pada sistem produksi.
+2. **Solusi Industri: `slogdet`**:
+   Untuk menghindari *underflow* dan *overflow*, pustaka komputasi numerik (`scipy.linalg.slogdet` atau `torch.linalg.slogdet`) menghitung tanda aljabar dan logaritma determinan:
+   $$\ln |\det(A)| = \ln \left( \prod_{i=1}^n |U_{ii}| \right) = \sum_{i=1}^n \ln |U_{ii}|$$
+   di mana $U_{ii}$ adalah elemen diagonal dari faktorisasi $PA = LU$. Penjumlahan suku logaritma tidak pernah mengalami ledakan eksponensial maupun underflow.
+</details>
+
+---
+
+### Soal 011.5: Dinamika Nilai Eigen, Matriks Markov Stasioner, dan Solusi Tertutup Fibonacci
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Bagaimana persamaan sederhana $A\mathbf{v}=\lambda\mathbf{v}$ mengungkap masa depan jangka panjang sistem probabilitas (Rantai Markov) dan menurunkan rumus rahasia suku ke-$k$ deret Fibonacci tanpa perlu menghitung satu per satu dari awal?
+
+Tinjau konsep nilai eigen $\lambda$ dan vektor eigen $\mathbf{v}$ pada matriks $A \in \mathbb{R}^{n \times n}$.
+1. Tinjau matriks stokastik kolom $M \in \mathbb{R}^{n \times n}$ (di mana $\sum_{i=1}^n M_{ij} = 1$ untuk setiap kolom $j$, dan $M_{ij} \ge 0$). Buktikan bahwa $\lambda_1 = 1$ selalu merupakan nilai eigen dari $M$ (petunjuk: tinjau $M^T \mathbf{1} = \mathbf{1}$), dan buktikan berdasarkan Teorema Lingkaran Gershgorin bahwa seluruh nilai eigen lainnya memenuhi $|\lambda_i| \le 1$.
+2. Susun relasi rekursif barisan Fibonacci $F_{k+2} = F_{k+1} + F_k$ ($F_0=0, F_1=1$) ke dalam bentuk sistem dinamik matriks 2D: $\mathbf{u}_{k+1} = A \mathbf{u}_k$ di mana $\mathbf{u}_k = [F_{k+1}, F_k]^T$. Hitung nilai eigen $\lambda_1, \lambda_2$ dari $A = \begin{bmatrix}1 & 1 \\ 1 & 0\end{bmatrix}$, carilah basis vektor eigen yang bersesuaian, dan turunkan secara analitis Rumus Binet:
+   $$F_k = \frac{1}{\sqrt{5}} \left[ \left(\frac{1+\sqrt{5}}{2}\right)^k - \left(\frac{1-\sqrt{5}}{2}\right)^k \right]$$
+3. Tinjau matriks riil $2 \times 2$ yang memiliki nilai eigen kompleks konjugat $\lambda = a \pm bi = r e^{\pm i\theta}$. Buktikan bahwa aksi matriks tersebut serupa (*similar*) dengan perkalian penskalaan $r = \sqrt{a^2+b^2}$ dan rotasi murni sebesar sudut $\theta = \arctan(b/a)$, serta jelaskan mengapa sistem fisik dengan nilai eigen ini mengalami osilasi.
+
+<details>
+<summary>💡 Petunjuk Bertahap (Hint)</summary>
+
+- **Petunjuk 1 (Matriks Stokastik):** Karena jumlah setiap kolom dari $M$ adalah 1, kalikan transpos $M^T$ dengan vektor satu $\mathbf{1} = [1, 1, \dots, 1]^T$. Perhatikan bahwa $(M^T \mathbf{1})_i = \sum_j M_{ji} = 1$, sehingga $M^T \mathbf{1} = \mathbf{1}$. Karena $\det(M - \lambda I) = \det(M^T - \lambda I)$, nilai eigen dari $M$ dan $M^T$ identik.
+- **Petunjuk 2 (Fibonacci & Rasio Emas):** Tuliskan sistem dinamik $\begin{bmatrix} F_{k+1} \\ F_k \end{bmatrix} = \begin{bmatrix} 1 & 1 \\ 1 & 0 \end{bmatrix} \begin{bmatrix} F_k \\ F_{k-1} \end{bmatrix}$. Persamaan karakteristiknya adalah $\lambda^2 - \lambda - 1 = 0$ dengan akar $\varphi = \frac{1+\sqrt{5}}{2}$ dan $\psi = \frac{1-\sqrt{5}}{2}$. Vektor awal adalah $\mathbf{u}_0 = [F_1, F_0]^T = [1, 0]^T$.
+- **Petunjuk 3 (Nilai Eigen Kompleks):** Matriks rotasi murni $R_\theta = \begin{bmatrix} \cos\theta & -\sin\theta \\ \sin\theta & \cos\theta \end{bmatrix}$ memiliki nilai eigen $\cos\theta \pm i\sin\theta = e^{\pm i\theta}$. Bentuk kanonik riil Jordan mentransformasikan matriks $2 \times 2$ dengan nilai eigen kompleks ke bentuk $r R_\theta$.
+</details>
+
+<details>
+<summary>✅ Pembahasan & Solusi Lengkap</summary>
+
+**Langkah 1: Nilai Eigen Dominan Matriks Markov & Teorema Lingkaran Gershgorin**
+1. **Bukti $\lambda_1 = 1$ Selalu Nilai Eigen**:
+   Matriks probabilitas transisi Markov kolom memenuhi sifat stokastik: $\sum_{i=1}^n M_{ij} = 1$ untuk setiap kolom $j$.
+   Tinjau matriks transpos $M^T$. Jumlah elemen pada setiap baris ke-$j$ dari $M^T$ adalah:
+   $$\sum_{i=1}^n (M^T)_{ji} = \sum_{i=1}^n M_{ij} = 1$$
+   Kalikan $M^T$ dengan vektor kolom satuan $\mathbf{1} = [1, 1, \dots, 1]^T$:
+   $$(M^T \mathbf{1})_j = \sum_{i=1}^n (M^T)_{ji} \cdot 1 = 1 \implies M^T \mathbf{1} = 1 \cdot \mathbf{1}$$
+   Ini membuktikan bahwa $\mathbf{1}$ adalah vektor eigen dari $M^T$ dengan nilai eigen $\lambda = 1$.
+   Mengingat determinan invarian terhadap operasi transpos:
+   $$\det(M - \lambda I) = \det((M - \lambda I)^T) = \det(M^T - \lambda I)$$
+   Maka spektrum nilai eigen dari $M$ dan $M^T$ identik. Oleh karena itu, $\lambda = 1$ pasti merupakan nilai eigen dari matriks Markov $M$. Vektor eigen kanannya yang dinormalisasi ($\sum v_i = 1$) adalah distribusi probabilitas keadaan stasioner $\mathbf{v}_\infty$.
+2. **Bukti $|\lambda_i| \le 1$ via Teorema Gershgorin**:
+   Terapkan Teorema Lingkaran Gershgorin pada baris-baris dari $M^T$.
+   Setiap lingkaran Gershgorin ke-$i$ berpusat di diagonal $c_i = (M^T)_{ii} = M_{ii}$ dengan radius:
+   $$R_i = \sum_{j \ne i} |(M^T)_{ij}| = \sum_{j \ne i} M_{ji}$$
+   Karena semua entri tak-negatif ($M_{ji} \ge 0$) dan jumlah baris adalah 1:
+   $$R_i = 1 - M_{ii}$$
+   Maka setiap lingkaran diskret Gershgorin $D_i$ dibatasi oleh:
+   $$|z - M_{ii}| \le 1 - M_{ii} \implies |z| \le |z - M_{ii}| + |M_{ii}| \le (1 - M_{ii}) + M_{ii} = 1$$
+   Seluruh nilai eigen $M^T$ (dan karenanya seluruh nilai eigen $M$) wajib berada di dalam gabungan lingkaran Gershgorin, sehingga $|\lambda_i| \le 1$ untuk setiap $i = 1, \dots, n$.
+
+**Langkah 2: Diagonalisasi Matriks Fibonacci $A^k = V \Lambda^k V^{-1}$ & Penurunan Rumus Binet**
+1. **Formulasi Sistem Dinamik**:
+   Relasi barisan Fibonacci adalah $F_{k+1} = 1 \cdot F_k + 1 \cdot F_{k-1}$ dan $F_k = 1 \cdot F_k + 0 \cdot F_{k-1}$.
+   Dapat dituliskan sebagai perkalian matriks:
+   $$\mathbf{u}_k = \begin{bmatrix} F_{k+1} \\ F_k \end{bmatrix} = \begin{bmatrix} 1 & 1 \\ 1 & 0 \end{bmatrix} \begin{bmatrix} F_k \\ F_{k-1} \end{bmatrix} = A \mathbf{u}_{k-1}$$
+   Dengan menerapkan rekursi berturut-turut hingga kondisi awal $\mathbf{u}_0 = [F_1, F_0]^T = [1, 0]^T$:
+   $$\mathbf{u}_k = A^k \mathbf{u}_0$$
+2. **Eigendecomposition Matriks $A$**:
+   Persamaan karakteristik:
+   $$\det(A - \lambda I) = \det \begin{bmatrix} 1-\lambda & 1 \\ 1 & -\lambda \end{bmatrix} = -\lambda(1-\lambda) - 1 = \lambda^2 - \lambda - 1 = 0$$
+   Akar-akar kuadratiknya adalah:
+   $$\lambda_1 = \frac{1 + \sqrt{5}}{2} = \varphi \quad (\text{Rasio Emas} \approx 1.61803), \quad \lambda_2 = \frac{1 - \sqrt{5}}{2} = -\frac{1}{\varphi} \approx -0.61803$$
+   Mencari vektor eigen $(A - \lambda_i I)\mathbf{v}_i = \mathbf{0}$:
+   $$\begin{bmatrix} 1-\lambda_i & 1 \\ 1 & -\lambda_i \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix} = \mathbf{0} \implies x - \lambda_i y = 0 \implies \mathbf{v}_i = \begin{bmatrix} \lambda_i \\ 1 \end{bmatrix}$$
+   Maka matriks modal $V$ dan matriks diagonal $\Lambda$ adalah:
+   $$V = \begin{bmatrix} \lambda_1 & \lambda_2 \\ 1 & 1 \end{bmatrix}, \quad \Lambda = \begin{bmatrix} \lambda_1 & 0 \\ 0 & \lambda_2 \end{bmatrix}$$
+3. **Ekstraksi Rumus Binet**:
+   Invers dari matriks modal $V$ ($\det(V) = \lambda_1 - \lambda_2 = \sqrt{5}$):
+   $$V^{-1} = \frac{1}{\sqrt{5}} \begin{bmatrix} 1 & -\lambda_2 \\ -1 & \lambda_1 \end{bmatrix}$$
+   Representasikan kondisi awal $\mathbf{u}_0 = [1, 0]^T$ dalam basis vektor eigen:
+   $$\mathbf{c} = V^{-1} \mathbf{u}_0 = \frac{1}{\sqrt{5}} \begin{bmatrix} 1 & -\lambda_2 \\ -1 & \lambda_1 \end{bmatrix} \begin{bmatrix} 1 \\ 0 \end{bmatrix} = \frac{1}{\sqrt{5}} \begin{bmatrix} 1 \\ -1 \end{bmatrix}$$
+   Maka evolusi sistem pada langkah ke-$k$:
+   $$\mathbf{u}_k = V \Lambda^k \mathbf{c} = \begin{bmatrix} \lambda_1 & \lambda_2 \\ 1 & 1 \end{bmatrix} \begin{bmatrix} \lambda_1^k & 0 \\ 0 & \lambda_2^k \end{bmatrix} \left( \frac{1}{\sqrt{5}} \begin{bmatrix} 1 \\ -1 \end{bmatrix} \right) = \frac{1}{\sqrt{5}} \begin{bmatrix} \lambda_1 & \lambda_2 \\ 1 & 1 \end{bmatrix} \begin{bmatrix} \lambda_1^k \\ -\lambda_2^k \end{bmatrix}$$
+   Komponen kedua dari $\mathbf{u}_k$ adalah suku Fibonacci $F_k$:
+   $$F_k = \frac{1}{\sqrt{5}} (\lambda_1^k - \lambda_2^k) = \frac{1}{\sqrt{5}} \left[ \left(\frac{1+\sqrt{5}}{2}\right)^k - \left(\frac{1-\sqrt{5}}{2}\right)^k \right]$$
+   Q.E.D. Rumus analitis Binet terbukti secara eksak murni dari dekomposisi nilai eigen matriks.
+
+**Langkah 3: Nilai Eigen Kompleks Konjugat sebagai Penskalaan & Rotasi**
+1. **Representasi Polar Nilai Eigen**:
+   Misalkan matriks riil $2 \times 2$ memiliki sepasang nilai eigen kompleks konjugat $\lambda_{1, 2} = a \pm bi$.
+   Tuliskan dalam koordinat polar:
+   $$r = \sqrt{a^2 + b^2}, \quad \theta = \arctan(b/a) \implies \lambda = r(\cos\theta \pm i\sin\theta) = r e^{\pm i\theta}$$
+2. **Kanonik Riil Jordan**:
+   Jika $\mathbf{v} = \mathbf{x} + i\mathbf{y}$ adalah vektor eigen yang bersesuaian dengan $\lambda = a + bi$, maka:
+   $$A(\mathbf{x} + i\mathbf{y}) = (a + bi)(\mathbf{x} + i\mathbf{y}) = (a\mathbf{x} - b\mathbf{y}) + i(b\mathbf{x} + a\mathbf{y})$$
+   Memisahkan bagian riil dan imajiner:
+   $$A\mathbf{x} = a\mathbf{x} - b\mathbf{y}, \quad A\mathbf{y} = b\mathbf{x} + a\mathbf{y}$$
+   Dalam bentuk matriks basis $P = [\mathbf{x} \mid \mathbf{y}]$:
+   $$A P = P \begin{bmatrix} a & b \\ -b & a \end{bmatrix} = P \left( r \begin{bmatrix} \cos\theta & \sin\theta \\ -\sin\theta & \cos\theta \end{bmatrix} \right)$$
+   Maka matriks $A$ serupa (*similar*) dengan perkalian penskalaan seragam sebesar $r$ dan rotasi bidang sebesar sudut $-\theta$:
+   $$P^{-1} A P = r R_{-\theta}$$
+3. **Interpretasi Fisik**:
+   Setiap langkah transformasi $A^k$ mengalikan amplitudo sistem dengan $r^k$ dan memutar fase sebesar $k\theta$.
+   - Jika $r = 1$: Sistem mengalami osilasi periodik murni tak teredam (seperti gelombang sinusoidal atau orbit melingkar).
+   - Jika $r < 1$: Lintasan spiral menyusut ke titik setimbang $\mathbf{0}$ (*stable spiral sink*).
+   - Jika $r > 1$: Lintasan spiral meledak ke tak terhingga (*unstable spiral source*).
+</details>
+
+---
+
+### Soal 011.6: Kriteria Sylvester, Bentuk Kuadratik, dan Algoritma Faktorisasi Cholesky $A = L L^T$
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Bagaimana memastikan mangkuk fungsi optimasi selalu melengkung ke atas (definit positif) sehingga gradien selalu menemukan titik minimum global? Mengapa algoritma Cholesky $A = LL^T$ dua kali lebih cepat dari LU dan dijamin tidak akan pernah meledak secara numerik tanpa perlu menukar baris?
+
 Diberikan matriks simetris riil $A = A^T \in \mathbb{R}^{n \times n}$.
 1. Tuliskan 5 pengujian ekuivalen matematis yang mendefinisikan bahwa $A$ bersifat Simetris Definit Positif (Symmetric Positive Definite / SPD).
 2. Buktikan Kriteria Sylvester: Tunjukkan secara induktif bahwa jika semua determinan minor utama terdepan (*leading principal minors*) bernilai positif:
    $$\Delta_k = \det(A_k) > 0 \quad \text{untuk setiap } k = 1, 2, \dots, n$$
    maka semua pivot eliminasi Gauss $d_k > 0$, dan seluruh nilai eigen $\lambda_i(A) > 0$.
-3. Turunkan algoritma analitis Faktorisasi Cholesky $A = L L^T$ di mana $L$ adalah matriks segitiga bawah dengan elemen diagonal riil positif $L_{ii} > 0$. Buktikan bahwa proses ini tidak pernah memerlukan *pivoting* (penukaran baris) dan tidak akan menghasilkan nilai di bawah tanda akar kuadrat yang bernilai negatif.
+3. Turunkan algoritma analitis Faktorisasi Cholesky $A = L L^T$ di mana $L$ adalah matriks segitiga bawah dengan elemen diagonal riil positif $L_{ii} > 0$. Buktikan bahwa proses ini tidak pernah memerlukan *pivoting* (penukaran baris) dan tidak akan menghasilkan nilai di bawah tanda akar kuadrat yang bernilai negatif. Jelaskan pula mengapa biaya komputasinya adalah tepat $\frac{1}{3}n^3$ total FLOPs ($\frac{1}{6}n^3$ penjumlahan/pengurangan + $\frac{1}{6}n^3$ perkalian).
 
 <details>
-<summary>Solusi Lengkap & Analisis Matematis</summary>
+<summary>💡 Petunjuk Bertahap (Hint)</summary>
+
+- **Petunjuk 1 (Hubungan Determinan & Pivot):** Pada dekomposisi $A = LDL^T$, determinan submatriks orde $k$ adalah hasil kali $k$ pivot pertama: $\det(A_k) = \prod_{j=1}^k d_j$. Rasio dua determinan berurutan $\Delta_k / \Delta_{k-1}$ langsung mengekstrak nilai pivot ke-$k$ ($d_k$).
+- **Petunjuk 2 (Nilai di Bawah Tanda Akar):** Ekspresi di bawah tanda akar pada rumus diagonal Cholesky $L_{jj} = \sqrt{a_{jj} - \sum_{k=1}^{j-1} L_{jk}^2}$ persis sama dengan pivot eliminasi Gauss $d_j$. Karena $A$ definit positif, $d_j > 0$ selalu bernilai riil positif.
+- **Petunjuk 3 (FLOPs Cholesky vs LU):** Karena matriks simetris, kita hanya menghitung separuh elemen (segitiga bawah). Deret jumlahan $\sum_{j=1}^n \sum_{k=1}^{j-1} 2 \approx \int_0^n j^2 dj = \frac{1}{3}n^3$ FLOPs total ($\frac{1}{6}n^3$ tambah/kurang + $\frac{1}{6}n^3$ kali), persis separuh dari LU ($\frac{2}{3}n^3$ FLOPs).
+</details>
+
+<details>
+<summary>✅ Pembahasan & Solusi Lengkap</summary>
 
 **Langkah 1: Lima Pengujian Ekuivalen Matriks Definit Positif (SPD)**
 Suatu matriks simetris $A = A^T \in \mathbb{R}^{n \times n}$ dikatakan Definit Positif ($A \succ 0$) jika dan hanya jika memenuhi salah satu (dan seluruhnya) dari kondisi setara berikut:
@@ -570,7 +853,7 @@ Tinjau eliminasi Gaussian pada matriks simetris $A$ yang mendekomposisi matriks 
    $$\lambda = v^T A v > 0$$
    Maka seluruh nilai eigen $\lambda_i(A)$ terbukti bernilai riil dan tegas positif.
 
-**Langkah 3: Penurunan Analitis Algoritma Cholesky & Stabilitas Numerik**
+**Langkah 3: Penurunan Analitis Algoritma Cholesky, Stabilitas Numerik, dan Kompleksitas FLOPs $\frac{1}{3}n^3$**
 Tuliskan relasi matriks $A = L L^T$ dalam bentuk perkalian indeks:
 $$a_{ij} = \sum_{k=1}^n L_{ik} (L^T)_{kj} = \sum_{k=1}^{\min(i, j)} L_{ik} L_{jk}$$
 Karena $L$ matriks segitiga bawah ($L_{ik} = 0$ untuk $k > i$):
@@ -591,12 +874,21 @@ Karena $L$ matriks segitiga bawah ($L_{ik} = 0$ untuk $k > i$):
    Artinya:
    $$|L_{ik}| \le \sqrt{a_{ii}} \le \max_i \sqrt{a_{ii}}$$
    Setiap elemen pada faktor Cholesky $L$ dibatasi secara alami oleh akar dari elemen diagonal matriks aslinya $A$. Pembesaran elemen (*element growth*) yang biasa terjadi pada eliminasi Gaussian biasa tidak akan pernah terjadi pada faktorisasi Cholesky. Oleh karena itu, faktorisasi Cholesky bersifat stabil secara numerik (*unconditionally backward stable*) tanpa perlu menukar baris (*pivoting*).
-
+5. **Analisis Kompleksitas FLOPs**:
+   Untuk setiap kolom $j = 1, \dots, n$:
+   - Menghitung $L_{jj}$: $j-1$ perkalian, $j-1$ pengurangan, 1 akar kuadrat ($2j$ operasi).
+   - Menghitung $L_{ij}$ untuk $i > j$: untuk masing-masing $n-j$ baris, dilakukan $j-1$ perkalian, $j-1$ pengurangan, 1 pembagian ($2j(n-j)$ operasi).
+   Total operasi penjumlahan dan perkalian:
+   $$\text{FLOPs}_{\text{Cholesky}} \approx \sum_{j=1}^n 2j(n-j) = 2n \frac{n^2}{2} - 2 \frac{n^3}{3} = n^3 - \frac{2}{3}n^3 = \frac{1}{3}n^3 \text{ FLOPs}$$
+   Rincian terstandarisasi: tepat $\frac{1}{6}n^3$ operasi penjumlahan/pengurangan dan $\frac{1}{6}n^3$ operasi perkalian (persis $50\%$ dari biaya eliminasi $PA=LU$ yang memerlukan $\frac{2}{3}n^3$ total operasi).
 </details>
 
 ---
 
-### Soal 011.4: Aksi Geometris SVD, Teorema Eckart-Young-Mirsky, dan Moore-Penrose Pseudoinverse $A^+$
+### Soal 011.7: Aksi Geometris SVD, Teorema Eckart-Young-Mirsky, dan Moore-Penrose Pseudoinverse $A^+$
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Mengapa Dekomposisi Nilai Singular (SVD) disebut puncak tertinggi aljabar linier? Bagaimana SVD membelah sembarang matriks menjadi rotasi $\to$ peregangan $\to$ rotasi, dan mengapa pemangkasan nilai singular terkecil memberikan kompresi gambar dan reduksi dimensi terbaik di dunia matematika?
+
 Diberikan matriks persegi panjang sembarang $A \in \mathbb{R}^{m \times n}$ dengan rank $r \le \min(m, n)$.
 1. Jelaskan interpretasi geometris dekomposisi nilai singular $A = U \Sigma V^T$ dalam memetakan bola hiper-satuan $S^{n-1} \subset \mathbb{R}^n$ menjadi hiper-elipsoid di $\mathbb{R}^m$. Tunjukkan peran dari vektor singular kanan $v_i$, nilai singular $\sigma_i$, dan vektor singular kiri $u_i$.
 2. Buktikan Teorema Eckart-Young-Mirsky untuk norma spektral matriks ($\|\cdot\|_2$):
@@ -607,7 +899,15 @@ Diberikan matriks persegi panjang sembarang $A \in \mathbb{R}^{m \times n}$ deng
 3. Turunkan rumusan Moore-Penrose Pseudoinverse $A^+ = V \Sigma^+ U^T$. Buktikan bahwa solusi kuadrat terkecil $\hat{x} = A^+ b$ merupakan vektor unik yang meminimalkan galat residu $\|Ax - b\|_2$, dan jika solusi tidak unik (sistem *underdetermined*), $\hat{x}$ memiliki norma Euclidean terkecil $\|x\|_2$.
 
 <details>
-<summary>Solusi Lengkap & Analisis Matematis</summary>
+<summary>💡 Petunjuk Bertahap (Hint)</summary>
+
+- **Petunjuk 1 (Geometri Bola ke Elipsoid):** Bola satuan adalah $\{x \mid \|x\|_2 = 1\}$. Karena $V$ ortogonal, $c = V^T x$ juga memiliki norma 1 ($\sum c_i^2 = 1$). Pengali $\Sigma$ mengubahnya menjadi $w_i = \sigma_i c_i \implies \sum (w_i/\sigma_i)^2 = 1$, yang merupakan rumus elipsoid. Lalu $U$ merotasikan sumbu elipsoid ke arah kolom-kolom $u_i$.
+- **Petunjuk 2 (Teorema Dimensi Eckart-Young):** Matriks sembarang $B$ dengan rank $\le k$ memiliki ruang nol berdimensi minimal $n-k$. Ruang yang direntang $k+1$ vektor singular pertama memiliki dimensi $k+1$. Karena $(n-k) + (k+1) = n+1 > n$, kedua subruang pasti beririsan pada minimal satu vektor satuan $z$. Gunakan vektor $z$ ini untuk membuktikan $\|(A-B)z\|_2 \ge \sigma_{k+1}$.
+- **Petunjuk 3 (Pseudoinverse Penrose):** Uraikan $\|Ax - b\|_2^2$ menggunakan sifat ortogonalitas $U^T$: $\|\Sigma y - U^T b\|_2^2 = \sum_{i=1}^r (\sigma_i y_i - u_i^T b)^2 + \sum_{i=r+1}^m (u_i^T b)^2$. Tetapkan $y_i = \frac{u_i^T b}{\sigma_i}$ untuk $i \le r$ dan $y_i = 0$ untuk $i > r$ agar $\|x\|_2 = \|y\|_2$ minimal.
+</details>
+
+<details>
+<summary>✅ Pembahasan & Solusi Lengkap</summary>
 
 **Langkah 1: Dekomposisi Aksi Geometris SVD ($A = U \Sigma V^T$)**
 Transformasi linier $A x$ dipetakan melalui tiga tahapan geometri berurutan:
@@ -684,12 +984,103 @@ Transformasi linier $A x$ dipetakan melalui tiga tahapan geometri berurutan:
    Sehingga solusi optimal unik adalah:
    $$\hat{x} = V y^* = V \Sigma^+ U^T b = A^+ b$$
    Q.E.D. Solusi pseudoinverse Moore-Penrose terbukti analitis meminimalkan galat kuadrat terkecil dan memiliki norma Euclidean minimum.
-
 </details>
 
 ---
 
-### Soal 011.5: Aljabar Multilinier Tensor: Unfolding Mode-$n$, Dekomposisi CP vs Tucker (HOSVD)
+### Soal 011.8: Optimasi Varians PCA, Rasio Rayleigh, dan Bahaya Jebakan Centering (*The Centering Trap*)
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** PCA bertugas menemukan arah di mana data paling menyebar luas (varians maksimal). Namun, mengapa jika Anda lupa mengurangkan rata-rata (*centering*), PCA menghasilkan sampah murni di mana komponen utama pertama justru menunjuk ke titik rata-rata alih-alih sumbu varians data?
+
+Tinjau dataset $n$ sampel dengan $d$ fitur $X \in \mathbb{R}^{n \times d}$.
+1. Formulasikan PCA sebagai persoalan optimasi berkendala: mencari vektor arah satuan $\mathbf{w} \in \mathbb{R}^d$ ($\|\mathbf{w}\|_2 = 1$) yang memaksimalkan varians data terproyeksi:
+   $$\max_{\mathbf{w}} \mathbf{w}^T S \mathbf{w} \quad \text{s.t.} \quad \mathbf{w}^T \mathbf{w} = 1$$
+   di mana $S = \frac{1}{n-1} X_c^T X_c$ adalah matriks kovarians sampel data terpusat ($X_c = X - \mathbf{1}\boldsymbol{\mu}^T$). Turunkan menggunakan metode Pengali Lagrange bahwa $\mathbf{w}$ wajib merupakan vektor eigen dari $S$ yang bersesuaian dengan nilai eigen terbesar $\lambda_{\max}$.
+2. Analisis matematis *The Centering Trap*: Tinjau matriks data tak terpusat $X = X_c + \mathbf{1}\boldsymbol{\mu}^T$, di mana $\boldsymbol{\mu} \in \mathbb{R}^d$ adalah vektor rata-rata fitur dan $\mathbf{1}^T X_c = \mathbf{0}^T$.
+   - Buktikan bahwa matriks momen kedua tak terpusat adalah:
+     $$\frac{1}{n} X^T X = \frac{1}{n} X_c^T X_c + \boldsymbol{\mu} \boldsymbol{\mu}^T$$
+   - Tunjukkan bahwa jika $\|\boldsymbol{\mu}\|_2^2 \gg \lambda_1(S)$, komponen utama pertama yang dihitung dari $X^T X$ akan mendekati arah vektor rata-rata $\frac{\boldsymbol{\mu}}{\|\boldsymbol{\mu}\|}$, bukan arah sebaran data. Jelaskan dampak fatalnya dalam sistem kompresi atau klasifikasi machine learning.
+3. Hubungan Komputasi SVD vs Eigendecomposition Kovarians:
+   - Tunjukkan bahwa SVD ekonomi pada data terpusat berskala $\frac{1}{\sqrt{n-1}} X_c = U \Sigma V^T$ langsung menghasilkan basis komponen utama $\mathbf{w}_i = \mathbf{v}_i$ dan varians $\lambda_i = \sigma_i^2$.
+   - Jelaskan mengapa implementasi industri (seperti `sklearn.decomposition.PCA`) selalu menggunakan SVD langsung pada $X_c$ dan menolak menghitung matriks kovarians $X_c^T X_c$ secara eksplisit (kaitkan dengan rasio kondisi $\kappa(X^T X) = \kappa(X)^2$).
+
+<details>
+<summary>💡 Petunjuk Bertahap (Hint)</summary>
+
+- **Petunjuk 1 (Pengali Lagrange):** Bentuk fungsi skalar Lagrangian $\mathcal{L}(\mathbf{w}, \lambda) = \mathbf{w}^T S \mathbf{w} - \lambda (\mathbf{w}^T \mathbf{w} - 1)$. Hitung turunan parsial terhadap vektor $\mathbf{w}$: $\frac{\partial \mathcal{L}}{\partial \mathbf{w}} = 2 S \mathbf{w} - 2 \lambda \mathbf{w} = \mathbf{0}$.
+- **Petunjuk 2 (Perturbasi Rank-1 Matriks Rata-rata):** Suku $\boldsymbol{\mu}\boldsymbol{\mu}^T$ adalah matriks simetris definit semi-positif ber-rank 1. Nilai eigen tunggal non-nol dari $\boldsymbol{\mu}\boldsymbol{\mu}^T$ adalah $\|\boldsymbol{\mu}\|_2^2$ dengan eigenvektor $\boldsymbol{\mu}$. Jika titik pusat data jauh dari $(0,0)$, energi rata-rata mendominasi seluruh varians internal data.
+- **Petunjuk 3 (Presisi SVD vs Matriks Kovarians):** Perkalian eksplisit matriks $X_c^T X_c$ menghabiskan $O(n d^2)$ operasi dan mengkuadratkan rasio kondisi: $\kappa(X_c^T X_c) = (\kappa(X_c))^2$. Jika $\kappa(X_c) = 10^9$, maka $\kappa(X_c^T X_c) = 10^{18} > 1/\epsilon_{\text{mach}}$, sehingga informasi pada arah nilai singular terkecil terhapus permanen akibat batas floating-point.
+</details>
+
+<details>
+<summary>✅ Pembahasan & Solusi Lengkap</summary>
+
+**Langkah 1: Perumusan Pengali Lagrange & Spektrum Kovarians**
+1. **Fungsi Objektif Varians Terproyeksi**:
+   Diberikan data terpusat $X_c \in \mathbb{R}^{n \times d}$ dengan matriks kovarians sampel $S = \frac{1}{n-1} X_c^T X_c \in \mathbb{R}^{d \times d}$.
+   Proyeksi sampel ke arah vektor satuan $\mathbf{w}$ ($\|\mathbf{w}\|_2 = 1$) adalah $z = X_c \mathbf{w}$.
+   Varians dari data terproyeksi adalah:
+   $$\sigma_z^2 = \frac{1}{n-1} z^T z = \frac{1}{n-1} (X_c \mathbf{w})^T (X_c \mathbf{w}) = \mathbf{w}^T \left( \frac{1}{n-1} X_c^T X_c \right) \mathbf{w} = \mathbf{w}^T S \mathbf{w}$$
+2. **Optimasi Berpembatas via Pengali Lagrange**:
+   Tujuan kita adalah memaksimalkan $\mathbf{w}^T S \mathbf{w}$ dengan kendala $\mathbf{w}^T \mathbf{w} = 1$.
+   Bentuk fungsi Lagrangian:
+   $$\mathcal{L}(\mathbf{w}, \lambda) = \mathbf{w}^T S \mathbf{w} - \lambda (\mathbf{w}^T \mathbf{w} - 1)$$
+   Hitung gradien terhadap $\mathbf{w}$ (mengingat $S$ simetris, $\nabla_{\mathbf{w}} (\mathbf{w}^T S \mathbf{w}) = 2S\mathbf{w}$):
+   $$\nabla_{\mathbf{w}} \mathcal{L} = 2 S \mathbf{w} - 2 \lambda \mathbf{w} = \mathbf{0} \implies S \mathbf{w} = \lambda \mathbf{w}$$
+   Ini adalah persamaan nilai eigen standar! Vektor arah optimal $\mathbf{w}$ wajib merupakan vektor eigen dari matriks kovarians $S$.
+3. **Maksimalisasi Varians**:
+   Kalikan kedua ruas dari kiri dengan $\mathbf{w}^T$:
+   $$\mathbf{w}^T S \mathbf{w} = \lambda \mathbf{w}^T \mathbf{w} = \lambda (1) = \lambda$$
+   Besarnya varians data terproyeksi persis sama dengan nilai eigen $\lambda$.
+   Untuk memaksimalkan varians, kita wajib memilih $\lambda = \lambda_1 = \lambda_{\max}(S)$, yaitu nilai eigen terbesar dari $S$. Vektor eigen yang bersesuaian $\mathbf{w}_1$ adalah Komponen Utama Pertama (PC1). Komponen berikutnya diperoleh dengan memaksakan ortogonalitas terhadap komponen sebelumnya, yang bersesuaian dengan $\mathbf{w}_2, \mathbf{w}_3, \dots, \mathbf{w}_d$.
+
+**Langkah 2: Pembuktian Fenomena The Centering Trap (Perturbasi Rank-1)**
+1. **Dekomposisi Matriks Momen Tak Terpusat**:
+   Tinjau data tak terpusat $X = X_c + \mathbf{1}\boldsymbol{\mu}^T$, di mana rata-rata sampel memenuhi $\mathbf{1}^T X_c = \mathbf{0}^T$.
+   Hitung perkalian $X^T X$:
+   $$X^T X = (X_c + \mathbf{1}\boldsymbol{\mu}^T)^T (X_c + \mathbf{1}\boldsymbol{\mu}^T) = X_c^T X_c + X_c^T \mathbf{1}\boldsymbol{\mu}^T + \boldsymbol{\mu}\mathbf{1}^T X_c + \boldsymbol{\mu}\mathbf{1}^T \mathbf{1}\boldsymbol{\mu}^T$$
+   Karena $\mathbf{1}^T X_c = \mathbf{0}^T$, dua suku silang lenyap persis: $X_c^T \mathbf{1} = \mathbf{0}$.
+   Mengingat $\mathbf{1}^T \mathbf{1} = n$:
+   $$X^T X = X_c^T X_c + n \boldsymbol{\mu} \boldsymbol{\mu}^T$$
+   Bagi kedua ruas dengan $n$:
+   $$\frac{1}{n} X^T X = \frac{1}{n} X_c^T X_c + \boldsymbol{\mu} \boldsymbol{\mu}^T$$
+2. **Dominasi Suku Rata-rata Rank-1**:
+   Matriks $\boldsymbol{\mu}\boldsymbol{\mu}^T$ adalah matriks ber-rank 1 dengan nilai eigen tunggal non-nol:
+   $$(\boldsymbol{\mu}\boldsymbol{\mu}^T) \boldsymbol{\mu} = \boldsymbol{\mu}(\boldsymbol{\mu}^T \boldsymbol{\mu}) = \|\boldsymbol{\mu}\|_2^2 \boldsymbol{\mu}$$
+   Nilai eigen dari suku rata-rata ini bernilai $\|\boldsymbol{\mu}\|_2^2$ pada arah vektor rata-rata $\boldsymbol{\mu}$.
+   Jika data berada jauh dari titik asal, sehingga $\|\boldsymbol{\mu}\|_2^2 \gg \lambda_1(S)$:
+   Berdasarkan Teorema Perturbasi Weyl, nilai eigen terbesar dari $\frac{1}{n} X^T X$ didominasi secara mutlak oleh suku rank-1 tersebut:
+   $$\lambda_1\left(\frac{1}{n} X^T X\right) \approx \|\boldsymbol{\mu}\|_2^2, \quad \mathbf{w}_1 \approx \frac{\boldsymbol{\mu}}{\|\boldsymbol{\mu}\|_2}$$
+   Akibatnya:
+   - Sumbu PC1 tidak menangkap variasi bentuk data, melainkan semata-mata menunjuk ke posisi pusat gravitasi data terhadap titik $(0,0)$.
+   - Proyeksi ke PC1 kehilangan kapasitas diskriminatif varians asli data.
+   - Pada kompresi dan rekonstruksi, fitur-fitur berharga dengan varians tinggi yang tegak lurus terhadap $\boldsymbol{\mu}$ akan terbuang atau terdistorsi parah.
+
+**Langkah 3: Stabilitas Numerik SVD pada Matriks Data Terpusat vs Matriks Kovarians**
+1. **Ekuivalensi Spektral SVD Data vs Eigendecomposition Kovarians**:
+   Lakukan SVD ekonomi pada matriks data terpusat yang diskalakan:
+   $$\tilde{X}_c = \frac{1}{\sqrt{n-1}} X_c = U \Sigma V^T$$
+   Hitung matriks kovarians $S$ menggunakan faktorisasi SVD tersebut:
+   $$S = \tilde{X}_c^T \tilde{X}_c = (U \Sigma V^T)^T (U \Sigma V^T) = V \Sigma^T U^T U \Sigma V^T$$
+   Karena kolom-kolom $U$ ortonormal ($U^T U = I$):
+   $$S = V \Sigma^2 V^T$$
+   Bandingkan dengan diagonalisasi ortogonal matriks simetris $S = V \Lambda V^T$:
+   - Vektor eigen kovarians $\mathbf{w}_i$ persis adalah vektor singular kanan $\mathbf{v}_i$.
+   - Nilai eigen kovarians (varians komponen) persis adalah kuadrat nilai singular: $\lambda_i = \sigma_i^2$.
+2. **Analisis Rasio Kondisi (*Condition Number*)**:
+   - Jika kita menghitung $S = \frac{1}{n-1} X_c^T X_c$ secara eksplisit, rasio kondisi matriks kovarians adalah:
+     $$\kappa(S) = \frac{\lambda_{\max}}{\lambda_{\min}} = \frac{\sigma_{\max}^2}{\sigma_{\min}^2} = (\kappa(\tilde{X}_c))^2$$
+   - Jika matriks data memiliki $\kappa(\tilde{X}_c) = 10^8$, pembentukan matriks kovarians menghasilkan $\kappa(S) = 10^{16}$.
+   - Pada presisi IEEE 754 float64 ($\epsilon_{\text{mach}} \approx 1.1 \times 10^{-16}$), matriks $S$ kehilangan seluruh digit presisinya pada arah komponen berbobot kecil ($\lambda_{\min}$ terdistorsi oleh noise pembulatan atau bernilai negatif palsu).
+   - Oleh karena itu, standar emas industri (seperti implementasi `sklearn.decomposition.PCA`) tidak pernah membentuk $X_c^T X_c$, melainkan langsung mengeksekusi algoritma divide-and-conquer SVD pada matriks data terpusat $X_c$.
+</details>
+
+---
+
+### Soal 011.9: Aljabar Multilinier Tensor: Unfolding Mode-$n$, Dekomposisi CP vs Tucker (HOSVD)
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Bagaimana memperluas konsep matriks 2D ke kubus data multi-dimensi (tensor)? Mengapa dekomposisi CP memiliki keunikan tanpa rotasi namun rank-nya sangat sulit dicari (NP-hard), sedangkan dekomposisi Tucker (HOSVD) selalu stabil dan dapat dihitung langsung menggunakan SVD matriks standar?
+
 Tinjau tensor orde-3 $\mathcal{X} \in \mathbb{R}^{I \times J \times K}$.
 1. Definisikan secara analitis operasi *mode-n unfolding/matricization* ($X_{(1)}, X_{(2)}, X_{(3)}$) serta tuliskan rumus pemetaan elemen $(\mathcal{X})_{ijk}$ ke elemen matriks $(X_{(n)})_{i_n, j_n}$. Definisikan pula produk tensor-matriks mode-$n$ ($\mathcal{Y} = \mathcal{X} \times_n M$).
 2. Bandingkan secara teoritis dan komputasional Dekomposisi CANDECOMP/PARAFAC (CP) dan Dekomposisi Tucker:
@@ -700,7 +1091,15 @@ Tinjau tensor orde-3 $\mathcal{X} \in \mathbb{R}^{I \times J \times K}$.
 3. Turunkan algoritma Higher-Order Singular Value Decomposition (HOSVD) langkah demi langkah untuk membangun aproksimasi Tucker $\mathcal{X} \approx \mathcal{G} \times_1 U^{(1)} \times_2 U^{(2)} \times_3 U^{(3)}$, dan buktikan bahwa tensor inti $\mathcal{G}$ dihitung melalui proyeksi multilinier $\mathcal{G} = \mathcal{X} \times_1 (U^{(1)})^T \times_2 (U^{(2)})^T \times_3 (U^{(3)})^T$.
 
 <details>
-<summary>Solusi Lengkap & Analisis Matematis</summary>
+<summary>💡 Petunjuk Bertahap (Hint)</summary>
+
+- **Petunjuk 1 (Serat & Unfolding):** Mode-$n$ unfolding menyusun serat-serat (kolom, baris, tabung) tensor menjadi kolom-kolom matriks 2D. Indeks kolom linier dihitung dengan melompati dimensi-dimensi lainnya. Produk mode-$n$ ekuivalen sederhana dengan perkalian matriks standar pada hasil unfolding: $Y_{(n)} = M X_{(n)}$.
+- **Petunjuk 2 (CP vs Tucker):** CP adalah jumlahan $R$ tensor rank-1 (faktor umumnya tidak ortogonal dan tensor intinya super-diagonal). Tucker memiliki matriks faktor ortogonal di setiap mode dan tensor inti padat $\mathcal{G}$ yang merekam interaksi energi silang antar-mode.
+- **Petunjuk 3 (Proyeksi HOSVD):** Untuk mencari faktor $U^{(n)}$, lakukan SVD pada matrisasi $X_{(n)}$ dan ambil $R_n$ vektor singular kiri pertama. Karena kolom-kolom $U^{(n)}$ ortonormal, $(U^{(n)})^T U^{(n)} = I$, perkalian kontraksi berturut-turut pada setiap mode mereduksi sisi kanan menjadi $\mathcal{G}$ murni.
+</details>
+
+<details>
+<summary>✅ Pembahasan & Solusi Lengkap</summary>
 
 **Langkah 1: Definisi Formal Unfolding Mode-$n$ & Produk Tensor-Matriks**
 1. **Unfolding / Matricization Mode-$n$ ($X_{(n)}$)**:
@@ -770,8 +1169,8 @@ Algoritma HOSVD (De Lathauwer, De Moor, Vandewalle, 2000) menggeneralisasi SVD m
    Dalam notasi indeks skalar, setiap elemen tensor inti dihitung melalui kontraksi multilinier:
    $$g_{pqr} = \sum_{i=1}^I \sum_{j=1}^J \sum_{k=1}^K \mathcal{X}_{ijk} U^{(1)}_{ip} U^{(2)}_{jq} U^{(3)}_{kr}$$
    Tensor inti $\mathcal{G}$ memenuhi sifat *all-orthogonality*, di mana irisan submatriks $\mathbf{G}_{i=p}$ saling ortogonal satu sama lain, mengindikasikan bahwa energi tensor telah terkonsentrasi secara maksimal pada sudut-sudut indeks dominan, persis seperti analog nilai singular pada matriks.
-
 </details>
+
 
 ---
 

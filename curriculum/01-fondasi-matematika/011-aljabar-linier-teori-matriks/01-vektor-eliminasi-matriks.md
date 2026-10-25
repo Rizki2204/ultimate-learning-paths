@@ -5,31 +5,220 @@
 ---
 
 ## 1. Intuisi Dasar & Motivasi dari Titik Nol
-Tautan Rujukan Kuliah: [MIT OCW 18.06 Kuliah 1: The Geometry of Linear Equations](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-1-the-geometry-of-linear-equations/) | [3Blue1Brown: Linear Combinations, Span, and Basis](https://www.youtube.com/watch?v=k7RM-ot2NWY)
+Tautan Rujukan Kuliah: [MIT OCW 18.06 Kuliah 1: The Geometry of Linear Equations](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-1-the-geometry-of-linear-equations/) | [3Blue1Brown: Linear Combinations, Span, and Basis](https://www.youtube.com/watch?v=k7RM-ot2NWY) | [Immersive Math Bab 2: Vectors](https://immersivemath.com/ila/ch02_vectors/ch02.html) | [Georgia Tech ILA: Row Reduction](https://textbooks.math.gatech.edu/ila/row-reduction.html)
 
-Bayangkan Anda mengendalikan lengan robot industri perakitan semikonduktor. Robot tersebut memiliki tiga motor servo penggerak independen. Setiap motor dapat digerakkan maju atau mundur dengan kecepatan tertentu. Ketika motor 1 berputar, ujung lengan bergerak ke arah vektor $\mathbf{v}_1$. Ketika motor 2 berputar, ujung lengan terdorong ke arah $\mathbf{v}_2$. Dan motor 3 menggerakkannya sepanjang $\mathbf{v}_3$. 
+Selamat datang di titik awal perjalanan aljabar linier! Jika Anda merasa cemas melihat rumus matematika berderet atau simbol Yunani yang tampak asing, tarik napas dalam-dalam. Mari kita lupakan sejenak semua istilah rumit tersebut. Anggap kita sedang mengobrol santai di warung kopi. Aljabar linier sebenarnya bukan tentang menghafal rumus abstrak, melainkan seni mengorganisasi data dan memecahkan teka-teki kehidupan sehari-hari dengan cara yang sangat rapi.
 
-Pertanyaan rekayasa yang muncul: *Jika target chip semikonduktor berada di koordinat spasial $\mathbf{b}$, berapa besar putaran masing-masing motor $(x_1, x_2, x_3)$ yang harus diinstruksikan oleh komputer kendali agar ujung lengan tepat menyentuh target?*
+### 1.1 Pengantar Pra-Aljabar Linier dari Nol: Apa Itu Matriks?
 
-Secara matematis, masalah ini dirumuskan sebagai pencarian kombinasi linier:
-$$x_1 \mathbf{v}_1 + x_2 \mathbf{v}_2 + x_3 \mathbf{v}_3 = \mathbf{b}$$
+Bayangkan Anda datang ke sebuah warung makan yang menjual dua macam paket hemat:
+- **Paket A**: 2 potong ayam goreng + 1 gelas es teh = Rp 25.000
+- **Paket B**: 1 potong ayam goreng + 2 gelas es teh = Rp 20.000
 
-Dalam aljabar linier, terdapat dua cara fundamental dalam memandang persamaan ini:
+Pertanyaan sederhana: *Berapakah harga 1 potong ayam ($x_1$) dan 1 gelas es teh ($x_2$)?*
 
-### 1.1 Pandangan Baris (*Row Picture*) vs Pandangan Kolom (*Column Picture*)
+Pada masa SMP atau SMA, Anda mungkin menyelesaikannya dengan menuliskan dua baris persamaan linier:
+$$\begin{aligned}
+2x_1 + 1x_2 &= 25.000 \\
+1x_1 + 2x_2 &= 20.000
+\end{aligned}$$
+
+Aljabar linier melakukan hal yang sangat cerdas: ia **memisahkan angka koefisien belanjaan, variabel pesanan, dan total harga** menjadi tiga wadah terpisah:
+
+$$\underbrace{\begin{bmatrix} 2 & 1 \\ 1 & 2 \end{bmatrix}}_{\text{Tabel Menu } (A)} \underbrace{\begin{bmatrix} x_1 \\ x_2 \end{bmatrix}}_{\text{Harga Satuan } (\mathbf{x})} = \underbrace{\begin{bmatrix} 25.000 \\ 20.000 \end{bmatrix}}_{\text{Total Bayar } (\mathbf{b})}$$
+
+Inilah yang dinamakan persamaan matriks:
+$$A\mathbf{x} = \mathbf{b}$$
+
+- **Apa itu Matriks?** Matriks hanyalah sebuah **tabel angka persegi panjang** yang tersusun rapi dalam baris dan kolom. Jika matriks memiliki $m$ baris dan $n$ kolom, kita menyebutnya berukuran $m \times n$.
+- **Konvensi Baris $i$ vs Kolom $j$**:
+  - **Baris ($i$)**: Berjalan mendatar/horisontal dari kiri ke kanan (seperti barisan tempat duduk bioskop).
+  - **Kolom ($j$)**: Berdiri tegak/vertikal dari atas ke bawah (seperti pilar atau tiang bangunan).
+  - Elemen pada baris ke-$i$ dan kolom ke-$j$ ditulis $a_{ij}$. Contohnya, $a_{12}$ berarti angka pada Baris 1 Kolom 2 (yaitu angka $1$ pada contoh warung di atas).
+
+> **🔤 Kamus Simbol Anti-Pusing — Pra-Aljabar Linier Lengkap:**
+> - $\in$ (Elemen dari): Dibaca *"anggota dari"* atau *"berada di dalam"*. Contoh: $x \in \mathbb{R}$ artinya $x$ adalah sebuah bilangan riil biasa.
+> - $\mathbb{R}^n$ (Ruang Euclidean Dimensi $n$): Dibaca *"R-pangkat-n"*. Artinya daftar terurut yang berisi tepat $n$ buah angka riil (sebuah vektor dengan $n$ elemen).
+> - $\mathbb{R}^{m \times n}$: Matriks yang memiliki $m$ baris dan $n$ kolom berisi angka-angka riil.
+> - $\forall$ (Universal Quantifier): Dibaca *"untuk setiap"* atau *"untuk semua"*.
+> - $\iff$ (Ekuivalensi Logika): Dibaca *"jika dan hanya jika"* (dua arah saling berlaku mutlak).
+> - $\sum_{k=1}^n$ (Sigma Jumlahan): Dibaca *"jumlahkan semua suku dari k=1 sampai n"*.
+> - $I$ (Matriks Identitas): Matriks persegi dengan angka 1 di diagonal utama dan 0 di tempat lainnya (berfungsi seperti angka 1 dalam perkalian biasa).
+> - $A^T$ (Transpose Matriks): Menukar baris menjadi kolom dan kolom menjadi baris.
+> - $\det(A)$ (Determinan): Faktor pengali luas atau volume yang dihasilkan oleh matriks $A$.
+> - $\text{tr}(A)$ (Trace / Jejak): Jumlah seluruh angka pada diagonal utama matriks.
+> - $\|\mathbf{x}\|_2$ (Norma Euclidean): Panjang fisik vektor, dihitung dengan $\sqrt{\sum x_i^2}$.
+> - $\delta_{ij}$ (Delta Kronecker): Bernilai $1$ jika $i = j$, dan bernilai $0$ jika $i \ne j$.
+> - $\kappa(A)$ (Kondisi Matriks): Mengukur tingkat kepekaan matriks terhadap galat numerik.
+
+---
+
+### 1.2 Jembatan Indeks Matematika (1-Based) vs Pemrograman Python (0-Based)
+
+Salah satu sumber kebingungan terbesar bagi pemula yang belajar matematika bersamaan dengan koding adalah **perbedaan sistem penomoran indeks**:
+- **Dalam Matematika (1-Based)**: Manusia menghitung mulai dari angka $1$. Baris pertama adalah Baris 1 ($i = 1$), kolom pertama adalah Kolom 1 ($j = 1$). Elemen pojok kiri atas matriks $A$ ditulis $a_{11}$. Rumus jumlahan sigma berjalan dari $k = 1$ sampai $n$: $\sum_{k=1}^n a_{ik} b_{kj}$.
+- **Dalam Python & Sains Komputer (0-Based)**: Mesin komputer menghitung offset memori mulai dari angka $0$. Baris pertama adalah indeks `0`, kolom pertama adalah indeks `0`. Elemen pojok kiri atas matriks diakses dengan sintaks `A[0][0]`. Loop jumlahan berjalan melalui `range(n)`, yaitu dari `0` sampai `n - 1`.
+
+| Notasi Matematika | Terjemahan Python | Penjelasan |
+|---|---|---|
+| Matriks $A \in \mathbb{R}^{2 \times 2}$ | `A = [[2, 1], [1, 2]]` | List 2D: baris 0 adalah `[2, 1]`, baris 1 adalah `[1, 2]` |
+| Elemen Baris 1, Kolom 1 ($a_{11}$) | `A[0][0]` | Baris indeks 0, elemen kolom indeks 0 |
+| Elemen Baris 2, Kolom 1 ($a_{21}$) | `A[1][0]` | Baris indeks 1, elemen kolom indeks 0 |
+| Vektor target $\mathbf{b} \in \mathbb{R}^2$ | `b = [25000, 20000]` | List 1D dengan 2 elemen |
+| Sigma $\sum_{k=1}^n a_{ik} b_{kj}$ | `sum(A[i][k] * B[k][j] for k in range(n))` | Menjumlahkan perkalian untuk indeks $k$ dari $0$ hingga $n-1$ |
+
+---
+
+### 1.3 Primer Kilat Python 5 Menit untuk Pemula Mutlak
+
+Karena kita ingin Anda dapat langsung menjalankan dan membuktikan setiap konsep di komputer tanpa hambatan, berikut rangkuman kilat sintaks Python dasar yang digunakan di seluruh bab ini:
+
+1. **Vektor (List 1D)**:
+```python
+# Vektor berisi 3 angka: [x, y, z]
+v = [10.0, 20.0, 30.0]
+print(v[0])  # Mencetak 10.0 (elemen pertama)
+```
+
+2. **Matriks (Nested List 2D)**:
+```python
+# Matriks 2 baris x 2 kolom
+A = [
+    [2.0, 1.0],  # Baris 0
+    [1.0, 2.0]   # Baris 1
+]
+print(A[0][1])  # Baris 0, Kolom 1 -> mencetak 1.0
+```
+
+3. **Loop & List Comprehension**:
+```python
+# Mengalikan setiap elemen vektor dengan skalar c = 3
+v = [1.0, 2.0, 3.0]
+scaled_v = [3.0 * x for x in v]  # Hasil: [3.0, 6.0, 9.0]
+```
+
+4. **Fungsi `zip()` untuk Menggabungkan Pasangan Elemen**:
+```python
+u = [1.0, 2.0, 3.0]
+v = [4.0, 5.0, 6.0]
+# Menghitung dot product: 1*4 + 2*5 + 3*6 = 32
+dot_product = sum(x * y for x, y in zip(u, v))
+```
+5. **Operator `@` pada Pustaka NumPy**:
+   Jika menggunakan pustaka NumPy, perkalian matriks tidak perlu ditulis dengan loop bersarang, melainkan cukup menggunakan operator `@`: `C = A @ B`.
+
+---
+
+### 1.4 Pandangan Baris (*Row Picture*) vs Pandangan Kolom (*Column Picture*)
 Tautan Rujukan Kuliah: [MIT OCW 18.06 Kuliah 1](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-1-the-geometry-of-linear-equations/) | [Wikipedia: Gaussian Elimination](https://en.wikipedia.org/wiki/Gaussian_elimination)
 
-1. **Pandangan Baris (*Row Picture*)**:
-   Setiap persamaan mewakili sebuah kondisi pembatas geometris. Pada ruang dua dimensi ($\mathbb{R}^2$), satu persamaan linier merepresentasikan sebuah garis lurus. Solusi sistem adalah titik potong dari garis-garis tersebut. Pada ruang tiga dimensi ($\mathbb{R}^3$), setiap baris mewakili sebuah bidang datar, dan solusi sistem adalah perpotongan bersama ketiga bidang datar tersebut. Namun, ketika dimensi ruang membengkak menjadi ribuan atau jutaan variabel (seperti pada model bahasa besar atau simulasi aerodinamika fluida Navier-Stokes), visualisasi perpotongan hiperbidang berdimensi tinggi menjadi mustahil dipahami secara spasial.
+Sekarang mari kita kembali ke masalah robotika industri. Bayangkan Anda mengendalikan lengan robot industri perakitan semikonduktor dengan tiga motor servo penggerak independen. Setiap motor dapat digerakkan maju atau mundur. Ketika motor 1 berputar, ujung lengan bergerak ke arah $\mathbf{v}_1$. Ketika motor 2 berputar, ujung lengan terdorong ke arah $\mathbf{v}_2$. Dan motor 3 menggerakkannya sepanjang $\mathbf{v}_3$. 
 
-2. **Pandangan Kolom (*Column Picture*) — Inti Sejati Aljabar Linier Modern**:
-   Alih-alih memandang persamaan per baris, kita menggabungkan seluruh koefisien variabel yang sama menjadi vektor-vektor kolom matriks $A = [\mathbf{a}_1 \mid \mathbf{a}_2 \mid \dots \mid \mathbf{a}_n]$. Masalah $A\mathbf{x} = \mathbf{b}$ dipahami sebagai: *Apakah vektor target $\mathbf{b}$ dapat dicapai dengan meregangkan dan menjumlahkan vektor-vektor kolom $A$?* 
-   Pandangan kolom ini langsung menghubungkan komputasi matriks dengan konsep rentang (*span*), ruang kolom $C(A)$, dan kebebasan linier.
+Target chip berada pada koordinat spasial $\mathbf{b}$. Berapa besar putaran masing-masing motor $(x_1, x_2, x_3)$ agar ujung lengan tepat menyentuh target?
+$$x_1 \mathbf{v}_1 + x_2 \mathbf{v}_2 + x_3 \mathbf{v}_3 = \mathbf{b}$$
+
+Ada dua sudut pandang fundamental untuk memahami persamaan ini:
+
+```
+PANDANGAN BARIS (Row Picture):       PANDANGAN KOLOM (Column Picture):
+   y ^                                  y ^
+     |   / (Garis 1)                      |          ^ b (Target)
+     |  /                                 |         /
+     | /                                  |        /  x1*a1 + x2*a2
+-----+--------> x                    -----+-------> x
+     | \                                  |      /
+     |  \ (Garis 2)                       |     / a1 (Vektor Kolom 1)
+     |   v Titik Potong (x1, x2)          |    v a2 (Vektor Kolom 2)
+"Di mana garis-garis berpotongan?"    "Berapa kombinasi kolom untuk mencapai target?"
+```
+
+1. **Pandangan Baris (*Row Picture*)**:
+   Setiap persamaan mewakili sebuah garis (di $\mathbb{R}^2$) atau sebuah bidang datar (di $\mathbb{R}^3$). Solusi sistem adalah **titik perpotongan bersama** dari seluruh garis atau bidang tersebut. Namun, jika sistem memiliki 1.000 variabel (seperti pada model kecerdasan buatan), membayangkan perpotongan 1.000 hiperbidang berdimensi 1.000 adalah hal yang mustahil bagi otak manusia.
+
+2. **Pandangan Kolom (*Column Picture*) — Mahkota Aljabar Linier**:
+   Alih-alih memotong-motong baris, kita melihat seluruh kolom matriks sekaligus:
+   $$x_1 \begin{bmatrix} 2 \\ 1 \end{bmatrix} + x_2 \begin{bmatrix} 1 \\ 2 \end{bmatrix} = \begin{bmatrix} 25.000 \\ 20.000 \end{bmatrix}$$
+   Pertanyaannya berubah menjadi: *Berapa kali kita harus meregangkan kolom 1, lalu menjumlahkannya dengan regangan kolom 2, agar ujung vektornya tepat mendarat di target $\mathbf{b}$?*
+   Pandangan kolom inilah yang menyatukan aljabar linier dengan konsep ruang rentang (*span*), ruang kolom $C(A)$, dan kebebasan linier.
+
+---
+
+### 1.5 Empat Cara Memandang Perkalian Matriks (*Strang's 4 Views*)
+Tautan Rujukan Kuliah: [Georgia Tech ILA: Matrix Multiplication](https://textbooks.math.gatech.edu/ila/matrix-multiplication.html) | [Immersive Math Bab 6: Matrices](https://immersivemath.com/ila/ch06_matrices/ch06.html)
+
+Bagaimana kita mengalikan dua buah matriks $C = AB$? Kebanyakan buku sekolah hanya mengajarkan rumus hafalan baris-kali-kolom. Profesor Gilbert Strang mengajarkan bahwa ada **4 cara pandang setara** yang masing-masing membuka rahasia arsitektur sains data modern:
+
+Misalkan $A$ berukuran $m \times n$ dan $B$ berukuran $n \times p$, menghasilkan $C$ berukuran $m \times p$:
+
+1. **Pandangan 1: Entri-demi-Entri / Hasil Kali Titik (*Dot Product of Rows and Columns*)**:
+   Setiap elemen tunggal $c_{ij}$ pada matriks hasil adalah perkalian titik antara Baris ke-$i$ dari matriks $A$ dengan Kolom ke-$j$ dari matriks $B$:
+   $$c_{ij} = (\text{Baris } i \text{ dari } A) \cdot (\text{Kolom } j \text{ dari } B) = \sum_{k=1}^n a_{ik} b_{kj}$$
+
+2. **Pandangan 2: Kolom-demi-Kolom (*Column Combinations*)**:
+   Setiap kolom ke-$j$ dari matriks hasil $C$ adalah **kombinasi linier dari seluruh kolom matriks $A$**, dengan koefisien pengali yang diambil dari kolom ke-$j$ matriks $B$:
+   $$\mathbf{c}_j = A \mathbf{b}_j = b_{1j} \mathbf{a}_1 + b_{2j} \mathbf{a}_2 + \dots + b_{nj} \mathbf{a}_n$$
+   *Wawasan Kritis*: Kolom-kolom $C$ selalu bersemayam di dalam ruang kolom $A$ ($C(C) \subseteq C(A)$).
+
+3. **Pandangan 3: Baris-demi-Baris (*Row Combinations*)**:
+   Setiap baris ke-$i$ dari matriks hasil $C$ adalah **kombinasi linier dari seluruh baris matriks $B$**, dengan koefisien pengali yang diambil dari baris ke-$i$ matriks $A$:
+   $$\text{Baris } i(C) = a_{i1} \text{Baris}_1(B) + a_{i2} \text{Baris}_2(B) + \dots + a_{in} \text{Baris}_n(B)$$
+   *Wawasan Kritis*: Baris-baris $C$ selalu bersemayam di dalam ruang baris $B$ ($C(C^T) \subseteq C(B^T)$).
+
+4. **Pandangan 4: Penjumlahan Perkalian Luar Kolom $\times$ Baris (*Outer Product Sum*)**:
+   Ini adalah cara pandang paling revolusioner dalam machine learning! Perkalian matriks $AB$ dapat dipecah menjadi jumlahan dari $n$ buah matriks ber-rank 1:
+   $$AB = \sum_{k=1}^n (\text{Kolom } k \text{ dari } A) \times (\text{Baris } k \text{ dari } B) = \sum_{k=1}^n \mathbf{a}_k \mathbf{b}_k^T$$
+   Di mana setiap $\mathbf{a}_k$ adalah vektor kolom $m \times 1$ dan $\mathbf{b}_k^T$ adalah vektor baris $1 \times p$, sehingga hasil kalinya adalah matriks berukuran penuh $m \times p$ dengan rank 1!
+
+> **💡 Mengapa Pandangan ke-4 Sangat Sakti dalam AI Modern?**
+> Pandangan Kolom $\times$ Baris ini adalah fondasi langsung dari **SVD (Singular Value Decomposition)** dan teknik adaptasi model bahasa besar **LoRA (Low-Rank Adaptation)**! Pada model AI besar dengan bobot $W \in \mathbb{R}^{d \times d}$, kita tidak melatih ulang seluruh matriks jutaan parameter tersebut. Kita mendekatinya sebagai perkalian dua matriks kecil berpangkat rendah $\Delta W = B A$, di mana $B \in \mathbb{R}^{d \times r}$ dan $A \in \mathbb{R}^{r \times d}$ dengan $r \ll d$. Ini persis merefleksikan dekomposisi jumlahan rank-1!
+
+---
+
+### 1.6 Alasan Aljabar & Geometris Mengapa $AB$ Tidak Sama dengan $BA$
+
+Dalam aritmatika bilangan biasa, perkalian bersifat komutatif: $3 \times 5 = 5 \times 3 = 15$. Namun dalam perkalian matriks, **secara umum $AB \ne BA$!** Mengapa?
+
+1. **Alasan Dimensi**: Jika $A$ berukuran $2 \times 3$ dan $B$ berukuran $3 \times 4$, maka $AB$ menghasilkan matriks $2 \times 4$. Namun $BA$ ($4 \times 3$ dikali $2 \times 3$) sama sekali **tidak terdefinisi** karena jumlah kolom $B$ tidak sama dengan jumlah baris $A$!
+2. **Alasan Geometris (Urutan Transformasi Ruang)**: Matriks merepresentasikan gerakan spasial. Bayangkan Anda memegang sebuah buku:
+   - Gerakan 1 ($A$): Putar buku $90^\circ$ ke arah kanan (rotasi sumbu Z).
+   - Gerakan 2 ($B$): Balikkan buku ke atas (rotasi sumbu X).
+   Jika Anda melakukan Gerakan 1 lalu Gerakan 2 ($BA$), sampul buku akan menghadap ke arah yang sama sekali berbeda dibandingkan jika Anda melakukan Gerakan 2 lalu Gerakan 1 ($AB$)! Urutan operasi ruang sangat menentukan hasil akhir.
+
+---
+
+### 1.7 Aturan "Kaus Kaki & Sepatu" (*Socks & Shoes Property*)
+
+Ketika kita menginversi atau mentranspos hasil perkalian matriks $AB$, urutannya **wajib dibalik**:
+$$(AB)^{-1} = B^{-1} A^{-1} \quad \text{dan} \quad (AB)^T = B^T A^T$$
+
+> **💡 Jembatan Keledai: Kaus Kaki & Sepatu**
+> Bayangkan rutinitas harian Anda di pagi hari:
+> 1. Langkah pertama ($A$): Anda memakai **kaus kaki**.
+> 2. Langkah kedua ($B$): Anda memakai **sepatu**.
+> 
+> Sekarang tiba waktu malam hari dan Anda ingin membatalkan/melepas kedua alas kaki tersebut (operasi invers):
+> - Apakah Anda bisa melepas kaus kaki terlebih dahulu saat sepatu masih terpasang? Tentu tidak bisa!
+> - Anda **wajib melepas sepatu terlebih dahulu ($B^{-1}$)**, baru setelah itu Anda bisa **melepas kaus kaki ($A^{-1}$)**!
+> Inilah alasan mengapa $(AB)^{-1} = B^{-1} A^{-1}$.
+
+Secara aljabar, pembuktiannya sangat elegan:
+$$(AB)(B^{-1} A^{-1}) = A (B B^{-1}) A^{-1} = A (I) A^{-1} = A A^{-1} = I$$
+Karena perkaliannya menghasilkan matriks identitas $I$, maka terbukti bahwa balikan dari $AB$ adalah tepat $B^{-1} A^{-1}$.
 
 ---
 
 ## 2. Definisi Formal, Teorema & Penurunan Matematis Lengkap
 Tautan Rujukan Kuliah: [MIT OCW 18.06 Kuliah 2: Elimination with Matrices](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-2-elimination-with-matrices/) | [MIT OCW 18.06 Kuliah 4: Factorization into A = LU](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-4-factorization-into-a-lu/) | [Wikipedia: LU Decomposition](https://en.wikipedia.org/wiki/LU_decomposition)
+
+> **🔤 Kamus Simbol Anti-Pusing — Operasi Matriks & Vektor:**
+> - $\mathbf{x} \in \mathbb{R}^n$: Vektor kolom berisi $n$ angka riil. Cara baca: *"vektor x di dalam R-pangkat-n"*.
+> - $A \in \mathbb{R}^{m \times n}$: Matriks dengan $m$ baris dan $n$ kolom. Cara baca: *"matriks A berukuran m kali n"*.
+> - $a_{ij}$: Elemen skalar pada baris $i$ dan kolom $j$.
+> - $\mathbf{e}_i$: Vektor basis standar yang bernilai 1 pada baris $i$ dan 0 di baris lainnya.
+> - $E_{ij}(l)$: Matriks eliminasi elementer untuk mengurangi baris $i$ dengan $l$ kali baris $j$.
+> - $L$: Matriks segitiga bawah (*Lower triangular*) dengan angka 1 pada diagonal.
+> - $U$: Matriks segitiga atas (*Upper triangular*) yang memuat pivot pada diagonal.
+> - $P$: Matriks permutasi untuk menukar posisi baris.
 
 ### 2.1 Definisi Ruang Vektor $\mathbb{R}^n$ dan Operasi Linier
 Sebuah vektor kolom $\mathbf{x} \in \mathbb{R}^n$ adalah tupel terurut dari $n$ bilangan riil:
@@ -42,6 +231,8 @@ Hasil kali titik (*dot product*) Euclidean antara dua vektor $\mathbf{x}, \mathb
 $$\mathbf{x} \cdot \mathbf{y} = \mathbf{x}^T \mathbf{y} = \sum_{i=1}^n x_i y_i$$
 Norma atau panjang vektor induksi $\ell_2$ adalah $\|\mathbf{x}\|_2 = \sqrt{\mathbf{x}^T \mathbf{x}} = \sqrt{\sum_{i=1}^n x_i^2}$.
 
+---
+
 ### 2.2 Sistem Persamaan Linier dan Matriks Eliminasi Elementer
 Diberikan sistem $m$ persamaan dengan $n$ variabel:
 $$\sum_{j=1}^n a_{ij} x_j = b_i, \quad i = 1, \dots, m \iff A\mathbf{x} = \mathbf{b}$$
@@ -52,6 +243,19 @@ $$E_{ij}(l) = I - l \mathbf{e}_i \mathbf{e}_j^T, \quad i > j$$
 Ketika $E_{ij}(l)$ mengalikan matriks $A$ dari kiri, baris ke-$i$ dari $A$ dikurangi dengan $l$ kali baris ke-$j$, di mana pengali (*multiplier*) eliminasi dipilih secara unik agar entri $(i, j)$ menjadi nol:
 $$l_{ij} = \frac{a_{ij}^{(j-1)}}{a_{jj}^{(j-1)}}$$
 Di sini, $a_{jj}^{(j-1)}$ disebut sebagai **elemen pivot** (*pivot element*). Syarat eliminasi tanpa pertukaran baris mengharuskan seluruh pivot $a_{jj}^{(j-1)} \neq 0$.
+
+> **🌉 Jembatan Logika — Mengapa Tanda Minus Lenyap pada Matriks L:**
+> Saat kita melakukan eliminasi pada persamaan, kita melakukan operasi:
+> $$\text{Baris}_2 \leftarrow \text{Baris}_2 - l_{21} \times \text{Baris}_1$$
+> Matriks transformasinya adalah $E_{21} = \begin{bmatrix} 1 & 0 \\ -l_{21} & 1 \end{bmatrix}$ (memiliki tanda minus).
+> Namun, faktorisasi kita adalah $A = L U$, yang berarti:
+> $$E_{21} A = U \iff A = E_{21}^{-1} U = L U$$
+> Perhatikan bahwa matriks $L$ adalah **invers** dari matriks eliminasi: $L = E_{21}^{-1}$!
+> Untuk membatalkan pengurangan sebesar $l_{21}$, kita harus **menambahkan kembali** $l_{21}$:
+> $$E_{21}^{-1} = \begin{bmatrix} 1 & 0 \\ +l_{21} & 1 \end{bmatrix}$$
+> Inilah alasan indah mengapa pengali eliminasi masuk ke dalam matriks $L$ **sebagai bilangan positif $+l_{ij}$ tanpa tanda minus**!
+
+---
 
 ### 2.3 Teorema Faktorisasi Matriks Segitiga $A = LU$
 **Teorema 1.1 (Faktorisasi Segitiga LU Tanpa Pivoting)**:
@@ -73,22 +277,27 @@ $$E_{n-1} \dots E_2 E_1 A = U$$
 Dengan mengalikan kedua sisi dari kiri dengan invers berurutan:
 $$A = E_1^{-1} E_2^{-1} \dots E_{n-1}^{-1} U$$
 Kita definisikan $L = E_1^{-1} E_2^{-1} \dots E_{n-1}^{-1}$.
-Sekarang perhatikan perkalian dari dua invers matriks kolom eliminasi:
-$$E_j^{-1} E_k^{-1} = \left( I + \sum_{i=j+1}^n l_{ij} \mathbf{e}_i \mathbf{e}_j^T \right) \left( I + \sum_{m=k+1}^n l_{mk} \mathbf{e}_m \mathbf{e}_k^T \right)$$
-Untuk $j < k$, suku silang perkalian menghasilkan:
-$$\left( \mathbf{e}_i \mathbf{e}_j^T \right) \left( \mathbf{e}_m \mathbf{e}_k^T \right) = \mathbf{e}_i (\mathbf{e}_j^T \mathbf{e}_m) \mathbf{e}_k^T$$
-Perhatikan bahwa $m \ge k+1 > j$. Oleh karena itu, hasil kali dalam vektor basis standar $\mathbf{e}_j^T \mathbf{e}_m = \delta_{jm} = 0$.
-Akibatnya, suku silang lenyap secara identik nol!
-$$E_1^{-1} E_2^{-1} \dots E_{n-1}^{-1} = I + \sum_{k=1}^{n-1} \sum_{i=k+1}^n l_{ik} \mathbf{e}_i \mathbf{e}_k^T$$
-Ini membuktikan secara aljabar murni bahwa seluruh pengali eliminasi $l_{ik}$ tersusun rapi langsung pada entri $(i, k)$ matriks $L$ di bawah diagonal utama, tanpa saling mencemari satu sama lain:
+
+> **🌉 Jembatan Logika — Mengapa Perkalian Invers Matriks Elementer Tidak Saling Merusak:**
+> Ketika kita mengalikan matriks eliminasi biasa: $E_2 E_1$, suku-suku pengali saling bercampur dan muncul suku silang yang rumit.
+> Namun ketika kita mengalikan **inversnya**: $E_1^{-1} E_2^{-1}$, perhatikan suku silangnya:
+> $$\left( \mathbf{e}_i \mathbf{e}_j^T \right) \left( \mathbf{e}_m \mathbf{e}_k^T \right) = \mathbf{e}_i (\mathbf{e}_j^T \mathbf{e}_m) \mathbf{e}_k^T$$
+> Untuk kolom $j < k$, indeks baris pengali kedua selalu $m \ge k+1 > j$.
+> Akibatnya, hasil kali titik basis kanonikal $\mathbf{e}_j^T \mathbf{e}_m = \delta_{jm} = 0$! Suku silang lenyap seketika!
+
+Karena suku silang lenyap secara identik nol, seluruh pengali eliminasi $l_{ik}$ tersusun rapi langsung pada entri $(i, k)$ matriks $L$ di bawah diagonal utama:
 $$L = \begin{bmatrix} 1 & 0 & 0 & \dots & 0 \\ l_{21} & 1 & 0 & \dots & 0 \\ l_{31} & l_{32} & 1 & \dots & 0 \\ \vdots & \vdots & \vdots & \ddots & \vdots \\ l_{n1} & l_{n2} & l_{n3} & \dots & 1 \end{bmatrix}$$
 Maka terbukti secara rigor bahwa $A = LU$. $\blacksquare$
+
+---
 
 ### 2.4 Bentuk Simetris Sempurna: Faktorisasi $A = LDU$
 Jika elemen pivot ditarik keluar dari baris-baris $U$, kita membentuk matriks diagonal pivot $D = \text{diag}(d_1, d_2, \dots, d_n)$ di mana $d_k = u_{kk} = a_{kk}^{(k-1)}$.
 Matriks segitiga atas baru didefinisikan sebagai $U' = D^{-1} U$, sehingga seluruh entri diagonal utama $U'$ bernilai tepat 1:
 $$A = L D U'$$
 Bentuk $LDU$ ini sangat penting: jika matriks $A$ bersifat simetris ($A = A^T$), maka $U' = L^T$, menghasilkan faktorisasi simetris $A = L D L^T$.
+
+---
 
 ### 2.5 Strategi *Partial Pivoting* dan Matriks Permutasi $PA = LU$
 Dalam komputasi numerik riil, terdapat dua situasi kegagalan eliminasi naif:
@@ -101,8 +310,13 @@ Baris ke-$k$ kemudian ditukar dengan baris ke-$p$. Pertukaran ini direpresentasi
 Dengan menerapkan permutasi baris sebelum setiap langkah eliminasi, faktorisasi universal untuk setiap matriks nonsingular adalah:
 $$PA = LU$$
 
+---
+
 ### 2.6 Pembuktian Kompleksitas Asimtotik Operasi Eliminasi Gaussian
 Berapa banyak operasi aritmatika titik kambang (*floating point operations* / *flops*) yang dibutuhkan untuk memfaktorkan matriks $n \times n$?
+
+Sesuai standar komputasi numerik modern (Golub & Van Loan, Higham):
+- Satu operasi perkalian-akumulasi ($a \cdot b + c$) dihitung sebagai **2 FLOPs** (1 kali + 1 tambah).
 
 **Penurunan Flops Eliminasi**:
 Pada langkah ke-$k$ (di mana $k$ berjalan dari $1$ hingga $n-1$):
@@ -120,8 +334,7 @@ $$\sum_{m=1}^{n-1} 2m^2 + \sum_{m=1}^{n-1} m$$
 Menggunakan rumus deret jumlahan kuadrat bilangan bulat $\sum_{m=1}^M m^2 = \frac{M(M+1)(2M+1)}{6}$:
 $$\sum_{m=1}^{n-1} 2m^2 = 2 \cdot \frac{(n-1)n(2n-1)}{6} = \frac{2n^3 - 3n^2 + n}{3} = \frac{2}{3}n^3 - n^2 + \frac{1}{3}n$$
 Suku dominan untuk $n$ besar adalah:
-$$\text{Kompleksitas Eliminasi } A = LU \sim \frac{2}{3}n^3 \text{ flops}$$
-(Terdiri dari $\frac{1}{3}n^3$ perkalian dan $\frac{1}{3}n^3$ penjumlahan/pengurangan).
+$$\text{Kompleksitas Eliminasi } A = LU \sim \frac{2}{3}n^3 \text{ total FLOPs } \left( \frac{1}{3}n^3 \text{ penjumlahan} + \frac{1}{3}n^3 \text{ perkalian} \right)$$
 
 Sebaliknya, penyelesaian dua sistem segitiga berturut-turut (substitusi maju $L\mathbf{y} = P\mathbf{b}$ dan substitusi mundur $U\mathbf{x} = \mathbf{y}$) hanya membutuhkan:
 $$\sum_{k=1}^n 2k \approx n^2 \text{ flops per substitusi} \implies 2n^2 \text{ flops total}$$
@@ -132,7 +345,66 @@ Inilah keunggulan utama faktorisasi $LU$: setelah matriks $A$ difaktorkan sekali
 ## 3. Contoh Perhitungan Manual Langkah-demi-Langkah
 Tautan Rujukan Kuliah: [MIT OCW 18.06 Kuliah 4](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-4-factorization-into-a-lu/)
 
-Mari kita selesaikan sistem persamaan linier $3 \times 3$ berikut secara manual tanpa jalan pintas aritmatika:
+### 3.1 Contoh 1: Inversi Matriks $2 \times 2$ Metode Gauss-Jordan $[A \mid I]$
+
+Mari kita pelajari cara mencari matriks invers $A^{-1}$ secara manual menggunakan algoritma eliminasi Gauss-Jordan pada matriks mainan $2 \times 2$:
+$$A = \begin{bmatrix} 2 & 1 \\ 5 & 3 \end{bmatrix}$$
+
+**Tutorial Resep Langkah-demi-Langkah**:
+Kita menyusun matriks perluasan (*augmented matrix*) dengan meletakkan matriks identitas $I$ di sisi kanan:
+$$[A \mid I] = \left[ \begin{array}{cc|cc} 2 & 1 & 1 & 0 \\ 5 & 3 & 0 & 1 \end{array} \right]$$
+
+Tujuan kita adalah mengubah sisi kiri menjadi matriks identitas $\left[ \begin{array}{cc} 1 & 0 \\ 0 & 1 \end{array} \right]$ melalui operasi baris elementer. Sisi kanan secara otomatis akan bertransformasi menjadi $A^{-1}$!
+
+1. **Langkah 1: Jadikan Pivot Pertama Bernilai 1**:
+   Bagi Baris 1 dengan angka $2$ ($R_1 \leftarrow \frac{1}{2} R_1$):
+   $$\left[ \begin{array}{cc|cc} 1 & 0{,}5 & 0{,}5 & 0 \\ 5 & 3 & 0 & 1 \end{array} \right]$$
+
+2. **Langkah 2: Nolkan Elemen di Bawah Pivot 1**:
+   Kurangkan Baris 2 dengan $5$ kali Baris 1 ($R_2 \leftarrow R_2 - 5 R_1$):
+   - Kolom 1: $5 - 5(1) = 0$
+   - Kolom 2: $3 - 5(0{,}5) = 3 - 2{,}5 = 0{,}5$
+   - Kolom 3: $0 - 5(0{,}5) = -2{,}5$
+   - Kolom 4: $1 - 5(0) = 1$
+   Matriks menjadi:
+   $$\left[ \begin{array}{cc|cc} 1 & 0{,}5 & 0{,}5 & 0 \\ 0 & 0{,}5 & -2{,}5 & 1 \end{array} \right]$$
+
+3. **Langkah 3: Jadikan Pivot Kedua Bernilai 1**:
+   Kalikan Baris 2 dengan angka $2$ ($R_2 \leftarrow 2 R_2$):
+   $$\left[ \begin{array}{cc|cc} 1 & 0{,}5 & 0{,}5 & 0 \\ 0 & 1 & -5 & 2 \end{array} \right]$$
+
+4. **Langkah 4: Nolkan Elemen di Atas Pivot 2 (Gauss-Jordan Mundur)**:
+   Kurangkan Baris 1 dengan $0{,}5$ kali Baris 2 ($R_1 \leftarrow R_1 - 0{,}5 R_2$):
+   - Kolom 1: $1 - 0{,}5(0) = 1$
+   - Kolom 2: $0{,}5 - 0{,}5(1) = 0$
+   - Kolom 3: $0{,}5 - 0{,}5(-5) = 0{,}5 + 2{,}5 = 3$
+   - Kolom 4: $0 - 0{,}5(2) = -1$
+   Matriks akhir:
+   $$\left[ \begin{array}{cc|cc} 1 & 0 & 3 & -1 \\ 0 & 1 & -5 & 2 \end{array} \right]$$
+
+Maka matriks invers adalah:
+$$A^{-1} = \begin{bmatrix} 3 & -1 \\ -5 & 2 \end{bmatrix}$$
+
+**Verifikasi Autentik Perkalian**:
+$$A A^{-1} = \begin{bmatrix} 2 & 1 \\ 5 & 3 \end{bmatrix} \begin{bmatrix} 3 & -1 \\ -5 & 2 \end{bmatrix} = \begin{bmatrix} 2(3)+1(-5) & 2(-1)+1(2) \\ 5(3)+3(-5) & 5(-1)+3(2) \end{bmatrix} = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix} = I$$
+
+> **❓ Pertanyaan Pemula: Mengapa Matriks di Kanan Otomatis Menjadi Invers?**
+> Setiap operasi baris elementer sebenarnya setara dengan mengalikan matriks dari kiri dengan matriks elementer $E$.
+> Jika rentetan operasi kita adalah $E_k \dots E_2 E_1 A = I$, maka gabungan seluruh matriks tersebut adalah invers dari $A$:
+> $$(E_k \dots E_2 E_1) = A^{-1}$$
+> Karena operasi yang persis sama kita terapkan pada sisi kanan yang awalnya berisi $I$:
+> $$(E_k \dots E_2 E_1) I = A^{-1} I = A^{-1}$$
+> Itulah sebabnya sisi kanan berubah menjadi $A^{-1}$ secara otomatis!
+
+> **💡 Tips, Trik, Rahasia Cepat Paham & Jembatan Keledai:**
+> 1. **BASKOM (Baris-Kolom)**: Saat mengalikan matriks atau merujuk indeks $a_{ij}$, ingat kata **BASKOM**: Baris dulu ($i$), baru Kolom ($j$).
+> 2. **Metode Rahasia "Check Column Sum"**: Saat melakukan eliminasi manual pada kertas, jumlahkan semua angka di setiap kolom pada baris baru. Jumlah baris baru harus persis sama dengan hasil operasi baris pada jumlah baris lama! Jika tidak cocok, Anda tahu telah terjadi salah hitung dalam 3 detik tanpa perlu mengulang dari awal.
+
+---
+
+### 3.2 Contoh 2: Faktorisasi $LU$ Berdimensi $3 \times 3$ dan Penyelesaian Sistem Lengkap
+
+Mari kita selesaikan sistem persamaan linier $3 \times 3$ berikut secara manual tanpa jalan pintas:
 $$\begin{aligned}
 2x_1 + 4x_2 - 2x_3 &= 6 \\
 4x_1 + 9x_2 - 3x_3 &= 8 \\
@@ -142,12 +414,13 @@ $$\begin{aligned}
 Bentuk matriks sistem $A\mathbf{x} = \mathbf{b}$ adalah:
 $$A = \begin{bmatrix} 2 & 4 & -2 \\ 4 & 9 & -3 \\ -2 & -3 & 7 \end{bmatrix}, \quad \mathbf{b} = \begin{bmatrix} 6 \\ 8 \\ 10 \end{bmatrix}$$
 
-### Langkah 1: Eliminasi Kolom 1
+#### Langkah 1: Eliminasi Kolom 1
 Pivot pertama adalah $d_1 = a_{11} = 2$.
 1. Hitung pengali baris 2:
    $$l_{21} = \frac{a_{21}}{a_{11}} = \frac{4}{2} = 2$$
    Operasi baris: $\text{Baris}_2 \leftarrow \text{Baris}_2 - 2 \times \text{Baris}_1$:
    $$\begin{bmatrix} 4 & 9 & -3 \end{bmatrix} - 2 \begin{bmatrix} 2 & 4 & -2 \end{bmatrix} = \begin{bmatrix} 4-4 & 9-8 & -3-(-4) \end{bmatrix} = \begin{bmatrix} 0 & 1 & 1 \end{bmatrix}$$
+
 2. Hitung pengali baris 3:
    $$l_{31} = \frac{a_{31}}{a_{11}} = \frac{-2}{2} = -1$$
    Operasi baris: $\text{Baris}_3 \leftarrow \text{Baris}_3 - (-1) \times \text{Baris}_1$:
@@ -156,7 +429,7 @@ Pivot pertama adalah $d_1 = a_{11} = 2$.
 Matriks sementara setelah eliminasi kolom 1:
 $$A^{(1)} = \begin{bmatrix} 2 & 4 & -2 \\ 0 & 1 & 1 \\ 0 & 1 & 5 \end{bmatrix}$$
 
-### Langkah 2: Eliminasi Kolom 2
+#### Langkah 2: Eliminasi Kolom 2
 Pivot kedua adalah $d_2 = a_{22}^{(1)} = 1$.
 1. Hitung pengali baris 3:
    $$l_{32} = \frac{a_{32}^{(1)}}{a_{22}^{(1)}} = \frac{1}{1} = 1$$
@@ -170,7 +443,7 @@ Elemen diagonal pivot adalah $d_1 = 2, d_2 = 1, d_3 = 4$.
 Matriks segitiga bawah $L$ memuat seluruh pengali $l_{ij}$:
 $$L = \begin{bmatrix} 1 & 0 & 0 \\ l_{21} & 1 & 0 \\ l_{31} & l_{32} & 1 \end{bmatrix} = \begin{bmatrix} 1 & 0 & 0 \\ 2 & 1 & 0 \\ -1 & 1 & 1 \end{bmatrix}$$
 
-### Langkah 3: Verifikasi Autentik Perkalian $LU$
+#### Langkah 3: Verifikasi Autentik Perkalian $LU$
 Mari kita kalikan $L$ dan $U$ secara analitis:
 $$LU = \begin{bmatrix} 1 & 0 & 0 \\ 2 & 1 & 0 \\ -1 & 1 & 1 \end{bmatrix} \begin{bmatrix} 2 & 4 & -2 \\ 0 & 1 & 1 \\ 0 & 0 & 4 \end{bmatrix}$$
 - Baris 1: $[1\cdot 2, 1\cdot 4, 1\cdot (-2)] = [2, 4, -2]$
@@ -178,7 +451,7 @@ $$LU = \begin{bmatrix} 1 & 0 & 0 \\ 2 & 1 & 0 \\ -1 & 1 & 1 \end{bmatrix} \begin
 - Baris 3: $[-1\cdot 2 + 1\cdot 0 + 1\cdot 0, -1\cdot 4 + 1\cdot 1 + 1\cdot 0, -1\cdot (-2) + 1\cdot 1 + 1\cdot 4] = [-2, -3, 7]$
 Hasil tepat sama persis dengan matriks asal $A$!
 
-### Langkah 4: Penyelesaian Sistem Menggunakan $L\mathbf{y} = \mathbf{b}$ dan $U\mathbf{x} = \mathbf{y}$
+#### Langkah 4: Penyelesaian Sistem Menggunakan $L\mathbf{y} = \mathbf{b}$ dan $U\mathbf{x} = \mathbf{y}$
 1. **Substitusi Maju (*Forward Substitution*)**: $L\mathbf{y} = \mathbf{b}$
    $$\begin{bmatrix} 1 & 0 & 0 \\ 2 & 1 & 0 \\ -1 & 1 & 1 \end{bmatrix} \begin{bmatrix} y_1 \\ y_2 \\ y_3 \end{bmatrix} = \begin{bmatrix} 6 \\ 8 \\ 10 \end{bmatrix}$$
    - Baris 1: $y_1 = 6$
@@ -202,10 +475,12 @@ Substitusi balik ke persamaan awal membuktikan kebenaran absolut:
 
 ---
 
-## 4. Kode Program Komputasi Teranotasi
+## 4. Implementasi Praktis & Kode Program Komputasi Teranotasi
 Tautan Rujukan Kuliah: [MIT OCW 18.06 Kuliah 2 & 4](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-4-factorization-into-a-lu/)
 
-Berikut adalah modul solver linier berbasis faktorisasi $PA = LU$ dengan *partial pivoting* yang diimplementasikan secara murni dan deterministik. Kode ini menangani deteksi matriks singular dan pertukaran baris:
+### 4.1 Tahap 5A: Implementasi Algoritma Mandiri (Pure Python Tanpa Library)
+
+Berikut adalah modul solver linier berbasis faktorisasi $PA = LU$ dengan strategi *partial pivoting* yang dibangun murni tanpa dependensi pihak ketiga:
 
 ```python
 from typing import List, Tuple
@@ -243,7 +518,7 @@ def lu_factorization_partial_pivot(A: List[List[float]]) -> Tuple[List[List[floa
         if max_row != k:
             U[k], U[max_row] = U[max_row], U[k]
             P[k], P[max_row] = P[max_row], P[k]
-            # Tukar pengali L yang telah dihitung sebelumnya
+            # Tukar pengali L yang telah dihitung pada kolom sebelumnya
             for j in range(k):
                 L[k][j], L[max_row][j] = L[max_row][j], L[k][j]
 
@@ -277,6 +552,7 @@ def back_solve(U: List[List[float]], y: List[float]) -> List[float]:
     return x
 
 def mat_vec_mul(M: List[List[float]], v: List[float]) -> List[float]:
+    """Mengalikan matriks M dengan vektor v."""
     return [sum(M[i][j] * v[j] for j in range(len(v))) for i in range(len(M))]
 
 # Uji eksekusi pada sistem 3x3 yang membutuhkan pertukaran baris
@@ -312,7 +588,7 @@ galat_residu = sum((Ax_computed[i] - b_input[i]) ** 2 for i in range(len(b_input
 print(f"\nNorma Residu: {galat_residu:.2e}")
 ```
 
-```output
+```text
 --- Matriks Permutasi P ---
 [0.0, 0.0, 1.0]
 [0.0, 1.0, 0.0]
@@ -336,6 +612,54 @@ Norma Residu: 9.93e-16
 
 ---
 
+### 4.2 Tahap 5B: Implementasi Standar Industri (NumPy & SciPy)
+
+Dalam lingkungan produksi kecerdasan buatan dan komputasi sains berkecepatan tinggi, kita menggunakan pustaka `scipy.linalg` yang membungkus rutin LAPACK dalam bahasa C dan Fortran teroptimasi:
+
+```python
+import numpy as np
+from scipy import linalg
+
+# Matriks sistem dan vektor target
+A = np.array([
+    [0.0, 2.0, 1.0],
+    [1.0, -1.0, 1.0],
+    [2.0, 3.0, -1.0]
+], dtype=np.float64)
+b = np.array([5.0, 0.0, 1.0], dtype=np.float64)
+
+# 1. Dekomposisi PLU standar industri via SciPy LAPACK dgetrf
+P, L, U = linalg.lu(A)
+
+# 2. Penyelesaian langsung sistem Ax = b via LAPACK dgesv
+x = np.linalg.solve(A, b)
+
+# Verifikasi residu: r = b - Ax
+residu = np.linalg.norm(b - A @ x)
+
+print("Matriks Permutasi P:\n", P)
+print("Matriks L:\n", L)
+print("Matriks U:\n", U)
+print("Vektor Solusi x:\n", x)
+print(f"Norma Residu Numerik: {residu:.2e}")
+```
+
+#### Tabel Bedah Kode Baris-demi-Baris
+
+| Baris Kode | Apa yang Dilakukan Komputer | Terjemahan Bahasa Manusia |
+|---|---|---|
+| `max_val = abs(U[k][k])` | Membaca magnitudo elemen diagonal saat ini | Mengukur apakah calon pivot cukup besar untuk mencegah pembagian dengan nol |
+| `if abs(U[i][k]) > max_val:` | Memindai baris-baris di bawah kolom $k$ | Mencari angka terbesar di seluruh kolom untuk dijadikan pivot stabil (*partial pivoting*) |
+| `U[k], U[max_row] = U[max_row], U[k]` | Menukar pointer dua list baris di memori | Menukar baris matriks secara fisik dalam kompleksitas $O(1)$ |
+| `factor = U[i][k] / U[k][k]` | Membagi elemen target dengan elemen pivot | Menghitung pengali eliminasi $l_{ik}$ yang akan menolkan entri kolom |
+| `U[i][j] -= factor * U[k][j]` | Fused Multiply-Subtract pada submatriks | Mengurangkan kelipatan baris pivot dari baris target untuk membentuk segitiga atas $U$ |
+| `L[i][k] = factor` | Menyimpan nilai pengali ke dalam matriks $L$ | Mengabadikan jejak langkah eliminasi agar dapat dipakai kembali untuk vektor $\mathbf{b}$ mana pun |
+
+> **🔬 Eksperimen Mandiri 60 Detik (Ubah 1 Angka & Amati!):**
+> Pada kode Tahap 5A di atas, ubah elemen `A_input[0][0]` dari `0.0` menjadi `1e-18` (angka yang sangat dekat ke nol tapi bukan nol), lalu matikan logika pertukaran baris (`max_row != k`). Jalankan kembali skrip tersebut. Anda akan melihat nilai solusi meledak menjadi angka tak masuk akal dengan norma residu membengkak ribuan kali lipat! Eksperimen ini membuktikan secara nyata betapa vitalnya *partial pivoting* untuk menjaga stabilitas numerik floating-point.
+
+---
+
 ## 5. Miskonsepsi Umum & Post-Mortem Kegagalan Industri
 Tautan Rujukan Kuliah: [MIT OCW 18.06 Kuliah 2 & 5](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-2-elimination-with-matrices/) | [Prof. Douglas Arnold: Patriot Missile Roundoff Disaster Analysis](https://www-users.cse.umn.edu/~arnold/disasters/patriot.html)
 
@@ -353,8 +677,10 @@ assert np.allclose(A @ x, b)
 print("Solusi stabil via solve():", x)
 ```
 **Mengapa `inv(A)` berbahaya?**
-1. **Biaya Flops**: Menghitung $A^{-1}$ secara eksplisit membutuhkan $2n^3$ flops (tiga kali lebih lambat daripada eliminasi $LU$ yang hanya memerlukan $\frac{2}{3}n^3$ flops).
+1. **Biaya Flops**: Menghitung $A^{-1}$ secara eksplisit membutuhkan $2n^3$ total FLOPs (tiga kali lebih lambat daripada eliminasi $LU$ yang hanya memerlukan $\frac{2}{3}n^3$ total FLOPs).
 2. **Ketidakstabilan Numerik**: Mengalikan matriks $A^{-1}$ yang telah terkontaminasi galat pembulatan floating-point dengan vektor $\mathbf{b}$ akan menggandakan kesalahan numerik sebanding dengan kuadrat bilangan kondisi $\kappa(A)$. Sebaliknya, algoritma Gaussian elimination dengan *partial pivoting* dijamin stabil secara numerik mundur (*backward stable*).
+
+---
 
 ### 5.2 Post-Mortem Bencana Nyata: Tragedi Rudal Patriot Dhahran (1991)
 Pada tanggal 25 Februari 1991, baterai sistem pertahanan udara rudal Patriot di Dhahran, Arab Saudi, gagal mencegat rudal Scud Irak yang masuk, menewaskan 28 prajurit. Laporan analisis komputasi resmi dari [Prof. Douglas Arnold: Patriot Missile Failure Analysis](https://www-users.cse.umn.edu/~arnold/disasters/patriot.html) mengungkapkan bahwa kegagalan tersebut disebabkan oleh galat akumulasi floating-point aritmatika biner:
@@ -371,7 +697,31 @@ Pelajaran rekayasa ini menegaskan bahwa dalam sistem kendali matriks linier, pen
 ## 6. Latihan Berjenjang & Kunci Jawaban Lengkap
 Tautan Rujukan Kuliah: [MIT OCW 18.06 Kuliah 4](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-4-factorization-into-a-lu/)
 
-### Tingkat 1: Pemula (Konseptual & Perhitungan Matriks $2 \times 2$)
+### Tingkat 1: Pemanasan Bayi / Hitung Jari (Kombinasi Linier & Perkalian Matriks $2 \times 2$)
+**Soal**:
+Diberikan matriks $A = \begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix}$ dan vektor $\mathbf{x} = \begin{bmatrix} 5 \\ 6 \end{bmatrix}$:
+1. Hitunglah perkalian $A\mathbf{x}$ menggunakan Pandangan Baris (*Row Picture* / dot product).
+2. Hitunglah perkalian $A\mathbf{x}$ menggunakan Pandangan Kolom (*Column Picture* / kombinasi linier kolom).
+3. Buktikan bahwa kedua cara pandang menghasilkan vektor hasil yang persis sama.
+
+<details>
+<summary>Kunci Jawaban & Langkah Pengerjaan Detail</summary>
+
+1. **Pandangan Baris (Dot Product)**:
+   - Baris 1: $1(5) + 2(6) = 5 + 12 = 17$
+   - Baris 2: $3(5) + 4(6) = 15 + 24 = 39$
+   Hasil: $\begin{bmatrix} 17 \\ 39 \end{bmatrix}$.
+
+2. **Pandangan Kolom (Kombinasi Linier)**:
+   $$5 \begin{bmatrix} 1 \\ 3 \end{bmatrix} + 6 \begin{bmatrix} 2 \\ 4 \end{bmatrix} = \begin{bmatrix} 5(1) + 6(2) \\ 5(3) + 6(4) \end{bmatrix} = \begin{bmatrix} 5 + 12 \\ 15 + 24 \end{bmatrix} = \begin{bmatrix} 17 \\ 39 \end{bmatrix}$$
+
+3. **Kesimpulan**:
+   Kedua pendekatan terbukti menghasilkan vektor $\begin{bmatrix} 17 \\ 39 \end{bmatrix}$ secara identik.
+</details>
+
+---
+
+### Tingkat 2: Pemula / Tulis Tangan (Faktorisasi $LU$ Matriks $2 \times 2$ & Gauss-Jordan)
 **Soal**:
 Diberikan matriks $A = \begin{bmatrix} 3 & 1 \\ 6 & 5 \end{bmatrix}$ dan vektor target $\mathbf{b} = \begin{bmatrix} 5 \\ 16 \end{bmatrix}$:
 1. Tentukan pengali eliminasi $l_{21}$ dan faktorisasi $A = LU$.
@@ -406,7 +756,7 @@ Diberikan matriks $A = \begin{bmatrix} 3 & 1 \\ 6 & 5 \end{bmatrix}$ dan vektor 
 
 ---
 
-### Tingkat 2: Menengah (Faktorisasi $PA = LU$ dengan Pertukaran Baris)
+### Tingkat 3: Menengah / Pemodelan & Koding (Faktorisasi $PA = LU$ Matriks $3 \times 3$ dengan Pivoting)
 **Soal**:
 Diberikan sistem persamaan linier $3 \times 3$:
 $$\begin{aligned}
@@ -467,7 +817,7 @@ $$\begin{aligned}
 
 ---
 
-### Tingkat 3: Mahir (Analisis Instabilitas Numerik & Pembatalan Katastropik)
+### Tingkat 4: Mahir / Tantangan Industri (Analisis Instabilitas Numerik Epsilon IEEE 754)
 **Soal**:
 Perhatikan sistem persamaan linier $2 \times 2$ dengan parameter perturbasi kecil $\epsilon > 0$:
 $$\begin{bmatrix} \epsilon & 1 \\ 1 & 1 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} 1 \\ 2 \end{bmatrix}$$
@@ -532,7 +882,12 @@ Untuk memperdalam pemahaman materi pada Bab 01 ini, pelajari sumber rujukan prim
    - [MIT OCW 18.06 Kuliah 2: Elimination with Matrices](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-2-elimination-with-matrices/) — Matriks eliminasi elementer, pembentukan matriks segitiga, dan kondisi singularitas.
    - [MIT OCW 18.06 Kuliah 4: Factorization into A = LU](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-4-factorization-into-a-lu/) — Penjelasan mengapa $L$ mencatat pengali eliminasi tanpa efek samping dan penghematan biaya $O(n^2)$.
 
-2. **Visualisasi Geometris Interaktif**:
+2. **Visualisasi Geometris Interaktif & Eksplorasi Digital**:
+   - [Immersive Math Bab 2: Vectors](https://immersivemath.com/ila/ch02_vectors/ch02.html) — Visualisasi 3D vektor interaktif yang dapat diputar secara bebas.
+   - [Immersive Math Bab 5: Gaussian Elimination](https://immersivemath.com/ila/ch05_gausselim/ch05.html) — Simulasi visual eliminasi baris elementer 3D langkah-demi-langkah.
+   - [Immersive Math Bab 6: Matrices](https://immersivemath.com/ila/ch06_matrices/ch06.html) — Eksplorasi interaktif perkalian matriks dan transformasi koordinat.
+   - [Georgia Tech ILA: Row Reduction](https://textbooks.math.gatech.edu/ila/row-reduction.html) — Buku teks interaktif Georgia Tech dengan visualisasi pembentukan matriks eselon baris.
+   - [Georgia Tech ILA: Matrix Multiplication](https://textbooks.math.gatech.edu/ila/matrix-multiplication.html) — Diagram interaktif komposisi dan perkalian matriks.
    - [3Blue1Brown: Linear Combinations, Span, and Basis Vectors](https://www.youtube.com/watch?v=k7RM-ot2NWY) — Animasi dinamis pemetaan kombinasi linier dan ruang rentang.
    - [3Blue1Brown: Matrix Multiplication as Composition](https://www.youtube.com/watch?v=XkY2DOUCWMU) — Pandangan visual komposisi pemetaan ruang linier.
 

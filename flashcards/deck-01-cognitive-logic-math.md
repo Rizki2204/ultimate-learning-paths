@@ -1,7 +1,7 @@
 # Tingkat 0 & 1: Fondasi Kognitif, Logika Murni & Matematika Komprehensif
 
 **Deck ID**: `deck-01-cognitive-logic-math`  
-**Jumlah Kartu**: 25 kartu active recall  
+**Jumlah Kartu**: 43 kartu active recall  
 **Tingkat Kurikulum Terkait**:
 - Tingkat 0: [00-fondasi-kognitif-logika](../curriculum/00-fondasi-kognitif-logika/README.md)
 - Tingkat 1: [01-fondasi-matematika](../curriculum/01-fondasi-matematika/README.md)
@@ -16,31 +16,49 @@ Penguasaan prinsip kognitif, penalaran first-principles, logika proposisional/pr
 ## Daftar Ringkasan Kartu
 | No | Kategori | Ringkasan Pertanyaan | Tags |
 |---|---|---|---|
-| 01 | Foundational Definitions | Aturan inferensi logika yang menyatakan jika **[P \to Q]** bernilai benar dan **[P]** b... | `tier-00::logika` |
-| 02 | Foundational Definitions | Aturan inferensi logika yang menyatakan jika **[P \to Q]** bernilai benar dan **[\neg Q... | `tier-00::logika` |
-| 03 | Foundational Definitions | Teorema Ketidaklengkapan Pertama Gödel menyatakan bahwa dalam sistem formal aksiomatik ... | `tier-00::logika` |
-| 04 | Design Heuristics & Rules of Thumb | Metode berpikir yang membedah suatu masalah ke tingkat kebenaran paling mendasar yang t... | `tier-00::kognisi` |
-| 05 | Foundational Definitions | Kriteria demarkasi Karl Popper yang membedakan sains empiris dari pseudosains menyataka... | `tier-00::filsafat-sains` |
-| 06 | Foundational Definitions | Paradoks dalam teori himpunan naif yang menanyakan apakah himpunan R yang beranggotakan... | `tier-01::matematika` |
-| 07 | Foundational Definitions | Suatu relasi biner R pada himpunan A disebut relasi ekuivalensi jika dan hanya jika mem... | `tier-01::matematika` |
-| 08 | Mathematical Identities | Bézout's Identity menyatakan bahwa untuk sembarang bilangan bulat tak-nol a dan b, terd... | `tier-01::matematika` |
-| 09 | Foundational Definitions | Struktur aljabar (G, *) disebut Grup jika memenuhi empat aksioma formal: **[closure (te... | `tier-01::matematika` |
-| 10 | Mathematical Identities | Teorema Rank-Nullity menyatakan bahwa untuk transformasi linear T: V -> W dengan ruang ... | `tier-01::matematika` |
-| 11 | Mathematical Identities | Dekomposisi Nilai Singular (SVD) dari matriks real A berukuran m x n dinyatakan sebagai... | `tier-01::matematika` |
-| 12 | Mathematical Identities | Matriks turunan parsial kedua berukuran n x n dari fungsi skalar bernilai riil f(x_1, .... | `tier-01::matematika` |
-| 13 | Mathematical Identities | Ekspansi deret Taylor untuk fungsi analitik f(x) di sekitar titik a dirumuskan dengan i... | `tier-01::matematika` |
-| 14 | Mathematical Identities | Identitas Euler yang menghubungkan lima konstanta fundamental matematika (e, i, pi, 1, ... | `tier-01::matematika` |
-| 15 | Mathematical Identities | Ketidaksamaan Cauchy-Schwarz untuk dua vektor u dan v dalam ruang hasil kali dalam meny... | `tier-01::matematika` |
-| 16 | Mathematical Identities | Teorema Bayes untuk probabilitas bersyarat merumuskan peluang posterior P(A\|B) sebagai:... | `tier-01::matematika` |
-| 17 | Architecture Constants | Format floating-point presisi tunggal standar IEEE 754 (float32) memiliki alokasi 32-bi... | `tier-01::matematika` |
-| 18 | Architecture Constants | Format floating-point presisi ganda standar IEEE 754 (float64) mengalokasikan 64 bit ya... | `tier-01::matematika` |
-| 19 | Architecture Constants | Dalam format Google Bfloat16 (brain floating point), alokasi bit tetap 16 bit namun eks... | `tier-01::matematika` |
-| 20 | Assembly Opcodes & Byte Layouts | Dalam arsitektur RISC-V RV32I, opcode base untuk operasi logika bitwise register-ke-reg... | `tier-00::logika` |
-| 21 | Assembly Opcodes & Byte Layouts | Instruksi perbandingan bersyarat RISC-V RV32I yang menetapkan nilai rd = 1 jika rs1 < r... | `tier-00::logika` |
-| 22 | Design Heuristics & Rules of Thumb | Hukum Amdahl merumuskan potensi speedup sistem S saat fraksi p dari beban kerja diparal... | `tier-01::matematika` |
-| 23 | Design Heuristics & Rules of Thumb | Hukum Little dalam teori antrean sistem menyatakan bahwa jumlah rata-rata entitas (L) d... | `tier-01::matematika` |
-| 24 | Design Heuristics & Rules of Thumb | Dalam Cognitive Load Theory oleh John Sweller, tiga jenis beban kognitif yang membebani... | `tier-00::kognisi` |
-| 25 | Foundational Definitions | Empat kondisi Karush-Kuhn-Tucker (KKT) yang merupakan syarat perlu bagi titik optimal p... | `tier-01::matematika` |
+| 01 | Foundational Definitions | Aturan inferensi logika yang menyatakan jika **[P \to Q]** bernilai benar dan **[P]**... | `tier-00::logika` |
+| 02 | Foundational Definitions | Aturan inferensi logika yang menyatakan jika **[P \to Q]** bernilai benar dan **[\neg... | `tier-00::logika` |
+| 03 | Foundational Definitions | Teorema Ketidaklengkapan Pertama Gödel menyatakan bahwa dalam sistem formal aksiomati... | `tier-00::logika` |
+| 04 | Design Heuristics & Rules of Thumb | Metode berpikir yang membedah suatu masalah ke tingkat kebenaran paling mendasar yang... | `tier-00::kognisi` |
+| 05 | Foundational Definitions | Kriteria demarkasi Karl Popper yang membedakan sains empiris dari pseudosains menyata... | `tier-00::filsafat-sains` |
+| 06 | Foundational Definitions | Paradoks dalam teori himpunan naif yang menanyakan apakah himpunan R yang beranggotak... | `tier-01::matematika` |
+| 07 | Foundational Definitions | Suatu relasi biner R pada himpunan A disebut relasi ekuivalensi jika dan hanya jika m... | `tier-01::matematika` |
+| 08 | Mathematical Identities | Bézout's Identity menyatakan bahwa untuk sembarang bilangan bulat tak-nol a dan b, te... | `tier-01::matematika` |
+| 09 | Foundational Definitions | Struktur aljabar (G, *) disebut Grup jika memenuhi empat aksioma formal: **[closure (... | `tier-01::matematika` |
+| 10 | Mathematical Identities | Teorema Rank-Nullity menyatakan bahwa untuk transformasi linear T: V -> W dengan ruan... | `tier-01::matematika` |
+| 11 | Mathematical Identities | Dekomposisi Nilai Singular (SVD) dari matriks real A berukuran m x n dinyatakan sebag... | `tier-01::matematika` |
+| 12 | Mathematical Identities | Matriks turunan parsial kedua berukuran n x n dari fungsi skalar bernilai riil f(x_1,... | `tier-01::matematika` |
+| 13 | Mathematical Identities | Ekspansi deret Taylor untuk fungsi analitik f(x) di sekitar titik a dirumuskan dengan... | `tier-01::matematika` |
+| 14 | Mathematical Identities | Identitas Euler yang menghubungkan lima konstanta fundamental matematika (e, i, pi, 1... | `tier-01::matematika` |
+| 15 | Mathematical Identities | Ketidaksamaan Cauchy-Schwarz untuk dua vektor u dan v dalam ruang hasil kali dalam me... | `tier-01::matematika` |
+| 16 | Mathematical Identities | Teorema Bayes untuk probabilitas bersyarat merumuskan peluang posterior P(A\|B) sebaga... | `tier-01::matematika` |
+| 17 | Architecture Constants | Format floating-point presisi tunggal standar IEEE 754 (float32) memiliki alokasi 32-... | `tier-01::matematika` |
+| 18 | Architecture Constants | Format floating-point presisi ganda standar IEEE 754 (float64) mengalokasikan 64 bit ... | `tier-01::matematika` |
+| 19 | Architecture Constants | Dalam format Google Bfloat16 (brain floating point), alokasi bit tetap 16 bit namun e... | `tier-01::matematika` |
+| 20 | Assembly Opcodes & Byte Layouts | Dalam arsitektur RISC-V RV32I, opcode base untuk operasi logika bitwise register-ke-r... | `tier-00::logika` |
+| 21 | Assembly Opcodes & Byte Layouts | Instruksi perbandingan bersyarat RISC-V RV32I yang menetapkan nilai rd = 1 jika rs1 <... | `tier-00::logika` |
+| 22 | Design Heuristics & Rules of Thumb | Hukum Amdahl merumuskan potensi speedup sistem S saat fraksi p dari beban kerja dipar... | `tier-01::matematika` |
+| 23 | Design Heuristics & Rules of Thumb | Hukum Little dalam teori antrean sistem menyatakan bahwa jumlah rata-rata entitas (L)... | `tier-01::matematika` |
+| 24 | Design Heuristics & Rules of Thumb | Dalam Cognitive Load Theory oleh John Sweller, tiga jenis beban kognitif yang membeba... | `tier-00::kognisi` |
+| 25 | Foundational Definitions | Empat kondisi Karush-Kuhn-Tucker (KKT) yang merupakan syarat perlu bagi titik optimal... | `tier-01::matematika` |
+| 26 | Foundational Definitions | Teorema Fundamental Aljabar Linier (FTLA Bagian 2) menyatakan bahwa ruang baris C(A^T... | `tier-01::matematika` |
+| 27 | Mathematical Identities | Faktorisasi Kolom-Baris (Column-Row Factorization) menyatakan bahwa setiap matriks A ... | `tier-01::matematika` |
+| 28 | Mathematical Identities | Dalam Faktorisasi QR dari matriks A berukuran m x n (m >= n) ber-rank kolom penuh, ma... | `tier-01::matematika` |
+| 29 | Mathematical Identities | Berdasarkan Teorema Spektral, setiap matriks simetris riil A = A^T berukuran n x n se... | `tier-01::matematika` |
+| 30 | Mathematical Identities | Faktorisasi Cholesky menyatakan bahwa suatu matriks riil A berukuran n x n dapat difa... | `tier-01::matematika` |
+| 31 | Mathematical Identities | Dekomposisi Nilai Singular (SVD) memfaktorkan sembarang matriks riil A berukuran m x ... | `tier-01::matematika` |
+| 32 | Foundational Definitions | Teorema Eckart-Young-Mirsky menyatakan bahwa untuk matriks sembarang A dengan SVD A =... | `tier-01::matematika` |
+| 33 | Mathematical Identities | Pseudoinvers Moore-Penrose dari matriks A berukuran m x n dengan SVD A = U \Sigma V^T... | `tier-01::matematika` |
+| 34 | Foundational Definitions | Fungsi objektif Principal Component Analysis (PCA) mencari vektor arah proyeksi satua... | `tier-01::matematika` |
+| 35 | Foundational Definitions | Matrisasi atau Unfolding Mode-n dari tensor orde-N \mathcal{X} berukuran I_1 x I_2 x ... | `tier-01::matematika` |
+| 36 | Mathematical Identities | Dekomposisi CANDECOMP/PARAFAC (CP) menyatakan tensor orde-N \mathcal{X} sebagai jumla... | `tier-01::matematika` |
+| 37 | Mathematical Identities | Dekomposisi Tucker memfaktorkan tensor \mathcal{X} berukuran I_1 x I_2 x I_3 menjadi ... | `tier-01::matematika` |
+| 38 | Mathematical Identities | Dalam eliminasi Gaussian komputasional, jika pivot bernilai nol atau sangat mendekati... | `tier-01::matematika` |
+| 39 | Foundational Definitions | Gilbert Strang merumuskan 4 cara fundamental memandang perkalian matriks C = A B: (1)... | `tier-01::matematika` |
+| 40 | Foundational Definitions | Secara geometris dalam ruang R^n, nilai mutlak determinan \|\det(A)\| merepresentasikan... | `tier-01::matematika` |
+| 41 | Mathematical Identities | Sifat multiplikatif fundamental determinan menyatakan bahwa untuk dua matriks bujur s... | `tier-01::matematika` |
+| 42 | Mathematical Identities | Nilai eigen \lambda dari matriks bujur sangkar A dihitung melalui akar-akar persamaan... | `tier-01::matematika` |
+| 43 | Foundational Definitions | Jika suatu matriks riil A memiliki nilai eigen bilangan kompleks non-riil, nilai-nila... | `tier-01::matematika` |
 
 ---
 
@@ -442,6 +460,294 @@ Penguasaan prinsip kognitif, penalaran first-principles, logika proposisional/pr
 > Complementary slackness menyatakan lambda_i * g_i(x) = 0, artinya pengali Lagrange nol jika pembatas tidak aktif (inequality strictly negative). Merupakan landasan algoritma Support Vector Machines (SVM).
 
 **Tags**: `tier-01::matematika math::optimization foundational-definitions`  
+**Kategori**: `Foundational Definitions`
+
+---
+
+### Kartu 26: Foundational Definitions
+
+**Pertanyaan Cloze (Anki Text)**:
+> Teorema Fundamental Aljabar Linier (FTLA Bagian 2) menyatakan bahwa ruang baris C(A^T) dan ruang nol N(A) dari matriks A berukuran m x n merupakan {{c1::komplemen ortogonal (orthogonal complements)}} dalam R^n, sehingga berlaku {{c2::C(A^T) \perp N(A)}} dan {{c2::\dim(C(A^T)) + \dim(N(A)) = n}}.
+
+**Tampilan Jawaban Terbuka**:
+> Teorema Fundamental Aljabar Linier (FTLA Bagian 2) menyatakan bahwa ruang baris C(A^T) dan ruang nol N(A) dari matriks A berukuran m x n merupakan **[komplemen ortogonal (orthogonal complements)]** dalam R^n, sehingga berlaku **[C(A^T) \perp N(A)]** dan **[\dim(C(A^T)) + \dim(N(A)) = n]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Setiap vektor x dalam R^n dapat didekomposisi secara unik menjadi x = x_r + x_n di mana x_r dalam C(A^T) dan x_n dalam N(A). Hubungan serupa berlaku di R^m antara ruang kolom C(A) dan ruang nol kiri N(A^T) (C(A) tegak lurus N(A^T)). Pemetaan A dari C(A^T) ke C(A) adalah isomorfisma bijektif.
+
+**Tags**: `tier-01::matematika math::linear-algebra foundational-definitions`  
+**Kategori**: `Foundational Definitions`
+
+---
+
+### Kartu 27: Mathematical Identities
+
+**Pertanyaan Cloze (Anki Text)**:
+> Faktorisasi Kolom-Baris (Column-Row Factorization) menyatakan bahwa setiap matriks A berukuran m x n dengan rank r dapat difaktorisasi menjadi {{c1::A = C \cdot R}}, di mana matriks C berukuran m x r memuat {{c2::r kolom independen pertama dari A}} dan matriks R berukuran r x n memuat {{c2::r baris tak-nol dari reduced row echelon form (RREF) matriks A}}.
+
+**Tampilan Jawaban Terbuka**:
+> Faktorisasi Kolom-Baris (Column-Row Factorization) menyatakan bahwa setiap matriks A berukuran m x n dengan rank r dapat difaktorisasi menjadi **[A = C \cdot R]**, di mana matriks C berukuran m x r memuat **[r kolom independen pertama dari A]** dan matriks R berukuran r x n memuat **[r baris tak-nol dari reduced row echelon form (RREF) matriks A]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Faktorisasi A = CR membuktikan secara elegan bahwa rank kolom selalu sama dengan rank baris (r), dan setiap kolom A merupakan kombinasi linier dari kolom-kolom basis di C yang diboboti oleh koefisien pada baris R.
+
+**Tags**: `tier-01::matematika math::linear-algebra mathematical-identities`  
+**Kategori**: `Mathematical Identities`
+
+---
+
+### Kartu 28: Mathematical Identities
+
+**Pertanyaan Cloze (Anki Text)**:
+> Dalam Faktorisasi QR dari matriks A berukuran m x n (m >= n) ber-rank kolom penuh, matriks Q berukuran m x n memiliki kolom-kolom ortonormal yang memenuhi identitas {{c1::Q^T Q = I_n}}, dan matriks R berukuran n x n adalah matriks {{c2::segitiga atas (upper triangular)}} yang invertibel.
+
+**Tampilan Jawaban Terbuka**:
+> Dalam Faktorisasi QR dari matriks A berukuran m x n (m >= n) ber-rank kolom penuh, matriks Q berukuran m x n memiliki kolom-kolom ortonormal yang memenuhi identitas **[Q^T Q = I_n]**, dan matriks R berukuran n x n adalah matriks **[segitiga atas (upper triangular)]** yang invertibel.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Jika m = n, Q adalah matriks ortogonal penuh sehingga Q^T Q = Q Q^T = I_n. Faktorisasi QR dihitung menggunakan Gram-Schmidt Termodifikasi (MGS) atau Reflektor Householder untuk stabilitas numerik tinggi dalam menyelesaikan persoalan kuadrat terkecil: R \hat{x} = Q^T b.
+
+**Tags**: `tier-01::matematika math::linear-algebra mathematical-identities`  
+**Kategori**: `Mathematical Identities`
+
+---
+
+### Kartu 29: Mathematical Identities
+
+**Pertanyaan Cloze (Anki Text)**:
+> Berdasarkan Teorema Spektral, setiap matriks simetris riil A = A^T berukuran n x n selalu dapat didiagonalisasi secara ortogonal menjadi {{c1::A = Q \Lambda Q^T}}, di mana seluruh nilai eigen \lambda_i bernilai {{c2::riil}} dan matriks Q adalah matriks {{c2::ortogonal}} (Q^T Q = I) yang kolom-kolomnya merupakan basis eigenvektor ortonormal.
+
+**Tampilan Jawaban Terbuka**:
+> Berdasarkan Teorema Spektral, setiap matriks simetris riil A = A^T berukuran n x n selalu dapat didiagonalisasi secara ortogonal menjadi **[A = Q \Lambda Q^T]**, di mana seluruh nilai eigen \lambda_i bernilai **[riil]** dan matriks Q adalah matriks **[ortogonal]** (Q^T Q = I) yang kolom-kolomnya merupakan basis eigenvektor ortonormal.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Teorema Spektral menjamin bahwa matriks simetris tidak pernah cacat (non-defective) dan ruang eigen yang bersesuaian dengan nilai eigen berbeda saling tegak lurus secara alamiah. Bentuk kuadratik x^T A x dapat dirotasi ke sumbu-sumbu utama tanpa suku silang.
+
+**Tags**: `tier-01::matematika math::linear-algebra mathematical-identities`  
+**Kategori**: `Mathematical Identities`
+
+---
+
+### Kartu 30: Mathematical Identities
+
+**Pertanyaan Cloze (Anki Text)**:
+> Faktorisasi Cholesky menyatakan bahwa suatu matriks riil A berukuran n x n dapat difaktorisasi secara tunggal menjadi {{c1::A = L L^T}} (dengan L matriks segitiga bawah dengan entri diagonal positif L_{ii} > 0) jika dan hanya jika A bersifat {{c2::simetris dan definit positif (symmetric positive definite)}}.
+
+**Tampilan Jawaban Terbuka**:
+> Faktorisasi Cholesky menyatakan bahwa suatu matriks riil A berukuran n x n dapat difaktorisasi secara tunggal menjadi **[A = L L^T]** (dengan L matriks segitiga bawah dengan entri diagonal positif L_{ii} > 0) jika dan hanya jika A bersifat **[simetris dan definit positif (symmetric positive definite)]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Definit positif dapat diuji menggunakan Kriteria Sylvester (semua leading principal minors positif: det(A_k) > 0) atau semua pivot Gaussian positif tanpa penukaran baris. Biaya komputasi Cholesky terstandarisasi adalah tepat (1/3)n^3 total FLOPs ((1/6)n^3 operasi penjumlahan/pengurangan + (1/6)n^3 operasi perkalian), persis setengah dari biaya eliminasi LU biasa ((2/3)n^3 total FLOPs).
+
+**Tags**: `tier-01::matematika math::linear-algebra mathematical-identities`  
+**Kategori**: `Mathematical Identities`
+
+---
+
+### Kartu 31: Mathematical Identities
+
+**Pertanyaan Cloze (Anki Text)**:
+> Dekomposisi Nilai Singular (SVD) memfaktorkan sembarang matriks riil A berukuran m x n menjadi bentuk {{c1::A = U \Sigma V^T}}, di mana U berukuran m x m dan V berukuran n x n adalah matriks {{c2::ortogonal}}, dan \Sigma berukuran m x n adalah matriks {{c2::diagonal persegi panjang}} yang memuat nilai singular terurut non-negatif \sigma_1 >= \sigma_2 >= ... >= \sigma_r > 0.
+
+**Tampilan Jawaban Terbuka**:
+> Dekomposisi Nilai Singular (SVD) memfaktorkan sembarang matriks riil A berukuran m x n menjadi bentuk **[A = U \Sigma V^T]**, di mana U berukuran m x m dan V berukuran n x n adalah matriks **[ortogonal]**, dan \Sigma berukuran m x n adalah matriks **[diagonal persegi panjang]** yang memuat nilai singular terurut non-negatif \sigma_1 >= \sigma_2 >= ... >= \sigma_r > 0.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Secara geometris, SVD memetakan bola satuan hiper-bola di R^n menjadi hiper-elipsoid di R^m, di mana arah sumbu-sumbunya adalah kolom-kolom u_i dan panjang setengah-sumbunya adalah nilai singular \sigma_i. Nilai singular adalah akar kuadrat dari nilai eigen matriks A^T A (\sigma_i = \sqrt{\lambda_i(A^T A)}).
+
+**Tags**: `tier-01::matematika math::linear-algebra mathematical-identities`  
+**Kategori**: `Mathematical Identities`
+
+---
+
+### Kartu 32: Foundational Definitions
+
+**Pertanyaan Cloze (Anki Text)**:
+> Teorema Eckart-Young-Mirsky menyatakan bahwa untuk matriks sembarang A dengan SVD A = \sum_{i=1}^r \sigma_i u_i v_i^T, aproksimasi matriks ber-rank k < r terbaik yang meminimalkan galat \|A - B\|_F dan \|A - B\|_2 adalah matriks terpangkas {{c1::A_k = \sum_{i=1}^k \sigma_i u_i v_i^T}}, dengan galat aproksimasi spektral eksak sebesar {{c2::\|A - A_k\|_2 = \sigma_{k+1}}}.
+
+**Tampilan Jawaban Terbuka**:
+> Teorema Eckart-Young-Mirsky menyatakan bahwa untuk matriks sembarang A dengan SVD A = \sum_{i=1}^r \sigma_i u_i v_i^T, aproksimasi matriks ber-rank k < r terbaik yang meminimalkan galat \|A - B\|_F dan \|A - B\|_2 adalah matriks terpangkas **[A_k = \sum_{i=1}^k \sigma_i u_i v_i^T]**, dengan galat aproksimasi spektral eksak sebesar **[\|A - A_k\|_2 = \sigma_{k+1]**}.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Untuk norma Frobenius, galat kuadratnya adalah \|A - A_k\|_F^2 = \sum_{i=k+1}^r \sigma_i^2. Teorema ini membuktikan bahwa pemangkasan nilai singular terkecil adalah strategi optimal mutlak untuk kompresi data, peredaman derau gambar, dan Principal Component Analysis (PCA).
+
+**Tags**: `tier-01::matematika math::linear-algebra foundational-definitions`  
+**Kategori**: `Foundational Definitions`
+
+---
+
+### Kartu 33: Mathematical Identities
+
+**Pertanyaan Cloze (Anki Text)**:
+> Pseudoinvers Moore-Penrose dari matriks A berukuran m x n dengan SVD A = U \Sigma V^T didefinisikan sebagai {{c1::A^+ = V \Sigma^+ U^T}}, di mana \Sigma^+ dibentuk dengan mengambil {{c2::kebalikan 1/\sigma_i untuk setiap nilai singular tak-nol \sigma_i > 0}} dan mentransposisikan dimensinya.
+
+**Tampilan Jawaban Terbuka**:
+> Pseudoinvers Moore-Penrose dari matriks A berukuran m x n dengan SVD A = U \Sigma V^T didefinisikan sebagai **[A^+ = V \Sigma^+ U^T]**, di mana \Sigma^+ dibentuk dengan mengambil **[kebalikan 1/\sigma_i untuk setiap nilai singular tak-nol \sigma_i > 0]** dan mentransposisikan dimensinya.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Matriks A^+ secara tunggal memenuhi 4 kondisi Penrose: (1) A A^+ A = A, (2) A^+ A A^+ = A^+, (3) (A A^+)^T = A A^+, dan (4) (A^+ A)^T = A^+ A. Solusi \hat{x} = A^+ b meminimalkan galat kuadrat terkecil \|Ax - b\|_2 sekaligus memiliki norma Euclidean \|x\|_2 terkecil di antara seluruh solusi yang mungkin.
+
+**Tags**: `tier-01::matematika math::linear-algebra mathematical-identities`  
+**Kategori**: `Mathematical Identities`
+
+---
+
+### Kartu 34: Foundational Definitions
+
+**Pertanyaan Cloze (Anki Text)**:
+> Fungsi objektif Principal Component Analysis (PCA) mencari vektor arah proyeksi satuan w dalam R^d (\|w\|_2 = 1) yang {{c1::memaksimalkan varians data terproyeksi \max_{w} w^T S w}}, di mana S = \frac{1}{n-1} X_c^T X_c adalah matriks kovarians sampel data terpusat, yang solusinya merupakan {{c2::eigenvektor dari S yang bersesuaian dengan nilai eigen terbesar \lambda_1}}.
+
+**Tampilan Jawaban Terbuka**:
+> Fungsi objektif Principal Component Analysis (PCA) mencari vektor arah proyeksi satuan w dalam R^d (\|w\|_2 = 1) yang **[memaksimalkan varians data terproyeksi \max_{w} w^T S w]**, di mana S = \frac{1}{n-1} X_c^T X_c adalah matriks kovarians sampel data terpusat, yang solusinya merupakan **[eigenvektor dari S yang bersesuaian dengan nilai eigen terbesar \lambda_1]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Berdasarkan formalisme Rasio Rayleigh, \max_{\|w\|=1} w^T S w = \lambda_{\max}(S). Proyeksi ini ekuivalen secara matematis dengan meminimalkan jumlah kuadrat galat rekonstruksi ortogonal (Mean Squared Error). Arah komponen utama ke-k bersesuaian dengan eigenvektor ke-k dari S.
+
+**Tags**: `tier-01::matematika math::linear-algebra foundational-definitions`  
+**Kategori**: `Foundational Definitions`
+
+---
+
+### Kartu 35: Foundational Definitions
+
+**Pertanyaan Cloze (Anki Text)**:
+> Matrisasi atau Unfolding Mode-n dari tensor orde-N \mathcal{X} berukuran I_1 x I_2 x ... x I_N, yang dinotasikan dengan {{c1::X_{(n)}}}, adalah operasi penyusunan ulang elemen tensor menjadi matriks 2D berukuran {{c2::I_n \times \prod_{k \ne n} I_k}}, di mana baris-baris matriks tersebut dibentuk dari {{c2::serat-serat mode-n (mode-n fibers)}} tensor.
+
+**Tampilan Jawaban Terbuka**:
+> Matrisasi atau Unfolding Mode-n dari tensor orde-N \mathcal{X} berukuran I_1 x I_2 x ... x I_N, yang dinotasikan dengan **[X_{(n)]**}, adalah operasi penyusunan ulang elemen tensor menjadi matriks 2D berukuran **[I_n \times \prod_{k \ne n} I_k]**, di mana baris-baris matriks tersebut dibentuk dari **[serat-serat mode-n (mode-n fibers)]** tensor.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Pada tensor orde-3 \mathcal{X} berukuran I x J x K, matrisasi mode-1 menghasilkan X_{(1)} berukuran I x (JK), mode-2 menghasilkan X_{(2)} berukuran J x (IK), dan mode-3 menghasilkan X_{(3)} berukuran K x (IJ). Operasi ini adalah jembatan utama antara aljabar matriks standar dan dekomposisi tensor multilinier.
+
+**Tags**: `tier-01::matematika math::tensor-algebra foundational-definitions`  
+**Kategori**: `Foundational Definitions`
+
+---
+
+### Kartu 36: Mathematical Identities
+
+**Pertanyaan Cloze (Anki Text)**:
+> Dekomposisi CANDECOMP/PARAFAC (CP) menyatakan tensor orde-N \mathcal{X} sebagai jumlahan terhingga R buah {{c1::tensor rank-1 (produk luar vektor)}}, dirumuskan sebagai {{c2::\mathcal{X} \approx \sum_{r=1}^R \lambda_r (a_r^{(1)} \circ a_r^{(2)} \circ \dots \circ a_r^{(N)})}}, di mana nilai minimum R yang menghasilkan kesetaraan eksak disebut {{c2::rank tensor}}.
+
+**Tampilan Jawaban Terbuka**:
+> Dekomposisi CANDECOMP/PARAFAC (CP) menyatakan tensor orde-N \mathcal{X} sebagai jumlahan terhingga R buah **[tensor rank-1 (produk luar vektor)]**, dirumuskan sebagai **[\mathcal{X} \approx \sum_{r=1}^R \lambda_r (a_r^{(1)} \circ a_r^{(2)} \circ \dots \circ a_r^{(N)})]**, di mana nilai minimum R yang menghasilkan kesetaraan eksak disebut **[rank tensor]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Matriks-matriks faktor A^{(n)} dioptimasi menggunakan algoritma Alternating Least Squares (ALS). Menurut Teorema Kruskal, dekomposisi CP memiliki sifat keunikan esensial (essential uniqueness) tanpa memerlukan pembatas ortogonalitas jika jumlah k-rank memenuhi k_A + k_B + k_C >= 2R + 2. Berbeda dengan matriks, penentuan rank tensor CP adalah NP-hard.
+
+**Tags**: `tier-01::matematika math::tensor-algebra mathematical-identities`  
+**Kategori**: `Mathematical Identities`
+
+---
+
+### Kartu 37: Mathematical Identities
+
+**Pertanyaan Cloze (Anki Text)**:
+> Dekomposisi Tucker memfaktorkan tensor \mathcal{X} berukuran I_1 x I_2 x I_3 menjadi bentuk perkalian multilinier {{c1::\mathcal{X} \approx \mathcal{G} \times_1 U^{(1)} \times_2 U^{(2)} \times_3 U^{(3)}}}, di mana \mathcal{G} adalah {{c2::tensor inti (core tensor)}} yang merekam interaksi antar faktor, dan U^{(n)} adalah {{c2::matriks faktor ortogonal}} yang merepresentasikan basis subruang tiap mode.
+
+**Tampilan Jawaban Terbuka**:
+> Dekomposisi Tucker memfaktorkan tensor \mathcal{X} berukuran I_1 x I_2 x I_3 menjadi bentuk perkalian multilinier **[\mathcal{X} \approx \mathcal{G} \times_1 U^{(1)} \times_2 U^{(2)} \times_3 U^{(3)]**}, di mana \mathcal{G} adalah **[tensor inti (core tensor)]** yang merekam interaksi antar faktor, dan U^{(n)} adalah **[matriks faktor ortogonal]** yang merepresentasikan basis subruang tiap mode.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Dekomposisi Tucker dipandang sebagai Higher-Order SVD (HOSVD), di mana matriks faktor U^{(n)} dihitung langsung dari left singular vectors hasil SVD dari matriks unfolding mode-n X_{(n)}. Tensor inti kemudian diperoleh via proyeksi multilinier \mathcal{G} = \mathcal{X} \times_1 (U^{(1)})^T \times_2 (U^{(2)})^T \times_3 (U^{(3)})^T.
+
+**Tags**: `tier-01::matematika math::tensor-algebra mathematical-identities`  
+**Kategori**: `Mathematical Identities`
+
+---
+
+### Kartu 38: Mathematical Identities
+
+**Pertanyaan Cloze (Anki Text)**:
+> Dalam eliminasi Gaussian komputasional, jika pivot bernilai nol atau sangat mendekati nol, algoritma melakukan penukaran baris (partial pivoting) yang direpresentasikan oleh faktorisasi {{c1::P A = L U}}, di mana P adalah matriks {{c2::permutasi}} (ortogonal: P^T P = I), L adalah matriks {{c2::unit segitiga bawah}} dengan diagonal L_{ii} = 1, dan U adalah matriks {{c2::segitiga atas}}.
+
+**Tampilan Jawaban Terbuka**:
+> Dalam eliminasi Gaussian komputasional, jika pivot bernilai nol atau sangat mendekati nol, algoritma melakukan penukaran baris (partial pivoting) yang direpresentasikan oleh faktorisasi **[P A = L U]**, di mana P adalah matriks **[permutasi]** (ortogonal: P^T P = I), L adalah matriks **[unit segitiga bawah]** dengan diagonal L_{ii} = 1, dan U adalah matriks **[segitiga atas]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Penukaran baris memilih elemen dengan nilai mutlak terbesar |a_{ik}| di bawah pivot untuk mencegah pembagian dengan angka sangat kecil yang memicu amplifikasi galat pembulatan floating-point. Total kompleksitas eliminasi terstandarisasi adalah tepat (2/3)n^3 FLOPs ((1/3)n^3 penjumlahan/pengurangan + (1/3)n^3 perkalian).
+
+**Tags**: `tier-01::matematika math::linear-algebra mathematical-identities`  
+**Kategori**: `Mathematical Identities`
+
+---
+
+### Kartu 39: Foundational Definitions
+
+**Pertanyaan Cloze (Anki Text)**:
+> Gilbert Strang merumuskan 4 cara fundamental memandang perkalian matriks C = A B: (1) Entri individu dot product baris-ke-kolom c_{ij} = a_i^T b_j, (2) Kombinasi linier {{c1::kolom-kolom matriks A}}, (3) Kombinasi linier {{c1::baris-baris matriks B}}, dan (4) Jumlahan produk luar rank-1 {{c2::kolom-kali-baris C = \sum_{k=1}^p \mathbf{a}_k \mathbf{b}_k^T}}.
+
+**Tampilan Jawaban Terbuka**:
+> Gilbert Strang merumuskan 4 cara fundamental memandang perkalian matriks C = A B: (1) Entri individu dot product baris-ke-kolom c_{ij} = a_i^T b_j, (2) Kombinasi linier **[kolom-kolom matriks A]**, (3) Kombinasi linier **[baris-baris matriks B]**, dan (4) Jumlahan produk luar rank-1 **[kolom-kali-baris C = \sum_{k=1}^p \mathbf{a}_k \mathbf{b}_k^T]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Pandangan ke-4 (Column times Row / Outer Product Sum) memandang matriks sebagai jumlahan lapisan informasi rank-1, yang menjadi fondasi konseptual Dekomposisi SVD dan adaptasi ber-rank rendah LoRA (Low-Rank Adaptation) pada LLM modern.
+
+**Tags**: `tier-01::matematika math::linear-algebra foundational-definitions`  
+**Kategori**: `Foundational Definitions`
+
+---
+
+### Kartu 40: Foundational Definitions
+
+**Pertanyaan Cloze (Anki Text)**:
+> Secara geometris dalam ruang R^n, nilai mutlak determinan |\det(A)| merepresentasikan {{c1::faktor penskalaan hiper-volume terorientasi (volume scaling factor)}} dari kotak satuan paralelopiped setelah ditransformasikan oleh matriks A, sedangkan tanda aljabar \det(A) mengindikasikan {{c2::orientasi ruang (orientasi tangan kanan dipertahankan jika positif, dan dibalik jika negatif)}}.
+
+**Tampilan Jawaban Terbuka**:
+> Secara geometris dalam ruang R^n, nilai mutlak determinan |\det(A)| merepresentasikan **[faktor penskalaan hiper-volume terorientasi (volume scaling factor)]** dari kotak satuan paralelopiped setelah ditransformasikan oleh matriks A, sedangkan tanda aljabar \det(A) mengindikasikan **[orientasi ruang (orientasi tangan kanan dipertahankan jika positif, dan dibalik jika negatif)]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Pada dimensi 2, |ad - bc| adalah luas jajar genjang yang direntang vektor kolom. Jika \det(A) = 0, transformasi memipihkan ruang berdimensi n ke subruang berdimensi lebih rendah (garis atau titik), membuktikan volume nol dan matriks tidak memiliki invers (singular).
+
+**Tags**: `tier-01::matematika math::linear-algebra foundational-definitions`  
+**Kategori**: `Foundational Definitions`
+
+---
+
+### Kartu 41: Mathematical Identities
+
+**Pertanyaan Cloze (Anki Text)**:
+> Sifat multiplikatif fundamental determinan menyatakan bahwa untuk dua matriks bujur sangkar A dan B berlaku {{c1::\det(A B) = \det(A) \cdot \det(B)}}, dan jika A invertibel maka {{c1::\det(A^{-1}) = \frac{1}{\det(A)}}}; namun dalam komputasi AI/statistik berdimensi tinggi, fungsi {{c2::\text{slogdet} (\ln |\det(A)|)}} digunakan untuk mencegah underflow/overflow numerik.
+
+**Tampilan Jawaban Terbuka**:
+> Sifat multiplikatif fundamental determinan menyatakan bahwa untuk dua matriks bujur sangkar A dan B berlaku **[\det(A B) = \det(A) \cdot \det(B)]**, dan jika A invertibel maka **[\det(A^{-1}) = \frac{1}{\det(A)]**}; namun dalam komputasi AI/statistik berdimensi tinggi, fungsi **[\text{slogdet} (\ln |\det(A)|)]** digunakan untuk mencegah underflow/overflow numerik.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Determinan mendekati nol bukan jaminan matriks dekat dengan singularitas (misal matriks diagonal 0.1 * I_{100} memiliki determinan 10^{-100} yang underflow ke 0 pada float64 padahal condition number kappa(A) = 1 sempurna). Stabilitas numerik inversi selalu ditentukan oleh condition number kappa(A), bukan determinan.
+
+**Tags**: `tier-01::matematika math::linear-algebra mathematical-identities`  
+**Kategori**: `Mathematical Identities`
+
+---
+
+### Kartu 42: Mathematical Identities
+
+**Pertanyaan Cloze (Anki Text)**:
+> Nilai eigen \lambda dari matriks bujur sangkar A dihitung melalui akar-akar persamaan karakteristik {{c1::\det(A - \lambda I) = 0}}, di mana jumlah seluruh nilai eigen selalu sama dengan {{c2::jejak matriks (trace) \sum_{i=1}^n \lambda_i = \text{tr}(A)}}, dan hasil kali seluruh nilai eigen sama dengan {{c2::determinan \prod_{i=1}^n \lambda_i = \det(A)}}.
+
+**Tampilan Jawaban Terbuka**:
+> Nilai eigen \lambda dari matriks bujur sangkar A dihitung melalui akar-akar persamaan karakteristik **[\det(A - \lambda I) = 0]**, di mana jumlah seluruh nilai eigen selalu sama dengan **[jejak matriks (trace) \sum_{i=1}^n \lambda_i = \text{tr}(A)]**, dan hasil kali seluruh nilai eigen sama dengan **[determinan \prod_{i=1}^n \lambda_i = \det(A)]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Relasi trace dan determinan memberikan cara verifikasi kilat 3 detik untuk menguji kebenaran perhitungan nilai eigen matriks 2x2: lambda_1 + lambda_2 = a_{11} + a_{22} dan lambda_1 * lambda_2 = a_{11} a_{22} - a_{12} a_{21}.
+
+**Tags**: `tier-01::matematika math::linear-algebra mathematical-identities`  
+**Kategori**: `Mathematical Identities`
+
+---
+
+### Kartu 43: Foundational Definitions
+
+**Pertanyaan Cloze (Anki Text)**:
+> Jika suatu matriks riil A memiliki nilai eigen bilangan kompleks non-riil, nilai-nilai eigen tersebut selalu muncul secara berpasangan konjugat {{c1::\lambda = a \pm b i = r e^{\pm i \theta}}}, yang secara fisik merepresentasikan transformasi gabungan antara {{c2::penskalaan magnitudo dengan faktor r = \sqrt{a^2 + b^2}}} dan {{c2::rotasi bidang sebesar sudut \theta = \arctan(b/a)}}.
+
+**Tampilan Jawaban Terbuka**:
+> Jika suatu matriks riil A memiliki nilai eigen bilangan kompleks non-riil, nilai-nilai eigen tersebut selalu muncul secara berpasangan konjugat **[\lambda = a \pm b i = r e^{\pm i \theta]**}, yang secara fisik merepresentasikan transformasi gabungan antara **[penskalaan magnitudo dengan faktor r = \sqrt{a^2 + b^2]**} dan **[rotasi bidang sebesar sudut \theta = \arctan(b/a)]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Contoh kanonik adalah matriks rotasi 90 derajat [[0, -1], [1, 0]] dengan nilai eigen lambda = \pm i (r = 1, theta = 90 derajat). Karena tidak ada vektor riil yang arahnya tetap tak berputar, matriks rotasi murni tidak memiliki vektor eigen riil, menandakan osilasi periodik tanpa titik tetap.
+
+**Tags**: `tier-01::matematika math::linear-algebra foundational-definitions`  
 **Kategori**: `Foundational Definitions`
 
 ---
