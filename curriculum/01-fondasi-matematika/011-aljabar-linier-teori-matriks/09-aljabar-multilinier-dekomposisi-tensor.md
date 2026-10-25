@@ -26,11 +26,22 @@ Mari kita pahami tangga dimensi ini dengan analogi makanan sehari-hari:
 
 Perhatikan skenario nyata dalam rekayasa perangkat lunak modern:
 1. **Video Digital Warna Resolusi Tinggi**: Sebuah video berwarna tidak bisa dipaksa masuk ke dalam matriks 2D tanpa merusak susunannya. Video adalah tensor 4 dimensi:
-   $$(\text{Tinggi Piksel}) \times (\text{Lebar Piksel}) \times (\text{Kanal Warna RGB}) \times (\text{Frame Waktu})$$
+
+$$
+(\text{Tinggi Piksel}) \times (\text{Lebar Piksel}) \times (\text{Kanal Warna RGB}) \times (\text{Frame Waktu})
+$$
+
 2. **Sistem Rekomendasi E-Commerce Multi-Aspek**: Rekomendasi belanja bukan sekadar hubungan dua arah $\text{Pengguna} \times \text{Produk}$. Data riil mencakup konteks jamak:
-   $$(\text{Pengguna}) \times (\text{Produk}) \times (\text{Waktu Belanja}) \times (\text{Tipe Perangkat Mobile/Desktop})$$
+
+$$
+(\text{Pengguna}) \times (\text{Produk}) \times (\text{Waktu Belanja}) \times (\text{Tipe Perangkat Mobile/Desktop})
+$$
+
 3. **Rekayasa Biomedis & Rekaman Sinyal Otak**: Sinyal elektroensefalogram (EEG) direkam sebagai tensor 4 dimensi:
-   $$(\text{Elektroda Kulit Kepala}) \times (\text{Titik Sampel Waktu}) \times (\text{Domain Frekuensi Gelombang}) \times (\text{Uji Coba Pasien})$$
+
+$$
+(\text{Elektroda Kulit Kepala}) \times (\text{Titik Sampel Waktu}) \times (\text{Domain Frekuensi Gelombang}) \times (\text{Uji Coba Pasien})
+$$
 
 > **❓ Pertanyaan Pemula: Mengapa Kita Tidak Boleh Memipihkan (Flatten) Saja Tensor Menjadi Matriks 2D Biasa?**
 >
@@ -66,7 +77,11 @@ Dekomposisi tensor memperluas konsep faktorisasi matriks (seperti SVD $A = U \Si
 Tautan Pendukung: [SIAM Review 2009: Section 2 - Tensor Basics](https://arxiv.org/abs/0904.3131) | [TensorLy Basics Guide](https://tensorly.org/stable/user_guide/tensor_basics.html)
 
 Sebuah **tensor riil orde-$N$** (juga disebut tensor berdimensi $N$ atau *way-$N$ tensor*) adalah elemen dari ruang hasil kali tensor ruang-ruang vektor:
-$$\boldsymbol{\mathcal{X}} \in \mathbb{R}^{I_1 \times I_2 \times \dots \times I_N}$$
+
+$$
+\boldsymbol{\mathcal{X}} \in \mathbb{R}^{I_1 \times I_2 \times \dots \times I_N}
+$$
+
 di mana entri individual dinotasikan dengan $x_{i_1 i_2 \dots i_N}$ dengan batas indeks $1 \le i_n \le I_n$ untuk setiap mode $n \in \{1, 2, \dots, N\}$.
 
 > **🔤 Kamus Simbol Anti-Pusing — Anatomi Tensor:**
@@ -74,11 +89,11 @@ di mana entri individual dinotasikan dengan $x_{i_1 i_2 \dots i_N}$ dengan batas
 > - Orde / *Way* ($N$): Jumlah sumbu indeks atau dimensi fisik tensor (misal orde 3 memiliki 3 indeks $i, j, k$).
 > - Serat (*Fiber*): Vektor 1D di dalam tensor yang diperoleh dengan mengunci seluruh indeks kecuali satu.
 > - Irisan (*Slice*): Matriks 2D di dalam tensor yang diperoleh dengan mengunci seluruh indeks kecuali dua.
-> - $\|\boldsymbol{\mathcal{X}}\|_F$: Norma Frobenius tensor, yaitu akar dari jumlahan kuadrat seluruh elemen di dalam tensor.
-> - $\circ$: Perkalian luar (*outer product*), menghasilkan tensor dengan orde bertambah.
-> - $\times_n$: Produk mode-$n$ (*mode-n tensor-matrix product*).
+> - $\lVert \boldsymbol{\mathcal{X}} \rVert_F$ : Norma Frobenius tensor, yaitu akar dari jumlahan kuadrat seluruh elemen di dalam tensor.
+> - $\circ$ : Perkalian luar (*outer product*), menghasilkan tensor dengan orde bertambah.
+> - $\times_n$ : Produk mode-$n$ (*mode-n tensor-matrix product*).
 
-Untuk tensor orde-3 $\boldsymbol{\mathcal{X}} \in \mathbb{R}^{I \times J \times K}$:
+Untuk tensor orde-3 $\boldsymbol{\mathcal{X}} \in \mathbb{R}^{I \times J \times K}$ :
 1. **Tiga Jenis Serat Tensor (*Fibers*)**:
    - **Serat Mode-1 (Column Fiber)**: $\mathbf{x}_{:jk} \in \mathbb{R}^I$ (bergerak vertikal sepanjang kolom, mengunci $j$ dan $k$).
    - **Serat Mode-2 (Row Fiber)**: $\mathbf{x}_{i:k} \in \mathbb{R}^J$ (bergerak horizontal sepanjang baris, mengunci $i$ dan $k$).
@@ -90,7 +105,11 @@ Untuk tensor orde-3 $\boldsymbol{\mathcal{X}} \in \mathbb{R}^{I \times J \times 
    - **Irisan Horizontal (*Horizontal Slices*)**: $X_{i::} \in \mathbb{R}^{J \times K}$ (lembaran matriks horizontal ke-$i$ dari atas ke bawah).
 
 3. **Norma Frobenius Tensor**:
-   $$\|\boldsymbol{\mathcal{X}}\|_F = \sqrt{\sum_{i=1}^I \sum_{j=1}^J \sum_{k=1}^K x_{ijk}^2}$$
+
+$$
+\lVert \boldsymbol{\mathcal{X}} \rVert_F = \sqrt{\sum_{i=1}^I \sum_{j=1}^J \sum_{k=1}^K x_{ijk}^2}
+$$
+
    Hasil kali dalam (*inner product*) antara dua tensor berdimensi sama didefinisikan sebagai $\langle \boldsymbol{\mathcal{X}}, \boldsymbol{\mathcal{Y}} \rangle = \sum_{i,j,k} x_{ijk} y_{ijk}$.
 
 ---
@@ -100,15 +119,26 @@ Tautan Pendukung: [SIAM Review 2009: Section 3 - Tensor Operations](https://arxi
 
 #### 1. Matrisasi / Unfolding Mode-$n$ ($X_{(n)}$)
 **Matrisasi Mode-$n$** adalah proses penyusunan ulang entri-entri tensor $\boldsymbol{\mathcal{X}} \in \mathbb{R}^{I_1 \times \dots \times I_N}$ menjadi matriks dua dimensi biasa $X_{(n)}$ berukuran:
-$$X_{(n)} \in \mathbb{R}^{I_n \times J_n}, \quad \text{di mana } J_n = \prod_{k \ne n} I_k$$
+
+$$
+X_{(n)} \in \mathbb{R}^{I_n \times J_n}, \quad \text{di mana } J_n = \prod_{k \ne n} I_k
+$$
+
 Kolom-kolom dari matriks $X_{(n)}$ adalah seluruh serat mode-$n$ dari tensor yang dijejerkan secara teratur.
 
 #### Ilustrasi Visual Unfolding Kubus $2 \times 2 \times 2$ (Angka 1 s/d 8)
 Bayangkan sebuah kubus tensor $\boldsymbol{\mathcal{X}} \in \mathbb{R}^{2 \times 2 \times 2}$ yang memiliki elemen angka 1 sampai 8:
 - **Irisan Frontal 1 ($k = 1$)**:
-  $$X_{::1} = \begin{bmatrix} x_{111} & x_{121} \\ x_{211} & x_{221} \end{bmatrix} = \begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix}$$
+
+$$
+X_{::1} = \begin{bmatrix} x_{111} & x_{121} \\ x_{211} & x_{221} \end{bmatrix} = \begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix}
+$$
+
 - **Irisan Frontal 2 ($k = 2$)**:
-  $$X_{::2} = \begin{bmatrix} x_{112} & x_{122} \\ x_{212} & x_{222} \end{bmatrix} = \begin{bmatrix} 5 & 6 \\ 7 & 8 \end{bmatrix}$$
+
+$$
+X_{::2} = \begin{bmatrix} x_{112} & x_{122} \\ x_{212} & x_{222} \end{bmatrix} = \begin{bmatrix} 5 & 6 \\ 7 & 8 \end{bmatrix}
+$$
 
 Mari kita buka (*unfold*) kubus 3D ini menjadi tiga buah matriks 2D:
 ```text
@@ -154,10 +184,18 @@ Saat melakukan `tensor_unfold` dengan NumPy, kita memindahkan mode target ke sum
 
 #### 3. Memory Strides & Peran `.contiguous()` pada Framework Deep Learning (PyTorch)
 Mengapa pemahaman tata letak memori tensor ini krusial bagi rekayasawan AI?
-Tinjau sebuah matriks sederhana berukuran $2 \times 3$:
-$$A = \begin{bmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \end{bmatrix}$$
+Tinjau sebuah matriks sederhana berukuran $2 \times 3$ :
+
+$$
+A = \begin{bmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \end{bmatrix}
+$$
+
 Di dalam memori fisik RAM komputer, matriks ini disimpan sebagai larik 1D datar:
-$$\text{Buffer Memori: } [1, 2, 3, 4, 5, 6]$$
+
+$$
+\text{Buffer Memori: } [1, 2, 3, 4, 5, 6]
+$$
+
 - **Memory Strides Awal**: `strides = (3, 1)`, artinya untuk pindah 1 baris ke bawah komputer harus melompati 3 angka, sedangkan untuk pindah 1 kolom ke kanan komputer melompati 1 angka.
 - **Ketika Ditranspos ($A^T$)**: Matriks menjadi berukuran $3 \times 2$. Untuk efisiensi tanpa menyalin data di RAM (*zero-copy view*), PyTorch/NumPy **tidak memindahkan angka di memori**. Mereka hanya membalik nilai strides menjadi `strides = (1, 3)`.
 - **Masalah Non-Contiguous**: Buffer fisik di RAM tetap `[1, 2, 3, 4, 5, 6]`. Jika kita sekarang memanggil `.view()` atau mengirim tensor ini ke kernel GPU CUDA, operasi tersebut gagal dengan pesan kesalahan:
@@ -179,42 +217,81 @@ Contoh konkret:
    Dalam Einsum: `np.einsum("ij,jk->ik", A, B)`. (Indeks $j$ hilang di kanan $\implies$ dijumlahkan!).
 2. **Produk Mode-$n$ Tensor Orde-3 ($\boldsymbol{\mathcal{X}} \times_n U$)**:
    - Mode 0 (mengalikan sumbu baris $i$ dengan matriks $U_{mi}$):
-     $$y_{mjk} = \sum_i u_{mi} x_{ijk} \implies \texttt{np.einsum("mi,ijk->mjk", U, X)}$$
+
+$$
+y_{mjk} = \sum_i u_{mi} x_{ijk} \implies \texttt{np.einsum("mi,ijk->mjk", U, X)}
+$$
+
    - Mode 1 (mengalikan sumbu kolom $j$ dengan matriks $U_{mj}$):
-     $$y_{imk} = \sum_j u_{mj} x_{ijk} \implies \texttt{np.einsum("mj,ijk->imk", U, X)}$$
+
+$$
+y_{imk} = \sum_j u_{mj} x_{ijk} \implies \texttt{np.einsum("mj,ijk->imk", U, X)}
+$$
+
    - Mode 2 (mengalikan sumbu kedalaman $k$ dengan matriks $U_{mk}$):
-     $$y_{ijm} = \sum_k u_{mk} x_{ijk} \implies \texttt{np.einsum("mk,ijk->ijm", U, X)}$$
+
+$$
+y_{ijm} = \sum_k u_{mk} x_{ijk} \implies \texttt{np.einsum("mk,ijk->ijm", U, X)}
+$$
+
 3. **Multi-Head Attention pada Arsitektur Transformer**:
-   $$\text{Attention Score} = \texttt{np.einsum("bhid,bhjd->bhij", Q, K)}$$
+
+$$
+\text{Attention Score} = \texttt{np.einsum("bhid,bhjd->bhij", Q, K)}
+$$
+
    Di mana $b$ = batch, $h$ = head, $i, j$ = panjang sekuens token, $d$ = dimensi embedding. Indeks $d$ dikontraksikan secara instan!
 
 ---
 
 #### 5. Produk Mode-$n$ (*Mode-n Tensor-Matrix Product*)
 Perkalian tensor $\boldsymbol{\mathcal{X}} \in \mathbb{R}^{I_1 \times \dots \times I_N}$ dengan matriks $U \in \mathbb{R}^{J \times I_n}$ sepanjang mode ke-$n$, dinotasikan:
-$$\boldsymbol{\mathcal{Y}} = \boldsymbol{\mathcal{X}} \times_n U \in \mathbb{R}^{I_1 \times \dots \times I_{n-1} \times J \times I_{n+1} \times \dots \times I_N}$$
-Setiap serat mode-$n$ dari $\boldsymbol{\mathcal{X}}$ dikalikan dari kiri dengan matriks $U$:
-$$y_{i_1 \dots i_{n-1} j i_{n+1} \dots i_N} = \sum_{i_n=1}^{I_n} x_{i_1 \dots i_n \dots i_N} u_{j, i_n}$$
+
+$$
+\boldsymbol{\mathcal{Y}} = \boldsymbol{\mathcal{X}} \times_n U \in \mathbb{R}^{I_1 \times \dots \times I_{n-1} \times J \times I_{n+1} \times \dots \times I_N}
+$$
+
+Setiap serat mode-$n$ dari $\boldsymbol{\mathcal{X}}$ dikalikan dari kiri dengan matriks $U$ :
+
+$$
+y_{i_1 \dots i_{n-1} j i_{n+1} \dots i_N} = \sum_{i_n=1}^{I_n} x_{i_1 \dots i_n \dots i_N} u_{j, i_n}
+$$
 
 **Teorema Ekuivalensi Matrisasi**:
-$$\boldsymbol{\mathcal{Y}} = \boldsymbol{\mathcal{X}} \times_n U \iff Y_{(n)} = U X_{(n)}$$
+
+$$
+\boldsymbol{\mathcal{Y}} = \boldsymbol{\mathcal{X}} \times_n U \iff Y_{(n)} = U X_{(n)}
+$$
+
 > **🌉 Jembatan Logika:** Menghitung produk mode-$n$ pada tensor identik dengan membuka tensor menjadi matriks mode-$n$ ($X_{(n)}$), mengalikannya dari kiri dengan matriks $U$, lalu melipat kembali matriks hasilnya menjadi bentuk tensor!
 
 ---
 
 #### 6. Tiga Jenis Perkalian Matriks Khusus: Kronecker, Hadamard & Khatri-Rao
-Misalkan $A \in \mathbb{R}^{I \times K}$ dan $B \in \mathbb{R}^{J \times K}$:
+Misalkan $A \in \mathbb{R}^{I \times K}$ dan $B \in \mathbb{R}^{J \times K}$ :
 
 1. **Produk Kronecker ($A \otimes B \in \mathbb{R}^{IJ \times K^2}$)**:
-   Setiap elemen skalar dari $A$ dikalikan dengan seluruh blok matriks $B$:
-   $$A \otimes B = \begin{bmatrix} a_{11} B & a_{12} B & \dots \\ a_{21} B & a_{22} B & \dots \\ \vdots & \vdots & \ddots \end{bmatrix}$$
+   Setiap elemen skalar dari $A$ dikalikan dengan seluruh blok matriks $B$ :
+
+$$
+A \otimes B = \begin{bmatrix} a_{11} B & a_{12} B & \dots \\ a_{21} B & a_{22} B & \dots \\ \vdots & \vdots & \ddots \end{bmatrix}
+$$
+
 2. **Produk Hadamard / Perkalian Titik Sejajar ($A * B \in \mathbb{R}^{I \times K}$)**:
    Perkalian elemen-demi-elemen (*element-wise product*): $(A * B)_{ik} = a_{ik} b_{ik}$.
 3. **Produk Khatri-Rao ($A \odot B \in \mathbb{R}^{IJ \times K}$)**:
    Perkalian Kronecker per kolom yang bersesuaian (*matching column-wise Kronecker product*):
-   $$A \odot B = \begin{bmatrix} \mathbf{a}_1 \otimes \mathbf{b}_1 & \mathbf{a}_2 \otimes \mathbf{b}_2 & \dots & \mathbf{a}_K \otimes \mathbf{b}_K \end{bmatrix}$$
+
+$$
+A \odot B = \begin{bmatrix} \mathbf{a}_1 \otimes \mathbf{b}_1 & \mathbf{a}_2 \otimes \mathbf{b}_2 & \dots & \mathbf{a}_K \otimes \mathbf{b}_K \end{bmatrix}
+$$
+
    **Identitas Campuran Fundamental**:
-   $$(A \odot B)^T (A \odot B) = (A^T A) * (B^T B)$$
+
+$$
+(A \odot B)^T (A \odot B) = (A^T A) * (B^T B)
+$$
+
    Identitas ini memangkas komputasi invers kuadrat terkecil dari matriks raksasa $IJ \times IJ$ menjadi matriks mungil $K \times K$!
 
 ---
@@ -223,30 +300,59 @@ Misalkan $A \in \mathbb{R}^{I \times K}$ dan $B \in \mathbb{R}^{J \times K}$:
 Tautan Pendukung: [Wikipedia: Tensor Rank Decomposition](https://en.wikipedia.org/wiki/Tensor_rank_decomposition) | [Kruskal 1977 Uniqueness Theorem](https://en.wikipedia.org/wiki/Tensor_rank_decomposition#Uniqueness)
 
 Dekomposisi CP menguraikan tensor $\boldsymbol{\mathcal{X}} \in \mathbb{R}^{I \times J \times K}$ menjadi jumlahan dari $R$ buah tensor rank-1:
-$$\boldsymbol{\mathcal{X}} \approx \sum_{r=1}^R \lambda_r \, \mathbf{a}_r \circ \mathbf{b}_r \circ \mathbf{c}_r \equiv [\![\boldsymbol{\lambda}; A, B, C]\!]$$
+
+$$
+\boldsymbol{\mathcal{X}} \approx \sum_{r=1}^R \lambda_r \, \mathbf{a}_r \circ \mathbf{b}_r \circ \mathbf{c}_r \equiv [\![\boldsymbol{\lambda}; A, B, C]\!]
+$$
+
 di mana:
 - $\circ$ melambangkan hasil kali luar vektor (*outer product*): $(\mathbf{a}_r \circ \mathbf{b}_r \circ \mathbf{c}_r)_{ijk} = a_{ir} b_{jr} c_{kr}$.
 - Matriks faktor: $A = [\mathbf{a}_1 \dots \mathbf{a}_R] \in \mathbb{R}^{I \times R}$, $B = [\mathbf{b}_1 \dots \mathbf{b}_R] \in \mathbb{R}^{J \times R}$, $C = [\mathbf{c}_1 \dots \mathbf{c}_R] \in \mathbb{R}^{K \times R}$.
 - $R$ terkecil yang menghasilkan kesamaan eksak disebut **Rank Tensor** ($\text{rank}(\boldsymbol{\mathcal{X}})$).
 
 #### Bentuk Matrisasi CP via Khatri-Rao:
-$$X_{(1)} \approx A \Lambda (C \odot B)^T$$
-$$X_{(2)} \approx B \Lambda (C \odot A)^T$$
-$$X_{(3)} \approx C \Lambda (B \odot A)^T$$
+
+$$
+X_{(1)} \approx A \Lambda (C \odot B)^T
+$$
+
+$$
+X_{(2)} \approx B \Lambda (C \odot A)^T
+$$
+
+$$
+X_{(3)} \approx C \Lambda (B \odot A)^T
+$$
 
 #### Algoritma Alternating Least Squares (ALS) untuk Dekomposisi CP:
 Algoritma memperbarui matriks faktor satu per satu secara bergantian dengan mengunci dua matriks lainnya:
-1. Perbarui $A$ dengan mengunci $B$ dan $C$:
-   $$A = X_{(1)} \left( (C \odot B)^T \right)^+ = X_{(1)} (C \odot B) \left( (C^T C) * (B^T B) \right)^{-1}$$
-2. Perbarui $B$ dengan mengunci $A$ dan $C$:
-   $$B = X_{(2)} (C \odot A) \left( (C^T C) * (A^T A) \right)^{-1}$$
-3. Perbarui $C$ dengan mengunci $A$ dan $B$:
-   $$C = X_{(3)} (B \odot A) \left( (B^T B) * (A^T A) \right)^{-1}$$
-Ulangi iterasi hingga konvergen $\|\boldsymbol{\mathcal{X}} - [\![A, B, C]\!]\|_F < \epsilon$.
+1. Perbarui $A$ dengan mengunci $B$ dan $C$ :
+
+$$
+A = X_{(1)} \left( (C \odot B)^T \right)^+ = X_{(1)} (C \odot B) \left( (C^T C) * (B^T B) \right)^{-1}
+$$
+
+2. Perbarui $B$ dengan mengunci $A$ dan $C$ :
+
+$$
+B = X_{(2)} (C \odot A) \left( (C^T C) * (A^T A) \right)^{-1}
+$$
+
+3. Perbarui $C$ dengan mengunci $A$ dan $B$ :
+
+$$
+C = X_{(3)} (B \odot A) \left( (B^T B) * (A^T A) \right)^{-1}
+$$
+
+Ulangi iterasi hingga konvergen $\lVert \boldsymbol{\mathcal{X}} - [\![A, B, C]\!] \rVert_F < \epsilon$.
 
 #### Teorema Keunikan Kruskal (1977):
 Definisikan $k$-rank ($k_A$) sebagai bilangan bulat terbesar sedemikian rupa sehingga setiap $k_A$ kolom dari $A$ bebas linier. Jika:
-$$k_A + k_B + k_C \ge 2R + 2$$
+
+$$
+k_A + k_B + k_C \ge 2R + 2
+$$
+
 Maka dekomposisi CP **dijamin unik secara esensial** (hanya terdapat kebebasan permutasi kolom dan penskalaan skalar, tanpa adanya ambiguitas rotasi ortogonal seperti pada PCA matriks 2D!).
 
 ---
@@ -255,7 +361,11 @@ Maka dekomposisi CP **dijamin unik secara esensial** (hanya terdapat kebebasan p
 Tautan Pendukung: [Lieven De Lathauwer et al. (2000): HOSVD on Wikipedia](https://en.wikipedia.org/wiki/Higher-order_singular_value_decomposition) | [TensorLy Tucker Decomposition](https://tensorly.org/stable/modules/generated/tensorly.decomposition.tucker.html)
 
 Dekomposisi Tucker adalah generalisasi murni dari SVD menuju tensor multidimensi:
-$$\boldsymbol{\mathcal{X}} \approx \boldsymbol{\mathcal{G}} \times_1 U^{(1)} \times_2 U^{(2)} \times_3 U^{(3)}$$
+
+$$
+\boldsymbol{\mathcal{X}} \approx \boldsymbol{\mathcal{G}} \times_1 U^{(1)} \times_2 U^{(2)} \times_3 U^{(3)}
+$$
+
 di mana:
 1. $U^{(1)} \in \mathbb{R}^{I \times R_1}, U^{(2)} \in \mathbb{R}^{J \times R_2}, U^{(3)} \in \mathbb{R}^{K \times R_3}$ adalah **matriks faktor ortogonal** ($U^{(n)T} U^{(n)} = I$).
 2. $\boldsymbol{\mathcal{G}} \in \mathbb{R}^{R_1 \times R_2 \times R_3}$ adalah **Core Tensor**, yang menangkap seluruh interaksi silang kompleks antar komponen basis di setiap mode.
@@ -273,7 +383,7 @@ flowchart TD
     CoreG -->|x_2| U2
     CoreG -->|x_3| U3
 
-    classDef tStyle fill:#fff3e0,stroke:#e65100,stroke-width:2px;
+    classDef tStyle fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#0f172a;
     class TensorX,CoreG,U1,U2,U3 tStyle;
 ```
 
@@ -282,7 +392,10 @@ flowchart TD
 2. **Langkah 2**: Bentuk matrisasi mode-2 $X_{(2)} \in \mathbb{R}^{J \times IK}$. Hitung SVD: $X_{(2)} = U_2 \Sigma_2 V_2^T$. Ambil $R_2$ vektor singular kiri pertama sebagai $U^{(2)}$.
 3. **Langkah 3**: Bentuk matrisasi mode-3 $X_{(3)} \in \mathbb{R}^{K \times IJ}$. Hitung SVD: $X_{(3)} = U_3 \Sigma_3 V_3^T$. Ambil $R_3$ vektor singular kiri pertama sebagai $U^{(3)}$.
 4. **Langkah 4 (Proyeksi Core Tensor)**:
-   $$\boldsymbol{\mathcal{G}} = \boldsymbol{\mathcal{X}} \times_1 U^{(1)T} \times_2 U^{(2)T} \times_3 U^{(3)T}$$
+
+$$
+\boldsymbol{\mathcal{G}} = \boldsymbol{\mathcal{X}} \times_1 U^{(1)T} \times_2 U^{(2)T} \times_3 U^{(3)T}
+$$
 
 ---
 
@@ -302,17 +415,27 @@ Meskipun tensor sangat berdaya guna, matematika multilinier menyimpan sejumlah p
 
 ## 3. Contoh Hitungan Manual Langkah-demi-Langkah
 
-Diberikan sebuah tensor orde-3 berukuran $2 \times 2 \times 2$: $\boldsymbol{\mathcal{X}} \in \mathbb{R}^{2 \times 2 \times 2}$.
+Diberikan sebuah tensor orde-3 berukuran $2 \times 2 \times 2$ : $\boldsymbol{\mathcal{X}} \in \mathbb{R}^{2 \times 2 \times 2}$.
 Dua irisan frontal tensor tersebut adalah:
-$$X_{::1} = \begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix}, \quad X_{::2} = \begin{bmatrix} 5 & 6 \\ 7 & 8 \end{bmatrix}$$
+
+$$
+X_{::1} = \begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix}, \quad X_{::2} = \begin{bmatrix} 5 & 6 \\ 7 & 8 \end{bmatrix}
+$$
 
 ---
 
 ### 3.1 Perhitungan Norma Frobenius Tensor
-$$\|\boldsymbol{\mathcal{X}}\|_F^2 = \sum_{i=1}^2 \sum_{j=1}^2 \sum_{k=1}^2 x_{ijk}^2$$
+
+$$
+\lVert \boldsymbol{\mathcal{X}} \rVert_F^2 = \sum_{i=1}^2 \sum_{j=1}^2 \sum_{k=1}^2 x_{ijk}^2
+$$
+
 Entri irisan 1: $1^2 + 2^2 + 3^2 + 4^2 = 1 + 4 + 9 + 16 = 30$.
 Entri irisan 2: $5^2 + 6^2 + 7^2 + 8^2 = 25 + 36 + 49 + 64 = 174$.
-$$\|\boldsymbol{\mathcal{X}}\|_F^2 = 30 + 174 = 204 \implies \|\boldsymbol{\mathcal{X}}\|_F = \sqrt{204} \approx 14{,}282857$$
+
+$$
+\lVert \boldsymbol{\mathcal{X}} \rVert_F^2 = 30 + 174 = 204 \implies \lVert \boldsymbol{\mathcal{X}} \rVert_F = \sqrt{204} \approx 14{,}282857
+$$
 
 ---
 
@@ -323,52 +446,87 @@ $$\|\boldsymbol{\mathcal{X}}\|_F^2 = 30 + 174 = 204 \implies \|\boldsymbol{\math
    - Kolom irisan 1: $[1, 3]^T, [2, 4]^T$
    - Kolom irisan 2: $[5, 7]^T, [6, 8]^T$
    Jejerkan ke samping:
-   $$X_{(1)} = \begin{bmatrix} 1 & 2 & 5 & 6 \\ 3 & 4 & 7 & 8 \end{bmatrix}$$
+
+$$
+X_{(1)} = \begin{bmatrix} 1 & 2 & 5 & 6 \\ 3 & 4 & 7 & 8 \end{bmatrix}
+$$
 
 2. **Matrisasi Mode-2 ($X_{(2)} \in \mathbb{R}^{2 \times 4}$)**:
    Serat mode-2 adalah baris-baris horizontal pada setiap irisan frontal:
    - Baris irisan 1 (transpose): $[1, 2]^T, [3, 4]^T$
    - Baris irisan 2 (transpose): $[5, 6]^T, [7, 8]^T$
    Jejerkan ke samping:
-   $$X_{(2)} = \begin{bmatrix} 1 & 3 & 5 & 7 \\ 2 & 4 & 6 & 8 \end{bmatrix}$$
+
+$$
+X_{(2)} = \begin{bmatrix} 1 & 3 & 5 & 7 \\ 2 & 4 & 6 & 8 \end{bmatrix}
+$$
 
 3. **Matrisasi Mode-3 ($X_{(3)} \in \mathbb{R}^{2 \times 4}$)**:
    Serat mode-3 adalah tabung yang menembus irisan 1 ke irisan 2 ($x_{ij:}$):
-   - Tabung $(1, 1)$: $[1, 5]^T$
-   - Tabung $(2, 1)$: $[3, 7]^T$
-   - Tabung $(1, 2)$: $[2, 6]^T$
-   - Tabung $(2, 2)$: $[4, 8]^T$
+   - Tabung $(1, 1)$ : $[1, 5]^T$
+   - Tabung $(2, 1)$ : $[3, 7]^T$
+   - Tabung $(1, 2)$ : $[2, 6]^T$
+   - Tabung $(2, 2)$ : $[4, 8]^T$
    Jejerkan ke samping:
-   $$X_{(3)} = \begin{bmatrix} 1 & 3 & 2 & 4 \\ 5 & 7 & 6 & 8 \end{bmatrix}$$
+
+$$
+X_{(3)} = \begin{bmatrix} 1 & 3 & 2 & 4 \\ 5 & 7 & 6 & 8 \end{bmatrix}
+$$
 
 ---
 
 ### 3.3 Perhitungan Produk Mode-1
 Diberikan matriks pengali mode-1:
-$$U = \begin{bmatrix} 1 & 0 \\ 0 & 2 \end{bmatrix}$$
 
-Gunakan Teorema Ekuivalensi Matrisasi $Y_{(1)} = U X_{(1)}$:
-$$Y_{(1)} = \begin{bmatrix} 1 & 0 \\ 0 & 2 \end{bmatrix} \begin{bmatrix} 1 & 2 & 5 & 6 \\ 3 & 4 & 7 & 8 \end{bmatrix} = \begin{bmatrix} 1(1) & 1(2) & 1(5) & 1(6) \\ 2(3) & 2(4) & 2(7) & 2(8) \end{bmatrix} = \begin{bmatrix} 1 & 2 & 5 & 6 \\ 6 & 8 & 14 & 16 \end{bmatrix}$$
+$$
+U = \begin{bmatrix} 1 & 0 \\ 0 & 2 \end{bmatrix}
+$$
 
-Kembalikan bentuknya menjadi dua irisan frontal tensor luaran $\boldsymbol{\mathcal{Y}}$:
-$$Y_{::1} = \begin{bmatrix} 1 & 2 \\ 6 & 8 \end{bmatrix}, \quad Y_{::2} = \begin{bmatrix} 5 & 6 \\ 14 & 16 \end{bmatrix}$$
+Gunakan Teorema Ekuivalensi Matrisasi $Y_{(1)} = U X_{(1)}$ :
+
+$$
+Y_{(1)} = \begin{bmatrix} 1 & 0 \\ 0 & 2 \end{bmatrix} \begin{bmatrix} 1 & 2 & 5 & 6 \\ 3 & 4 & 7 & 8 \end{bmatrix} = \begin{bmatrix} 1(1) & 1(2) & 1(5) & 1(6) \\ 2(3) & 2(4) & 2(7) & 2(8) \end{bmatrix} = \begin{bmatrix} 1 & 2 & 5 & 6 \\ 6 & 8 & 14 & 16 \end{bmatrix}
+$$
+
+Kembalikan bentuknya menjadi dua irisan frontal tensor luaran $\boldsymbol{\mathcal{Y}}$ :
+
+$$
+Y_{::1} = \begin{bmatrix} 1 & 2 \\ 6 & 8 \end{bmatrix}, \quad Y_{::2} = \begin{bmatrix} 5 & 6 \\ 14 & 16 \end{bmatrix}
+$$
 
 ---
 
 ### 3.4 Konstruksi Basis Ortonormal Mode-1 HOSVD
-Untuk mencari matriks faktor ortogonal $U^{(1)}$ dalam HOSVD, hitung SVD dari $X_{(1)}$:
-$$X_{(1)} X_{(1)}^T = \begin{bmatrix} 1 & 2 & 5 & 6 \\ 3 & 4 & 7 & 8 \end{bmatrix} \begin{bmatrix} 1 & 3 \\ 2 & 4 \\ 5 & 7 \\ 6 & 8 \end{bmatrix} = \begin{bmatrix} 1 + 4 + 25 + 36 & 3 + 8 + 35 + 48 \\ 3 + 8 + 35 + 48 & 9 + 16 + 49 + 64 \end{bmatrix} = \begin{bmatrix} 66 & 94 \\ 94 & 138 \end{bmatrix}$$
+Untuk mencari matriks faktor ortogonal $U^{(1)}$ dalam HOSVD, hitung SVD dari $X_{(1)}$ :
 
-Polinomial karakteristik $\det(X_{(1)} X_{(1)}^T - \lambda I) = 0$:
-$$\lambda^2 - 204\lambda + (9108 - 8836) = \lambda^2 - 204\lambda + 272 = 0$$
-Perhatikan jumlah nilai eigen: $\text{trace} = 66 + 138 = 204 = \|\boldsymbol{\mathcal{X}}\|_F^2$!
+$$
+X_{(1)} X_{(1)}^T = \begin{bmatrix} 1 & 2 & 5 & 6 \\ 3 & 4 & 7 & 8 \end{bmatrix} \begin{bmatrix} 1 & 3 \\ 2 & 4 \\ 5 & 7 \\ 6 & 8 \end{bmatrix} = \begin{bmatrix} 1 + 4 + 25 + 36 & 3 + 8 + 35 + 48 \\ 3 + 8 + 35 + 48 & 9 + 16 + 49 + 64 \end{bmatrix} = \begin{bmatrix} 66 & 94 \\ 94 & 138 \end{bmatrix}
+$$
+
+Polinomial karakteristik $\det(X_{(1)} X_{(1)}^T - \lambda I) = 0$ :
+
+$$
+\lambda^2 - 204\lambda + (9108 - 8836) = \lambda^2 - 204\lambda + 272 = 0
+$$
+
+Perhatikan jumlah nilai eigen: $\text{trace} = 66 + 138 = 204 = \lVert \boldsymbol{\mathcal{X}} \rVert_F^2$!
 
 Akar-akar kuadratik:
-$$\lambda_1 = \frac{204 + \sqrt{204^2 - 4(272)}}{2} = \frac{204 + \sqrt{40528}}{2} \approx \frac{204 + 201{,}3156}{2} \approx \mathbf{202{,}6578}$$
-$$\lambda_2 = \frac{204 - 201{,}3156}{2} \approx \mathbf{1{,}3422}$$
+
+$$
+\lambda_1 = \frac{204 + \sqrt{204^2 - 4(272)}}{2} = \frac{204 + \sqrt{40528}}{2} \approx \frac{204 + 201{,}3156}{2} \approx \mathbf{202{,}6578}
+$$
+
+$$
+\lambda_2 = \frac{204 - 201{,}3156}{2} \approx \mathbf{1{,}3422}
+$$
 
 Nilai singular mode-1:
-$$\sigma_1^{(1)} = \sqrt{202{,}6578} \approx 14{,}2358, \quad \sigma_2^{(1)} = \sqrt{1{,}3422} \approx 1{,}1585$$
+
+$$
+\sigma_1^{(1)} = \sqrt{202{,}6578} \approx 14{,}2358, \quad \sigma_2^{(1)} = \sqrt{1{,}3422} \approx 1{,}1585
+$$
+
 Vektor singular kiri $\mathbf{u}_1^{(1)}$ dan $\mathbf{u}_2^{(1)}$ membentuk matriks basis ortogonal $U^{(1)}$ untuk dekomposisi Tucker!
 
 ---
@@ -385,7 +543,6 @@ Mengimplementasikan norma Frobenius, matrisasi mode-n, dan perkalian mode-n tens
 """
 import math
 from typing import List
-
 
 def pure_tensor_unfold_3d(X: List[List[List[float]]], mode: int) -> List[List[float]]:
     """
@@ -407,7 +564,6 @@ def pure_tensor_unfold_3d(X: List[List[List[float]]], mode: int) -> List[List[fl
         # Mode-2 (Mode-3 matematika): Baris adalah indeks k
         return [[X[i][j][k] for j in range(J) for i in range(I)] for k in range(K)]
     raise ValueError(f"Mode harus bernilai 0, 1, atau 2; diterima: {mode}")
-
 
 def pure_tensor_mode_product_3d(
     X: List[List[List[float]]], U: List[List[float]], mode: int
@@ -447,7 +603,6 @@ def pure_tensor_mode_product_3d(
         ]
     raise ValueError(f"Mode harus bernilai 0, 1, atau 2; diterima: {mode}")
 
-
 def pure_frobenius_norm_3d(X: List[List[List[float]]]) -> float:
     """Menghitung norma Frobenius tensor 3D: akar dari jumlahan kuadrat seluruh elemen."""
     return math.sqrt(sum(
@@ -456,7 +611,6 @@ def pure_frobenius_norm_3d(X: List[List[List[float]]]) -> float:
         for row in slice_2d
         for val in row
     ))
-
 
 def run_pure_python_tensor_demo() -> None:
     # Kubus angka 1 s/d 8 dari Bagian 3
@@ -495,7 +649,6 @@ def run_pure_python_tensor_demo() -> None:
     assert [[Y1[i][j][1] for j in range(2)] for i in range(2)] == [[5.0, 6.0], [14.0, 16.0]]
 
     print("\n[SUKSES] Seluruh komputasi Pure Python Tensor terverifikasi 100% konsisten!")
-
 
 if __name__ == "__main__":
     run_pure_python_tensor_demo()
@@ -539,7 +692,6 @@ Dilengkapi perbaikan bug permutasi sumbu mode-product dan unit test tensor asime
 """
 from typing import Tuple, List
 import sys
-
 
 def run_numpy_hosvd_suite() -> None:
     try:
@@ -639,7 +791,6 @@ def run_numpy_hosvd_suite() -> None:
     assert np.isclose(err_asym, 0.0, atol=1e-10), "Rekonstruksi tensor asimetris gagal!"
     print("[SUKSES] Bug permutasi sumbu mode-product terbukti sembuh 100%!")
 
-
 if __name__ == "__main__":
     run_numpy_hosvd_suite()
 ```
@@ -710,7 +861,11 @@ Pada tahun 2018, tim rekayasa data sebuah platform e-commerce terkemuka merancan
 
 ### 6.1 Tingkat 1 — Pemanasan Bayi / Hitung Jari (Outer Product Tensor Rank-1)
 Diberikan tensor rank-1 orde-3 $\boldsymbol{\mathcal{T}} = \mathbf{a} \circ \mathbf{b} \circ \mathbf{c}$, di mana:
-$$\mathbf{a} = \begin{bmatrix} 1 \\ 2 \end{bmatrix}, \quad \mathbf{b} = \begin{bmatrix} 3 \\ 4 \end{bmatrix}, \quad \mathbf{c} = \begin{bmatrix} 1 \\ 0 \end{bmatrix}$$
+
+$$
+\mathbf{a} = \begin{bmatrix} 1 \\ 2 \end{bmatrix}, \quad \mathbf{b} = \begin{bmatrix} 3 \\ 4 \end{bmatrix}, \quad \mathbf{c} = \begin{bmatrix} 1 \\ 0 \end{bmatrix}
+$$
+
 1. Tentukan ukuran dimensi (*shape*) dari tensor $\boldsymbol{\mathcal{T}}$.
 2. Tuliskan secara eksplisit kedua irisan frontal $T_{::1}$ dan $T_{::2}$.
 
@@ -724,9 +879,17 @@ $$\mathbf{a} = \begin{bmatrix} 1 \\ 2 \end{bmatrix}, \quad \mathbf{b} = \begin{b
 2. **Irisan Frontal**:
    Setiap entri tensor dirumuskan sebagai $t_{ijk} = a_i b_j c_k$.
    - **Untuk irisan $k = 1$ ($c_1 = 1$)**:
-     $$T_{::1} = c_1 (\mathbf{a} \mathbf{b}^T) = 1 \begin{bmatrix} 1 \\ 2 \end{bmatrix} \begin{bmatrix} 3 & 4 \end{bmatrix} = \begin{bmatrix} 1(3) & 1(4) \\ 2(3) & 2(4) \end{bmatrix} = \begin{bmatrix} 3 & 4 \\ 6 & 8 \end{bmatrix}$$
+
+$$
+T_{::1} = c_1 (\mathbf{a} \mathbf{b}^T) = 1 \begin{bmatrix} 1 \\ 2 \end{bmatrix} \begin{bmatrix} 3 & 4 \end{bmatrix} = \begin{bmatrix} 1(3) & 1(4) \\ 2(3) & 2(4) \end{bmatrix} = \begin{bmatrix} 3 & 4 \\ 6 & 8 \end{bmatrix}
+$$
+
    - **Untuk irisan $k = 2$ ($c_2 = 0$)**:
-     $$T_{::2} = c_2 (\mathbf{a} \mathbf{b}^T) = 0 \begin{bmatrix} 1 \\ 2 \end{bmatrix} \begin{bmatrix} 3 & 4 \end{bmatrix} = \begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix}$$
+
+$$
+T_{::2} = c_2 (\mathbf{a} \mathbf{b}^T) = 0 \begin{bmatrix} 1 \\ 2 \end{bmatrix} \begin{bmatrix} 3 & 4 \end{bmatrix} = \begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix}
+$$
+
 </details>
 
 ---
@@ -735,7 +898,11 @@ $$\mathbf{a} = \begin{bmatrix} 1 \\ 2 \end{bmatrix}, \quad \mathbf{b} = \begin{b
 Diberikan tensor $\boldsymbol{\mathcal{X}} \in \mathbb{R}^{3 \times 4 \times 5}$.
 1. Tentukan ukuran dimensi matriks dari matrisasi mode-1 ($X_{(1)}$), mode-2 ($X_{(2)}$), dan mode-3 ($X_{(3)}$).
 2. Jika kita mengalikan tensor tersebut dengan matriks $U \in \mathbb{R}^{2 \times 3}$ pada mode-1 dan matriks $V \in \mathbb{R}^{2 \times 4}$ pada mode-2:
-   $$\boldsymbol{\mathcal{Y}} = \boldsymbol{\mathcal{X}} \times_1 U \times_2 V$$
+
+$$
+\boldsymbol{\mathcal{Y}} = \boldsymbol{\mathcal{X}} \times_1 U \times_2 V
+$$
+
    Berapakah ukuran dimensi (*shape*) akhir dari tensor $\boldsymbol{\mathcal{Y}}$?
 
 <details>
@@ -757,7 +924,11 @@ Diberikan tensor $\boldsymbol{\mathcal{X}} \in \mathbb{R}^{3 \times 4 \times 5}$
 
 ### 6.3 Tingkat 3 — Menengah / Analitis (Paradoks Rank Tensor 2x2x2 Bernilai 3)
 Tinjau tensor $\boldsymbol{\mathcal{W}} \in \mathbb{R}^{2 \times 2 \times 2}$ yang memiliki irisan frontal:
-$$W_{::1} = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}, \quad W_{::2} = \begin{bmatrix} 0 & 1 \\ -1 & 0 \end{bmatrix}$$
+
+$$
+W_{::1} = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}, \quad W_{::2} = \begin{bmatrix} 0 & 1 \\ -1 & 0 \end{bmatrix}
+$$
+
 Buktikan bahwa $\text{rank}(\boldsymbol{\mathcal{W}}) = 3$ atas medan bilangan riil $\mathbb{R}$, meskipun tidak ada dimensi penyusun yang melebihi 2!
 
 <details>
@@ -765,15 +936,34 @@ Buktikan bahwa $\text{rank}(\boldsymbol{\mathcal{W}}) = 3$ atas medan bilangan r
 
 **Bukti Analitis Lengkap**:
 1. Andaikan $\text{rank}(\boldsymbol{\mathcal{W}}) \le 2$. Maka $\boldsymbol{\mathcal{W}}$ dapat dituliskan sebagai jumlahan dari maksimal 2 tensor rank-1:
-   $$\boldsymbol{\mathcal{W}} = \mathbf{a}_1 \circ \mathbf{b}_1 \circ \mathbf{c}_1 + \mathbf{a}_2 \circ \mathbf{b}_2 \circ \mathbf{c}_2$$
-2. Dalam bentuk irisan frontal, setiap irisan merupakan kombinasi linier dari dua matriks rank-1 $\mathbf{a}_1 \mathbf{b}_1^T$ dan $\mathbf{a}_2 \mathbf{b}_2^T$:
-   $$W_{::1} = c_{11} (\mathbf{a}_1 \mathbf{b}_1^T) + c_{21} (\mathbf{a}_2 \mathbf{b}_2^T)$$
-   $$W_{::2} = c_{12} (\mathbf{a}_1 \mathbf{b}_1^T) + c_{22} (\mathbf{a}_2 \mathbf{b}_2^T)$$
+
+$$
+\boldsymbol{\mathcal{W}} = \mathbf{a}_1 \circ \mathbf{b}_1 \circ \mathbf{c}_1 + \mathbf{a}_2 \circ \mathbf{b}_2 \circ \mathbf{c}_2
+$$
+
+2. Dalam bentuk irisan frontal, setiap irisan merupakan kombinasi linier dari dua matriks rank-1 $\mathbf{a}_1 \mathbf{b}_1^T$ dan $\mathbf{a}_2 \mathbf{b}_2^T$ :
+
+$$
+W_{::1} = c_{11} (\mathbf{a}_1 \mathbf{b}_1^T) + c_{21} (\mathbf{a}_2 \mathbf{b}_2^T)
+$$
+
+$$
+W_{::2} = c_{12} (\mathbf{a}_1 \mathbf{b}_1^T) + c_{22} (\mathbf{a}_2 \mathbf{b}_2^T)
+$$
+
    Artinya, seluruh irisan frontal dari $\boldsymbol{\mathcal{W}}$ berada di dalam subruang matriks berdimensi 2 yang direntang oleh $\{\mathbf{a}_1 \mathbf{b}_1^T, \mathbf{a}_2 \mathbf{b}_2^T\}$.
-3. Tinjau kombinasi linier sembarang dari kedua irisan tersebut untuk sudut $\theta \in \mathbb{R}$:
-   $$M(\theta) = \cos(\theta) W_{::1} + \sin(\theta) W_{::2} = \begin{bmatrix} \cos(\theta) & \sin(\theta) \\ -\sin(\theta) & \cos(\theta) \end{bmatrix}$$
-   Hitung determinan dari matriks $M(\theta)$:
-   $$\det(M(\theta)) = \cos^2(\theta) - (-\sin^2(\theta)) = \cos^2(\theta) + \sin^2(\theta) = 1$$
+3. Tinjau kombinasi linier sembarang dari kedua irisan tersebut untuk sudut $\theta \in \mathbb{R}$ :
+
+$$
+M(\theta) = \cos(\theta) W_{::1} + \sin(\theta) W_{::2} = \begin{bmatrix} \cos(\theta) & \sin(\theta) \\ -\sin(\theta) & \cos(\theta) \end{bmatrix}
+$$
+
+   Hitung determinan dari matriks $M(\theta)$ :
+
+$$
+\det(M(\theta)) = \cos^2(\theta) - (-\sin^2(\theta)) = \cos^2(\theta) + \sin^2(\theta) = 1
+$$
+
    Untuk **setiap sudut $\theta \in \mathbb{R}$**, determinan matriks $M(\theta)$ selalu bernilai 1 (selalu ber-rank 2 penuh)!
 4. Namun, jika subruang tersebut direntang oleh dua matriks ber-rank 1 ($\mathbf{a}_1 \mathbf{b}_1^T$ dan $\mathbf{a}_2 \mathbf{b}_2^T$), maka di dalam subruang 2D tersebut **wajib terdapat matriks ber-rank $\le 1$** (persamaan $\det(\alpha M_1 + \beta M_2) = 0$ adalah polinomial kuadrat homogen yang memiliki akar pada ruang proyektif).
    Karena polinomial kuadrat $\det(M(\theta)) = 1 \ne 0$ tidak memiliki akar riil, maka subruang tersebut tidak mungkin direntang oleh dua matriks rank-1 riil.
@@ -785,13 +975,25 @@ Maka terbukti bahwa $\text{rank}(\boldsymbol{\mathcal{W}}) = 3$. Tensor $2 \time
 
 ### 6.4 Tingkat 4 — Mahir / Rekayasa Industri (Kompresi Model Transformer via Tucker Decomposition)
 Dalam model bahasa besar (*Large Language Models* / LLM) modern seperti LLaMA dan GPT, lapisan linear proyeksi atensi (*Multi-Head Attention Projection*) sering kali menggunakan matriks bobot berukuran raksasa:
-$$W \in \mathbb{R}^{4096 \times 4096}$$
+
+$$
+W \in \mathbb{R}^{4096 \times 4096}
+$$
+
 Matriks ini menyimpan $4096 \times 4096 = 16.777.216$ parameter (sekitar 67 MB bobot float32).
 
-Untuk mengompresi model agar muat di perangkat *edge* (ponsel cerdas/robotika), tim rekayasa memetakan matriks ini menjadi tensor orde-4 dengan memfaktorkan dimensi $4096 = 16 \times 16 \times 16$:
-$$\boldsymbol{\mathcal{W}} \in \mathbb{R}^{16 \times 16 \times 16 \times 16}$$
-Kemudian menerapkan Dekomposisi Tucker dengan rank pemotongan $(R_1, R_2, R_3, R_4) = (8, 8, 8, 8)$:
-$$\boldsymbol{\mathcal{W}} \approx \boldsymbol{\mathcal{G}} \times_1 U^{(1)} \times_2 U^{(2)} \times_3 U^{(3)} \times_4 U^{(4)}$$
+Untuk mengompresi model agar muat di perangkat *edge* (ponsel cerdas/robotika), tim rekayasa memetakan matriks ini menjadi tensor orde-4 dengan memfaktorkan dimensi $4096 = 16 \times 16 \times 16$ :
+
+$$
+\boldsymbol{\mathcal{W}} \in \mathbb{R}^{16 \times 16 \times 16 \times 16}
+$$
+
+Kemudian menerapkan Dekomposisi Tucker dengan rank pemotongan $(R_1, R_2, R_3, R_4) = (8, 8, 8, 8)$ :
+
+$$
+\boldsymbol{\mathcal{W}} \approx \boldsymbol{\mathcal{G}} \times_1 U^{(1)} \times_2 U^{(2)} \times_3 U^{(3)} \times_4 U^{(4)}
+$$
+
 di mana Core Tensor $\boldsymbol{\mathcal{G}} \in \mathbb{R}^{8 \times 8 \times 8 \times 8}$ dan setiap matriks faktor $U^{(m)} \in \mathbb{R}^{16 \times 8}$.
 
 1. Hitung total parameter yang dibutuhkan untuk menyimpan Core Tensor $\boldsymbol{\mathcal{G}}$ dan keempat matriks faktor $U^{(1)}, \dots, U^{(4)}$.
@@ -802,20 +1004,39 @@ di mana Core Tensor $\boldsymbol{\mathcal{G}} \in \mathbb{R}^{8 \times 8 \times 
 <summary>Kunci Jawaban & Pembahasan Lengkap Tingkat 4</summary>
 
 1. **Total Parameter Model Terkompresi**:
-   - Parameter Core Tensor $\boldsymbol{\mathcal{G}}$:
-     $$\text{Size}(\boldsymbol{\mathcal{G}}) = R_1 \times R_2 \times R_3 \times R_4 = 8 \times 8 \times 8 \times 8 = 8^4 = \mathbf{4.096} \text{ parameter}$$
-   - Parameter 4 Matriks Faktor $U^{(1)}, \dots, U^{(4)}$:
+   - Parameter Core Tensor $\boldsymbol{\mathcal{G}}$ :
+
+$$
+\text{Size}(\boldsymbol{\mathcal{G}}) = R_1 \times R_2 \times R_3 \times R_4 = 8 \times 8 \times 8 \times 8 = 8^4 = \mathbf{4.096} \text{ parameter}
+$$
+
+   - Parameter 4 Matriks Faktor $U^{(1)}, \dots, U^{(4)}$ :
      Setiap $U^{(m)}$ berukuran $16 \times 8 = 128$ parameter.
-     $$\text{Total 4 Faktor} = 4 \times 128 = \mathbf{512} \text{ parameter}$$
+
+$$
+\text{Total 4 Faktor} = 4 \times 128 = \mathbf{512} \text{ parameter}
+$$
+
    - **Total Parameter Dekomposisi Tucker**:
-     $$\text{Total Parameter} = 4.096 + 512 = \mathbf{4.608} \text{ parameter}$$
+
+$$
+\text{Total Parameter} = 4.096 + 512 = \mathbf{4.608} \text{ parameter}
+$$
 
 2. **Rasio Kompresi Parameter**:
    - Parameter Asli: $4096 \times 4096 = 16.777.216$ parameter.
    - Rasio Penyusutan:
-     $$\frac{4.608}{16.777.216} \approx 0{,}0002746 \implies \mathbf{0{,}027\%}$$
+
+$$
+\frac{4.608}{16.777.216} \approx 0{,}0002746 \implies \mathbf{0{,}027\%}
+$$
+
    - **Persentase Penghematan Memori**:
-     $$100\% - 0{,}027\% = \mathbf{99{,}973\%} \text{ Terpangkas!}$$
+
+$$
+100\% - 0{,}027\% = \mathbf{99{,}973\%} \text{ Terpangkas!}
+$$
+
    Model terkompresi lebih dari $3.600 \times$ lebih kecil, menyusut dari 67 MB menjadi hanya 18,4 KB RAM!
 
 3. **Perbandingan Kompleksitas FLOPs Inferensi**:
@@ -823,9 +1044,9 @@ di mana Core Tensor $\boldsymbol{\mathcal{G}} \in \mathbb{R}^{8 \times 8 \times 
      Membutuhkan $4096 \times 4096 = 16.777.216$ operasi perkalian-akumulasi (MACs) $\approx 33{,}55 \text{ MFLOPs}$.
    - **Inferensi Multilinier Tucker Bertahap**:
      Reshape vektor masukan $\mathbf{x} \in \mathbb{R}^{4096}$ menjadi tensor 2-mode atau 4-mode:
-     1. Proyeksi dengan $U^{(m)T}$: $4 \times (16 \times 8) = 512$ MACs per blok.
-     2. Kontraksi dengan Core Tensor $\boldsymbol{\mathcal{G}}$: $8^4 = 4.096$ MACs.
-     3. Rekonstruksi luaran dengan $U^{(m)}$: $4 \times (8 \times 16) = 512$ MACs.
+     1. Proyeksi dengan $U^{(m)T}$ : $4 \times (16 \times 8) = 512$ MACs per blok.
+     2. Kontraksi dengan Core Tensor $\boldsymbol{\mathcal{G}}$ : $8^4 = 4.096$ MACs.
+     3. Rekonstruksi luaran dengan $U^{(m)}$ : $4 \times (8 \times 16) = 512$ MACs.
      Total MACs inferensi $\approx 5.120$ MACs $\approx 10{,}24 \text{ KFLOPs}$.
    - **Kesimpulan Rekayasa**:
      Inferensi multilinier Tucker memangkas beban komputasi lebih dari **$3.000 \times$ lebih cepat**, memungkinkan model Transformer berkinerja tinggi dijalankan secara real-time pada chip mikrokontroler berdaya rendah (*Edge AI*). $\blacksquare$

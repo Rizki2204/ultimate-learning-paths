@@ -12,8 +12,11 @@ Garis-garis arah istimewa yang orientasi sudutnya sama sekali tidak berbelok ata
 
 Secara visual dan geometris:
 - Transformasi matriks $A$ pada umumnya memutar sekaligus meregangkan sembarang vektor $\mathbf{x}$. Vektor hasil transformasi $A\mathbf{x}$ biasanya menunjuk ke arah mata angin yang sama sekali berbeda dari vektor awal $\mathbf{x}$.
-- Namun untuk vektor istimewa $\mathbf{v}$, matriks $A$ bekerja layaknya sebuah **angka skalar biasa** $\lambda$. Orientasi arah $\mathbf{v}$ tetap berimpit sempurna pada garis lurus yang sama, hanya panjangnya yang dilipatgandakan dengan faktor $\lambda$:
-  $$A\mathbf{v} = \lambda \mathbf{v}$$
+- Namun untuk vektor istimewa $\mathbf{v}$, matriks $A$ bekerja layaknya sebuah **angka skalar biasa** $\lambda$. Orientasi arah $\mathbf{v}$ tetap berimpit sempurna pada garis lurus yang sama, hanya panjangnya yang dilipatgandakan dengan faktor $\lambda$ :
+
+$$
+A\mathbf{v} = \lambda \mathbf{v}
+$$
 
 Mengapa penemuan arah dan nilai eigen ini menjadi salah satu pilar matematika paling penting dalam sejarah komputasi modern?
 1. **Pangkat Matriks Raksasa ($A^k$) Tanpa Beban**: Jika Anda harus menghitung $A^{1000}$ secara naif pada komputer, Anda memerlukan 999 kali perkalian matriks yang memakan miliaran operasi komputasi dan menumpuk galat pembulatan desimal (*floating-point roundoff*). Namun jika matriks tersebut dapat diurai ke dalam basis vektor eigen, kita cukup menghitung $\lambda^{1000}$ pada bilangan biasa, yang selesai dalam hitungan mikrodetik!
@@ -37,38 +40,60 @@ Diberikan sebuah operator linier yang direpresentasikan oleh matriks persegi $A 
 
 **Definisi 1 (Pasangan Nilai dan Vektor Eigen)**:
 Skalar $\lambda \in \mathbb{C}$ dinamakan *nilai eigen* dari $A$, dan vektor tak-nol $\mathbf{v} \in \mathbb{C}^n \setminus \{\mathbf{0}\}$ dinamakan *vektor eigen* yang bersesuaian dengan $\lambda$, jika memenuhi persamaan dasar:
-$$A\mathbf{v} = \lambda \mathbf{v}$$
+
+$$
+A\mathbf{v} = \lambda \mathbf{v}
+$$
 
 > **🔤 Kamus Simbol Anti-Pusing — Persamaan Nilai Eigen Dasar ($A\mathbf{v} = \lambda \mathbf{v}$):**
 > - **Cara Membaca Lisan**: *"Matriks $A$ dikalikan vektor eigen $v$ sama dengan skalar lambda dikalikan vektor $v$."*
 > - **Arti Simbol**:
->   - $A$: Matriks transformasi linier berukuran bujur sangkar $n \times n$.
->   - $\mathbf{v}$: Vektor kolom arah eigen (panjang $n \times 1$) yang orientasinya tidak berubah di bawah transformasi $A$.
+>   - $A$ : Matriks transformasi linier berukuran bujur sangkar $n \times n$.
+>   - $\mathbf{v}$ : Vektor kolom arah eigen (panjang $n \times 1$) yang orientasinya tidak berubah di bawah transformasi $A$.
 >   - $\lambda$ (huruf Yunani *lambda*): Bilangan skalar (bisa positif, negatif, nol, atau kompleks) yang menjadi faktor pengali panjang vektor $\mathbf{v}$.
 > - **Contoh Mainan Super Kecil ($2 \times 2$)**:
 >   Misalkan $A = \begin{bmatrix} 3 & 0 \\ 0 & 2 \end{bmatrix}$ dan $\mathbf{v} = \begin{bmatrix} 1 \\ 0 \end{bmatrix}$.
->   $$A\mathbf{v} = \begin{bmatrix} 3 & 0 \\ 0 & 2 \end{bmatrix} \begin{bmatrix} 1 \\ 0 \end{bmatrix} = \begin{bmatrix} 3 \\ 0 \end{bmatrix} = 3 \begin{bmatrix} 1 \\ 0 \end{bmatrix}$$
+>
+> $$
+> A\mathbf{v} = \begin{bmatrix} 3 & 0 \\ 0 & 2 \end{bmatrix} \begin{bmatrix} 1 \\ 0 \end{bmatrix} = \begin{bmatrix} 3 \\ 0 \end{bmatrix} = 3 \begin{bmatrix} 1 \\ 0 \end{bmatrix}
+> $$
+>
 >   Di sini, nilai eigen adalah $\lambda = 3$ dan vektor eigennya adalah $\mathbf{v} = [1, 0]^T$. Arah vektor sama sekali tidak berbelok!
 
 Bagaimana kita menyelesaikan persamaan ini jika kedua variabel $\lambda$ dan $\mathbf{v}$ sama-sama belum diketahui? Kita lakukan manipulasi aljabar dengan sangat hati-hati:
-$$A\mathbf{v} - \lambda \mathbf{v} = \mathbf{0}$$
 
-Perhatikan: kita **tidak boleh** langsung memfaktorkan menjadi $(A - \lambda)\mathbf{v}$, karena kita tidak bisa mengurangkan bilangan skalar $\lambda$ secara langsung dari matriks kotak $A$. Oleh karena itu, kita sisipkan matriks identitas $I$ di samping $\lambda$, karena $\lambda \mathbf{v} = \lambda I \mathbf{v}$:
-$$(A - \lambda I)\mathbf{v} = \mathbf{0}$$
+$$
+A\mathbf{v} - \lambda \mathbf{v} = \mathbf{0}
+$$
+
+Perhatikan: kita **tidak boleh** langsung memfaktorkan menjadi $(A - \lambda)\mathbf{v}$, karena kita tidak bisa mengurangkan bilangan skalar $\lambda$ secara langsung dari matriks kotak $A$. Oleh karena itu, kita sisipkan matriks identitas $I$ di samping $\lambda$, karena $\lambda \mathbf{v} = \lambda I \mathbf{v}$ :
+
+$$
+(A - \lambda I)\mathbf{v} = \mathbf{0}
+$$
 
 > **❓ Pertanyaan Pemula: Mengapa Vektor Nol $\mathbf{0}$ Dilarang Keras Menjadi Vektor Eigen?**
 > Jika kita memasukkan vektor nol $\mathbf{v} = \mathbf{0}$ ke persamaan $A\mathbf{v} = \lambda \mathbf{v}$, maka $A\mathbf{0} = \lambda \mathbf{0} = \mathbf{0}$ akan selalu bernilai benar untuk **seluruh bilangan $\lambda$ apa pun di dunia**! Jika vektor nol diizinkan, konsep nilai eigen menjadi tidak bermakna karena setiap angka akan menjadi nilai eigen dari setiap matriks. Oleh sebab itu, definisi formal secara ketat mensyaratkan $\mathbf{v} \ne \mathbf{0}$.
 
 Sekarang tinjau sistem persamaan linier homogen $(A - \lambda I)\mathbf{v} = \mathbf{0}$.
-Karena kita mencari solusi non-trivial ($\mathbf{v} \ne \mathbf{0}$), maka matriks $(A - \lambda I)$ **wajib tidak memiliki invers (singular)**. Mengapa? Sebab jika $(A - \lambda I)$ memiliki invers, kita dapat mengalikan kedua ruas dengan $(A - \lambda I)^{-1}$:
-$$\mathbf{v} = (A - \lambda I)^{-1} \mathbf{0} = \mathbf{0}$$
+Karena kita mencari solusi non-trivial ($\mathbf{v} \ne \mathbf{0}$), maka matriks $(A - \lambda I)$ **wajib tidak memiliki invers (singular)**. Mengapa? Sebab jika $(A - \lambda I)$ memiliki invers, kita dapat mengalikan kedua ruas dengan $(A - \lambda I)^{-1}$ :
+
+$$
+\mathbf{v} = (A - \lambda I)^{-1} \mathbf{0} = \mathbf{0}
+$$
+
 Yang membuat $\mathbf{v}$ runtuh menjadi vektor nol (bertentangan dengan syarat $\mathbf{v} \ne \mathbf{0}$).
 Sebuah matriks persegi bersifat singular jika dan hanya jika determinannya bernilai nol. Dari sinilah lahir **Persamaan Karakteristik**:
 
-$$p(\lambda) = \det(A - \lambda I) = 0$$
+$$
+p(\lambda) = \det(A - \lambda I) = 0
+$$
 
-Fungsi $p(\lambda)$ adalah sebuah polinomial berderajat $n$ terhadap variabel $\lambda$. Berdasarkan Teorema Dasar Aljabar (*Fundamental Theorem of Algebra*), polinomial berderajat $n$ selalu memiliki tepat $n$ akar di medan bilangan kompleks $\mathbb{C}$:
-$$p(\lambda) = (-1)^n (\lambda - \lambda_1)(\lambda - \lambda_2)\cdots(\lambda - \lambda_n) = 0$$
+Fungsi $p(\lambda)$ adalah sebuah polinomial berderajat $n$ terhadap variabel $\lambda$. Berdasarkan Teorema Dasar Aljabar (*Fundamental Theorem of Algebra*), polinomial berderajat $n$ selalu memiliki tepat $n$ akar di medan bilangan kompleks $\mathbb{C}$ :
+
+$$
+p(\lambda) = (-1)^n (\lambda - \lambda_1)(\lambda - \lambda_2)\cdots(\lambda - \lambda_n) = 0
+$$
 
 ---
 
@@ -77,11 +102,20 @@ $$p(\lambda) = (-1)^n (\lambda - \lambda_1)(\lambda - \lambda_2)\cdots(\lambda -
 Banyak pemula merasa bingung ketika menemukan bahwa matriks dengan entri bilangan riil murni dapat menghasilkan nilai eigen berupa bilangan imajiner/kompleks. Mengapa hal ini terjadi di alam fisis?
 
 Mari kita amati matriks rotasi dua dimensi sebesar $90^\circ$ berlawanan arah jarum jam:
-$$R_{90^\circ} = \begin{bmatrix} \cos(90^\circ) & -\sin(90^\circ) \\ \sin(90^\circ) & \cos(90^\circ) \end{bmatrix} = \begin{bmatrix} 0 & -1 \\ 1 & 0 \end{bmatrix}$$
+
+$$
+R_{90^\circ} = \begin{bmatrix} \cos(90^\circ) & -\sin(90^\circ) \\ \sin(90^\circ) & \cos(90^\circ) \end{bmatrix} = \begin{bmatrix} 0 & -1 \\ 1 & 0 \end{bmatrix}
+$$
 
 Mari kita cari nilai eigen matriks rotasi ini:
-$$\det(R_{90^\circ} - \lambda I) = \det \begin{bmatrix} -\lambda & -1 \\ 1 & -\lambda \end{bmatrix} = (-\lambda)(-\lambda) - (-1)(1) = \lambda^2 + 1 = 0$$
-$$\lambda^2 = -1 \implies \lambda_1 = +i, \quad \lambda_2 = -i$$
+
+$$
+\det(R_{90^\circ} - \lambda I) = \det \begin{bmatrix} -\lambda & -1 \\ 1 & -\lambda \end{bmatrix} = (-\lambda)(-\lambda) - (-1)(1) = \lambda^2 + 1 = 0
+$$
+
+$$
+\lambda^2 = -1 \implies \lambda_1 = +i, \quad \lambda_2 = -i
+$$
 
 > **🌉 Jembatan Logika — Makna Fisis Nilai Eigen Kompleks:**
 > 1. **Secara Geometris di Bidang Riil $\mathbb{R}^2$**: Jika Anda memutar bidang datar sebesar $90^\circ$, **setiap garis lurus di bidang tersebut pasti berbelok** tegak lurus dari arah semula! Tidak ada satu pun garis lurus riil yang orientasi arahnya tetap tidak berubah. Karena tidak ada arah riil yang orientasinya tetap, maka **tidak mungkin ada nilai eigen riil**.
@@ -99,27 +133,62 @@ Dua besaran skalar intrinsik matriks yang selalu kebal (invarian) terhadap perub
 
 **Teorema 1 (Koneksi Erat Jejak & Determinan dengan Nilai Eigen)**:
 1. Jumlah seluruh nilai eigen sama dengan jejak matriks (jumlahan elemen diagonal utama):
-   $$\sum_{i=1}^n \lambda_i = \text{tr}(A) = \sum_{i=1}^n a_{ii}$$
+
+$$
+\sum_{i=1}^n \lambda_i = \text{tr}(A) = \sum_{i=1}^n a_{ii}
+$$
+
 2. Hasil kali seluruh nilai eigen sama dengan determinan matriks:
-   $$\prod_{i=1}^n \lambda_i = \det(A)$$
+
+$$
+\prod_{i=1}^n \lambda_i = \det(A)
+$$
 
 **Pembuktian Langkah-demi-Langkah**:
 Tinjau ekspansi determinan dari polinomial karakteristik $p(\lambda) = \det(A - \lambda I)$.
 Berdasarkan rumus permutasi determinan:
-$$\det(A - \lambda I) = (a_{11} - \lambda)(a_{22} - \lambda)\cdots(a_{nn} - \lambda) + \text{suku berderajat } \le (n-2)$$
+
+$$
+\det(A - \lambda I) = (a_{11} - \lambda)(a_{22} - \lambda)\cdots(a_{nn} - \lambda) + \text{suku berderajat } \le (n-2)
+$$
 
 > **🌉 Jembatan Logika:**
 > Kita mengalikan suku-suku linear diagonal utama:
-> $$(a_{11} - \lambda)(a_{22} - \lambda)\cdots(a_{nn} - \lambda) = (-\lambda)^n + (-\lambda)^{n-1} \sum_{i=1}^n a_{ii} + \dots$$
-> $$= (-1)^n \lambda^n + (-1)^{n-1} \left(\sum_{i=1}^n a_{ii}\right) \lambda^{n-1} + \dots + \det(A)$$
+>
+> $$
+> (a_{11} - \lambda)(a_{22} - \lambda)\cdots(a_{nn} - \lambda) = (-\lambda)^n + (-\lambda)^{n-1} \sum_{i=1}^n a_{ii} + \dots
+> $$
+>
+> $$
+> = (-1)^n \lambda^n + (-1)^{n-1} \left(\sum_{i=1}^n a_{ii}\right) \lambda^{n-1} + \dots + \det(A)
+> $$
+>
 > Di sisi lain, jika polinomial tersebut difaktorkan berdasarkan akar-akar nilai eigennya:
-> $$p(\lambda) = (-1)^n (\lambda - \lambda_1)(\lambda - \lambda_2)\cdots(\lambda - \lambda_n)$$
-> $$= (-1)^n \left[ \lambda^n - \left(\sum_{i=1}^n \lambda_i\right) \lambda^{n-1} + \dots + (-1)^n \prod_{i=1}^n \lambda_i \right]$$
-> $$= (-1)^n \lambda^n + (-1)^{n-1} \left(\sum_{i=1}^n \lambda_i\right) \lambda^{n-1} + \dots + \prod_{i=1}^n \lambda_i$$
+>
+> $$
+> p(\lambda) = (-1)^n (\lambda - \lambda_1)(\lambda - \lambda_2)\cdots(\lambda - \lambda_n)
+> $$
+>
+> $$
+> = (-1)^n \left[ \lambda^n - \left(\sum_{i=1}^n \lambda_i\right) \lambda^{n-1} + \dots + (-1)^n \prod_{i=1}^n \lambda_i \right]
+> $$
+>
+> $$
+> = (-1)^n \lambda^n + (-1)^{n-1} \left(\sum_{i=1}^n \lambda_i\right) \lambda^{n-1} + \dots + \prod_{i=1}^n \lambda_i
+> $$
+>
 > Dengan menyamakan koefisien pangkat $\lambda^{n-1}$, kita peroleh:
-> $$\sum_{i=1}^n \lambda_i = \sum_{i=1}^n a_{ii} = \text{tr}(A)$$
+>
+> $$
+> \sum_{i=1}^n \lambda_i = \sum_{i=1}^n a_{ii} = \text{tr}(A)
+> $$
+>
 > Dan dengan mengevaluasi pada $\lambda = 0$, suku konstan memberikan:
-> $$\prod_{i=1}^n \lambda_i = \det(A)$$
+>
+> $$
+> \prod_{i=1}^n \lambda_i = \det(A)
+> $$
+>
 > $\blacksquare$
 
 > **💡 Tips, Trik, Rahasia Cepat Paham & Jembatan Keledai — Trik Cek Nilai Eigen 3 Detik:**
@@ -137,19 +206,29 @@ $$\det(A - \lambda I) = (a_{11} - \lambda)(a_{22} - \lambda)\cdots(a_{nn} - \lam
 
 ### 2.4 Multiplicitas Aljabar vs Multiplicitas Geometris & Matriks Cacat
 
-Untuk setiap nilai eigen $\lambda_j$:
+Untuk setiap nilai eigen $\lambda_j$ :
 1. **Multiplicitas Aljabar ($AM$)**: Berapa kali akar $(\lambda - \lambda_j)$ muncul dalam pemfaktoran polinomial karakteristik $p(\lambda) = 0$.
 2. **Multiplicitas Geometris ($GM$)**: Jumlah vektor eigen independen yang bersesuaian dengan $\lambda_j$, yaitu dimensi dari ruang eigen (*nullspace* dari $A - \lambda_j I$):
-   $$GM(\lambda_j) = \dim(N(A - \lambda_j I)) = n - \text{rank}(A - \lambda_j I)$$
+
+$$
+GM(\lambda_j) = \dim(N(A - \lambda_j I)) = n - \text{rank}(A - \lambda_j I)
+$$
 
 **Teorema 2 (Batas Multiplicitas Geometris)**:
 Untuk setiap nilai eigen, berlaku relasi ketat:
-$$1 \le GM(\lambda_j) \le AM(\lambda_j)$$
+
+$$
+1 \le GM(\lambda_j) \le AM(\lambda_j)
+$$
 
 Jika ada nilai eigen yang memiliki $GM < AM$, matriks tersebut dinamakan **Matriks Cacat (*Defective Matrix*)**. Matriks cacat kekurangan vektor eigen untuk merentang seluruh ruang $\mathbb{R}^n$, sehingga **mustahil untuk didiagonalisasi**.
 
 *Contoh Klasik Matriks Cacat (Matriks Geser / Shear Matrix)*:
-$$A = \begin{bmatrix} 1 & 1 \\ 0 & 1 \end{bmatrix}$$
+
+$$
+A = \begin{bmatrix} 1 & 1 \\ 0 & 1 \end{bmatrix}
+$$
+
 - Polinomial karakteristik: $\det(A - \lambda I) = (1 - \lambda)^2 = 0 \implies \lambda = 1$ dengan $AM = 2$.
 - Ruang eigen: $A - 1 \cdot I = \begin{bmatrix} 0 & 1 \\ 0 & 0 \end{bmatrix}$.
   Persamaan $\begin{bmatrix} 0 & 1 \\ 0 & 0 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}$ menghasilkan $x_2 = 0$, sementara $x_1$ bebas.
@@ -167,23 +246,50 @@ Jika $\mathbf{v}_1, \mathbf{v}_2, \dots, \mathbf{v}_k$ adalah vektor-vektor eige
 - **Basis Induksi ($k=1$)**: Karena vektor eigen disyaratkan $\mathbf{v}_1 \ne \mathbf{0}$, persamaan $c_1 \mathbf{v}_1 = \mathbf{0}$ memaksa $c_1 = 0$. Terbukti bebas linier.
 - **Langkah Induksi**: Asumsikan teorema benar untuk $k-1$ vektor (himpunan $\{\mathbf{v}_1, \dots, \mathbf{v}_{k-1}\}$ bebas linier). Kita buktikan kebenarannya untuk $k$ vektor.
 Tinjau kombinasi linier yang menghasilkan vektor nol:
-$$c_1 \mathbf{v}_1 + c_2 \mathbf{v}_2 + \dots + c_k \mathbf{v}_k = \mathbf{0} \quad \text{--- (Persamaan 1)}$$
+
+$$
+c_1 \mathbf{v}_1 + c_2 \mathbf{v}_2 + \dots + c_k \mathbf{v}_k = \mathbf{0} \quad \text{--- (Persamaan 1)}
+$$
 
 > **🌉 Jembatan Logika:**
 > Kita kalikan Persamaan 1 dengan matriks $A$ dari sebelah kiri:
-> $$A(c_1 \mathbf{v}_1 + \dots + c_k \mathbf{v}_k) = A\mathbf{0} = \mathbf{0}$$
+>
+> $$
+> A(c_1 \mathbf{v}_1 + \dots + c_k \mathbf{v}_k) = A\mathbf{0} = \mathbf{0}
+> $$
+>
 > Karena $A\mathbf{v}_i = \lambda_i \mathbf{v}_i$, persamaan berubah menjadi:
-> $$c_1 \lambda_1 \mathbf{v}_1 + c_2 \lambda_2 \mathbf{v}_2 + \dots + c_k \lambda_k \mathbf{v}_k = \mathbf{0} \quad \text{--- (Persamaan 2)}$$
-> Sekarang, kalikan Persamaan 1 asli dengan skalar $\lambda_k$:
-> $$c_1 \lambda_k \mathbf{v}_1 + c_2 \lambda_k \mathbf{v}_2 + \dots + c_k \lambda_k \mathbf{v}_k = \mathbf{0} \quad \text{--- (Persamaan 3)}$$
+>
+> $$
+> c_1 \lambda_1 \mathbf{v}_1 + c_2 \lambda_2 \mathbf{v}_2 + \dots + c_k \lambda_k \mathbf{v}_k = \mathbf{0} \quad \text{--- (Persamaan 2)}
+> $$
+>
+> Sekarang, kalikan Persamaan 1 asli dengan skalar $\lambda_k$ :
+>
+> $$
+> c_1 \lambda_k \mathbf{v}_1 + c_2 \lambda_k \mathbf{v}_2 + \dots + c_k \lambda_k \mathbf{v}_k = \mathbf{0} \quad \text{--- (Persamaan 3)}
+> $$
+>
 > Kurangkan Persamaan 2 dengan Persamaan 3:
-> $$c_1 (\lambda_1 - \lambda_k) \mathbf{v}_1 + c_2 (\lambda_2 - \lambda_k) \mathbf{v}_2 + \dots + c_{k-1} (\lambda_{k-1} - \lambda_k) \mathbf{v}_{k-1} + \mathbf{0} = \mathbf{0}$$
+>
+> $$
+> c_1 (\lambda_1 - \lambda_k) \mathbf{v}_1 + c_2 (\lambda_2 - \lambda_k) \mathbf{v}_2 + \dots + c_{k-1} (\lambda_{k-1} - \lambda_k) \mathbf{v}_{k-1} + \mathbf{0} = \mathbf{0}
+> $$
+>
 > Berdasarkan hipotesis induksi, himpunan $k-1$ vektor $\{\mathbf{v}_1, \dots, \mathbf{v}_{k-1}\}$ adalah bebas linier, sehingga seluruh koefisiennya harus bernilai nol:
-> $$c_i (\lambda_i - \lambda_k) = 0, \quad \forall i \in \{1, \dots, k-1\}$$
+>
+> $$
+> c_i (\lambda_i - \lambda_k) = 0, \quad \forall i \in \{1, \dots, k-1\}
+> $$
+>
 > Karena seluruh nilai eigen saling berbeda, $(\lambda_i - \lambda_k) \ne 0$ untuk setiap $i < k$.
 > Akibatnya, wajib berlaku $c_1 = c_2 = \dots = c_{k-1} = 0$.
 > Substitusikan kembali ke Persamaan 1:
-> $$0 \cdot \mathbf{v}_1 + \dots + 0 \cdot \mathbf{v}_{k-1} + c_k \mathbf{v}_k = \mathbf{0} \implies c_k \mathbf{v}_k = \mathbf{0}$$
+>
+> $$
+> 0 \cdot \mathbf{v}_1 + \dots + 0 \cdot \mathbf{v}_{k-1} + c_k \mathbf{v}_k = \mathbf{0} \implies c_k \mathbf{v}_k = \mathbf{0}
+> $$
+>
 > Karena $\mathbf{v}_k \ne \mathbf{0}$, maka $c_k = 0$.
 > Terbukti seluruh koefisien $c_1 = c_2 = \dots = c_k = 0$. Seluruh vektor eigen bebas linier! $\blacksquare$
 
@@ -191,13 +297,28 @@ $$c_1 \mathbf{v}_1 + c_2 \mathbf{v}_2 + \dots + c_k \mathbf{v}_k = \mathbf{0} \q
 Matriks $A \in \mathbb{R}^{n \times n}$ dapat didiagonalisasi jika dan hanya jika $A$ memiliki $n$ vektor eigen yang bebas linier.
 
 Bentuk matriks modal $X$ yang kolom-kolomnya berisi vektor eigen:
-$$X = \begin{bmatrix} \mathbf{v}_1 & \mathbf{v}_2 & \cdots & \mathbf{v}_n \end{bmatrix}$$
-Kalikan $A$ dengan $X$:
-$$AX = A \begin{bmatrix} \mathbf{v}_1 & \cdots & \mathbf{v}_n \end{bmatrix} = \begin{bmatrix} A\mathbf{v}_1 & \cdots & A\mathbf{v}_n \end{bmatrix} = \begin{bmatrix} \lambda_1 \mathbf{v}_1 & \cdots & \lambda_n \mathbf{v}_n \end{bmatrix}$$
-Perkalian ini persis sama dengan mengalikan $X$ dari sebelah kanan dengan matriks diagonal $\Lambda$:
-$$X\Lambda = \begin{bmatrix} \mathbf{v}_1 & \cdots & \mathbf{v}_n \end{bmatrix} \begin{bmatrix} \lambda_1 & & \\ & \ddots & \\ & & \lambda_n \end{bmatrix} = \begin{bmatrix} \lambda_1 \mathbf{v}_1 & \cdots & \lambda_n \mathbf{v}_n \end{bmatrix}$$
+
+$$
+X = \begin{bmatrix} \mathbf{v}_1 & \mathbf{v}_2 & \cdots & \mathbf{v}_n \end{bmatrix}
+$$
+
+Kalikan $A$ dengan $X$ :
+
+$$
+AX = A \begin{bmatrix} \mathbf{v}_1 & \cdots & \mathbf{v}_n \end{bmatrix} = \begin{bmatrix} A\mathbf{v}_1 & \cdots & A\mathbf{v}_n \end{bmatrix} = \begin{bmatrix} \lambda_1 \mathbf{v}_1 & \cdots & \lambda_n \mathbf{v}_n \end{bmatrix}
+$$
+
+Perkalian ini persis sama dengan mengalikan $X$ dari sebelah kanan dengan matriks diagonal $\Lambda$ :
+
+$$
+X\Lambda = \begin{bmatrix} \mathbf{v}_1 & \cdots & \mathbf{v}_n \end{bmatrix} \begin{bmatrix} \lambda_1 & & \\ & \ddots & \\ & & \lambda_n \end{bmatrix} = \begin{bmatrix} \lambda_1 \mathbf{v}_1 & \cdots & \lambda_n \mathbf{v}_n \end{bmatrix}
+$$
+
 Dengan demikian:
-$$AX = X\Lambda \iff A = X \Lambda X^{-1} \iff \Lambda = X^{-1} A X$$
+
+$$
+AX = X\Lambda \iff A = X \Lambda X^{-1} \iff \Lambda = X^{-1} A X
+$$
 
 ---
 
@@ -205,37 +326,74 @@ $$AX = X\Lambda \iff A = X \Lambda X^{-1} \iff \Lambda = X^{-1} A X$$
 
 Salah satu penerapan aljabar linier paling memukau adalah menurunkan rumus suku ke-$k$ bilangan Fibonacci tanpa rekursi manual.
 Definisi barisan Fibonacci:
-$$F_0 = 0, \quad F_1 = 1, \quad F_{k+2} = F_{k+1} + F_k$$
 
-Mari kita susun barisan ini menjadi sistem dinamik linier berukuran $2 \times 2$:
-$$\mathbf{u}_{k+1} = \begin{bmatrix} F_{k+1} \\ F_k \end{bmatrix} = \begin{bmatrix} 1 & 1 \\ 1 & 0 \end{bmatrix} \begin{bmatrix} F_k \\ F_{k-1} \end{bmatrix} = A \mathbf{u}_k$$
+$$
+F_0 = 0, \quad F_1 = 1, \quad F_{k+2} = F_{k+1} + F_k
+$$
+
+Mari kita susun barisan ini menjadi sistem dinamik linier berukuran $2 \times 2$ :
+
+$$
+\mathbf{u}_{k+1} = \begin{bmatrix} F_{k+1} \\ F_k \end{bmatrix} = \begin{bmatrix} 1 & 1 \\ 1 & 0 \end{bmatrix} \begin{bmatrix} F_k \\ F_{k-1} \end{bmatrix} = A \mathbf{u}_k
+$$
+
 Di mana matriks pendamping transisi adalah $A = \begin{bmatrix} 1 & 1 \\ 1 & 0 \end{bmatrix}$.
-Kondisi awal untuk $k=1$: $\mathbf{u}_1 = \begin{bmatrix} F_1 \\ F_0 \end{bmatrix} = \begin{bmatrix} 1 \\ 0 \end{bmatrix}$.
-Maka status pada langkah ke-$k$:
-$$\mathbf{u}_k = \begin{bmatrix} F_k \\ F_{k-1} \end{bmatrix} = A^k \mathbf{u}_0 = A^{k-1} \mathbf{u}_1$$
+Kondisi awal untuk $k=1$ : $\mathbf{u}_1 = \begin{bmatrix} F_1 \\ F_0 \end{bmatrix} = \begin{bmatrix} 1 \\ 0 \end{bmatrix}$.
+Maka status pada langkah ke-$k$ :
 
-Mari kita diagonalisasi matriks $A = \begin{bmatrix} 1 & 1 \\ 1 & 0 \end{bmatrix}$:
+$$
+\mathbf{u}_k = \begin{bmatrix} F_k \\ F_{k-1} \end{bmatrix} = A^k \mathbf{u}_0 = A^{k-1} \mathbf{u}_1
+$$
+
+Mari kita diagonalisasi matriks $A = \begin{bmatrix} 1 & 1 \\ 1 & 0 \end{bmatrix}$ :
 1. **Polinomial Karakteristik**:
-   $$\det(A - \lambda I) = \det \begin{bmatrix} 1 - \lambda & 1 \\ 1 & -\lambda \end{bmatrix} = -\lambda(1 - \lambda) - 1 = \lambda^2 - \lambda - 1 = 0$$
+
+$$
+\det(A - \lambda I) = \det \begin{bmatrix} 1 - \lambda & 1 \\ 1 & -\lambda \end{bmatrix} = -\lambda(1 - \lambda) - 1 = \lambda^2 - \lambda - 1 = 0
+$$
+
    Akar-akar persamaan kuadrat ini adalah Rasio Emas (*Golden Ratio* $\phi$):
-   $$\lambda_1 = \frac{1 + \sqrt{5}}{2} \approx 1{,}618034 = \phi, \quad \lambda_2 = \frac{1 - \sqrt{5}}{2} \approx -0{,}618034 = -\frac{1}{\phi}$$
+
+$$
+\lambda_1 = \frac{1 + \sqrt{5}}{2} \approx 1{,}618034 = \phi, \quad \lambda_2 = \frac{1 - \sqrt{5}}{2} \approx -0{,}618034 = -\frac{1}{\phi}
+$$
 
 2. **Vektor Eigen**:
-   Untuk $\lambda$: $(A - \lambda I)\mathbf{v} = \begin{bmatrix} 1 - \lambda & 1 \\ 1 & -\lambda \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \mathbf{0} \implies x_1 - \lambda x_2 = 0 \implies x_1 = \lambda x_2$.
+   Untuk $\lambda$ : $(A - \lambda I)\mathbf{v} = \begin{bmatrix} 1 - \lambda & 1 \\ 1 & -\lambda \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \mathbf{0} \implies x_1 - \lambda x_2 = 0 \implies x_1 = \lambda x_2$.
    Pilih $x_2 = 1 \implies \mathbf{v}_1 = \begin{bmatrix} \lambda_1 \\ 1 \end{bmatrix}, \quad \mathbf{v}_2 = \begin{bmatrix} \lambda_2 \\ 1 \end{bmatrix}$.
 
 3. **Matriks Modal $X$ & Inversnya**:
-   $$X = \begin{bmatrix} \lambda_1 & \lambda_2 \\ 1 & 1 \end{bmatrix} \implies \det(X) = \lambda_1 - \lambda_2 = \frac{1+\sqrt{5}}{2} - \frac{1-\sqrt{5}}{2} = \sqrt{5}$$
-   $$X^{-1} = \frac{1}{\sqrt{5}} \begin{bmatrix} 1 & -\lambda_2 \\ -1 & \lambda_1 \end{bmatrix}$$
+
+$$
+X = \begin{bmatrix} \lambda_1 & \lambda_2 \\ 1 & 1 \end{bmatrix} \implies \det(X) = \lambda_1 - \lambda_2 = \frac{1+\sqrt{5}}{2} - \frac{1-\sqrt{5}}{2} = \sqrt{5}
+$$
+
+$$
+X^{-1} = \frac{1}{\sqrt{5}} \begin{bmatrix} 1 & -\lambda_2 \\ -1 & \lambda_1 \end{bmatrix}
+$$
 
 4. **Ekspansi Kondisi Awal $\mathbf{u}_1 = [1, 0]^T$**:
-   $$\mathbf{c} = X^{-1} \mathbf{u}_1 = \frac{1}{\sqrt{5}} \begin{bmatrix} 1 & -\lambda_2 \\ -1 & \lambda_1 \end{bmatrix} \begin{bmatrix} 1 \\ 0 \end{bmatrix} = \frac{1}{\sqrt{5}} \begin{bmatrix} 1 \\ -1 \end{bmatrix}$$
+
+$$
+\mathbf{c} = X^{-1} \mathbf{u}_1 = \frac{1}{\sqrt{5}} \begin{bmatrix} 1 & -\lambda_2 \\ -1 & \lambda_1 \end{bmatrix} \begin{bmatrix} 1 \\ 0 \end{bmatrix} = \frac{1}{\sqrt{5}} \begin{bmatrix} 1 \\ -1 \end{bmatrix}
+$$
+
    Maka:
-   $$\mathbf{u}_k = A^{k-1} \mathbf{u}_1 = X \Lambda^{k-1} \mathbf{c} = \begin{bmatrix} \lambda_1 & \lambda_2 \\ 1 & 1 \end{bmatrix} \begin{bmatrix} \lambda_1^{k-1} & 0 \\ 0 & \lambda_2^{k-1} \end{bmatrix} \left( \frac{1}{\sqrt{5}} \begin{bmatrix} 1 \\ -1 \end{bmatrix} \right)$$
-   $$= \frac{1}{\sqrt{5}} \begin{bmatrix} \lambda_1 & \lambda_2 \\ 1 & 1 \end{bmatrix} \begin{bmatrix} \lambda_1^{k-1} \\ -\lambda_2^{k-1} \end{bmatrix} = \frac{1}{\sqrt{5}} \begin{bmatrix} \lambda_1^k - \lambda_2^k \\ \lambda_1^{k-1} - \lambda_2^{k-1} \end{bmatrix}$$
+
+$$
+\mathbf{u}_k = A^{k-1} \mathbf{u}_1 = X \Lambda^{k-1} \mathbf{c} = \begin{bmatrix} \lambda_1 & \lambda_2 \\ 1 & 1 \end{bmatrix} \begin{bmatrix} \lambda_1^{k-1} & 0 \\ 0 & \lambda_2^{k-1} \end{bmatrix} \left( \frac{1}{\sqrt{5}} \begin{bmatrix} 1 \\ -1 \end{bmatrix} \right)
+$$
+
+$$
+= \frac{1}{\sqrt{5}} \begin{bmatrix} \lambda_1 & \lambda_2 \\ 1 & 1 \end{bmatrix} \begin{bmatrix} \lambda_1^{k-1} \\ -\lambda_2^{k-1} \end{bmatrix} = \frac{1}{\sqrt{5}} \begin{bmatrix} \lambda_1^k - \lambda_2^k \\ \lambda_1^{k-1} - \lambda_2^{k-1} \end{bmatrix}
+$$
 
 Komponen pertama adalah $F_k$. Kita peroleh **Rumus Tertutup Binet (1843)** secara eksak:
-$$F_k = \frac{1}{\sqrt{5}} \left[ \left(\frac{1 + \sqrt{5}}{2}\right)^k - \left(\frac{1 - \sqrt{5}}{2}\right)^k \right]$$
+
+$$
+F_k = \frac{1}{\sqrt{5}} \left[ \left(\frac{1 + \sqrt{5}}{2}\right)^k - \left(\frac{1 - \sqrt{5}}{2}\right)^k \right]
+$$
+
 Sebuah deret bilangan bulat murni lahir secara harmonis dari nilai eigen irasional matriks!
 
 ---
@@ -243,28 +401,55 @@ Sebuah deret bilangan bulat murni lahir secara harmonis dari nilai eigen irasion
 ### 2.7 Eksponensial Matriks $e^{At}$ & Sistem Persamaan Diferensial
 
 Tinjau sistem persamaan diferensial linier homogen kontinu orde satu terkopel:
-$$\frac{d\mathbf{u}(t)}{dt} = A\mathbf{u}(t), \quad \text{dengan kondisi awal } \mathbf{u}(0) = \mathbf{u}_0$$
+
+$$
+\frac{d\mathbf{u}(t)}{dt} = A\mathbf{u}(t), \quad \text{dengan kondisi awal } \mathbf{u}(0) = \mathbf{u}_0
+$$
 
 Secara analogi dengan persamaan skalar $\frac{du}{dt} = au \implies u(t) = e^{at} u_0$, solusi sistem multivariat diberikan oleh **Eksponensial Matriks**:
-$$\mathbf{u}(t) = e^{At} \mathbf{u}_0$$
+
+$$
+\mathbf{u}(t) = e^{At} \mathbf{u}_0
+$$
 
 **Definisi Deret Taylor Eksponensial Matriks**:
-$$e^{At} = \sum_{k=0}^\infty \frac{(At)^k}{k!} = I + At + \frac{A^2 t^2}{2!} + \frac{A^3 t^3}{3!} + \dots$$
+
+$$
+e^{At} = \sum_{k=0}^\infty \frac{(At)^k}{k!} = I + At + \frac{A^2 t^2}{2!} + \frac{A^3 t^3}{3!} + \dots
+$$
 
 Jika matriks $A$ dapat didiagonalisasi ($A = X \Lambda X^{-1}$):
-$$(At)^k = (X \Lambda X^{-1} t)^k = X (\Lambda t)^k X^{-1}$$
+
+$$
+(At)^k = (X \Lambda X^{-1} t)^k = X (\Lambda t)^k X^{-1}
+$$
+
 Maka deret dapat ditarik masuk ke dalam matriks diagonal:
-$$e^{At} = X \left( \sum_{k=0}^\infty \frac{(\Lambda t)^k}{k!} \right) X^{-1} = X e^{\Lambda t} X^{-1}$$
+
+$$
+e^{At} = X \left( \sum_{k=0}^\infty \frac{(\Lambda t)^k}{k!} \right) X^{-1} = X e^{\Lambda t} X^{-1}
+$$
+
 Di mana matriks eksponensial diagonal sangat sepele untuk dihitung:
-$$e^{\Lambda t} = \begin{bmatrix} e^{\lambda_1 t} & 0 & \cdots & 0 \\ 0 & e^{\lambda_2 t} & \cdots & 0 \\ \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & \cdots & e^{\lambda_n t} \end{bmatrix}$$
+
+$$
+e^{\Lambda t} = \begin{bmatrix} e^{\lambda_1 t} & 0 & \cdots & 0 \\ 0 & e^{\lambda_2 t} & \cdots & 0 \\ \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & \cdots & e^{\lambda_n t} \end{bmatrix}
+$$
 
 *Contoh Angka Nyata $2 \times 2$*:
 Misalkan $A = \begin{bmatrix} 0 & 1 \\ -2 & -3 \end{bmatrix}$.
 Nilai eigen: $\lambda_1 = -1, \lambda_2 = -2$.
 Vektor eigen: $\mathbf{v}_1 = [1, -1]^T, \mathbf{v}_2 = [1, -2]^T$.
-$$X = \begin{bmatrix} 1 & 1 \\ -1 & -2 \end{bmatrix} \implies X^{-1} = \begin{bmatrix} 2 & 1 \\ -1 & -1 \end{bmatrix}$$
+
+$$
+X = \begin{bmatrix} 1 & 1 \\ -1 & -2 \end{bmatrix} \implies X^{-1} = \begin{bmatrix} 2 & 1 \\ -1 & -1 \end{bmatrix}
+$$
+
 Maka eksponensial matriks adalah:
-$$e^{At} = \begin{bmatrix} 1 & 1 \\ -1 & -2 \end{bmatrix} \begin{bmatrix} e^{-t} & 0 \\ 0 & e^{-2t} \end{bmatrix} \begin{bmatrix} 2 & 1 \\ -1 & -1 \end{bmatrix} = \begin{bmatrix} 2e^{-t} - e^{-2t} & e^{-t} - e^{-2t} \\ -2e^{-t} + 2e^{-2t} & -e^{-t} + 2e^{-2t} \end{bmatrix}$$
+
+$$
+e^{At} = \begin{bmatrix} 1 & 1 \\ -1 & -2 \end{bmatrix} \begin{bmatrix} e^{-t} & 0 \\ 0 & e^{-2t} \end{bmatrix} \begin{bmatrix} 2 & 1 \\ -1 & -1 \end{bmatrix} = \begin{bmatrix} 2e^{-t} - e^{-2t} & e^{-t} - e^{-2t} \\ -2e^{-t} + 2e^{-2t} & -e^{-t} + 2e^{-2t} \end{bmatrix}
+$$
 
 **Kriteria Kestabilan Lyapunov Kontinu**:
 Karena kedua nilai eigen bertanda riil negatif ($\lambda_1 = -1 < 0, \lambda_2 = -2 < 0$), maka ketika $t \to \infty$, $e^{-t} \to 0$ dan $e^{-2t} \to 0$, sehingga $\lim_{t \to \infty} \mathbf{u}(t) = \mathbf{0}$. Sistem stabil asimtotik!
@@ -276,7 +461,10 @@ Karena kedua nilai eigen bertanda riil negatif ($\lambda_1 = -1 < 0, \lambda_2 =
 Sebuah matriks persegi $M \in \mathbb{R}^{n \times n}$ dinamakan **Matriks Markov Kolom (Stokastik Kolom)** jika:
 1. Seluruh entri non-negatif: $m_{ij} \ge 0$.
 2. Jumlah setiap elemen di setiap kolom bernilai tepat 1:
-   $$\sum_{i=1}^n m_{ij} = 1, \quad \forall j \in \{1, \dots, n\}$$
+
+$$
+\sum_{i=1}^n m_{ij} = 1, \quad \forall j \in \{1, \dots, n\}
+$$
 
 **Teorema 5 (Spektrum Matriks Markov)**:
 1. $\lambda_1 = 1$ selalu merupakan nilai eigen dari setiap matriks Markov.
@@ -284,11 +472,19 @@ Sebuah matriks persegi $M \in \mathbb{R}^{n \times n}$ dinamakan **Matriks Marko
 
 **Bukti**:
 Tinjau transpos matriks $M^T$. Jumlah elemen pada setiap baris $M^T$ bernilai tepat 1.
-Jika kita kalikan $M^T$ dengan vektor satu $\mathbf{e} = [1, 1, \dots, 1]^T$:
-$$(M^T \mathbf{e})_i = \sum_{j=1}^n m_{ji} = 1 \implies M^T \mathbf{e} = 1 \cdot \mathbf{e}$$
+Jika kita kalikan $M^T$ dengan vektor satu $\mathbf{e} = [1, 1, \dots, 1]^T$ :
+
+$$
+(M^T \mathbf{e})_i = \sum_{j=1}^n m_{ji} = 1 \implies M^T \mathbf{e} = 1 \cdot \mathbf{e}
+$$
+
 Artinya, $\mathbf{e}$ adalah vektor eigen dari $M^T$ dengan nilai eigen $\lambda = 1$.
 Karena determinan karakteristik matriks dan transposnya identik:
-$$\det(M^T - \lambda I) = \det((M - \lambda I)^T) = \det(M - \lambda I)$$
+
+$$
+\det(M^T - \lambda I) = \det((M - \lambda I)^T) = \det(M - \lambda I)
+$$
+
 Maka matriks asli $M$ juga pasti memiliki nilai eigen $\lambda = 1$. $\blacksquare$
 
 ---
@@ -298,25 +494,51 @@ Maka matriks asli $M$ juga pasti memiliki nilai eigen $\lambda = 1$. $\blacksqua
 Mari kita lakukan perhitungan lengkap langkah-demi-langkah tanpa melewatkan satu baris pun untuk sistem dinamik migrasi penduduk antara Kota $A$ dan Kota $B$.
 
 Misalkan matriks transisi perpindahan penduduk tahunan adalah:
-$$A = \begin{bmatrix} 0{,}8 & 0{,}3 \\ 0{,}2 & 0{,}7 \end{bmatrix}$$
+
+$$
+A = \begin{bmatrix} 0{,}8 & 0{,}3 \\ 0{,}2 & 0{,}7 \end{bmatrix}
+$$
+
 *Interpretasi Fisis*: Setiap tahun, 80% penduduk Kota $A$ tetap di Kota $A$ dan 20% pindah ke Kota $B$. Dari Kota $B$, 30% pindah ke Kota $A$ dan 70% tetap di Kota $B$.
 Kolom 1: $0{,}8 + 0{,}2 = 1{,}0$. Kolom 2: $0{,}3 + 0{,}7 = 1{,}0$ (Matriks Markov sah).
 
 ---
 
 ### Langkah 1: Membentuk Polinomial Karakteristik
-$$\det(A - \lambda I) = \det \begin{bmatrix} 0{,}8 - \lambda & 0{,}3 \\ 0{,}2 & 0{,}7 - \lambda \end{bmatrix} = 0$$
 
-Hitung determinan matriks $2 \times 2$:
-$$(0{,}8 - \lambda)(0{,}7 - \lambda) - (0{,}3)(0{,}2) = 0$$
-$$\lambda^2 - 0{,}7\lambda - 0{,}8\lambda + (0{,}8 \times 0{,}7) - 0{,}06 = 0$$
-$$\lambda^2 - 1{,}5\lambda + 0{,}56 - 0{,}06 = 0$$
-$$\lambda^2 - 1{,}5\lambda + 0{,}50 = 0$$
+$$
+\det(A - \lambda I) = \det \begin{bmatrix} 0{,}8 - \lambda & 0{,}3 \\ 0{,}2 & 0{,}7 - \lambda \end{bmatrix} = 0
+$$
+
+Hitung determinan matriks $2 \times 2$ :
+
+$$
+(0{,}8 - \lambda)(0{,}7 - \lambda) - (0{,}3)(0{,}2) = 0
+$$
+
+$$
+\lambda^2 - 0{,}7\lambda - 0{,}8\lambda + (0{,}8 \times 0{,}7) - 0{,}06 = 0
+$$
+
+$$
+\lambda^2 - 1{,}5\lambda + 0{,}56 - 0{,}06 = 0
+$$
+
+$$
+\lambda^2 - 1{,}5\lambda + 0{,}50 = 0
+$$
 
 Faktorkan persamaan kuadrat:
-$$(\lambda - 1{,}0)(\lambda - 0{,}5) = 0$$
+
+$$
+(\lambda - 1{,}0)(\lambda - 0{,}5) = 0
+$$
+
 Akar-akar karakteristiknya adalah:
-$$\lambda_1 = 1{,}0, \quad \lambda_2 = 0{,}5$$
+
+$$
+\lambda_1 = 1{,}0, \quad \lambda_2 = 0{,}5
+$$
 
 *Cek Invarian 3 Detik*:
 - $\text{tr}(A) = 0{,}8 + 0{,}7 = 1{,}5 = \lambda_1 + \lambda_2$ (Cocok!).
@@ -326,54 +548,120 @@ $$\lambda_1 = 1{,}0, \quad \lambda_2 = 0{,}5$$
 
 ### Langkah 2: Menentukan Vektor Eigen
 
-#### Untuk $\lambda_1 = 1{,}0$:
-Selesaikan sistem homogen $(A - 1{,}0 \cdot I)\mathbf{v}_1 = \mathbf{0}$:
-$$\begin{bmatrix} 0{,}8 - 1{,}0 & 0{,}3 \\ 0{,}2 & 0{,}7 - 1{,}0 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} -0{,}2 & 0{,}3 \\ 0{,}2 & -0{,}3 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}$$
-Persamaan baris 1:
-$$-0{,}2 x_1 + 0{,}3 x_2 = 0 \iff 0{,}3 x_2 = 0{,}2 x_1 \iff 2x_1 = 3x_2 \iff x_1 = \frac{3}{2} x_2$$
-Pilih parameter bebas $x_2 = 2 \implies x_1 = 3$.
-$$\mathbf{v}_1 = \begin{bmatrix} 3 \\ 2 \end{bmatrix}$$
-Jika dinormalisasi ke total populasi 1 (vektor probabilitas status tunak):
-$$\mathbf{v}_{1,\text{prob}} = \begin{bmatrix} 3/5 \\ 2/5 \end{bmatrix} = \begin{bmatrix} 0{,}6 \\ 0{,}4 \end{bmatrix}$$
+#### Untuk $\lambda_1 = 1{,}0$ :
+Selesaikan sistem homogen $(A - 1{,}0 \cdot I)\mathbf{v}_1 = \mathbf{0}$ :
 
-#### Untuk $\lambda_2 = 0{,}5$:
-Selesaikan sistem homogen $(A - 0{,}5 \cdot I)\mathbf{v}_2 = \mathbf{0}$:
-$$\begin{bmatrix} 0{,}8 - 0{,}5 & 0{,}3 \\ 0{,}2 & 0{,}7 - 0{,}5 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} 0{,}3 & 0{,}3 \\ 0{,}2 & 0{,}2 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}$$
+$$
+\begin{bmatrix} 0{,}8 - 1{,}0 & 0{,}3 \\ 0{,}2 & 0{,}7 - 1{,}0 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} -0{,}2 & 0{,}3 \\ 0{,}2 & -0{,}3 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}
+$$
+
 Persamaan baris 1:
-$$0{,}3 x_1 + 0{,}3 x_2 = 0 \iff x_1 + x_2 = 0 \iff x_1 = -x_2$$
+
+$$
+-0{,}2 x_1 + 0{,}3 x_2 = 0 \iff 0{,}3 x_2 = 0{,}2 x_1 \iff 2x_1 = 3x_2 \iff x_1 = \frac{3}{2} x_2
+$$
+
+Pilih parameter bebas $x_2 = 2 \implies x_1 = 3$.
+
+$$
+\mathbf{v}_1 = \begin{bmatrix} 3 \\ 2 \end{bmatrix}
+$$
+
+Jika dinormalisasi ke total populasi 1 (vektor probabilitas status tunak):
+
+$$
+\mathbf{v}_{1,\text{prob}} = \begin{bmatrix} 3/5 \\ 2/5 \end{bmatrix} = \begin{bmatrix} 0{,}6 \\ 0{,}4 \end{bmatrix}
+$$
+
+#### Untuk $\lambda_2 = 0{,}5$ :
+Selesaikan sistem homogen $(A - 0{,}5 \cdot I)\mathbf{v}_2 = \mathbf{0}$ :
+
+$$
+\begin{bmatrix} 0{,}8 - 0{,}5 & 0{,}3 \\ 0{,}2 & 0{,}7 - 0{,}5 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} 0{,}3 & 0{,}3 \\ 0{,}2 & 0{,}2 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}
+$$
+
+Persamaan baris 1:
+
+$$
+0{,}3 x_1 + 0{,}3 x_2 = 0 \iff x_1 + x_2 = 0 \iff x_1 = -x_2
+$$
+
 Pilih parameter bebas $x_2 = -1 \implies x_1 = 1$.
-$$\mathbf{v}_2 = \begin{bmatrix} 1 \\ -1 \end{bmatrix}$$
+
+$$
+\mathbf{v}_2 = \begin{bmatrix} 1 \\ -1 \end{bmatrix}
+$$
 
 ---
 
 ### Langkah 3: Membangun Matriks Modal $X$ & Inversnya $X^{-1}$
 Susun vektor-vektor eigen sebagai kolom:
-$$X = \begin{bmatrix} \mathbf{v}_1 & \mathbf{v}_2 \end{bmatrix} = \begin{bmatrix} 3 & 1 \\ 2 & -1 \end{bmatrix}$$
-Hitung determinan $X$:
-$$\det(X) = (3)(-1) - (1)(2) = -3 - 2 = -5 \ne 0$$
-Invers matriks $2 \times 2$:
-$$X^{-1} = \frac{1}{-5} \begin{bmatrix} -1 & -1 \\ -2 & 3 \end{bmatrix} = \begin{bmatrix} 0{,}2 & 0{,}2 \\ 0{,}4 & -0{,}6 \end{bmatrix}$$
+
+$$
+X = \begin{bmatrix} \mathbf{v}_1 & \mathbf{v}_2 \end{bmatrix} = \begin{bmatrix} 3 & 1 \\ 2 & -1 \end{bmatrix}
+$$
+
+Hitung determinan $X$ :
+
+$$
+\det(X) = (3)(-1) - (1)(2) = -3 - 2 = -5 \ne 0
+$$
+
+Invers matriks $2 \times 2$ :
+
+$$
+X^{-1} = \frac{1}{-5} \begin{bmatrix} -1 & -1 \\ -2 & 3 \end{bmatrix} = \begin{bmatrix} 0{,}2 & 0{,}2 \\ 0{,}4 & -0{,}6 \end{bmatrix}
+$$
 
 ---
 
 ### Langkah 4: Verifikasi Rekonstruksi $A = X \Lambda X^{-1}$
-$$X\Lambda = \begin{bmatrix} 3 & 1 \\ 2 & -1 \end{bmatrix} \begin{bmatrix} 1{,}0 & 0 \\ 0 & 0{,}5 \end{bmatrix} = \begin{bmatrix} 3{,}0 & 0{,}5 \\ 2{,}0 & -0{,}5 \end{bmatrix}$$
-Kalikan dengan $X^{-1}$:
-$$X\Lambda X^{-1} = \begin{bmatrix} 3{,}0 & 0{,}5 \\ 2{,}0 & -0{,}5 \end{bmatrix} \begin{bmatrix} 0{,}2 & 0{,}2 \\ 0{,}4 & -0{,}6 \end{bmatrix}$$
-$$= \begin{bmatrix} (3{,}0)(0{,}2) + (0{,}5)(0{,}4) & (3{,}0)(0{,}2) + (0{,}5)(-0{,}6) \\ (2{,}0)(0{,}2) + (-0{,}5)(0{,}4) & (2{,}0)(0{,}2) + (-0{,}5)(-0{,}6) \end{bmatrix}$$
-$$= \begin{bmatrix} 0{,}6 + 0{,}2 & 0{,}6 - 0{,}3 \\ 0{,}4 - 0{,}2 & 0{,}4 + 0{,}3 \end{bmatrix} = \begin{bmatrix} 0{,}8 & 0{,}3 \\ 0{,}2 & 0{,}7 \end{bmatrix} = A$$
+
+$$
+X\Lambda = \begin{bmatrix} 3 & 1 \\ 2 & -1 \end{bmatrix} \begin{bmatrix} 1{,}0 & 0 \\ 0 & 0{,}5 \end{bmatrix} = \begin{bmatrix} 3{,}0 & 0{,}5 \\ 2{,}0 & -0{,}5 \end{bmatrix}
+$$
+
+Kalikan dengan $X^{-1}$ :
+
+$$
+X\Lambda X^{-1} = \begin{bmatrix} 3{,}0 & 0{,}5 \\ 2{,}0 & -0{,}5 \end{bmatrix} \begin{bmatrix} 0{,}2 & 0{,}2 \\ 0{,}4 & -0{,}6 \end{bmatrix}
+$$
+
+$$
+= \begin{bmatrix} (3{,}0)(0{,}2) + (0{,}5)(0{,}4) & (3{,}0)(0{,}2) + (0{,}5)(-0{,}6) \\ (2{,}0)(0{,}2) + (-0{,}5)(0{,}4) & (2{,}0)(0{,}2) + (-0{,}5)(-0{,}6) \end{bmatrix}
+$$
+
+$$
+= \begin{bmatrix} 0{,}6 + 0{,}2 & 0{,}6 - 0{,}3 \\ 0{,}4 - 0{,}2 & 0{,}4 + 0{,}3 \end{bmatrix} = \begin{bmatrix} 0{,}8 & 0{,}3 \\ 0{,}2 & 0{,}7 \end{bmatrix} = A
+$$
+
 Terbukti presisi sempurna 100%!
 
 ---
 
 ### Langkah 5: Pangkat $A^k$ dan Status Jangka Panjang Tunak ($k \to \infty$)
-Formula analitis untuk $A^k$:
-$$A^k = X \Lambda^k X^{-1} = \begin{bmatrix} 3 & 1 \\ 2 & -1 \end{bmatrix} \begin{bmatrix} 1^k & 0 \\ 0 & (0{,}5)^k \end{bmatrix} \begin{bmatrix} 0{,}2 & 0{,}2 \\ 0{,}4 & -0{,}6 \end{bmatrix}$$
-$$= \begin{bmatrix} 0{,}6 + 0{,}4(0{,}5)^k & 0{,}6 - 0{,}6(0{,}5)^k \\ 0{,}4 - 0{,}4(0{,}5)^k & 0{,}4 + 0{,}6(0{,}5)^k \end{bmatrix}$$
-Ketika $k \to \infty$, karena $(0{,}5)^k \to 0$:
-$$\lim_{k \to \infty} A^k = \begin{bmatrix} 0{,}6 & 0{,}6 \\ 0{,}4 & 0{,}4 \end{bmatrix}$$
+Formula analitis untuk $A^k$ :
+
+$$
+A^k = X \Lambda^k X^{-1} = \begin{bmatrix} 3 & 1 \\ 2 & -1 \end{bmatrix} \begin{bmatrix} 1^k & 0 \\ 0 & (0{,}5)^k \end{bmatrix} \begin{bmatrix} 0{,}2 & 0{,}2 \\ 0{,}4 & -0{,}6 \end{bmatrix}
+$$
+
+$$
+= \begin{bmatrix} 0{,}6 + 0{,}4(0{,}5)^k & 0{,}6 - 0{,}6(0{,}5)^k \\ 0{,}4 - 0{,}4(0{,}5)^k & 0{,}4 + 0{,}6(0{,}5)^k \end{bmatrix}
+$$
+
+Ketika $k \to \infty$, karena $(0{,}5)^k \to 0$ :
+
+$$
+\lim_{k \to \infty} A^k = \begin{bmatrix} 0{,}6 & 0{,}6 \\ 0{,}4 & 0{,}4 \end{bmatrix}
+$$
+
 Jika kondisi awal populasi adalah 100 juta jiwa seluruhnya tinggal di Kota $A$ ($\mathbf{u}_0 = [100, 0]^T$):
-$$\mathbf{u}_\infty = \lim_{k \to \infty} A^k \mathbf{u}_0 = \begin{bmatrix} 0{,}6(100) \\ 0{,}4(100) \end{bmatrix} = \begin{bmatrix} 60 \\ 40 \end{bmatrix}$$
+
+$$
+\mathbf{u}_\infty = \lim_{k \to \infty} A^k \mathbf{u}_0 = \begin{bmatrix} 0{,}6(100) \\ 0{,}4(100) \end{bmatrix} = \begin{bmatrix} 60 \\ 40 \end{bmatrix}
+$$
+
 Sebanyak 60 juta penduduk menetap di Kota $A$ dan 40 juta penduduk menetap di Kota $B$.
 
 ---
@@ -390,7 +678,6 @@ Tahap 5A: SpectralEngine - Mesin Analisis Spektral Pure Python.
 Mengimplementasikan Power Iteration, Pemecah Analitis 2x2, dan Rumus Binet Fibonacci.
 """
 import math
-
 
 class SpectralEngine:
     """Mesin komputasi spektral mandiri tanpa pustaka eksternal."""
@@ -452,7 +739,6 @@ class SpectralEngine:
         psi = (1.0 - sqrt5) / 2.0
         return round((phi ** k - psi ** k) / sqrt5)
 
-
 if __name__ == "__main__":
     A_markov = [[0.8, 0.3], [0.2, 0.7]]
 
@@ -497,7 +783,6 @@ Tahap 5B: Implementasi Standar Industri NumPy (Eigendecomposition & Rantai Marko
 """
 import numpy as np
 
-
 def run_numpy_spectral_demo():
     # Matriks transisi Markov migrasi kota
     A = np.array([[0.8, 0.3],
@@ -524,7 +809,6 @@ def run_numpy_spectral_demo():
     A_pow_50 = np.linalg.matrix_power(A, 50)
     u_50 = A_pow_50 @ u0
     print(f"Populasi Setelah 50 Tahun: Kota A = {u_50[0]:.2f} jt, Kota B = {u_50[1]:.2f} jt")
-
 
 if __name__ == "__main__":
     run_numpy_spectral_demo()
@@ -574,7 +858,11 @@ Populasi Setelah 50 Tahun: Kota A = 60.00 jt, Kota B = 40.00 jt
 #### Kasus 1: Runtuhnya Jembatan Tacoma Narrows (1940) — Nilai Eigen Riil Positif pada Dinamika Fluida-Struktur
 - **Latar Belakang**: Pada 7 November 1940, jembatan gantung Tacoma Narrows di Washington runtuh di bawah terpaan angin sepoi-sepoi 68 km/jam, peristiwa paling ikonik dalam sejarah kegagalan teknik sipil.
 - **Akar Masalah Aljabar Linier**: Gerak getaran dek jembatan dimodelkan oleh sistem persamaan diferensial linier orde dua terkopel:
-  $$M \ddot{\mathbf{u}} + C \dot{\mathbf{u}} + K \mathbf{u} = \mathbf{F}_{\text{angin}}(t)$$
+
+$$
+M \ddot{\mathbf{u}} + C \dot{\mathbf{u}} + K \mathbf{u} = \mathbf{F}_{\text{angin}}(t)
+$$
+
   Dengan mereduksi ke sistem orde satu $\dot{\mathbf{z}} = A_{\text{aero}} \mathbf{z}$, perilaku osilasi ditentukan oleh nilai-nilai eigen $\lambda_j = \alpha_j \pm i \omega_j$.
   Akibat bentuk penampang gelagar jembatan yang menyerupai huruf H tertutup, pusaran angin (*Von Kármán vortex shedding*) menghasilkan gaya dorong balik yang membatalkan redaman alami jembatan. Fenomena *flutter* ini menggeser bagian riil nilai eigen mode puntir menjadi positif: $\alpha_{\text{torsi}} > 0$.
 - **Dampak Bencana**: Solusi getaran $u(t) \propto e^{\alpha_{\text{torsi}} t} \sin(\omega t)$ meledak secara eksponensial tak terbatas hingga kabel baja penggantung putus dan seluruh dek jembatan ambruk ke dalam selat.
@@ -584,7 +872,11 @@ Populasi Setelah 50 Tahun: Kota A = 60.00 jt, Kota B = 40.00 jt
 - **Latar Belakang**: Ketika Larry Page dan Sergey Brin mengembangkan PageRank di Stanford, mereka memodelkan peselancar web sebagai rantai Markov dengan matriks transisi tautan $H$.
 - **Akar Masalah Aljabar Linier**: Pada graf web dunia nyata, terdapat kelompok halaman web yang hanya saling menautkan satu sama lain tanpa pernah memberikan tautan ke luar (*spider traps*). Hal ini membuat matriks $H$ tidak teratur (tidak primitif). Nilai eigen dominan $\lambda_1 = 1$ memiliki multiplicitas ganda atau terdapat nilai eigen pada lingkaran satuan $|\lambda| = 1$ yang memicu osilasi tak berujung saat iterasi pangkat $A^k \mathbf{u}_0$. Seluruh skor ranking web tersedot habis ke dalam kelompok halaman jebakan tersebut.
 - **Solusi Rekayasa Google Matrix**: Brin dan Page memodifikasi matriks dengan menambahkan faktor redaman (*damping factor* $d \approx 0{,}85$):
-  $$G = d H + \frac{1 - d}{n} \mathbf{e}\mathbf{e}^T$$
+
+$$
+G = d H + \frac{1 - d}{n} \mathbf{e}\mathbf{e}^T
+$$
+
   Karena seluruh entri $G_{ij} > 0$ secara ketat, Teorema Perron-Frobenius menjamin bahwa nilai eigen dominan $\lambda_1 = 1$ bersifat tunggal murni, dan nilai eigen kedua dibatasi oleh $|\lambda_2| \le d = 0{,}85$. Algoritma iterasi pangkat dijamin konvergen stabil dalam ~50 iterasi untuk miliaran halaman web!
 
 ---
@@ -592,8 +884,12 @@ Populasi Setelah 50 Tahun: Kota A = 60.00 jt, Kota B = 40.00 jt
 ## 6. Proyek Latihan & Rubrik Penilaian Mandiri
 
 ### Tingkat 1: Pemanasan Bayi / Hitung Jari
-Diberikan matriks $2 \times 2$:
-$$A = \begin{bmatrix} 5 & 3 \\ 3 & 5 \end{bmatrix}$$
+Diberikan matriks $2 \times 2$ :
+
+$$
+A = \begin{bmatrix} 5 & 3 \\ 3 & 5 \end{bmatrix}
+$$
+
 1. Hitung nilai eigen $\lambda_1$ dan $\lambda_2$ dalam waktu kurang dari 30 detik menggunakan metode jejak dan determinan.
 2. Tentukan vektor eigen ortonormal yang bersesuaian dengan masing-masing nilai eigen.
 
@@ -604,15 +900,29 @@ $$A = \begin{bmatrix} 5 & 3 \\ 3 & 5 \end{bmatrix}$$
    - $\text{tr}(A) = 5 + 5 = 10$.
    - $\det(A) = (5)(5) - (3)(3) = 25 - 9 = 16$.
    Dua angka yang dijumlahkan menghasilkan 10 dan dikalikan menghasilkan 16:
-   $$\lambda^2 - 10\lambda + 16 = 0 \implies (\lambda - 8)(\lambda - 2) = 0$$
-   $$\lambda_1 = 8, \quad \lambda_2 = 2$$
+
+$$
+\lambda^2 - 10\lambda + 16 = 0 \implies (\lambda - 8)(\lambda - 2) = 0
+$$
+
+$$
+\lambda_1 = 8, \quad \lambda_2 = 2
+$$
 
 2. **Vektor Eigen**:
-   - Untuk $\lambda_1 = 8$:
-     $$(A - 8I)\mathbf{v}_1 = \begin{bmatrix} -3 & 3 \\ 3 & -3 \end{bmatrix}\begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \mathbf{0} \implies -3x_1 + 3x_2 = 0 \implies x_1 = x_2$$
+   - Untuk $\lambda_1 = 8$ :
+
+$$
+(A - 8I)\mathbf{v}_1 = \begin{bmatrix} -3 & 3 \\ 3 & -3 \end{bmatrix}\begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \mathbf{0} \implies -3x_1 + 3x_2 = 0 \implies x_1 = x_2
+$$
+
      Vektor satuan: $\mathbf{v}_1 = \frac{1}{\sqrt{2}} \begin{bmatrix} 1 \\ 1 \end{bmatrix}$.
-   - Untuk $\lambda_2 = 2$:
-     $$(A - 2I)\mathbf{v}_2 = \begin{bmatrix} 3 & 3 \\ 3 & 3 \end{bmatrix}\begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \mathbf{0} \implies 3x_1 + 3x_2 = 0 \implies x_1 = -x_2$$
+   - Untuk $\lambda_2 = 2$ :
+
+$$
+(A - 2I)\mathbf{v}_2 = \begin{bmatrix} 3 & 3 \\ 3 & 3 \end{bmatrix}\begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \mathbf{0} \implies 3x_1 + 3x_2 = 0 \implies x_1 = -x_2
+$$
+
      Vektor satuan: $\mathbf{v}_2 = \frac{1}{\sqrt{2}} \begin{bmatrix} 1 \\ -1 \end{bmatrix}$.
    Perhatikan bahwa $\mathbf{v}_1 \cdot \mathbf{v}_2 = \frac{1}{2}(1 - 1) = 0$ (saling tegak lurus sempurna).
 </details>
@@ -621,7 +931,11 @@ $$A = \begin{bmatrix} 5 & 3 \\ 3 & 5 \end{bmatrix}$$
 
 ### Tingkat 2: Pemula / Tulis Tangan
 Diberikan dua matriks berikut:
-$$M = \begin{bmatrix} 3 & 2 \\ 0 & 4 \end{bmatrix}, \quad N = \begin{bmatrix} 4 & 1 \\ 0 & 4 \end{bmatrix}$$
+
+$$
+M = \begin{bmatrix} 3 & 2 \\ 0 & 4 \end{bmatrix}, \quad N = \begin{bmatrix} 4 & 1 \\ 0 & 4 \end{bmatrix}
+$$
+
 1. Apakah matriks $M$ dapat didiagonalisasi? Jika ya, cari formula eksak untuk $M^{10}$.
 2. Buktikan secara matematis bahwa matriks $N$ adalah matriks cacat (*defective*) dan tidak dapat didiagonalisasi.
 
@@ -631,11 +945,17 @@ $$M = \begin{bmatrix} 3 & 2 \\ 0 & 4 \end{bmatrix}, \quad N = \begin{bmatrix} 4 
 1. **Matriks $M$**:
    Karena $M$ adalah matriks segitiga atas, nilai-nilai eigen berada langsung pada diagonal utama: $\lambda_1 = 3, \lambda_2 = 4$.
    Karena memiliki 2 nilai eigen berbeda untuk ukuran $2 \times 2$, matriks dijamin memiliki 2 vektor eigen bebas linier, sehingga **dapat didiagonalisasi**.
-   - Untuk $\lambda_1 = 3$: $\begin{bmatrix} 0 & 2 \\ 0 & 1 \end{bmatrix}\mathbf{v}_1 = \mathbf{0} \implies x_2 = 0 \implies \mathbf{v}_1 = \begin{bmatrix} 1 \\ 0 \end{bmatrix}$.
-   - Untuk $\lambda_2 = 4$: $\begin{bmatrix} -1 & 2 \\ 0 & 0 \end{bmatrix}\mathbf{v}_2 = \mathbf{0} \implies -x_1 + 2x_2 = 0 \implies \mathbf{v}_2 = \begin{bmatrix} 2 \\ 1 \end{bmatrix}$.
+   - Untuk $\lambda_1 = 3$ : $\begin{bmatrix} 0 & 2 \\ 0 & 1 \end{bmatrix}\mathbf{v}_1 = \mathbf{0} \implies x_2 = 0 \implies \mathbf{v}_1 = \begin{bmatrix} 1 \\ 0 \end{bmatrix}$.
+   - Untuk $\lambda_2 = 4$ : $\begin{bmatrix} -1 & 2 \\ 0 & 0 \end{bmatrix}\mathbf{v}_2 = \mathbf{0} \implies -x_1 + 2x_2 = 0 \implies \mathbf{v}_2 = \begin{bmatrix} 2 \\ 1 \end{bmatrix}$.
    Matriks modal $X = \begin{bmatrix} 1 & 2 \\ 0 & 1 \end{bmatrix}$ dengan $X^{-1} = \begin{bmatrix} 1 & -2 \\ 0 & 1 \end{bmatrix}$.
-   $$M^{10} = X \begin{bmatrix} 3^{10} & 0 \\ 0 & 4^{10} \end{bmatrix} X^{-1} = \begin{bmatrix} 1 & 2 \\ 0 & 1 \end{bmatrix} \begin{bmatrix} 59049 & 0 \\ 0 & 1048576 \end{bmatrix} \begin{bmatrix} 1 & -2 \\ 0 & 1 \end{bmatrix}$$
-   $$= \begin{bmatrix} 59049 & 2(1048576) \\ 0 & 1048576 \end{bmatrix} \begin{bmatrix} 1 & -2 \\ 0 & 1 \end{bmatrix} = \begin{bmatrix} 59049 & 2097152 - 118098 \\ 0 & 1048576 \end{bmatrix} = \begin{bmatrix} 59049 & 1979054 \\ 0 & 1048576 \end{bmatrix}$$
+
+$$
+M^{10} = X \begin{bmatrix} 3^{10} & 0 \\ 0 & 4^{10} \end{bmatrix} X^{-1} = \begin{bmatrix} 1 & 2 \\ 0 & 1 \end{bmatrix} \begin{bmatrix} 59049 & 0 \\ 0 & 1048576 \end{bmatrix} \begin{bmatrix} 1 & -2 \\ 0 & 1 \end{bmatrix}
+$$
+
+$$
+= \begin{bmatrix} 59049 & 2(1048576) \\ 0 & 1048576 \end{bmatrix} \begin{bmatrix} 1 & -2 \\ 0 & 1 \end{bmatrix} = \begin{bmatrix} 59049 & 2097152 - 118098 \\ 0 & 1048576 \end{bmatrix} = \begin{bmatrix} 59049 & 1979054 \\ 0 & 1048576 \end{bmatrix}
+$$
 
 2. **Matriks $N$**:
    Polinomial karakteristik: $\det(N - \lambda I) = (4 - \lambda)^2 = 0 \implies \lambda = 4$ dengan kelipatan aljabar $AM = 2$.
@@ -650,7 +970,11 @@ $$M = \begin{bmatrix} 3 & 2 \\ 0 & 4 \end{bmatrix}, \quad N = \begin{bmatrix} 4 
 
 ### Tingkat 3: Menengah / Pemodelan & Koding
 Tinjau sistem persamaan diferensial linier kontinu berikut yang memodelkan dua tangki larutan kimia terhubung:
-$$\frac{dx_1}{dt} = -2x_1 + x_2, \quad \frac{dx_2}{dt} = x_1 - 2x_2$$
+
+$$
+\frac{dx_1}{dt} = -2x_1 + x_2, \quad \frac{dx_2}{dt} = x_1 - 2x_2
+$$
+
 Dengan kondisi konsentrasi awal $\mathbf{x}(0) = \begin{bmatrix} 6 \\ 2 \end{bmatrix}$.
 1. Tuliskan sistem dalam bentuk matriks $\dot{\mathbf{x}} = A\mathbf{x}$.
 2. Hitung nilai eigen dan vektor eigen dari matriks $A$.
@@ -661,25 +985,43 @@ Dengan kondisi konsentrasi awal $\mathbf{x}(0) = \begin{bmatrix} 6 \\ 2 \end{bma
 <summary>🔑 Kunci Jawaban Lengkap & Langkah Pengerjaan</summary>
 
 1. **Bentuk Matriks**:
-   $$\frac{d}{dt}\begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} -2 & 1 \\ 1 & -2 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} \implies A = \begin{bmatrix} -2 & 1 \\ 1 & -2 \end{bmatrix}$$
+
+$$
+\frac{d}{dt}\begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} -2 & 1 \\ 1 & -2 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} \implies A = \begin{bmatrix} -2 & 1 \\ 1 & -2 \end{bmatrix}
+$$
 
 2. **Nilai & Vektor Eigen**:
    - $\text{tr}(A) = -4$, $\det(A) = (-2)(-2) - 1 = 3$.
    - $\lambda^2 + 4\lambda + 3 = 0 \implies (\lambda + 1)(\lambda + 3) = 0 \implies \lambda_1 = -1, \lambda_2 = -3$.
-   - Untuk $\lambda_1 = -1$: $(A + I)\mathbf{v}_1 = \begin{bmatrix} -1 & 1 \\ 1 & -1 \end{bmatrix}\mathbf{v}_1 = \mathbf{0} \implies \mathbf{v}_1 = \begin{bmatrix} 1 \\ 1 \end{bmatrix}$.
-   - Untuk $\lambda_2 = -3$: $(A + 3I)\mathbf{v}_2 = \begin{bmatrix} 1 & 1 \\ 1 & 1 \end{bmatrix}\mathbf{v}_2 = \mathbf{0} \implies \mathbf{v}_2 = \begin{bmatrix} 1 \\ -1 \end{bmatrix}$.
+   - Untuk $\lambda_1 = -1$ : $(A + I)\mathbf{v}_1 = \begin{bmatrix} -1 & 1 \\ 1 & -1 \end{bmatrix}\mathbf{v}_1 = \mathbf{0} \implies \mathbf{v}_1 = \begin{bmatrix} 1 \\ 1 \end{bmatrix}$.
+   - Untuk $\lambda_2 = -3$ : $(A + 3I)\mathbf{v}_2 = \begin{bmatrix} 1 & 1 \\ 1 & 1 \end{bmatrix}\mathbf{v}_2 = \mathbf{0} \implies \mathbf{v}_2 = \begin{bmatrix} 1 \\ -1 \end{bmatrix}$.
 
 3. **Solusi Analitis Eksak**:
-   Uraikan kondisi awal $\mathbf{x}(0) = c_1 \mathbf{v}_1 + c_2 \mathbf{v}_2$:
-   $$\begin{bmatrix} 6 \\ 2 \end{bmatrix} = c_1 \begin{bmatrix} 1 \\ 1 \end{bmatrix} + c_2 \begin{bmatrix} 1 \\ -1 \end{bmatrix} \implies \begin{cases} c_1 + c_2 = 6 \\ c_1 - c_2 = 2 \end{cases} \implies c_1 = 4, \quad c_2 = 2$$
+   Uraikan kondisi awal $\mathbf{x}(0) = c_1 \mathbf{v}_1 + c_2 \mathbf{v}_2$ :
+
+$$
+\begin{bmatrix} 6 \\ 2 \end{bmatrix} = c_1 \begin{bmatrix} 1 \\ 1 \end{bmatrix} + c_2 \begin{bmatrix} 1 \\ -1 \end{bmatrix} \implies \begin{cases} c_1 + c_2 = 6 \\ c_1 - c_2 = 2 \end{cases} \implies c_1 = 4, \quad c_2 = 2
+$$
+
    Maka solusi analitis adalah:
-   $$\mathbf{x}(t) = c_1 e^{\lambda_1 t} \mathbf{v}_1 + c_2 e^{\lambda_2 t} \mathbf{v}_2 = 4 e^{-t} \begin{bmatrix} 1 \\ 1 \end{bmatrix} + 2 e^{-3t} \begin{bmatrix} 1 \\ -1 \end{bmatrix}$$
+
+$$
+\mathbf{x}(t) = c_1 e^{\lambda_1 t} \mathbf{v}_1 + c_2 e^{\lambda_2 t} \mathbf{v}_2 = 4 e^{-t} \begin{bmatrix} 1 \\ 1 \end{bmatrix} + 2 e^{-3t} \begin{bmatrix} 1 \\ -1 \end{bmatrix}
+$$
+
    Dalam komponen skalar:
-   $$x_1(t) = 4e^{-t} + 2e^{-3t}, \quad x_2(t) = 4e^{-t} - 2e^{-3t}$$
+
+$$
+x_1(t) = 4e^{-t} + 2e^{-3t}, \quad x_2(t) = 4e^{-t} - 2e^{-3t}
+$$
 
 4. **Kestabilan**:
    Karena seluruh nilai eigen bernilai riil negatif tegas ($\lambda_1 = -1 < 0, \lambda_2 = -3 < 0$), maka ketika $t \to \infty$, $e^{-t} \to 0$ dan $e^{-3t} \to 0$.
-   $$\lim_{t \to \infty} \mathbf{x}(t) = \begin{bmatrix} 0 \\ 0 \end{bmatrix}$$
+
+$$
+\lim_{t \to \infty} \mathbf{x}(t) = \begin{bmatrix} 0 \\ 0 \end{bmatrix}
+$$
+
    Sistem bersifat **stabil asimtotik strictly stable**.
 </details>
 
@@ -687,7 +1029,11 @@ Dengan kondisi konsentrasi awal $\mathbf{x}(0) = \begin{bmatrix} 6 \\ 2 \end{bma
 
 ### Tingkat 4: Mahir / Tantangan Industri
 Sebuah jaringan web mini terdiri dari 3 halaman dengan matriks keterhubungan stokastik:
-$$H = \begin{bmatrix} 0 & 0 & 1 \\ 1 & 0 & 0 \\ 0 & 1 & 0 \end{bmatrix}$$
+
+$$
+H = \begin{bmatrix} 0 & 0 & 1 \\ 1 & 0 & 0 \\ 0 & 1 & 0 \end{bmatrix}
+$$
+
 1. Buktikan bahwa matriks $H$ memiliki nilai eigen kompleks pada lingkaran satuan ($|\lambda| = 1$), yang menyebabkan iterasi PageRank naif berosilasi tanpa konvergen.
 2. Hitung Google Matrix $G = d H + \frac{1-d}{3} \mathbf{e}\mathbf{e}^T$ dengan $d = 0{,}85$.
 3. Buktikan bahwa nilai eigen kedua memenuhi $|\lambda_2| \le 0{,}85$ sehingga iterasi dijamin konvergen menuju vektor ranking unik.
@@ -697,24 +1043,47 @@ $$H = \begin{bmatrix} 0 & 0 & 1 \\ 1 & 0 & 0 \\ 0 & 1 & 0 \end{bmatrix}$$
 
 1. **Spektrum Matriks Sirkulan Naif $H$**:
    Polinomial karakteristik:
-   $$\det(H - \lambda I) = \det \begin{bmatrix} -\lambda & 0 & 1 \\ 1 & -\lambda & 0 \\ 0 & 1 & -\lambda \end{bmatrix} = -\lambda(-\lambda)(-\lambda) + 1(1) = -\lambda^3 + 1 = 0 \implies \lambda^3 = 1$$
+
+$$
+\det(H - \lambda I) = \det \begin{bmatrix} -\lambda & 0 & 1 \\ 1 & -\lambda & 0 \\ 0 & 1 & -\lambda \end{bmatrix} = -\lambda(-\lambda)(-\lambda) + 1(1) = -\lambda^3 + 1 = 0 \implies \lambda^3 = 1
+$$
+
    Akar-akar pangkat tiga dari satu (*cube roots of unity*):
-   $$\lambda_1 = 1, \quad \lambda_2 = e^{i 2\pi/3} = -\frac{1}{2} + i \frac{\sqrt{3}}{2}, \quad \lambda_3 = e^{-i 2\pi/3} = -\frac{1}{2} - i \frac{\sqrt{3}}{2}$$
+
+$$
+\lambda_1 = 1, \quad \lambda_2 = e^{i 2\pi/3} = -\frac{1}{2} + i \frac{\sqrt{3}}{2}, \quad \lambda_3 = e^{-i 2\pi/3} = -\frac{1}{2} - i \frac{\sqrt{3}}{2}
+$$
+
    Ketiga nilai eigen memiliki modulus tepat $|\lambda_j| = 1$. Karena terdapat nilai eigen berosilasi murni selain $\lambda = 1$, proses iterasi pangkat $\mathbf{u}_{k+1} = H \mathbf{u}_k$ akan terjebak dalam siklus rotasi periodik dan tidak pernah konvergen!
 
 2. **Konstruksi Google Matrix $G$**:
-   $$E = \frac{1}{3} \mathbf{e}\mathbf{e}^T = \begin{bmatrix} 1/3 & 1/3 & 1/3 \\ 1/3 & 1/3 & 1/3 \\ 1/3 & 1/3 & 1/3 \end{bmatrix}$$
+
+$$
+E = \frac{1}{3} \mathbf{e}\mathbf{e}^T = \begin{bmatrix} 1/3 & 1/3 & 1/3 \\ 1/3 & 1/3 & 1/3 \\ 1/3 & 1/3 & 1/3 \end{bmatrix}
+$$
+
    Dengan $d = 0{,}85$, maka $(1-d)/3 = 0{,}15 / 3 = 0{,}05$.
-   $$G = 0{,}85 \begin{bmatrix} 0 & 0 & 1 \\ 1 & 0 & 0 \\ 0 & 1 & 0 \end{bmatrix} + \begin{bmatrix} 0{,}05 & 0{,}05 & 0{,}05 \\ 0{,}05 & 0{,}05 & 0{,}05 \\ 0{,}05 & 0{,}05 & 0{,}05 \end{bmatrix} = \begin{bmatrix} 0{,}05 & 0{,}05 & 0{,}90 \\ 0{,}90 & 0{,}05 & 0{,}05 \\ 0{,}05 & 0{,}90 & 0{,}05 \end{bmatrix}$$
+
+$$
+G = 0{,}85 \begin{bmatrix} 0 & 0 & 1 \\ 1 & 0 & 0 \\ 0 & 1 & 0 \end{bmatrix} + \begin{bmatrix} 0{,}05 & 0{,}05 & 0{,}05 \\ 0{,}05 & 0{,}05 & 0{,}05 \\ 0{,}05 & 0{,}05 & 0{,}05 \end{bmatrix} = \begin{bmatrix} 0{,}05 & 0{,}05 & 0{,}90 \\ 0{,}90 & 0{,}05 & 0{,}05 \\ 0{,}05 & 0{,}90 & 0{,}05 \end{bmatrix}
+$$
 
 3. **Kestabilan Spektral Google Matrix**:
    Perhatikan bahwa matriks $G$ adalah matriks sirkulan positif dengan jumlah kolom 1.
    Nilai eigen dari matriks sirkulan adalah:
-   $$\lambda_j(G) = d \cdot \lambda_j(H) + (1-d) \cdot \lambda_j(E)$$
-   Untuk $j=1$: $\lambda_1 = 0{,}85(1) + 0{,}15(1) = 1{,}0$.
-   Untuk $j=2, 3$: Karena $\mathbf{v}_{2,3}$ ortogonal terhadap vektor satu $\mathbf{e}$, maka $E \mathbf{v}_{2,3} = \mathbf{0}$.
+
+$$
+\lambda_j(G) = d \cdot \lambda_j(H) + (1-d) \cdot \lambda_j(E)
+$$
+
+   Untuk $j=1$ : $\lambda_1 = 0{,}85(1) + 0{,}15(1) = 1{,}0$.
+   Untuk $j=2, 3$ : Karena $\mathbf{v}_{2,3}$ ortogonal terhadap vektor satu $\mathbf{e}$, maka $E \mathbf{v}_{2,3} = \mathbf{0}$.
    Akibatnya:
-   $$\lambda_{2,3}(G) = d \cdot \lambda_{2,3}(H) = 0{,}85 e^{\pm i 2\pi/3}$$
+
+$$
+\lambda_{2,3}(G) = d \cdot \lambda_{2,3}(H) = 0{,}85 e^{\pm i 2\pi/3}
+$$
+
    Modulus nilai eigen kedua adalah $|\lambda_2| = |0{,}85| \times 1 = 0{,}85$.
    Karena $|\lambda_2| = 0{,}85 < 1$, suku galat pada iterasi ke-$k$ meluruh secepat $(0{,}85)^k$. Untuk mencapai presisi $10^{-6}$, kita hanya membutuhkan $k \approx \frac{-6}{\log_{10}(0{,}85)} \approx 84$ iterasi. Vektor ranking tunak konvergen unik ke $\mathbf{v}_\infty = [1/3, 1/3, 1/3]^T$. $\blacksquare$
 </details>

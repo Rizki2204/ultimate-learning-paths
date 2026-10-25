@@ -31,11 +31,20 @@ Bagi pemula yang baru pertama kali menyentuh aljabar linier, jangan membayangkan
 Bayangkan Anda memesan **2 piring nasi goreng** dan **1 gelas es teh** dengan total tagihan Rp 25.000. Keesokan harinya, teman Anda memesan **1 piring nasi goreng** dan **2 gelas es teh** dengan total tagihan Rp 20.000. Berapakah harga satu porsi nasi goreng ($x_1$) dan segelas es teh ($x_2$)?
 
 Secara intuitif, Anda sedang berurusan dengan sebuah sistem persamaan linier:
-$$2x_1 + 1x_2 = 25.000$$
-$$1x_1 + 2x_2 = 20.000$$
 
-Aljabar linier lahir dari ide sederhana: **pisahkan angka pesanan dari barang yang dipesan**. Angka-angka pesanan kita kumpulkan ke dalam sebuah tabel kotak 2 dimensi yang disebut **matriks** $A$, daftar barang yang dicari menjadi **vektor** $\mathbf{x}$, dan total harga menjadi vektor $\mathbf{b}$:
-$$\begin{bmatrix} 2 & 1 \\ 1 & 2 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} 25.000 \\ 20.000 \end{bmatrix} \iff A\mathbf{x} = \mathbf{b}$$
+$$
+2x_1 + 1x_2 = 25.000
+$$
+
+$$
+1x_1 + 2x_2 = 20.000
+$$
+
+Aljabar linier lahir dari ide sederhana: **pisahkan angka pesanan dari barang yang dipesan**. Angka-angka pesanan kita kumpulkan ke dalam sebuah tabel kotak 2 dimensi yang disebut **matriks** $A$, daftar barang yang dicari menjadi **vektor** $\mathbf{x}$, dan total harga menjadi vektor $\mathbf{b}$ :
+
+$$
+\begin{bmatrix} 2 & 1 \\ 1 & 2 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} 25.000 \\ 20.000 \end{bmatrix} \iff A\mathbf{x} = \mathbf{b}
+$$
 
 Sekarang, naikkan level pemahaman Anda ke ranah geometri:
 Bayangkan Anda memegang selembar kain karet elastis dua dimensi yang memiliki gambar lingkaran sempurna. Anda kemudian menarik kain karet tersebut ke arah horizontal sebesar $2\times$ lipat sambil membiarkan dimensi vertikal tetap seperti semula. Gambar lingkaran Anda berubah bentuk menjadi elips lonjong.
@@ -47,14 +56,18 @@ Peristiwa transformasi geometris ini merangkum hakikat dari sebuah **Transformas
 - Setiap transformasi matriks sembarang—betapapun rumit dan tidak teraturnya—dapat diurai secara sempurna menjadi tiga tahapan geometris murni: (1) rotasi koordinat awal, (2) peregangan independen di sepanjang sumbu-sumbu utama, dan (3) rotasi koordinat akhir. Dekomposisi universal ini adalah **Singular Value Decomposition (SVD)**.
 - Ketika data kita tidak lagi berwujud tabel 2 dimensi melainkan tersusun dalam dimensi ganda (misalnya rekaman data spasial $X \times Y$, dimensi waktu $T$, dan variabel sensor $S$), representasi matriks diperluas menjadi array multidimensi yang disebut **Tensor**, di mana operasi perentangan dan kompresi diatur oleh kaidah **Aljabar Multilinier**.
 
-> **🔤 Kamus Simbol Anti-Pusing — Persamaan Linier $A\mathbf{x} = \mathbf{b}$:**
+> **🔤 Kamus Simbol Anti-Pusing — Persamaan Linier $A\mathbf{x} = \mathbf{b}$ :**
 > - **Cara Membaca Lisan**: *"Matriks A dikalikan vektor x menghasilkan vektor b"*.
 > - **Arti Simbol**:
->   - $A \in \mathbb{R}^{m \times n}$: Tabel kotak angka berukuran $m$ baris dan $n$ kolom.
->   - $\mathbf{x} \in \mathbb{R}^n$: Vektor kolom masukan berisi $n$ variabel yang tidak diketahui.
->   - $\mathbf{b} \in \mathbb{R}^m$: Vektor kolom luaran berisi $m$ nilai target atau hasil pengukuran.
+>   - $A \in \mathbb{R}^{m \times n}$ : Tabel kotak angka berukuran $m$ baris dan $n$ kolom.
+>   - $\mathbf{x} \in \mathbb{R}^n$ : Vektor kolom masukan berisi $n$ variabel yang tidak diketahui.
+>   - $\mathbf{b} \in \mathbb{R}^m$ : Vektor kolom luaran berisi $m$ nilai target atau hasil pengukuran.
 > - **Contoh Angka Mainan $2 \times 2$**:
->   $$\begin{bmatrix} 2 & 1 \\ 1 & 2 \end{bmatrix} \begin{bmatrix} 10.000 \\ 5.000 \end{bmatrix} = \begin{bmatrix} 2(10.000) + 1(5.000) \\ 1(10.000) + 2(5.000) \end{bmatrix} = \begin{bmatrix} 25.000 \\ 20.000 \end{bmatrix}$$
+>
+> $$
+> \begin{bmatrix} 2 & 1 \\ 1 & 2 \end{bmatrix} \begin{bmatrix} 10.000 \\ 5.000 \end{bmatrix} = \begin{bmatrix} 2(10.000) + 1(5.000) \\ 1(10.000) + 2(5.000) \end{bmatrix} = \begin{bmatrix} 25.000 \\ 20.000 \end{bmatrix}
+> $$
+>
 >   Solusi uniknya: nasi goreng = Rp 10.000, es teh = Rp 5.000.
 
 > **❓ Pertanyaan Pemula: Kenapa perkalian matriks harus baris dikali kolom (BASKOM), bukan elemen seposisi?**
@@ -64,7 +77,11 @@ Peristiwa transformasi geometris ini merangkum hakikat dari sebuah **Transformas
 > - **BASKOM (Baris-Kolom)**: Saat mengingat ukuran matriks $m \times n$ atau aturan perkalian matriks, ingat kata **BASKOM**: **BAS** = Baris (arah mendatar), **KOM** = Kolom (arah tegak). Matriks $2 \times 3$ artinya 2 Baris dan 3 Kolom. Perkalian matriks $C = AB$ hanya sah jika jumlah Kolom $A$ sama dengan jumlah Baris $B$!
 > - **Aturan Kaus Kaki & Sepatu (*Socks and Shoes Rule*)**:
 >   Saat memakai perlengkapan, Anda memakai kaus kaki dulu baru sepatu ($A$ lalu $B$). Namun saat melepasnya di malam hari, Anda harus melepas sepatu terlebih dahulu baru kemudian kaus kaki! Itulah sebabnya invers perkalian matriks membalik urutan:
->   $$(AB)^{-1} = B^{-1} A^{-1} \quad \text{dan} \quad (AB)^T = B^T A^T$$
+>
+> $$
+> (AB)^{-1} = B^{-1} A^{-1} \quad \text{dan} \quad (AB)^T = B^T A^T
+> $$
+>
 
 ---
 
@@ -96,7 +113,7 @@ Berikut adalah panduan notasi matematika yang dipakai di seluruh modul beserta p
 | $\otimes$ | "Produk Kronecker" | Perkalian blok matriks | `np.kron(A, B)` |
 | $\times_n$ | "Produk mode-$n$" | Kontraksi tensor sepanjang sumbu $n$ | `tensor_mode_product(X, U, n)` |
 | $\delta_{ij}$ | "Delta Kronecker" | 1 jika $i=j$, 0 jika $i \neq j$ | `1.0 if i == j else 0.0` |
-| $\|\mathbf{x}\|_2$ | "Norma 2 Euclidean" | Jarak lurus $\sqrt{\sum x_i^2}$ | `math.sqrt(sum(x**2 for x in v))` |
+| $\lVert \mathbf{x} \rVert_2$ | "Norma 2 Euclidean" | Jarak lurus $\sqrt{\sum x_i^2}$ | `math.sqrt(sum(x**2 for x in v))` |
 
 ---
 
@@ -114,13 +131,24 @@ Sebuah ruang vektor riil $V$ atas medan skalar $\mathbb{R}$ adalah himpunan obje
 8. **Identitas Skalar**: $1 \cdot \mathbf{u} = \mathbf{u}$.
 
 Sebuah pemetaan $T: V \to W$ dinamakan **Transformasi Linier** jika dan hanya jika untuk seluruh $\mathbf{u}, \mathbf{v} \in V$ dan skalar $c, d \in \mathbb{R}$ berlaku prinsip superposisi:
-$$T(c\mathbf{u} + d\mathbf{v}) = cT(\mathbf{u}) + dT(\mathbf{v})$$
+
+$$
+T(c\mathbf{u} + d\mathbf{v}) = cT(\mathbf{u}) + dT(\mathbf{v})
+$$
 
 > **🌉 Jembatan Logika — Dari Transformasi Linier ke Perkalian Matriks:**
 > Bayangkan sebuah vektor sembarang $\mathbf{x} = [x_1, x_2]^T = x_1 \mathbf{e}_1 + x_2 \mathbf{e}_2$. Karena pemetaan $T$ bersifat linier, bayangan dari $\mathbf{x}$ cukup ditentukan oleh bayangan dari vektor-vektor basisnya:
-> $$T(\mathbf{x}) = T(x_1 \mathbf{e}_1 + x_2 \mathbf{e}_2) = x_1 T(\mathbf{e}_1) + x_2 T(\mathbf{e}_2)$$
+>
+> $$
+> T(\mathbf{x}) = T(x_1 \mathbf{e}_1 + x_2 \mathbf{e}_2) = x_1 T(\mathbf{e}_1) + x_2 T(\mathbf{e}_2)
+> $$
+>
 > Jika kita menyusun vektor kolom $T(\mathbf{e}_1)$ dan $T(\mathbf{e}_2)$ berdampingan ke dalam tabel kotak $A = [T(\mathbf{e}_1) \mid T(\mathbf{e}_2)]$, maka operasi pemetaan $T(\mathbf{x})$ bertransformasi menjadi perkalian matriks dengan vektor:
-> $$\mathbf{y} = A\mathbf{x}$$
+>
+> $$
+> \mathbf{y} = A\mathbf{x}
+> $$
+>
 
 ---
 
@@ -134,93 +162,160 @@ Diformulasikan secara mendalam oleh Gilbert Strang, setiap matriks $\mathbf{A} \
 **Teorema Fundamental Aljabar Linier (FTLA)** menetapkan dua relasi fundamental:
 - **Bagian 1 (Hubungan Dimensi & Rank-Nullity)**:
   - Dimensi ruang baris dan ruang nol:
-    $$\dim(C(\mathbf{A}^T)) + \dim(N(\mathbf{A})) = r + (n - r) = n$$
+
+$$
+\dim(C(\mathbf{A}^T)) + \dim(N(\mathbf{A})) = r + (n - r) = n
+$$
+
   - Dimensi ruang kolom dan ruang nol kiri:
-    $$\dim(C(\mathbf{A})) + \dim(N(\mathbf{A}^T)) = r + (m - r) = m$$
+
+$$
+\dim(C(\mathbf{A})) + \dim(N(\mathbf{A}^T)) = r + (m - r) = m
+$$
+
 - **Bagian 2 (Ortogonalitas Komplemen)**:
-  Ruang baris dan ruang nol adalah komplemen ortogonal di dalam $\mathbb{R}^n$:
-  $$C(\mathbf{A}^T) = (N(\mathbf{A}))^\perp \iff C(\mathbf{A}^T) \cap N(\mathbf{A}) = \{\mathbf{0}\} \quad \text{dan} \quad C(\mathbf{A}^T) \oplus N(\mathbf{A}) = \mathbb{R}^n$$
-  
-  Ruang kolom dan ruang nol kiri adalah komplemen ortogonal di dalam $\mathbb{R}^m$:
-  $$C(\mathbf{A}) = (N(\mathbf{A}^T))^\perp \iff C(\mathbf{A}) \cap N(\mathbf{A}^T) = \{\mathbf{0}\} \quad \text{dan} \quad C(\mathbf{A}) \oplus N(\mathbf{A}^T) = \mathbb{R}^m$$
+  Ruang baris dan ruang nol adalah komplemen ortogonal di dalam $\mathbb{R}^n$ :
+
+$$
+C(\mathbf{A}^T) = (N(\mathbf{A}))^\perp \iff C(\mathbf{A}^T) \cap N(\mathbf{A}) = \{\mathbf{0}\} \quad \text{dan} \quad C(\mathbf{A}^T) \oplus N(\mathbf{A}) = \mathbb{R}^n
+$$
+
+  Ruang kolom dan ruang nol kiri adalah komplemen ortogonal di dalam $\mathbb{R}^m$ :
+
+$$
+C(\mathbf{A}) = (N(\mathbf{A}^T))^\perp \iff C(\mathbf{A}) \cap N(\mathbf{A}^T) = \{\mathbf{0}\} \quad \text{dan} \quad C(\mathbf{A}) \oplus N(\mathbf{A}^T) = \mathbb{R}^m
+$$
 
 Sebagai jembatan pedagogis mutakhir, Strang (2023) memperkenalkan **Faktorisasi Kolom-Baris $A = CR$**:
-$$\mathbf{A} = \mathbf{C} \mathbf{R}$$
+
+$$
+\mathbf{A} = \mathbf{C} \mathbf{R}
+$$
+
 di mana $\mathbf{C} \in \mathbb{R}^{m \times r}$ berisi $r$ kolom independen basis dari $\mathbf{A}$, dan $\mathbf{R} \in \mathbb{R}^{r \times n}$ berisi $r$ baris independen pertama dari bentuk eselon baris tereduksi (*Reduced Row Echelon Form* / RREF).
 
 ---
 
 ### 2.3 Nilai Eigen, Teorema Spektral & Matriks Definit Positif
 Untuk matriks persegi $\mathbf{A} \in \mathbb{R}^{n \times n}$, skalar $\lambda \in \mathbb{C}$ dan vektor tak-nol $\mathbf{v} \in \mathbb{C}^n$ memenuhi:
-$$\mathbf{A} \mathbf{v} = \lambda \mathbf{v} \iff (\mathbf{A} - \lambda \mathbf{I}) \mathbf{v} = \mathbf{0}$$
 
-> **🔤 Kamus Simbol Anti-Pusing — Nilai & Vektor Eigen $A\mathbf{v} = \lambda\mathbf{v}$:**
+$$
+\mathbf{A} \mathbf{v} = \lambda \mathbf{v} \iff (\mathbf{A} - \lambda \mathbf{I}) \mathbf{v} = \mathbf{0}
+$$
+
+> **🔤 Kamus Simbol Anti-Pusing — Nilai & Vektor Eigen $A\mathbf{v} = \lambda\mathbf{v}$ :**
 > - **Cara Membaca Lisan**: *"Matriks A mengalikan vektor v sama dengan skalar lambda mengalikan vektor v"*.
 > - **Arti Simbol**:
->   - $A$: Matriks transformasi persegi $n \times n$.
->   - $\mathbf{v} \neq \mathbf{0}$: Vektor khusus yang arahnya tidak berubah setelah dipetakan oleh $A$.
->   - $\lambda$: Angka skalar (nilai eigen) yang mengukur berapa kali lipat vektor $\mathbf{v}$ memanjang atau memendek.
+>   - $A$ : Matriks transformasi persegi $n \times n$.
+>   - $\mathbf{v} \neq \mathbf{0}$ : Vektor khusus yang arahnya tidak berubah setelah dipetakan oleh $A$.
+>   - $\lambda$ : Angka skalar (nilai eigen) yang mengukur berapa kali lipat vektor $\mathbf{v}$ memanjang atau memendek.
 > - **Contoh Angka Mainan $2 \times 2$**:
->   $$\begin{bmatrix} 3 & 0 \\ 0 & 2 \end{bmatrix} \begin{bmatrix} 1 \\ 0 \end{bmatrix} = \begin{bmatrix} 3 \\ 0 \end{bmatrix} = 3 \begin{bmatrix} 1 \\ 0 \end{bmatrix} \implies \lambda_1 = 3, \quad \mathbf{v}_1 = [1, 0]^T$$
+>
+> $$
+> \begin{bmatrix} 3 & 0 \\ 0 & 2 \end{bmatrix} \begin{bmatrix} 1 \\ 0 \end{bmatrix} = \begin{bmatrix} 3 \\ 0 \end{bmatrix} = 3 \begin{bmatrix} 1 \\ 0 \end{bmatrix} \implies \lambda_1 = 3, \quad \mathbf{v}_1 = [1, 0]^T
+> $$
+>
 
 > **🌉 Jembatan Logika — Penurunan Nilai Eigen ke Persamaan Karakteristik:**
 > 1. Mulai dari definisi: $A\mathbf{v} = \lambda\mathbf{v}$.
 > 2. Pindahkan seluruh suku ke ruas kiri: $A\mathbf{v} - \lambda\mathbf{v} = \mathbf{0}$.
-> 3. Faktorkan vektor $\mathbf{v}$ ke kanan dengan menyisipkan matriks identitas $I$: $(A - \lambda I)\mathbf{v} = \mathbf{0}$.
+> 3. Faktorkan vektor $\mathbf{v}$ ke kanan dengan menyisipkan matriks identitas $I$ : $(A - \lambda I)\mathbf{v} = \mathbf{0}$.
 > 4. Karena kita mencari vektor eigen tak-nol ($\mathbf{v} \neq \mathbf{0}$), sistem $(A - \lambda I)\mathbf{v} = \mathbf{0}$ hanya memiliki solusi tak-trivial jika matriks $(A - \lambda I)$ tidak memiliki invers, yang setara dengan determinannya bernilai tepat nol:
->    $$p(\lambda) = \det(\mathbf{A} - \lambda \mathbf{I}) = 0$$
+>
+> $$
+> p(\lambda) = \det(\mathbf{A} - \lambda \mathbf{I}) = 0
+> $$
+>
 
 > **💡 Tips, Trik, Rahasia Cepat Paham & Jembatan Keledai — Cek Nilai Eigen 3 Detik via Trace & Determinan:**
 > Untuk sembarang matriks persegi, jumlah nilai-nilai eigen selalu sama dengan jumlah diagonal (*Trace*), dan hasil kali nilai-nilai eigen selalu sama dengan Determinan:
-> $$\sum_{i=1}^n \lambda_i = \text{tr}(A) \quad \text{dan} \quad \prod_{i=1}^n \lambda_i = \det(A)$$
+>
+> $$
+> \sum_{i=1}^n \lambda_i = \text{tr}(A) \quad \text{dan} \quad \prod_{i=1}^n \lambda_i = \det(A)
+> $$
+>
 > *Contoh*: Jika $A = \begin{bmatrix} 4 & 1 \\ 2 & 3 \end{bmatrix}$, maka $\text{tr}(A) = 4 + 3 = 7$ dan $\det(A) = (4)(3) - (1)(2) = 10$. Cari dua angka yang jika dijumlahkan bernilai $7$ dan jika dikalikan bernilai $10$. Tanpa rumus kuadratik, Anda langsung tahu: $\lambda_1 = 5$ dan $\lambda_2 = 2$!
 
-**Teorema Spektral Matriks Simetris Riil**: Jika $\mathbf{S} = \mathbf{S}^T \in \mathbb{R}^{n \times n}$, maka seluruh nilai eigen $\lambda_1, \dots, \lambda_n$ bernilai riil murni, dan vektor-vektor eigen dapat dipilih membentuk basis ortonormal $\mathbf{Q} = [\mathbf{q}_1, \dots, \mathbf{q}_n]$:
-$$\mathbf{S} = \mathbf{Q} \mathbf{\Lambda} \mathbf{Q}^T = \sum_{i=1}^n \lambda_i \mathbf{q}_i \mathbf{q}_i^T$$
+**Teorema Spektral Matriks Simetris Riil**: Jika $\mathbf{S} = \mathbf{S}^T \in \mathbb{R}^{n \times n}$, maka seluruh nilai eigen $\lambda_1, \dots, \lambda_n$ bernilai riil murni, dan vektor-vektor eigen dapat dipilih membentuk basis ortonormal $\mathbf{Q} = [\mathbf{q}_1, \dots, \mathbf{q}_n]$ :
+
+$$
+\mathbf{S} = \mathbf{Q} \mathbf{\Lambda} \mathbf{Q}^T = \sum_{i=1}^n \lambda_i \mathbf{q}_i \mathbf{q}_i^T
+$$
 
 Sebuah matriks simetris dikatakan **Definit Positif** ($\mathbf{S} \succ 0$) jika untuk setiap $\mathbf{x} \neq \mathbf{0}$ berlaku bentuk kuadratik positif:
-$$\mathbf{x}^T \mathbf{S} \mathbf{x} > 0 \iff \text{seluruh } \lambda_i > 0 \iff \text{seluruh pivot eliminasi } d_i > 0$$
+
+$$
+\mathbf{x}^T \mathbf{S} \mathbf{x} > 0 \iff \text{seluruh } \lambda_i > 0 \iff \text{seluruh pivot eliminasi } d_i > 0
+$$
 
 Setiap matriks definit positif memiliki faktorisasi segitiga bawah unik yang dinamakan **Dekomposisi Cholesky**:
-$$\mathbf{S} = \mathbf{L} \mathbf{L}^T$$
+
+$$
+\mathbf{S} = \mathbf{L} \mathbf{L}^T
+$$
+
 dengan biaya komputasi tepat $\frac{1}{3}n^3$ total FLOPs ($\frac{1}{6}n^3$ penjumlahan + $\frac{1}{6}n^3$ perkalian), dua kali lebih cepat dibandingkan eliminasi LU umum yang membutuhkan $\frac{2}{3}n^3$ total FLOPs ($\frac{1}{3}n^3$ penjumlahan + $\frac{1}{3}n^3$ perkalian).
 
 ---
 
 ### 2.4 Singular Value Decomposition (SVD) & Teorema Eckart-Young
 Untuk sembarang matriks riil $\mathbf{A} \in \mathbb{R}^{m \times n}$ ber-rank $r$, eksis dekomposisi universal:
-$$\mathbf{A} = \mathbf{U} \mathbf{\Sigma} \mathbf{V}^T = \sum_{i=1}^r \sigma_i \mathbf{u}_i \mathbf{v}_i^T$$
+
+$$
+\mathbf{A} = \mathbf{U} \mathbf{\Sigma} \mathbf{V}^T = \sum_{i=1}^r \sigma_i \mathbf{u}_i \mathbf{v}_i^T
+$$
+
 di mana:
 - $\mathbf{U} = [\mathbf{u}_1, \dots, \mathbf{u}_m] \in \mathbb{R}^{m \times m}$ adalah matriks ortogonal vektor singular kiri (vektor eigen dari $\mathbf{A}\mathbf{A}^T$).
 - $\mathbf{\Sigma} \in \mathbb{R}^{m \times n}$ adalah matriks kuasi-diagonal dengan nilai-nilai singular $\sigma_1 \ge \sigma_2 \ge \dots \ge \sigma_r > 0$ di mana $\sigma_i = \sqrt{\lambda_i(\mathbf{A}^T\mathbf{A})}$.
 - $\mathbf{V} = [\mathbf{v}_1, \dots, \mathbf{v}_n] \in \mathbb{R}^{n \times n}$ adalah matriks ortogonal vektor singular kanan (vektor eigen dari $\mathbf{A}^T\mathbf{A}$).
 
-> **🔤 Kamus Simbol Anti-Pusing — Dekomposisi Nilai Singular $A = U \Sigma V^T$:**
+> **🔤 Kamus Simbol Anti-Pusing — Dekomposisi Nilai Singular $A = U \Sigma V^T$ :**
 > - **Cara Membaca Lisan**: *"Matriks A sama dengan matriks rotasi U dikali matriks peregangan Sigma dikali matriks rotasi V transpos"*.
 > - **Arti Simbol**:
->   - $U$: Matriks rotasi di ruang tujuan $\mathbb{R}^m$ ($U^T U = I$).
->   - $\Sigma$: Matriks diagonal penskala sumbu semi-utama elipsoid ($\sigma_1 \ge \sigma_2 \ge \dots \ge 0$).
->   - $V^T$: Matriks rotasi di ruang asal $\mathbb{R}^n$ ($V^T V = I$).
+>   - $U$ : Matriks rotasi di ruang tujuan $\mathbb{R}^m$ ($U^T U = I$).
+>   - $\Sigma$ : Matriks diagonal penskala sumbu semi-utama elipsoid ($\sigma_1 \ge \sigma_2 \ge \dots \ge 0$).
+>   - $V^T$ : Matriks rotasi di ruang asal $\mathbb{R}^n$ ($V^T V = I$).
 
 > **🌉 Jembatan Logika — Mengapa Galat Pangkas SVD Tepat Sebesar Nilai Singular Terbuang:**
 > Menurut **Teorema Eckart-Young-Mirsky**, aproksimasi rank-$k$ terbaik bagi matriks $\mathbf{A}$ adalah memotong jumlahan rank-1 hingga $k$ suku pertama:
-> $$\mathbf{A}_k = \sum_{i=1}^k \sigma_i \mathbf{u}_i \mathbf{v}_i^T$$
+>
+> $$
+> \mathbf{A}_k = \sum_{i=1}^k \sigma_i \mathbf{u}_i \mathbf{v}_i^T
+> $$
+>
 > Karena vektor-vektor $\mathbf{u}_i$ dan $\mathbf{v}_i$ bersifat ortonormal ($\mathbf{u}_i^T \mathbf{u}_j = \delta_{ij}$ dan $\mathbf{v}_i^T \mathbf{v}_j = \delta_{ij}$), selisih matriks residual adalah jumlahan suku-suku yang dibuang:
-> $$\mathbf{A} - \mathbf{A}_k = \sum_{j=k+1}^r \sigma_j \mathbf{u}_j \mathbf{v}_j^T$$
+>
+> $$
+> \mathbf{A} - \mathbf{A}_k = \sum_{j=k+1}^r \sigma_j \mathbf{u}_j \mathbf{v}_j^T
+> $$
+>
 > Mengkuadratkan norma Frobenius menghasilkan jumlahan langsung:
-> $$\|\mathbf{A} - \mathbf{A}_k\|_F = \sqrt{\sum_{j=k+1}^r \sigma_j^2} \quad \text{dan} \quad \|\mathbf{A} - \mathbf{A}_k\|_2 = \sigma_{k+1}$$
+>
+> $$
+> \lVert \mathbf{A} - \mathbf{A}_k \rVert_F = \sqrt{\sum_{j=k+1}^r \sigma_j^2} \quad \text{dan} \quad \lVert \mathbf{A} - \mathbf{A}_k \rVert_2 = \sigma_{k+1}
+> $$
+>
 
-**Moore-Penrose Pseudoinverse**: Matriks invers umum $\mathbf{A}^+ \in \mathbb{R}^{n \times m}$ didefinisikan sebagai $\mathbf{A}^+ = \mathbf{V} \mathbf{\Sigma}^+ \mathbf{U}^T$, yang menjamin bahwa $\mathbf{x}^+ = \mathbf{A}^+ \mathbf{b}$ adalah solusi unik ber-norma Euclidean minimum $\|\mathbf{x}\|_2$ bagi masalah kuadrat terkecil $\min_{\mathbf{x}} \|\mathbf{A}\mathbf{x} - \mathbf{b}\|_2$.
+**Moore-Penrose Pseudoinverse**: Matriks invers umum $\mathbf{A}^+ \in \mathbb{R}^{n \times m}$ didefinisikan sebagai $\mathbf{A}^+ = \mathbf{V} \mathbf{\Sigma}^+ \mathbf{U}^T$, yang menjamin bahwa $\mathbf{x}^+ = \mathbf{A}^+ \mathbf{b}$ adalah solusi unik ber-norma Euclidean minimum $\lVert \mathbf{x} \rVert_2$ bagi masalah kuadrat terkecil $\min_{\mathbf{x}} \lVert \mathbf{A}\mathbf{x} - \mathbf{b} \rVert_2$.
 
 ---
 
 ### 2.5 Aljabar Multilinier & Dekomposisi Tensor
 Ketika array diperluas ke orde $N \ge 3$, tensor $\boldsymbol{\mathcal{X}} \in \mathbb{R}^{I_1 \times I_2 \times \dots \times I_N}$ didekomposisi melalui dua paradigma utama:
 1. **Dekomposisi CANDECOMP/PARAFAC (CP)**: Merepresentasikan tensor sebagai penjumlahan $R$ buah tensor rank-1 terfaktor:
-   $$\boldsymbol{\mathcal{X}} \approx \sum_{r=1}^R \lambda_r (\mathbf{a}_r \circ \mathbf{b}_r \circ \mathbf{c}_r) = [\![ \boldsymbol{\lambda}; \mathbf{A}, \mathbf{B}, \mathbf{C} ]\!]$$
+
+$$
+\boldsymbol{\mathcal{X}} \approx \sum_{r=1}^R \lambda_r (\mathbf{a}_r \circ \mathbf{b}_r \circ \mathbf{c}_r) = [\![ \boldsymbol{\lambda}; \mathbf{A}, \mathbf{B}, \mathbf{C} ]\!]
+$$
+
    Dioptimalkan melalui algoritma *Alternating Least Squares* (ALS) dan memiliki sifat keunikan hakiki (*essential uniqueness*) berdasarkan Kondisi Kruskal $k_A + k_B + k_C \ge 2R + 2$.
 2. **Dekomposisi Tucker & Higher-Order SVD (HOSVD)**: Memfaktorkan tensor ke dalam matriks-matriks ortogonal mode-$n$ dan tensor inti padat $\boldsymbol{\mathcal{G}}$ (*core tensor*):
-   $$\boldsymbol{\mathcal{X}} \approx \boldsymbol{\mathcal{G}} \times_1 \mathbf{U}^{(1)} \times_2 \mathbf{U}^{(2)} \times_3 \mathbf{U}^{(3)}$$
+
+$$
+\boldsymbol{\mathcal{X}} \approx \boldsymbol{\mathcal{G}} \times_1 \mathbf{U}^{(1)} \times_2 \mathbf{U}^{(2)} \times_3 \mathbf{U}^{(3)}
+$$
+
    di mana faktor basis $\mathbf{U}^{(n)}$ diekstraksi dari SVD matriks hasil unfolding mode-$n$ ($\mathbf{X}_{(n)}$).
 
 ---
@@ -228,7 +323,7 @@ Ketika array diperluas ke orde $N \ge 3$, tensor $\boldsymbol{\mathcal{X}} \in \
 ## 3. Anatomi Teknis & Cara Kerja Internal
 
 ### 3.1 Pipa Geometris Dekomposisi Matriks
-Diagram alir berikut mengilustrasikan dekomposisi aksi geometris dari operator matriks $\mathbf{A} = \mathbf{U} \mathbf{\Sigma} \mathbf{V}^T$ terhadap sembarang vektor input $\mathbf{x} \in \mathbb{R}^n$:
+Diagram alir berikut mengilustrasikan dekomposisi aksi geometris dari operator matriks $\mathbf{A} = \mathbf{U} \mathbf{\Sigma} \mathbf{V}^T$ terhadap sembarang vektor input $\mathbf{x} \in \mathbb{R}^n$ :
 
 ```mermaid
 flowchart LR
@@ -258,6 +353,16 @@ flowchart LR
     VT --> Sigma
     Sigma --> U
     U --> y
+
+    classDef domainNode fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#0f172a;
+    classDef opNode fill:#f3e8ff,stroke:#7c3aed,stroke-width:2px,color:#0f172a;
+    classDef scaleNode fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#0f172a;
+    classDef targetNode fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#0f172a;
+
+    class x,Vbasis domainNode;
+    class VT,U opNode;
+    class Sigma scaleNode;
+    class y targetNode;
 ```
 
 ---
@@ -280,16 +385,27 @@ Dalam arsitektur komputasi modern, algoritma aljabar linier diimplementasikan se
 Tabel berikut mendokumentasikan hasil kalkulasi deterministik algoritma *Power Iteration* pada graf web terarah 4-simpul. Graf ini dirancang untuk mendemonstrasikan mitigasi terhadap *spider trap* (simpul 1 yang hanya menunjuk ke dirinya sendiri) dan *dead end* (simpul 2 yang tidak memiliki tautan keluar):
 
 - **Matriks Adjasensi Graf Terarah** (kolom $j$ memuat tautan dari simpul $j$ ke baris target):
-  $$\mathbf{A}_{\text{adj}} = \begin{bmatrix} 0 & 0 & 0 & 0 \\ 1 & 1 & 0 & 1 \\ 0 & 0 & 0 & 0 \\ 1 & 0 & 0 & 0 \end{bmatrix}$$
+
+$$
+\mathbf{A}_{\text{adj}} = \begin{bmatrix} 0 & 0 & 0 & 0 \\ 1 & 1 & 0 & 1 \\ 0 & 0 & 0 & 0 \\ 1 & 0 & 0 & 0 \end{bmatrix}
+$$
+
 - **Penanganan Dead End**: Kolom 2 bernilai nol murni (out-degree = 0). Peluangnya didistribusikan merata ke seluruh simpul: $M_{:, 2} = [1/4, 1/4, 1/4, 1/4]^T$.
-- **Matriks Transisi Kolom-Stokastik** $\mathbf{M}$:
-  $$\mathbf{M} = \begin{bmatrix} 0.0 & 0.0 & 0.25 & 0.0 \\ 0.5 & 1.0 & 0.25 & 1.0 \\ 0.0 & 0.0 & 0.25 & 0.0 \\ 0.5 & 0.0 & 0.25 & 0.0 \end{bmatrix}$$
+- **Matriks Transisi Kolom-Stokastik** $\mathbf{M}$ :
+
+$$
+\mathbf{M} = \begin{bmatrix} 0.0 & 0.0 & 0.25 & 0.0 \\ 0.5 & 1.0 & 0.25 & 1.0 \\ 0.0 & 0.0 & 0.25 & 0.0 \\ 0.5 & 0.0 & 0.25 & 0.0 \end{bmatrix}
+$$
+
 - **Parameter Teleportasi Google**: Faktor redaman $\alpha = 0.85$, vektor teleportasi seragam $\mathbf{t} = \frac{1 - \alpha}{N} \mathbf{1} = [0.0375, 0.0375, 0.0375, 0.0375]^T$.
 - **Persamaan Pembaruan Iterasi**:
-  $$\mathbf{p}^{(k+1)} = \alpha \mathbf{M} \mathbf{p}^{(k)} + \frac{1 - \alpha}{N} \mathbf{1}$$
+
+$$
+\mathbf{p}^{(k+1)} = \alpha \mathbf{M} \mathbf{p}^{(k)} + \frac{1 - \alpha}{N} \mathbf{1}
+$$
 
 #### Tabel Trace Power Iteration Matriks Markov & Konvergensi PageRank (Hasil Komputasi Eksak)
-| Iterasi $(k)$ | Vektor State Probabilitas $\mathbf{p}^{(k)}$ | Operasi Matriks: $\mathbf{p}^{(k+1)} = \alpha \mathbf{M}\mathbf{p}^{(k)} + \mathbf{t}$ | Norma Residu $L_1$ ($\|\mathbf{p}^{(k+1)} - \mathbf{p}^{(k)}\|_1$) | Nilai Eigen Dominan ($\lambda_1$) | Status Konvergensi |
+| Iterasi $(k)$ | Vektor State Probabilitas $\mathbf{p}^{(k)}$ | Operasi Matriks: $\mathbf{p}^{(k+1)} = \alpha \mathbf{M}\mathbf{p}^{(k)} + \mathbf{t}$ | Norma Residu $L_1$ ($\lVert \mathbf{p}^{(k+1)} - \mathbf{p}^{(k)} \rVert_1$) | Nilai Eigen Dominan ($\lambda_1$) | Status Konvergensi |
 |---|---|---|---|---|---|
 | $k=0$ (Init) | $[0.250000, 0.250000, 0.250000, 0.250000]^T$ | Distribusi seragam probabilitas awal pada 4 simpul web | - | $\lambda_1 = 1.000000$ | Memulai iterasi daya Markov |
 | $k=1$ | $[0.090625, 0.621875, 0.090625, 0.196875]^T$ | Perpindahan probabilitas pertama via tautan graf & teleportasi | $\Delta = 0.743750$ | $\lambda_1 = 1.000000$ | Probabilitas mulai terkonsentrasi di simpul 1 |
@@ -316,7 +432,6 @@ Murni menggunakan struktur data bawaan list dan modul math standar.
 from typing import List, Tuple
 import math
 
-
 def pure_matmul_2x2(A: List[List[float]], B: List[List[float]]) -> List[List[float]]:
     """Perkalian dua matriks 2x2 murni: C = A @ B."""
     return [
@@ -324,11 +439,9 @@ def pure_matmul_2x2(A: List[List[float]], B: List[List[float]]) -> List[List[flo
         [A[1][0]*B[0][0] + A[1][1]*B[1][0], A[1][0]*B[0][1] + A[1][1]*B[1][1]]
     ]
 
-
 def pure_transpose_2x2(A: List[List[float]]) -> List[List[float]]:
     """Transpos matriks 2x2: menukar baris dan kolom."""
     return [[A[0][0], A[1][0]], [A[0][1], A[1][1]]]
-
 
 def pure_svd_2x2(A: List[List[float]]) -> Tuple[List[List[float]], List[float], List[List[float]]]:
     """
@@ -375,7 +488,6 @@ def pure_svd_2x2(A: List[List[float]]) -> Tuple[List[List[float]], List[float], 
     Vt = [v1, v2]
 
     return U, [sig1, sig2], Vt
-
 
 if __name__ == "__main__":
     A_toy = [[3.0, 1.0], [1.0, 3.0]]
@@ -441,7 +553,6 @@ try:
 except ModuleNotFoundError:
     np = None
 
-
 def eckart_young_rank_k_approximation(A, rank_k: int) -> Tuple:
     """
     Melakukan rekonstruksi aproksimasi rank-k terbaik menggunakan SVD
@@ -461,7 +572,6 @@ def eckart_young_rank_k_approximation(A, rank_k: int) -> Tuple:
     frobenius_error = float(np.linalg.norm(A - A_k, 'fro'))
     
     return A_k, frobenius_error
-
 
 if __name__ == "__main__" and np is not None:
     A_test = np.array([
@@ -527,7 +637,7 @@ if __name__ == "__main__" and np is not None:
   Pada tahun 1998, saat Larry Page dan Sergey Brin membangun mesin pencari Google di Stanford University, pemodelan awal web sebagai rantai Markov stokastik murni mengalami kegagalan sistematis ketika diuji pada graf web dunia nyata.
 - **Akar Masalah Aljabar Linier**:  
   Struktur web memuat dua topologi anomali:
-  1. **Simpul Buntu (*Dead Ends*)**: Halaman yang tidak memiliki tautan keluar sama sekali (kolom matriks adjasensi bernilai nol murni). Pada perkalian iterasi Markov naif $\mathbf{p}^{(k+1)} = \mathbf{M} \mathbf{p}^{(k)}$, massa probabilitas bocor keluar dari sistem pada setiap siklus, sehingga $\|\mathbf{p}^{(k)}\|_1 \to 0$.
+  1. **Simpul Buntu (*Dead Ends*)**: Halaman yang tidak memiliki tautan keluar sama sekali (kolom matriks adjasensi bernilai nol murni). Pada perkalian iterasi Markov naif $\mathbf{p}^{(k+1)} = \mathbf{M} \mathbf{p}^{(k)}$, massa probabilitas bocor keluar dari sistem pada setiap siklus, sehingga $\lVert \mathbf{p}^{(k)} \rVert_1 \to 0$.
   2. **Perangkap Laba-Laba (*Spider Traps*)**: Sekelompok halaman web yang hanya saling menautkan di antara mereka sendiri atau simpul yang memiliki *self-loop* murni. Dalam matriks transisi tak-tereduksi, spider trap bertindak sebagai lubang hitam penyerap (*absorbing state*), menarik seluruh bobot probabilitas stasioner ($\mathbf{p} \to [0, 1, 0, 0]^T$), dan menghancurkan relevansi peringkat dokumen di seluruh internet.
 
 - **Potongan Kode Arsitektur Penanganan (Production-Grade Implementation)**:
@@ -537,7 +647,6 @@ if __name__ == "__main__" and np is not None:
 Implementasi Produksi: Algoritma Google PageRank Tangguh Terhadap Spider Traps & Dead Ends
 """
 from typing import List
-
 
 def compute_pagerank_pure(adj: List[List[float]], alpha: float = 0.85, tol: float = 1e-6, max_iter: int = 100) -> List[float]:
     """
@@ -574,7 +683,6 @@ def compute_pagerank_pure(adj: List[List[float]], alpha: float = 0.85, tol: floa
             
     return p
 
-
 if __name__ == "__main__":
     web_graph = [
         [0.0, 0.0, 0.0, 0.0],
@@ -590,7 +698,11 @@ if __name__ == "__main__":
 
 - **Analisis Teoretis & Solusi Perron-Frobenius**:  
   Page dan Brin mengatasi krisis ini dengan memperkenalkan parameter redaman (*damping factor*) $\alpha \approx 0.85$. Secara matematis, penambahan matriks teleportasi seragam mentransformasikan matriks transisi menjadi **Matriks Google**:
-  $$\mathbf{G} = \alpha \mathbf{M} + (1 - \alpha) \frac{1}{N} \mathbf{1} \mathbf{1}^T$$
+
+$$
+\mathbf{G} = \alpha \mathbf{M} + (1 - \alpha) \frac{1}{N} \mathbf{1} \mathbf{1}^T
+$$
+
   Karena seluruh entri $G_{ij} > 0$ (positif murni), **Teorema Perron-Frobenius** menjamin bahwa matriks $\mathbf{G}$ bersifat primitif dan tak-tereduksi (*irreducible*). Dengan demikian, eksis nilai eigen dominan tunggal bernilai tepat $\lambda_1 = 1$, dengan vektor eigen positif unik yang dijamin konvergen secara eksponensial melalui *Power Iteration* terlepas dari status inisialisasi awal.
 
 ---
@@ -610,9 +722,17 @@ if __name__ == "__main__":
 <summary>✅ Pembahasan & Kunci Jawaban Lengkap</summary>
 
 Langkah 1: Hitung baris 1:
-$$b_1 = (2 \times 10) + (1 \times 5) = 20 + 5 = 25$$
+
+$$
+b_1 = (2 \times 10) + (1 \times 5) = 20 + 5 = 25
+$$
+
 Langkah 2: Hitung baris 2:
-$$b_2 = (1 \times 10) + (2 \times 5) = 10 + 10 = 20$$
+
+$$
+b_2 = (1 \times 10) + (2 \times 5) = 10 + 10 = 20
+$$
+
 Vektor hasil akhir adalah $\mathbf{b} = \begin{bmatrix} 25 \\ 20 \end{bmatrix}$. Cocok sempurna 100% dengan total tagihan warung!
 </details>
 
@@ -620,7 +740,11 @@ Vektor hasil akhir adalah $\mathbf{b} = \begin{bmatrix} 25 \\ 20 \end{bmatrix}$.
 
 ### Tingkat 2 (Pemula / Tulis Tangan) - Eliminasi Gaussian dengan Partial Pivoting 3x3
 - **Tugas**: Bangun fungsi penyelesai sistem persamaan linier $Ax = b$ menggunakan algoritma eliminasi Gaussian dengan pertukaran baris parsial (*Partial Pivoting*) dan substitusi mundur (*Back-Substitution*) murni tanpa pustaka `np.linalg.solve`.
-  $$\mathbf{A} = \begin{bmatrix} 2 & 1 & -1 \\ -3 & -1 & 2 \\ -2 & 1 & 2 \end{bmatrix}, \quad \mathbf{b} = \begin{bmatrix} 8 \\ -11 \\ -3 \end{bmatrix}$$
+
+$$
+\mathbf{A} = \begin{bmatrix} 2 & 1 & -1 \\ -3 & -1 & 2 \\ -2 & 1 & 2 \end{bmatrix}, \quad \mathbf{b} = \begin{bmatrix} 8 \\ -11 \\ -3 \end{bmatrix}
+$$
+
 <details>
 <summary>💡 Petunjuk Bertahap (Hint)</summary>
 
@@ -632,19 +756,27 @@ Vektor hasil akhir adalah $\mathbf{b} = \begin{bmatrix} 25 \\ 20 \end{bmatrix}$.
 <details>
 <summary>✅ Pembahasan & Kunci Jawaban Lengkap</summary>
 
-- **Langkah 1 (Pivoting Kolom 1)**: Pivot terbesar adalah $-3$ di baris 2. Tukar $R_1 \leftrightarrow R_2$:
-  $$\begin{bmatrix} -3 & -1 & 2 & \mid & -11 \\ 2 & 1 & -1 & \mid & 8 \\ -2 & 1 & 2 & \mid & -3 \end{bmatrix}$$
+- **Langkah 1 (Pivoting Kolom 1)**: Pivot terbesar adalah $-3$ di baris 2. Tukar $R_1 \leftrightarrow R_2$ :
+
+$$
+\begin{bmatrix} -3 & -1 & 2 & \mid & -11 \\ 2 & 1 & -1 & \mid & 8 \\ -2 & 1 & 2 & \mid & -3 \end{bmatrix}
+$$
+
 - **Langkah 2 (Eliminasi Kolom 1)**:
   - $R_2 \leftarrow R_2 - (-2/3) R_1 = R_2 + \frac{2}{3} R_1 \implies [0, 1/3, 1/3 \mid 2/3]$
   - $R_3 \leftarrow R_3 - (2/3) R_1 \implies [0, 5/3, 2/3 \mid 13/3]$
-- **Langkah 3 (Pivoting Kolom 2)**: Elemen kolom 2 adalah $1/3$ dan $5/3$. Pivot terbesar $5/3$ di baris 3. Tukar $R_2 \leftrightarrow R_3$:
-  $$\begin{bmatrix} -3 & -1 & 2 & \mid & -11 \\ 0 & 5/3 & 2/3 & \mid & 13/3 \\ 0 & 1/3 & 1/3 & \mid & 2/3 \end{bmatrix}$$
+- **Langkah 3 (Pivoting Kolom 2)**: Elemen kolom 2 adalah $1/3$ dan $5/3$. Pivot terbesar $5/3$ di baris 3. Tukar $R_2 \leftrightarrow R_3$ :
+
+$$
+\begin{bmatrix} -3 & -1 & 2 & \mid & -11 \\ 0 & 5/3 & 2/3 & \mid & 13/3 \\ 0 & 1/3 & 1/3 & \mid & 2/3 \end{bmatrix}
+$$
+
 - **Langkah 4 (Eliminasi Kolom 2)**:
   - $R_3 \leftarrow R_3 - (1/5) R_2 \implies [0, 0, 1/5 \mid -1/5]$
 - **Langkah 5 (Substitusi Mundur)**:
-  - Dari $R_3$: $\frac{1}{5} x_3 = -\frac{1}{5} \implies x_3 = -1$.
-  - Dari $R_2$: $\frac{5}{3} x_2 + \frac{2}{3}(-1) = \frac{13}{3} \implies \frac{5}{3} x_2 = \frac{15}{3} = 5 \implies x_2 = 3$.
-  - Dari $R_1$: $-3 x_1 - (3) + 2(-1) = -11 \implies -3 x_1 - 5 = -11 \implies -3 x_1 = -6 \implies x_1 = 2$.
+  - Dari $R_3$ : $\frac{1}{5} x_3 = -\frac{1}{5} \implies x_3 = -1$.
+  - Dari $R_2$ : $\frac{5}{3} x_2 + \frac{2}{3}(-1) = \frac{13}{3} \implies \frac{5}{3} x_2 = \frac{15}{3} = 5 \implies x_2 = 3$.
+  - Dari $R_1$ : $-3 x_1 - (3) + 2(-1) = -11 \implies -3 x_1 - 5 = -11 \implies -3 x_1 = -6 \implies x_1 = 2$.
   - **Solusi Eksak**: $\mathbf{x} = [2.0, 3.0, -1.0]^T$.
 </details>
 
@@ -652,27 +784,50 @@ Vektor hasil akhir adalah $\mathbf{b} = \begin{bmatrix} 25 \\ 20 \end{bmatrix}$.
 
 ### Tingkat 3 (Menengah / Pemodelan & Koding) - Modified Gram-Schmidt (MGS) & Faktorisasi QR
 - **Tugas**: Buktikan kestabilan algoritma Gram-Schmidt Termodifikasi (*Modified Gram-Schmidt* / MGS) pada matriks uji ill-conditioned:
-  $$\mathbf{a}_1 = [1, 1, 1]^T, \quad \mathbf{a}_2 = [1, 1 + 10^{-4}, 1]^T$$
+
+$$
+\mathbf{a}_1 = [1, 1, 1]^T, \quad \mathbf{a}_2 = [1, 1 + 10^{-4}, 1]^T
+$$
+
 <details>
 <summary>💡 Petunjuk Bertahap (Hint)</summary>
 
-1. Hitung $\mathbf{q}_1 = \mathbf{a}_1 / \|\mathbf{a}_1\|_2$.
-2. Pada MGS, segera proyeksikan $\mathbf{a}_2$ terhadap $\mathbf{q}_1$: $\mathbf{v}_2 = \mathbf{a}_2 - (\mathbf{q}_1^T \mathbf{a}_2) \mathbf{q}_1$.
-3. Normalisasi $\mathbf{q}_2 = \mathbf{v}_2 / \|\mathbf{v}_2\|_2$.
+1. Hitung $\mathbf{q}_1 = \mathbf{a}_1 / \lVert \mathbf{a}_1 \rVert_2$.
+2. Pada MGS, segera proyeksikan $\mathbf{a}_2$ terhadap $\mathbf{q}_1$ : $\mathbf{v}_2 = \mathbf{a}_2 - (\mathbf{q}_1^T \mathbf{a}_2) \mathbf{q}_1$.
+3. Normalisasi $\mathbf{q}_2 = \mathbf{v}_2 / \lVert \mathbf{v}_2 \rVert_2$.
 4. Periksa ortogonalitas $\mathbf{q}_1^T \mathbf{q}_2$ dan bandingkan dengan presisi mesin float64.
 </details>
 <details>
 <summary>✅ Pembahasan & Kunci Jawaban Lengkap</summary>
 
-- **Langkah 1**: $\|\mathbf{a}_1\|_2 = \sqrt{1^2 + 1^2 + 1^2} = \sqrt{3} \approx 1.7320508$.
-  $$\mathbf{q}_1 = [1/\sqrt{3}, 1/\sqrt{3}, 1/\sqrt{3}]^T$$
+- **Langkah 1**: $\lVert \mathbf{a}_1 \rVert_2 = \sqrt{1^2 + 1^2 + 1^2} = \sqrt{3} \approx 1.7320508$.
+
+$$
+\mathbf{q}_1 = [1/\sqrt{3}, 1/\sqrt{3}, 1/\sqrt{3}]^T
+$$
+
 - **Langkah 2**: Proyeksi:
-  $$\mathbf{q}_1^T \mathbf{a}_2 = \frac{1 + (1 + 10^{-4}) + 1}{\sqrt{3}} = \frac{3 + 10^{-4}}{\sqrt{3}}$$
-  $$\mathbf{v}_2 = \mathbf{a}_2 - (\mathbf{q}_1^T \mathbf{a}_2) \mathbf{q}_1 = \begin{bmatrix} 1 \\ 1 + 10^{-4} \\ 1 \end{bmatrix} - \frac{3 + 10^{-4}}{3} \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix} = \begin{bmatrix} -10^{-4}/3 \\ 2 \cdot 10^{-4}/3 \\ -10^{-4}/3 \end{bmatrix}$$
+
+$$
+\mathbf{q}_1^T \mathbf{a}_2 = \frac{1 + (1 + 10^{-4}) + 1}{\sqrt{3}} = \frac{3 + 10^{-4}}{\sqrt{3}}
+$$
+
+$$
+\mathbf{v}_2 = \mathbf{a}_2 - (\mathbf{q}_1^T \mathbf{a}_2) \mathbf{q}_1 = \begin{bmatrix} 1 \\ 1 + 10^{-4} \\ 1 \end{bmatrix} - \frac{3 + 10^{-4}}{3} \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix} = \begin{bmatrix} -10^{-4}/3 \\ 2 \cdot 10^{-4}/3 \\ -10^{-4}/3 \end{bmatrix}
+$$
+
 - **Langkah 3**: Norma $\mathbf{v}_2 = \frac{10^{-4}}{3} \sqrt{(-1)^2 + 2^2 + (-1)^2} = \frac{10^{-4} \sqrt{6}}{3}$.
-  $$\mathbf{q}_2 = \frac{1}{\sqrt{6}} \begin{bmatrix} -1 \\ 2 \\ -1 \end{bmatrix}$$
+
+$$
+\mathbf{q}_2 = \frac{1}{\sqrt{6}} \begin{bmatrix} -1 \\ 2 \\ -1 \end{bmatrix}
+$$
+
 - **Langkah 4**: Evaluasi dot product ortogonal:
-  $$\mathbf{q}_1^T \mathbf{q}_2 = \frac{1}{\sqrt{18}} (1(-1) + 1(2) + 1(-1)) = \frac{-1 + 2 - 1}{\sqrt{18}} = 0.0$$
+
+$$
+\mathbf{q}_1^T \mathbf{q}_2 = \frac{1}{\sqrt{18}} (1(-1) + 1(2) + 1(-1)) = \frac{-1 + 2 - 1}{\sqrt{18}} = 0.0
+$$
+
   Ortogonalitas sempurna terpenuhi hingga presisi batas toleransi numerik $< 10^{-14}$!
 </details>
 
@@ -685,16 +840,16 @@ Vektor hasil akhir adalah $\mathbf{b} = \begin{bmatrix} 25 \\ 20 \end{bmatrix}$.
 
 1. Terima matriks skala abu-abu $A \in \mathbb{R}^{m \times n}$.
 2. Hitung SVD penuh: $A = U \Sigma V^T$.
-3. Bangun aproksimasi matriks rank-$k$: $A_k = \sum_{i=1}^k \sigma_i \mathbf{u}_i \mathbf{v}_i^T$.
+3. Bangun aproksimasi matriks rank-$k$ : $A_k = \sum_{i=1}^k \sigma_i \mathbf{u}_i \mathbf{v}_i^T$.
 4. Evaluasi memori: dari $m \times n$ float menjadi $k(m + n + 1)$ float.
-5. Hitung galat Frobenius numerik $\|A - A_k\|_F$ dan cocokkan dengan $\sqrt{\sum_{j=k+1}^{\min(m,n)} \sigma_j^2}$.
+5. Hitung galat Frobenius numerik $\lVert A - A_k \rVert_F$ dan cocokkan dengan $\sqrt{\sum_{j=k+1}^{\min(m,n)} \sigma_j^2}$.
 </details>
 <details>
 <summary>✅ Pembahasan & Kunci Jawaban Lengkap</summary>
 
 - **Formula Penyimpanan**: Untuk citra $1024 \times 1024$, ukuran asli adalah $1.048.576$ float. Pada kompresi rank $k = 50$, penyimpanan berkurang menjadi $50 \times (1024 + 1024 + 1) = 102.450$ float (penghematan $> 90.2\%$).
 - **Verifikasi Teorema Eckart-Young**:
-  Sesuai dekomposisi ortogonal suku-suku singular, deviasi numerik antara $\text{Frobenius\_Actual} = \|A - A_k\|_F$ dan $\text{Frobenius\_Theoretical} = \sqrt{\sum_{j=k+1}^r \sigma_j^2}$ selalu bernilai nol dalam toleransi presisi floating-point IEEE 754 float64 (`math.isclose(frob_actual, frob_theo, rel_tol=1e-12)`).
+  Sesuai dekomposisi ortogonal suku-suku singular, deviasi numerik antara $\text{Frobenius\_Actual} = \lVert A - A_k \rVert_F$ dan $\text{Frobenius\_Theoretical} = \sqrt{\sum_{j=k+1}^r \sigma_j^2}$ selalu bernilai nol dalam toleransi presisi floating-point IEEE 754 float64 (`math.isclose(frob_actual, frob_theo, rel_tol=1e-12)`).
 - **Implikasi Arsitektural**: Pada data dengan spektrum nilai singular meluruh tajam (seperti bobot atensi LLM dan citra digital), SVD rank-$k$ menghasilkan kompresi optimal tanpa degradasi representasi laten.
 </details>
 

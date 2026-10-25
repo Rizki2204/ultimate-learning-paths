@@ -55,7 +55,7 @@ Penguasaan prinsip kognitif, penalaran first-principles, logika proposisional/pr
 | 37 | Mathematical Identities | Dekomposisi Tucker memfaktorkan tensor \mathcal{X} berukuran I_1 x I_2 x I_3 menjadi ... | `tier-01::matematika` |
 | 38 | Mathematical Identities | Dalam eliminasi Gaussian komputasional, jika pivot bernilai nol atau sangat mendekati... | `tier-01::matematika` |
 | 39 | Foundational Definitions | Gilbert Strang merumuskan 4 cara fundamental memandang perkalian matriks C = A B: (1)... | `tier-01::matematika` |
-| 40 | Foundational Definitions | Secara geometris dalam ruang R^n, nilai mutlak determinan \|\det(A)\| merepresentasikan... | `tier-01::matematika` |
+| 40 | Foundational Definitions | Secara geometris dalam ruang R^n, nilai mutlak determinan \lVert \det(A) \rVert merepresentasikan... | `tier-01::matematika` |
 | 41 | Mathematical Identities | Sifat multiplikatif fundamental determinan menyatakan bahwa untuk dua matriks bujur s... | `tier-01::matematika` |
 | 42 | Mathematical Identities | Nilai eigen \lambda dari matriks bujur sangkar A dihitung melalui akar-akar persamaan... | `tier-01::matematika` |
 | 43 | Foundational Definitions | Jika suatu matriks riil A memiliki nilai eigen bilangan kompleks non-riil, nilai-nila... | `tier-01::matematika` |
@@ -291,10 +291,10 @@ Penguasaan prinsip kognitif, penalaran first-principles, logika proposisional/pr
 ### Kartu 15: Mathematical Identities
 
 **Pertanyaan Cloze (Anki Text)**:
-> Ketidaksamaan Cauchy-Schwarz untuk dua vektor u dan v dalam ruang hasil kali dalam menyatakan bahwa: {{c1::|\langle u, v \rangle|^2 \le \langle u, u \rangle \cdot \langle v, v \rangle}} (atau {{c1::|u \cdot v| \le \|u\| \|v\|}}).
+> Ketidaksamaan Cauchy-Schwarz untuk dua vektor u dan v dalam ruang hasil kali dalam menyatakan bahwa: {{c1::|\langle u, v \rangle|^2 \le \langle u, u \rangle \cdot \langle v, v \rangle}} (atau {{c1::|u \cdot v| \le \lVert u \rVert \lVert v \rVert}}).
 
 **Tampilan Jawaban Terbuka**:
-> Ketidaksamaan Cauchy-Schwarz untuk dua vektor u dan v dalam ruang hasil kali dalam menyatakan bahwa: **[|\langle u, v \rangle|^2 \le \langle u, u \rangle \cdot \langle v, v \rangle]** (atau **[|u \cdot v| \le \|u\| \|v\|]**).
+> Ketidaksamaan Cauchy-Schwarz untuk dua vektor u dan v dalam ruang hasil kali dalam menyatakan bahwa: **[|\langle u, v \rangle|^2 \le \langle u, u \rangle \cdot \langle v, v \rangle]** (atau **[|u \cdot v| \le \lVert u \rVert \lVert v \rVert]**).
 
 **Penjelasan Ekstra & Konteks Teknis**:
 > Kesetaraan berlaku jika dan hanya jika u dan v bergantung linear (collinear). Ketidaksamaan ini adalah dasar perumusan prinsip ketidakpastian Heisenberg dan korelasi kosinus.
@@ -563,13 +563,13 @@ Penguasaan prinsip kognitif, penalaran first-principles, logika proposisional/pr
 ### Kartu 32: Foundational Definitions
 
 **Pertanyaan Cloze (Anki Text)**:
-> Teorema Eckart-Young-Mirsky menyatakan bahwa untuk matriks sembarang A dengan SVD A = \sum_{i=1}^r \sigma_i u_i v_i^T, aproksimasi matriks ber-rank k < r terbaik yang meminimalkan galat \|A - B\|_F dan \|A - B\|_2 adalah matriks terpangkas {{c1::A_k = \sum_{i=1}^k \sigma_i u_i v_i^T}}, dengan galat aproksimasi spektral eksak sebesar {{c2::\|A - A_k\|_2 = \sigma_{k+1}}}.
+> Teorema Eckart-Young-Mirsky menyatakan bahwa untuk matriks sembarang A dengan SVD A = \sum_{i=1}^r \sigma_i u_i v_i^T, aproksimasi matriks ber-rank k < r terbaik yang meminimalkan galat \lVert A - B \rVert_F dan \lVert A - B \rVert_2 adalah matriks terpangkas {{c1::A_k = \sum_{i=1}^k \sigma_i u_i v_i^T}}, dengan galat aproksimasi spektral eksak sebesar {{c2::\lVert A - A_k \rVert_2 = \sigma_{k+1}}}.
 
 **Tampilan Jawaban Terbuka**:
-> Teorema Eckart-Young-Mirsky menyatakan bahwa untuk matriks sembarang A dengan SVD A = \sum_{i=1}^r \sigma_i u_i v_i^T, aproksimasi matriks ber-rank k < r terbaik yang meminimalkan galat \|A - B\|_F dan \|A - B\|_2 adalah matriks terpangkas **[A_k = \sum_{i=1}^k \sigma_i u_i v_i^T]**, dengan galat aproksimasi spektral eksak sebesar **[\|A - A_k\|_2 = \sigma_{k+1]**}.
+> Teorema Eckart-Young-Mirsky menyatakan bahwa untuk matriks sembarang A dengan SVD A = \sum_{i=1}^r \sigma_i u_i v_i^T, aproksimasi matriks ber-rank k < r terbaik yang meminimalkan galat \lVert A - B \rVert_F dan \lVert A - B \rVert_2 adalah matriks terpangkas **[A_k = \sum_{i=1}^k \sigma_i u_i v_i^T]**, dengan galat aproksimasi spektral eksak sebesar **[\lVert A - A_k \rVert_2 = \sigma_{k+1}]**.
 
 **Penjelasan Ekstra & Konteks Teknis**:
-> Untuk norma Frobenius, galat kuadratnya adalah \|A - A_k\|_F^2 = \sum_{i=k+1}^r \sigma_i^2. Teorema ini membuktikan bahwa pemangkasan nilai singular terkecil adalah strategi optimal mutlak untuk kompresi data, peredaman derau gambar, dan Principal Component Analysis (PCA).
+> Untuk norma Frobenius, galat kuadratnya adalah \lVert A - A_k \rVert_F^2 = \sum_{i=k+1}^r \sigma_i^2. Teorema ini membuktikan bahwa pemangkasan nilai singular terkecil adalah strategi optimal mutlak untuk kompresi data, peredaman derau gambar, dan Principal Component Analysis (PCA).
 
 **Tags**: `tier-01::matematika math::linear-algebra foundational-definitions`  
 **Kategori**: `Foundational Definitions`
@@ -585,7 +585,7 @@ Penguasaan prinsip kognitif, penalaran first-principles, logika proposisional/pr
 > Pseudoinvers Moore-Penrose dari matriks A berukuran m x n dengan SVD A = U \Sigma V^T didefinisikan sebagai **[A^+ = V \Sigma^+ U^T]**, di mana \Sigma^+ dibentuk dengan mengambil **[kebalikan 1/\sigma_i untuk setiap nilai singular tak-nol \sigma_i > 0]** dan mentransposisikan dimensinya.
 
 **Penjelasan Ekstra & Konteks Teknis**:
-> Matriks A^+ secara tunggal memenuhi 4 kondisi Penrose: (1) A A^+ A = A, (2) A^+ A A^+ = A^+, (3) (A A^+)^T = A A^+, dan (4) (A^+ A)^T = A^+ A. Solusi \hat{x} = A^+ b meminimalkan galat kuadrat terkecil \|Ax - b\|_2 sekaligus memiliki norma Euclidean \|x\|_2 terkecil di antara seluruh solusi yang mungkin.
+> Matriks A^+ secara tunggal memenuhi 4 kondisi Penrose: (1) A A^+ A = A, (2) A^+ A A^+ = A^+, (3) (A A^+)^T = A A^+, dan (4) (A^+ A)^T = A^+ A. Solusi \hat{x} = A^+ b meminimalkan galat kuadrat terkecil \lVert Ax - b \rVert_2 sekaligus memiliki norma Euclidean \lVert x \rVert_2 terkecil di antara seluruh solusi yang mungkin.
 
 **Tags**: `tier-01::matematika math::linear-algebra mathematical-identities`  
 **Kategori**: `Mathematical Identities`
@@ -595,13 +595,13 @@ Penguasaan prinsip kognitif, penalaran first-principles, logika proposisional/pr
 ### Kartu 34: Foundational Definitions
 
 **Pertanyaan Cloze (Anki Text)**:
-> Fungsi objektif Principal Component Analysis (PCA) mencari vektor arah proyeksi satuan w dalam R^d (\|w\|_2 = 1) yang {{c1::memaksimalkan varians data terproyeksi \max_{w} w^T S w}}, di mana S = \frac{1}{n-1} X_c^T X_c adalah matriks kovarians sampel data terpusat, yang solusinya merupakan {{c2::eigenvektor dari S yang bersesuaian dengan nilai eigen terbesar \lambda_1}}.
+> Fungsi objektif Principal Component Analysis (PCA) mencari vektor arah proyeksi satuan w dalam R^d (\lVert w \rVert_2 = 1) yang {{c1::memaksimalkan varians data terproyeksi \max_{w} w^T S w}}, di mana S = \frac{1}{n-1} X_c^T X_c adalah matriks kovarians sampel data terpusat, yang solusinya merupakan {{c2::eigenvektor dari S yang bersesuaian dengan nilai eigen terbesar \lambda_1}}.
 
 **Tampilan Jawaban Terbuka**:
-> Fungsi objektif Principal Component Analysis (PCA) mencari vektor arah proyeksi satuan w dalam R^d (\|w\|_2 = 1) yang **[memaksimalkan varians data terproyeksi \max_{w} w^T S w]**, di mana S = \frac{1}{n-1} X_c^T X_c adalah matriks kovarians sampel data terpusat, yang solusinya merupakan **[eigenvektor dari S yang bersesuaian dengan nilai eigen terbesar \lambda_1]**.
+> Fungsi objektif Principal Component Analysis (PCA) mencari vektor arah proyeksi satuan w dalam R^d (\lVert w \rVert_2 = 1) yang **[memaksimalkan varians data terproyeksi \max_{w} w^T S w]**, di mana S = \frac{1}{n-1} X_c^T X_c adalah matriks kovarians sampel data terpusat, yang solusinya merupakan **[eigenvektor dari S yang bersesuaian dengan nilai eigen terbesar \lambda_1]**.
 
 **Penjelasan Ekstra & Konteks Teknis**:
-> Berdasarkan formalisme Rasio Rayleigh, \max_{\|w\|=1} w^T S w = \lambda_{\max}(S). Proyeksi ini ekuivalen secara matematis dengan meminimalkan jumlah kuadrat galat rekonstruksi ortogonal (Mean Squared Error). Arah komponen utama ke-k bersesuaian dengan eigenvektor ke-k dari S.
+> Berdasarkan formalisme Rasio Rayleigh, \max_{\lVert w \rVert=1} w^T S w = \lambda_{\max}(S). Proyeksi ini ekuivalen secara matematis dengan meminimalkan jumlah kuadrat galat rekonstruksi ortogonal (Mean Squared Error). Arah komponen utama ke-k bersesuaian dengan eigenvektor ke-k dari S.
 
 **Tags**: `tier-01::matematika math::linear-algebra foundational-definitions`  
 **Kategori**: `Foundational Definitions`
@@ -710,7 +710,7 @@ Penguasaan prinsip kognitif, penalaran first-principles, logika proposisional/pr
 > Sifat multiplikatif fundamental determinan menyatakan bahwa untuk dua matriks bujur sangkar A dan B berlaku {{c1::\det(A B) = \det(A) \cdot \det(B)}}, dan jika A invertibel maka {{c1::\det(A^{-1}) = \frac{1}{\det(A)}}}; namun dalam komputasi AI/statistik berdimensi tinggi, fungsi {{c2::\text{slogdet} (\ln |\det(A)|)}} digunakan untuk mencegah underflow/overflow numerik.
 
 **Tampilan Jawaban Terbuka**:
-> Sifat multiplikatif fundamental determinan menyatakan bahwa untuk dua matriks bujur sangkar A dan B berlaku **[\det(A B) = \det(A) \cdot \det(B)]**, dan jika A invertibel maka **[\det(A^{-1}) = \frac{1}{\det(A)]**}; namun dalam komputasi AI/statistik berdimensi tinggi, fungsi **[\text{slogdet} (\ln |\det(A)|)]** digunakan untuk mencegah underflow/overflow numerik.
+> Sifat multiplikatif fundamental determinan menyatakan bahwa untuk dua matriks bujur sangkar A dan B berlaku **[\det(A B) = \det(A) \cdot \det(B)]**, dan jika A invertibel maka **[\det(A^{-1}) = \frac{1}{\det(A)}]**; namun dalam komputasi AI/statistik berdimensi tinggi, fungsi **[\text{slogdet} (\ln |\det(A)|)]** digunakan untuk mencegah underflow/overflow numerik.
 
 **Penjelasan Ekstra & Konteks Teknis**:
 > Determinan mendekati nol bukan jaminan matriks dekat dengan singularitas (misal matriks diagonal 0.1 * I_{100} memiliki determinan 10^{-100} yang underflow ke 0 pada float64 padahal condition number kappa(A) = 1 sempurna). Stabilitas numerik inversi selalu ditentukan oleh condition number kappa(A), bukan determinan.

@@ -15,20 +15,28 @@ Bayangkan Anda datang ke sebuah warung makan yang menjual dua macam paket hemat:
 - **Paket A**: 2 potong ayam goreng + 1 gelas es teh = Rp 25.000
 - **Paket B**: 1 potong ayam goreng + 2 gelas es teh = Rp 20.000
 
-Pertanyaan sederhana: *Berapakah harga 1 potong ayam ($x_1$) dan 1 gelas es teh ($x_2$)?*
+Pertanyaan sederhana: Berapakah harga 1 potong ayam ($x_1$) dan 1 gelas es teh ($x_2$)?
 
 Pada masa SMP atau SMA, Anda mungkin menyelesaikannya dengan menuliskan dua baris persamaan linier:
-$$\begin{aligned}
+
+$$
+\begin{aligned}
 2x_1 + 1x_2 &= 25.000 \\
 1x_1 + 2x_2 &= 20.000
-\end{aligned}$$
+\end{aligned}
+$$
 
 Aljabar linier melakukan hal yang sangat cerdas: ia **memisahkan angka koefisien belanjaan, variabel pesanan, dan total harga** menjadi tiga wadah terpisah:
 
-$$\underbrace{\begin{bmatrix} 2 & 1 \\ 1 & 2 \end{bmatrix}}_{\text{Tabel Menu } (A)} \underbrace{\begin{bmatrix} x_1 \\ x_2 \end{bmatrix}}_{\text{Harga Satuan } (\mathbf{x})} = \underbrace{\begin{bmatrix} 25.000 \\ 20.000 \end{bmatrix}}_{\text{Total Bayar } (\mathbf{b})}$$
+$$
+\underbrace{\begin{bmatrix} 2 & 1 \\ 1 & 2 \end{bmatrix}}_{\text{Tabel Menu } (A)} \underbrace{\begin{bmatrix} x_1 \\ x_2 \end{bmatrix}}_{\text{Harga Satuan } (\mathbf{x})} = \underbrace{\begin{bmatrix} 25.000 \\ 20.000 \end{bmatrix}}_{\text{Total Bayar } (\mathbf{b})}
+$$
 
 Inilah yang dinamakan persamaan matriks:
-$$A\mathbf{x} = \mathbf{b}$$
+
+$$
+A\mathbf{x} = \mathbf{b}
+$$
 
 - **Apa itu Matriks?** Matriks hanyalah sebuah **tabel angka persegi panjang** yang tersusun rapi dalam baris dan kolom. Jika matriks memiliki $m$ baris dan $n$ kolom, kita menyebutnya berukuran $m \times n$.
 - **Konvensi Baris $i$ vs Kolom $j$**:
@@ -39,7 +47,7 @@ $$A\mathbf{x} = \mathbf{b}$$
 > **🔤 Kamus Simbol Anti-Pusing — Pra-Aljabar Linier Lengkap:**
 > - $\in$ (Elemen dari): Dibaca *"anggota dari"* atau *"berada di dalam"*. Contoh: $x \in \mathbb{R}$ artinya $x$ adalah sebuah bilangan riil biasa.
 > - $\mathbb{R}^n$ (Ruang Euclidean Dimensi $n$): Dibaca *"R-pangkat-n"*. Artinya daftar terurut yang berisi tepat $n$ buah angka riil (sebuah vektor dengan $n$ elemen).
-> - $\mathbb{R}^{m \times n}$: Matriks yang memiliki $m$ baris dan $n$ kolom berisi angka-angka riil.
+> - $\mathbb{R}^{m \times n}$ : Matriks yang memiliki $m$ baris dan $n$ kolom berisi angka-angka riil.
 > - $\forall$ (Universal Quantifier): Dibaca *"untuk setiap"* atau *"untuk semua"*.
 > - $\iff$ (Ekuivalensi Logika): Dibaca *"jika dan hanya jika"* (dua arah saling berlaku mutlak).
 > - $\sum_{k=1}^n$ (Sigma Jumlahan): Dibaca *"jumlahkan semua suku dari k=1 sampai n"*.
@@ -47,7 +55,7 @@ $$A\mathbf{x} = \mathbf{b}$$
 > - $A^T$ (Transpose Matriks): Menukar baris menjadi kolom dan kolom menjadi baris.
 > - $\det(A)$ (Determinan): Faktor pengali luas atau volume yang dihasilkan oleh matriks $A$.
 > - $\text{tr}(A)$ (Trace / Jejak): Jumlah seluruh angka pada diagonal utama matriks.
-> - $\|\mathbf{x}\|_2$ (Norma Euclidean): Panjang fisik vektor, dihitung dengan $\sqrt{\sum x_i^2}$.
+> - $\lVert \mathbf{x} \rVert_2$ (Norma Euclidean): Panjang fisik vektor, dihitung dengan $\sqrt{\sum x_i^2}$.
 > - $\delta_{ij}$ (Delta Kronecker): Bernilai $1$ jika $i = j$, dan bernilai $0$ jika $i \ne j$.
 > - $\kappa(A)$ (Kondisi Matriks): Mengukur tingkat kepekaan matriks terhadap galat numerik.
 
@@ -56,7 +64,7 @@ $$A\mathbf{x} = \mathbf{b}$$
 ### 1.2 Jembatan Indeks Matematika (1-Based) vs Pemrograman Python (0-Based)
 
 Salah satu sumber kebingungan terbesar bagi pemula yang belajar matematika bersamaan dengan koding adalah **perbedaan sistem penomoran indeks**:
-- **Dalam Matematika (1-Based)**: Manusia menghitung mulai dari angka $1$. Baris pertama adalah Baris 1 ($i = 1$), kolom pertama adalah Kolom 1 ($j = 1$). Elemen pojok kiri atas matriks $A$ ditulis $a_{11}$. Rumus jumlahan sigma berjalan dari $k = 1$ sampai $n$: $\sum_{k=1}^n a_{ik} b_{kj}$.
+- **Dalam Matematika (1-Based)**: Manusia menghitung mulai dari angka $1$. Baris pertama adalah Baris 1 ($i = 1$), kolom pertama adalah Kolom 1 ($j = 1$). Elemen pojok kiri atas matriks $A$ ditulis $a_{11}$. Rumus jumlahan sigma berjalan dari $k = 1$ sampai $n$ : $\sum_{k=1}^n a_{ik} b_{kj}$.
 - **Dalam Python & Sains Komputer (0-Based)**: Mesin komputer menghitung offset memori mulai dari angka $0$. Baris pertama adalah indeks `0`, kolom pertama adalah indeks `0`. Elemen pojok kiri atas matriks diakses dengan sintaks `A[0][0]`. Loop jumlahan berjalan melalui `range(n)`, yaitu dari `0` sampai `n - 1`.
 
 | Notasi Matematika | Terjemahan Python | Penjelasan |
@@ -115,7 +123,10 @@ Tautan Rujukan Kuliah: [MIT OCW 18.06 Kuliah 1](https://ocw.mit.edu/courses/18-0
 Sekarang mari kita kembali ke masalah robotika industri. Bayangkan Anda mengendalikan lengan robot industri perakitan semikonduktor dengan tiga motor servo penggerak independen. Setiap motor dapat digerakkan maju atau mundur. Ketika motor 1 berputar, ujung lengan bergerak ke arah $\mathbf{v}_1$. Ketika motor 2 berputar, ujung lengan terdorong ke arah $\mathbf{v}_2$. Dan motor 3 menggerakkannya sepanjang $\mathbf{v}_3$. 
 
 Target chip berada pada koordinat spasial $\mathbf{b}$. Berapa besar putaran masing-masing motor $(x_1, x_2, x_3)$ agar ujung lengan tepat menyentuh target?
-$$x_1 \mathbf{v}_1 + x_2 \mathbf{v}_2 + x_3 \mathbf{v}_3 = \mathbf{b}$$
+
+$$
+x_1 \mathbf{v}_1 + x_2 \mathbf{v}_2 + x_3 \mathbf{v}_3 = \mathbf{b}
+$$
 
 Ada dua sudut pandang fundamental untuk memahami persamaan ini:
 
@@ -137,7 +148,11 @@ PANDANGAN BARIS (Row Picture):       PANDANGAN KOLOM (Column Picture):
 
 2. **Pandangan Kolom (*Column Picture*) — Mahkota Aljabar Linier**:
    Alih-alih memotong-motong baris, kita melihat seluruh kolom matriks sekaligus:
-   $$x_1 \begin{bmatrix} 2 \\ 1 \end{bmatrix} + x_2 \begin{bmatrix} 1 \\ 2 \end{bmatrix} = \begin{bmatrix} 25.000 \\ 20.000 \end{bmatrix}$$
+
+$$
+x_1 \begin{bmatrix} 2 \\ 1 \end{bmatrix} + x_2 \begin{bmatrix} 1 \\ 2 \end{bmatrix} = \begin{bmatrix} 25.000 \\ 20.000 \end{bmatrix}
+$$
+
    Pertanyaannya berubah menjadi: *Berapa kali kita harus meregangkan kolom 1, lalu menjumlahkannya dengan regangan kolom 2, agar ujung vektornya tepat mendarat di target $\mathbf{b}$?*
    Pandangan kolom inilah yang menyatukan aljabar linier dengan konsep ruang rentang (*span*), ruang kolom $C(A)$, dan kebebasan linier.
 
@@ -148,25 +163,40 @@ Tautan Rujukan Kuliah: [Georgia Tech ILA: Matrix Multiplication](https://textboo
 
 Bagaimana kita mengalikan dua buah matriks $C = AB$? Kebanyakan buku sekolah hanya mengajarkan rumus hafalan baris-kali-kolom. Profesor Gilbert Strang mengajarkan bahwa ada **4 cara pandang setara** yang masing-masing membuka rahasia arsitektur sains data modern:
 
-Misalkan $A$ berukuran $m \times n$ dan $B$ berukuran $n \times p$, menghasilkan $C$ berukuran $m \times p$:
+Misalkan $A$ berukuran $m \times n$ dan $B$ berukuran $n \times p$, menghasilkan $C$ berukuran $m \times p$ :
 
 1. **Pandangan 1: Entri-demi-Entri / Hasil Kali Titik (*Dot Product of Rows and Columns*)**:
-   Setiap elemen tunggal $c_{ij}$ pada matriks hasil adalah perkalian titik antara Baris ke-$i$ dari matriks $A$ dengan Kolom ke-$j$ dari matriks $B$:
-   $$c_{ij} = (\text{Baris } i \text{ dari } A) \cdot (\text{Kolom } j \text{ dari } B) = \sum_{k=1}^n a_{ik} b_{kj}$$
+   Setiap elemen tunggal $c_{ij}$ pada matriks hasil adalah perkalian titik antara Baris ke-$i$ dari matriks $A$ dengan Kolom ke-$j$ dari matriks $B$ :
+
+$$
+c_{ij} = (\text{Baris } i \text{ dari } A) \cdot (\text{Kolom } j \text{ dari } B) = \sum_{k=1}^n a_{ik} b_{kj}
+$$
 
 2. **Pandangan 2: Kolom-demi-Kolom (*Column Combinations*)**:
-   Setiap kolom ke-$j$ dari matriks hasil $C$ adalah **kombinasi linier dari seluruh kolom matriks $A$**, dengan koefisien pengali yang diambil dari kolom ke-$j$ matriks $B$:
-   $$\mathbf{c}_j = A \mathbf{b}_j = b_{1j} \mathbf{a}_1 + b_{2j} \mathbf{a}_2 + \dots + b_{nj} \mathbf{a}_n$$
+   Setiap kolom ke-$j$ dari matriks hasil $C$ adalah **kombinasi linier dari seluruh kolom matriks $A$**, dengan koefisien pengali yang diambil dari kolom ke-$j$ matriks $B$ :
+
+$$
+\mathbf{c}_j = A \mathbf{b}_j = b_{1j} \mathbf{a}_1 + b_{2j} \mathbf{a}_2 + \dots + b_{nj} \mathbf{a}_n
+$$
+
    *Wawasan Kritis*: Kolom-kolom $C$ selalu bersemayam di dalam ruang kolom $A$ ($C(C) \subseteq C(A)$).
 
 3. **Pandangan 3: Baris-demi-Baris (*Row Combinations*)**:
-   Setiap baris ke-$i$ dari matriks hasil $C$ adalah **kombinasi linier dari seluruh baris matriks $B$**, dengan koefisien pengali yang diambil dari baris ke-$i$ matriks $A$:
-   $$\text{Baris } i(C) = a_{i1} \text{Baris}_1(B) + a_{i2} \text{Baris}_2(B) + \dots + a_{in} \text{Baris}_n(B)$$
+   Setiap baris ke-$i$ dari matriks hasil $C$ adalah **kombinasi linier dari seluruh baris matriks $B$**, dengan koefisien pengali yang diambil dari baris ke-$i$ matriks $A$ :
+
+$$
+\text{Baris } i(C) = a_{i1} \text{Baris}_1(B) + a_{i2} \text{Baris}_2(B) + \dots + a_{in} \text{Baris}_n(B)
+$$
+
    *Wawasan Kritis*: Baris-baris $C$ selalu bersemayam di dalam ruang baris $B$ ($C(C^T) \subseteq C(B^T)$).
 
 4. **Pandangan 4: Penjumlahan Perkalian Luar Kolom $\times$ Baris (*Outer Product Sum*)**:
    Ini adalah cara pandang paling revolusioner dalam machine learning! Perkalian matriks $AB$ dapat dipecah menjadi jumlahan dari $n$ buah matriks ber-rank 1:
-   $$AB = \sum_{k=1}^n (\text{Kolom } k \text{ dari } A) \times (\text{Baris } k \text{ dari } B) = \sum_{k=1}^n \mathbf{a}_k \mathbf{b}_k^T$$
+
+$$
+AB = \sum_{k=1}^n (\text{Kolom } k \text{ dari } A) \times (\text{Baris } k \text{ dari } B) = \sum_{k=1}^n \mathbf{a}_k \mathbf{b}_k^T
+$$
+
    Di mana setiap $\mathbf{a}_k$ adalah vektor kolom $m \times 1$ dan $\mathbf{b}_k^T$ adalah vektor baris $1 \times p$, sehingga hasil kalinya adalah matriks berukuran penuh $m \times p$ dengan rank 1!
 
 > **💡 Mengapa Pandangan ke-4 Sangat Sakti dalam AI Modern?**
@@ -189,7 +219,10 @@ Dalam aritmatika bilangan biasa, perkalian bersifat komutatif: $3 \times 5 = 5 \
 ### 1.7 Aturan "Kaus Kaki & Sepatu" (*Socks & Shoes Property*)
 
 Ketika kita menginversi atau mentranspos hasil perkalian matriks $AB$, urutannya **wajib dibalik**:
-$$(AB)^{-1} = B^{-1} A^{-1} \quad \text{dan} \quad (AB)^T = B^T A^T$$
+
+$$
+(AB)^{-1} = B^{-1} A^{-1} \quad \text{dan} \quad (AB)^T = B^T A^T
+$$
 
 > **💡 Jembatan Keledai: Kaus Kaki & Sepatu**
 > Bayangkan rutinitas harian Anda di pagi hari:
@@ -202,7 +235,11 @@ $$(AB)^{-1} = B^{-1} A^{-1} \quad \text{dan} \quad (AB)^T = B^T A^T$$
 > Inilah alasan mengapa $(AB)^{-1} = B^{-1} A^{-1}$.
 
 Secara aljabar, pembuktiannya sangat elegan:
-$$(AB)(B^{-1} A^{-1}) = A (B B^{-1}) A^{-1} = A (I) A^{-1} = A A^{-1} = I$$
+
+$$
+(AB)(B^{-1} A^{-1}) = A (B B^{-1}) A^{-1} = A (I) A^{-1} = A A^{-1} = I
+$$
+
 Karena perkaliannya menghasilkan matriks identitas $I$, maka terbukti bahwa balikan dari $AB$ adalah tepat $B^{-1} A^{-1}$.
 
 ---
@@ -211,48 +248,80 @@ Karena perkaliannya menghasilkan matriks identitas $I$, maka terbukti bahwa bali
 Tautan Rujukan Kuliah: [MIT OCW 18.06 Kuliah 2: Elimination with Matrices](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-2-elimination-with-matrices/) | [MIT OCW 18.06 Kuliah 4: Factorization into A = LU](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-4-factorization-into-a-lu/) | [Wikipedia: LU Decomposition](https://en.wikipedia.org/wiki/LU_decomposition)
 
 > **🔤 Kamus Simbol Anti-Pusing — Operasi Matriks & Vektor:**
-> - $\mathbf{x} \in \mathbb{R}^n$: Vektor kolom berisi $n$ angka riil. Cara baca: *"vektor x di dalam R-pangkat-n"*.
-> - $A \in \mathbb{R}^{m \times n}$: Matriks dengan $m$ baris dan $n$ kolom. Cara baca: *"matriks A berukuran m kali n"*.
-> - $a_{ij}$: Elemen skalar pada baris $i$ dan kolom $j$.
-> - $\mathbf{e}_i$: Vektor basis standar yang bernilai 1 pada baris $i$ dan 0 di baris lainnya.
-> - $E_{ij}(l)$: Matriks eliminasi elementer untuk mengurangi baris $i$ dengan $l$ kali baris $j$.
-> - $L$: Matriks segitiga bawah (*Lower triangular*) dengan angka 1 pada diagonal.
-> - $U$: Matriks segitiga atas (*Upper triangular*) yang memuat pivot pada diagonal.
-> - $P$: Matriks permutasi untuk menukar posisi baris.
+> - $\mathbf{x} \in \mathbb{R}^n$ : Vektor kolom berisi $n$ angka riil. Cara baca: *"vektor x di dalam R-pangkat-n"*.
+> - $A \in \mathbb{R}^{m \times n}$ : Matriks dengan $m$ baris dan $n$ kolom. Cara baca: *"matriks A berukuran m kali n"*.
+> - $a_{ij}$ : Elemen skalar pada baris $i$ dan kolom $j$.
+> - $\mathbf{e}_i$ : Vektor basis standar yang bernilai 1 pada baris $i$ dan 0 di baris lainnya.
+> - $E_{ij}(l)$ : Matriks eliminasi elementer untuk mengurangi baris $i$ dengan $l$ kali baris $j$.
+> - $L$ : Matriks segitiga bawah (*Lower triangular*) dengan angka 1 pada diagonal.
+> - $U$ : Matriks segitiga atas (*Upper triangular*) yang memuat pivot pada diagonal.
+> - $P$ : Matriks permutasi untuk menukar posisi baris.
 
 ### 2.1 Definisi Ruang Vektor $\mathbb{R}^n$ dan Operasi Linier
 Sebuah vektor kolom $\mathbf{x} \in \mathbb{R}^n$ adalah tupel terurut dari $n$ bilangan riil:
-$$\mathbf{x} = \begin{bmatrix} x_1 \\ x_2 \\ \vdots \\ x_n \end{bmatrix}, \quad x_i \in \mathbb{R}$$
+
+$$
+\mathbf{x} = \begin{bmatrix} x_1 \\ x_2 \\ \vdots \\ x_n \end{bmatrix}, \quad x_i \in \mathbb{R}
+$$
+
 Dua operasi tertutup yang mendefinisikan ruang vektor adalah:
 1. **Penjumlahan Vektor**: $\mathbf{x} + \mathbf{y} = \begin{bmatrix} x_1 + y_1 \\ \vdots \\ x_n + y_n \end{bmatrix} \in \mathbb{R}^n$
 2. **Perkalian Skalar**: $c\mathbf{x} = \begin{bmatrix} c x_1 \\ \vdots \\ c x_n \end{bmatrix} \in \mathbb{R}^n, \quad \forall c \in \mathbb{R}$
 
 Hasil kali titik (*dot product*) Euclidean antara dua vektor $\mathbf{x}, \mathbf{y} \in \mathbb{R}^n$ didefinisikan sebagai:
-$$\mathbf{x} \cdot \mathbf{y} = \mathbf{x}^T \mathbf{y} = \sum_{i=1}^n x_i y_i$$
-Norma atau panjang vektor induksi $\ell_2$ adalah $\|\mathbf{x}\|_2 = \sqrt{\mathbf{x}^T \mathbf{x}} = \sqrt{\sum_{i=1}^n x_i^2}$.
+
+$$
+\mathbf{x} \cdot \mathbf{y} = \mathbf{x}^T \mathbf{y} = \sum_{i=1}^n x_i y_i
+$$
+
+Norma atau panjang vektor induksi $\ell_2$ adalah $\lVert \mathbf{x} \rVert_2 = \sqrt{\mathbf{x}^T \mathbf{x}} = \sqrt{\sum_{i=1}^n x_i^2}$.
 
 ---
 
 ### 2.2 Sistem Persamaan Linier dan Matriks Eliminasi Elementer
 Diberikan sistem $m$ persamaan dengan $n$ variabel:
-$$\sum_{j=1}^n a_{ij} x_j = b_i, \quad i = 1, \dots, m \iff A\mathbf{x} = \mathbf{b}$$
+
+$$
+\sum_{j=1}^n a_{ij} x_j = b_i, \quad i = 1, \dots, m \iff A\mathbf{x} = \mathbf{b}
+$$
+
 Algoritma eliminasi Gaussian mentransformasi matriks sistem $A$ menjadi matriks segitiga atas $U$ (*upper triangular*) melalui perkalian beruntun dengan matriks eliminasi elementer $E_{ij}$.
 
-Matriks elementer $E_{ij}(l)$ adalah matriks identitas yang dimodifikasi pada baris ke-$i$ kolom ke-$j$ dengan nilai $-l$:
-$$E_{ij}(l) = I - l \mathbf{e}_i \mathbf{e}_j^T, \quad i > j$$
+Matriks elementer $E_{ij}(l)$ adalah matriks identitas yang dimodifikasi pada baris ke-$i$ kolom ke-$j$ dengan nilai $-l$ :
+
+$$
+E_{ij}(l) = I - l \mathbf{e}_i \mathbf{e}_j^T, \quad i > j
+$$
+
 Ketika $E_{ij}(l)$ mengalikan matriks $A$ dari kiri, baris ke-$i$ dari $A$ dikurangi dengan $l$ kali baris ke-$j$, di mana pengali (*multiplier*) eliminasi dipilih secara unik agar entri $(i, j)$ menjadi nol:
-$$l_{ij} = \frac{a_{ij}^{(j-1)}}{a_{jj}^{(j-1)}}$$
+
+$$
+l_{ij} = \frac{a_{ij}^{(j-1)}}{a_{jj}^{(j-1)}}
+$$
+
 Di sini, $a_{jj}^{(j-1)}$ disebut sebagai **elemen pivot** (*pivot element*). Syarat eliminasi tanpa pertukaran baris mengharuskan seluruh pivot $a_{jj}^{(j-1)} \neq 0$.
 
 > **🌉 Jembatan Logika — Mengapa Tanda Minus Lenyap pada Matriks L:**
 > Saat kita melakukan eliminasi pada persamaan, kita melakukan operasi:
-> $$\text{Baris}_2 \leftarrow \text{Baris}_2 - l_{21} \times \text{Baris}_1$$
+>
+> $$
+> \text{Baris}_2 \leftarrow \text{Baris}_2 - l_{21} \times \text{Baris}_1
+> $$
+>
 > Matriks transformasinya adalah $E_{21} = \begin{bmatrix} 1 & 0 \\ -l_{21} & 1 \end{bmatrix}$ (memiliki tanda minus).
 > Namun, faktorisasi kita adalah $A = L U$, yang berarti:
-> $$E_{21} A = U \iff A = E_{21}^{-1} U = L U$$
+>
+> $$
+> E_{21} A = U \iff A = E_{21}^{-1} U = L U
+> $$
+>
 > Perhatikan bahwa matriks $L$ adalah **invers** dari matriks eliminasi: $L = E_{21}^{-1}$!
-> Untuk membatalkan pengurangan sebesar $l_{21}$, kita harus **menambahkan kembali** $l_{21}$:
-> $$E_{21}^{-1} = \begin{bmatrix} 1 & 0 \\ +l_{21} & 1 \end{bmatrix}$$
+> Untuk membatalkan pengurangan sebesar $l_{21}$, kita harus **menambahkan kembali** $l_{21}$ :
+>
+> $$
+> E_{21}^{-1} = \begin{bmatrix} 1 & 0 \\ +l_{21} & 1 \end{bmatrix}
+> $$
+>
 > Inilah alasan indah mengapa pengali eliminasi masuk ke dalam matriks $L$ **sebagai bilangan positif $+l_{ij}$ tanpa tanda minus**!
 
 ---
@@ -265,28 +334,55 @@ Di sini, $a_{jj}^{(j-1)}$ disebut sebagai **elemen pivot** (*pivot element*). Sy
 Misalkan proses eliminasi Gaussian membutuhkan eliminasi bertahap dari kolom $j = 1$ hingga $n-1$.
 Untuk kolom $1$, kita mengalikan $A$ dengan runtunan matriks eliminasi $E_{21}, E_{31}, \dots, E_{n1}$.
 Didefinisikan matriks eliminasi total untuk kolom $1$ sebagai:
-$$E_1 = E_{n1} E_{n-1,1} \dots E_{21}$$
+
+$$
+E_1 = E_{n1} E_{n-1,1} \dots E_{21}
+$$
+
 Karena setiap $E_{i1} = I - l_{i1} \mathbf{e}_i \mathbf{e}_1^T$ saling komutatif untuk kolom pivot yang sama (karena $\mathbf{e}_1^T \mathbf{e}_i = 0$ untuk $i > 1$), maka:
-$$E_1 = I - \sum_{i=2}^n l_{i1} \mathbf{e}_i \mathbf{e}_1^T = \begin{bmatrix} 1 & 0 & \dots & 0 \\ -l_{21} & 1 & \dots & 0 \\ \vdots & \vdots & \ddots & \vdots \\ -l_{n1} & 0 & \dots & 1 \end{bmatrix}$$
+
+$$
+E_1 = I - \sum_{i=2}^n l_{i1} \mathbf{e}_i \mathbf{e}_1^T = \begin{bmatrix} 1 & 0 & \dots & 0 \\ -l_{21} & 1 & \dots & 0 \\ \vdots & \vdots & \ddots & \vdots \\ -l_{n1} & 0 & \dots & 1 \end{bmatrix}
+$$
+
 Invers dari matriks $E_1$ diperoleh secara langsung dengan membalik tanda pengali tanpa mengubah struktur lainnya:
-$$E_1^{-1} = I + \sum_{i=2}^n l_{i1} \mathbf{e}_i \mathbf{e}_1^T = \begin{bmatrix} 1 & 0 & \dots & 0 \\ l_{21} & 1 & \dots & 0 \\ \vdots & \vdots & \ddots & \vdots \\ l_{n1} & 0 & \dots & 1 \end{bmatrix}$$
+
+$$
+E_1^{-1} = I + \sum_{i=2}^n l_{i1} \mathbf{e}_i \mathbf{e}_1^T = \begin{bmatrix} 1 & 0 & \dots & 0 \\ l_{21} & 1 & \dots & 0 \\ \vdots & \vdots & \ddots & \vdots \\ l_{n1} & 0 & \dots & 1 \end{bmatrix}
+$$
 
 Secara umum, untuk kolom pivot $k$, matriks eliminasi kolom adalah $E_k = I - \sum_{i=k+1}^n l_{ik} \mathbf{e}_i \mathbf{e}_k^T$.
-Setelah seluruh $n-1$ langkah eliminasi selesai, matriks $A$ telah bertransformasi menjadi segitiga atas $U$:
-$$E_{n-1} \dots E_2 E_1 A = U$$
+Setelah seluruh $n-1$ langkah eliminasi selesai, matriks $A$ telah bertransformasi menjadi segitiga atas $U$ :
+
+$$
+E_{n-1} \dots E_2 E_1 A = U
+$$
+
 Dengan mengalikan kedua sisi dari kiri dengan invers berurutan:
-$$A = E_1^{-1} E_2^{-1} \dots E_{n-1}^{-1} U$$
+
+$$
+A = E_1^{-1} E_2^{-1} \dots E_{n-1}^{-1} U
+$$
+
 Kita definisikan $L = E_1^{-1} E_2^{-1} \dots E_{n-1}^{-1}$.
 
 > **🌉 Jembatan Logika — Mengapa Perkalian Invers Matriks Elementer Tidak Saling Merusak:**
 > Ketika kita mengalikan matriks eliminasi biasa: $E_2 E_1$, suku-suku pengali saling bercampur dan muncul suku silang yang rumit.
 > Namun ketika kita mengalikan **inversnya**: $E_1^{-1} E_2^{-1}$, perhatikan suku silangnya:
-> $$\left( \mathbf{e}_i \mathbf{e}_j^T \right) \left( \mathbf{e}_m \mathbf{e}_k^T \right) = \mathbf{e}_i (\mathbf{e}_j^T \mathbf{e}_m) \mathbf{e}_k^T$$
+>
+> $$
+> \left( \mathbf{e}_i \mathbf{e}_j^T \right) \left( \mathbf{e}_m \mathbf{e}_k^T \right) = \mathbf{e}_i (\mathbf{e}_j^T \mathbf{e}_m) \mathbf{e}_k^T
+> $$
+>
 > Untuk kolom $j < k$, indeks baris pengali kedua selalu $m \ge k+1 > j$.
 > Akibatnya, hasil kali titik basis kanonikal $\mathbf{e}_j^T \mathbf{e}_m = \delta_{jm} = 0$! Suku silang lenyap seketika!
 
 Karena suku silang lenyap secara identik nol, seluruh pengali eliminasi $l_{ik}$ tersusun rapi langsung pada entri $(i, k)$ matriks $L$ di bawah diagonal utama:
-$$L = \begin{bmatrix} 1 & 0 & 0 & \dots & 0 \\ l_{21} & 1 & 0 & \dots & 0 \\ l_{31} & l_{32} & 1 & \dots & 0 \\ \vdots & \vdots & \vdots & \ddots & \vdots \\ l_{n1} & l_{n2} & l_{n3} & \dots & 1 \end{bmatrix}$$
+
+$$
+L = \begin{bmatrix} 1 & 0 & 0 & \dots & 0 \\ l_{21} & 1 & 0 & \dots & 0 \\ l_{31} & l_{32} & 1 & \dots & 0 \\ \vdots & \vdots & \vdots & \ddots & \vdots \\ l_{n1} & l_{n2} & l_{n3} & \dots & 1 \end{bmatrix}
+$$
+
 Maka terbukti secara rigor bahwa $A = LU$. $\blacksquare$
 
 ---
@@ -294,7 +390,11 @@ Maka terbukti secara rigor bahwa $A = LU$. $\blacksquare$
 ### 2.4 Bentuk Simetris Sempurna: Faktorisasi $A = LDU$
 Jika elemen pivot ditarik keluar dari baris-baris $U$, kita membentuk matriks diagonal pivot $D = \text{diag}(d_1, d_2, \dots, d_n)$ di mana $d_k = u_{kk} = a_{kk}^{(k-1)}$.
 Matriks segitiga atas baru didefinisikan sebagai $U' = D^{-1} U$, sehingga seluruh entri diagonal utama $U'$ bernilai tepat 1:
-$$A = L D U'$$
+
+$$
+A = L D U'
+$$
+
 Bentuk $LDU$ ini sangat penting: jika matriks $A$ bersifat simetris ($A = A^T$), maka $U' = L^T$, menghasilkan faktorisasi simetris $A = L D L^T$.
 
 ---
@@ -304,11 +404,18 @@ Dalam komputasi numerik riil, terdapat dua situasi kegagalan eliminasi naif:
 1. Elemen pivot bernilai tepat nol ($a_{kk} = 0$), sehingga pembagian $l_{ik} = a_{ik} / a_{kk}$ memicu galat tak terdefinisi (*division by zero*).
 2. Elemen pivot bernilai sangat mendekati nol ($|a_{kk}| \ll 1$), sehingga pembagian menghasilkan nilai pengali raksasa yang menyebabkan pembatalan katastropik (*catastrophic cancellation*) dan amplifikasi galat pembulatan floating-point IEEE 754.
 
-Untuk mengatasinya, algoritma **Partial Pivoting** mencari entri baris $p \ge k$ yang memiliki magnitudo absolut maksimum pada kolom ke-$k$:
-$$p = \arg\max_{i \ge k} |u_{ik}|$$
+Untuk mengatasinya, algoritma **Partial Pivoting** mencari entri baris $p \ge k$ yang memiliki magnitudo absolut maksimum pada kolom ke-$k$ :
+
+$$
+p = \arg\max_{i \ge k} |u_{ik}|
+$$
+
 Baris ke-$k$ kemudian ditukar dengan baris ke-$p$. Pertukaran ini direpresentasikan secara aljabar oleh **Matriks Permutasi** $P$. Matriks permutasi adalah matriks ortogonal diskrit ($P^T P = I$) yang baris-barisnya merupakan permutasi dari baris-baris matriks identitas.
 Dengan menerapkan permutasi baris sebelum setiap langkah eliminasi, faktorisasi universal untuk setiap matriks nonsingular adalah:
-$$PA = LU$$
+
+$$
+PA = LU
+$$
 
 ---
 
@@ -322,23 +429,46 @@ Sesuai standar komputasi numerik modern (Golub & Van Loan, Higham):
 Pada langkah ke-$k$ (di mana $k$ berjalan dari $1$ hingga $n-1$):
 1. Menghitung pengali $l_{ik} = u_{ik} / u_{kk}$ untuk setiap baris di bawah pivot ($i = k+1, \dots, n$):
    Terdapat $n - k$ operasi pembagian.
-2. Memperbarui entri submatriks $(n-k) \times (n-k)$:
-   Untuk setiap baris $i \in \{k+1, \dots, n\}$ dan setiap kolom $j \in \{k+1, \dots, n\}$:
-   $$u_{ij} \leftarrow u_{ij} - l_{ik} u_{kj}$$
+2. Memperbarui entri submatriks $(n-k) \times (n-k)$ :
+   Untuk setiap baris $i \in \{k+1, \dots, n\}$ dan setiap kolom $j \in \{k+1, \dots, n\}$ :
+
+$$
+u_{ij} \leftarrow u_{ij} - l_{ik} u_{kj}
+$$
+
    Operasi ini membutuhkan 1 perkalian dan 1 pengurangan per elemen, sehingga totalnya $2(n - k)^2$ flops.
 
 Jumlah total flops untuk seluruh eliminasi adalah:
-$$\text{Total Flops} = \sum_{k=1}^{n-1} \left( (n - k) + 2(n - k)^2 \right)$$
+
+$$
+\text{Total Flops} = \sum_{k=1}^{n-1} \left( (n - k) + 2(n - k)^2 \right)
+$$
+
 Misalkan substitusi indeks $m = n - k$. Saat $k = 1 \implies m = n-1$, dan saat $k = n-1 \implies m = 1$.
-$$\sum_{m=1}^{n-1} 2m^2 + \sum_{m=1}^{n-1} m$$
-Menggunakan rumus deret jumlahan kuadrat bilangan bulat $\sum_{m=1}^M m^2 = \frac{M(M+1)(2M+1)}{6}$:
-$$\sum_{m=1}^{n-1} 2m^2 = 2 \cdot \frac{(n-1)n(2n-1)}{6} = \frac{2n^3 - 3n^2 + n}{3} = \frac{2}{3}n^3 - n^2 + \frac{1}{3}n$$
+
+$$
+\sum_{m=1}^{n-1} 2m^2 + \sum_{m=1}^{n-1} m
+$$
+
+Menggunakan rumus deret jumlahan kuadrat bilangan bulat $\sum_{m=1}^M m^2 = \frac{M(M+1)(2M+1)}{6}$ :
+
+$$
+\sum_{m=1}^{n-1} 2m^2 = 2 \cdot \frac{(n-1)n(2n-1)}{6} = \frac{2n^3 - 3n^2 + n}{3} = \frac{2}{3}n^3 - n^2 + \frac{1}{3}n
+$$
+
 Suku dominan untuk $n$ besar adalah:
-$$\text{Kompleksitas Eliminasi } A = LU \sim \frac{2}{3}n^3 \text{ total FLOPs } \left( \frac{1}{3}n^3 \text{ penjumlahan} + \frac{1}{3}n^3 \text{ perkalian} \right)$$
+
+$$
+\text{Kompleksitas Eliminasi } A = LU \sim \frac{2}{3}n^3 \text{ total FLOPs } \left( \frac{1}{3}n^3 \text{ penjumlahan} + \frac{1}{3}n^3 \text{ perkalian} \right)
+$$
 
 Sebaliknya, penyelesaian dua sistem segitiga berturut-turut (substitusi maju $L\mathbf{y} = P\mathbf{b}$ dan substitusi mundur $U\mathbf{x} = \mathbf{y}$) hanya membutuhkan:
-$$\sum_{k=1}^n 2k \approx n^2 \text{ flops per substitusi} \implies 2n^2 \text{ flops total}$$
-Inilah keunggulan utama faktorisasi $LU$: setelah matriks $A$ difaktorkan sekali dengan biaya $O(n^3)$, setiap vektor target baru $\mathbf{b}$ dapat diselesaikan hanya dengan biaya kuadratik $O(n^2)$ flops.
+
+$$
+\sum_{k=1}^n 2k \approx n^2 \text{ flops per substitusi} \implies 2n^2 \text{ flops total}
+$$
+
+Inilah keunggulan utama faktorisasi $LU$ : setelah matriks $A$ difaktorkan sekali dengan biaya $O(n^3)$, setiap vektor target baru $\mathbf{b}$ dapat diselesaikan hanya dengan biaya kuadratik $O(n^2)$ flops.
 
 ---
 
@@ -347,18 +477,27 @@ Tautan Rujukan Kuliah: [MIT OCW 18.06 Kuliah 4](https://ocw.mit.edu/courses/18-0
 
 ### 3.1 Contoh 1: Inversi Matriks $2 \times 2$ Metode Gauss-Jordan $[A \mid I]$
 
-Mari kita pelajari cara mencari matriks invers $A^{-1}$ secara manual menggunakan algoritma eliminasi Gauss-Jordan pada matriks mainan $2 \times 2$:
-$$A = \begin{bmatrix} 2 & 1 \\ 5 & 3 \end{bmatrix}$$
+Mari kita pelajari cara mencari matriks invers $A^{-1}$ secara manual menggunakan algoritma eliminasi Gauss-Jordan pada matriks mainan $2 \times 2$ :
+
+$$
+A = \begin{bmatrix} 2 & 1 \\ 5 & 3 \end{bmatrix}
+$$
 
 **Tutorial Resep Langkah-demi-Langkah**:
 Kita menyusun matriks perluasan (*augmented matrix*) dengan meletakkan matriks identitas $I$ di sisi kanan:
-$$[A \mid I] = \left[ \begin{array}{cc|cc} 2 & 1 & 1 & 0 \\ 5 & 3 & 0 & 1 \end{array} \right]$$
+
+$$
+[A \mid I] = \left[ \begin{array}{cc|cc} 2 & 1 & 1 & 0 \\ 5 & 3 & 0 & 1 \end{array} \right]
+$$
 
 Tujuan kita adalah mengubah sisi kiri menjadi matriks identitas $\left[ \begin{array}{cc} 1 & 0 \\ 0 & 1 \end{array} \right]$ melalui operasi baris elementer. Sisi kanan secara otomatis akan bertransformasi menjadi $A^{-1}$!
 
 1. **Langkah 1: Jadikan Pivot Pertama Bernilai 1**:
    Bagi Baris 1 dengan angka $2$ ($R_1 \leftarrow \frac{1}{2} R_1$):
-   $$\left[ \begin{array}{cc|cc} 1 & 0{,}5 & 0{,}5 & 0 \\ 5 & 3 & 0 & 1 \end{array} \right]$$
+
+$$
+\left[ \begin{array}{cc|cc} 1 & 0{,}5 & 0{,}5 & 0 \\ 5 & 3 & 0 & 1 \end{array} \right]
+$$
 
 2. **Langkah 2: Nolkan Elemen di Bawah Pivot 1**:
    Kurangkan Baris 2 dengan $5$ kali Baris 1 ($R_2 \leftarrow R_2 - 5 R_1$):
@@ -367,11 +506,17 @@ Tujuan kita adalah mengubah sisi kiri menjadi matriks identitas $\left[ \begin{a
    - Kolom 3: $0 - 5(0{,}5) = -2{,}5$
    - Kolom 4: $1 - 5(0) = 1$
    Matriks menjadi:
-   $$\left[ \begin{array}{cc|cc} 1 & 0{,}5 & 0{,}5 & 0 \\ 0 & 0{,}5 & -2{,}5 & 1 \end{array} \right]$$
+
+$$
+\left[ \begin{array}{cc|cc} 1 & 0{,}5 & 0{,}5 & 0 \\ 0 & 0{,}5 & -2{,}5 & 1 \end{array} \right]
+$$
 
 3. **Langkah 3: Jadikan Pivot Kedua Bernilai 1**:
    Kalikan Baris 2 dengan angka $2$ ($R_2 \leftarrow 2 R_2$):
-   $$\left[ \begin{array}{cc|cc} 1 & 0{,}5 & 0{,}5 & 0 \\ 0 & 1 & -5 & 2 \end{array} \right]$$
+
+$$
+\left[ \begin{array}{cc|cc} 1 & 0{,}5 & 0{,}5 & 0 \\ 0 & 1 & -5 & 2 \end{array} \right]
+$$
 
 4. **Langkah 4: Nolkan Elemen di Atas Pivot 2 (Gauss-Jordan Mundur)**:
    Kurangkan Baris 1 dengan $0{,}5$ kali Baris 2 ($R_1 \leftarrow R_1 - 0{,}5 R_2$):
@@ -380,20 +525,37 @@ Tujuan kita adalah mengubah sisi kiri menjadi matriks identitas $\left[ \begin{a
    - Kolom 3: $0{,}5 - 0{,}5(-5) = 0{,}5 + 2{,}5 = 3$
    - Kolom 4: $0 - 0{,}5(2) = -1$
    Matriks akhir:
-   $$\left[ \begin{array}{cc|cc} 1 & 0 & 3 & -1 \\ 0 & 1 & -5 & 2 \end{array} \right]$$
+
+$$
+\left[ \begin{array}{cc|cc} 1 & 0 & 3 & -1 \\ 0 & 1 & -5 & 2 \end{array} \right]
+$$
 
 Maka matriks invers adalah:
-$$A^{-1} = \begin{bmatrix} 3 & -1 \\ -5 & 2 \end{bmatrix}$$
+
+$$
+A^{-1} = \begin{bmatrix} 3 & -1 \\ -5 & 2 \end{bmatrix}
+$$
 
 **Verifikasi Autentik Perkalian**:
-$$A A^{-1} = \begin{bmatrix} 2 & 1 \\ 5 & 3 \end{bmatrix} \begin{bmatrix} 3 & -1 \\ -5 & 2 \end{bmatrix} = \begin{bmatrix} 2(3)+1(-5) & 2(-1)+1(2) \\ 5(3)+3(-5) & 5(-1)+3(2) \end{bmatrix} = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix} = I$$
+
+$$
+A A^{-1} = \begin{bmatrix} 2 & 1 \\ 5 & 3 \end{bmatrix} \begin{bmatrix} 3 & -1 \\ -5 & 2 \end{bmatrix} = \begin{bmatrix} 2(3)+1(-5) & 2(-1)+1(2) \\ 5(3)+3(-5) & 5(-1)+3(2) \end{bmatrix} = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix} = I
+$$
 
 > **❓ Pertanyaan Pemula: Mengapa Matriks di Kanan Otomatis Menjadi Invers?**
 > Setiap operasi baris elementer sebenarnya setara dengan mengalikan matriks dari kiri dengan matriks elementer $E$.
-> Jika rentetan operasi kita adalah $E_k \dots E_2 E_1 A = I$, maka gabungan seluruh matriks tersebut adalah invers dari $A$:
-> $$(E_k \dots E_2 E_1) = A^{-1}$$
-> Karena operasi yang persis sama kita terapkan pada sisi kanan yang awalnya berisi $I$:
-> $$(E_k \dots E_2 E_1) I = A^{-1} I = A^{-1}$$
+> Jika rentetan operasi kita adalah $E_k \dots E_2 E_1 A = I$, maka gabungan seluruh matriks tersebut adalah invers dari $A$ :
+>
+> $$
+> (E_k \dots E_2 E_1) = A^{-1}
+> $$
+>
+> Karena operasi yang persis sama kita terapkan pada sisi kanan yang awalnya berisi $I$ :
+>
+> $$
+> (E_k \dots E_2 E_1) I = A^{-1} I = A^{-1}
+> $$
+>
 > Itulah sebabnya sisi kanan berubah menjadi $A^{-1}$ secara otomatis!
 
 > **💡 Tips, Trik, Rahasia Cepat Paham & Jembatan Keledai:**
@@ -405,47 +567,88 @@ $$A A^{-1} = \begin{bmatrix} 2 & 1 \\ 5 & 3 \end{bmatrix} \begin{bmatrix} 3 & -1
 ### 3.2 Contoh 2: Faktorisasi $LU$ Berdimensi $3 \times 3$ dan Penyelesaian Sistem Lengkap
 
 Mari kita selesaikan sistem persamaan linier $3 \times 3$ berikut secara manual tanpa jalan pintas:
-$$\begin{aligned}
+
+$$
+\begin{aligned}
 2x_1 + 4x_2 - 2x_3 &= 6 \\
 4x_1 + 9x_2 - 3x_3 &= 8 \\
 -2x_1 - 3x_2 + 7x_3 &= 10
-\end{aligned}$$
+\end{aligned}
+$$
 
 Bentuk matriks sistem $A\mathbf{x} = \mathbf{b}$ adalah:
-$$A = \begin{bmatrix} 2 & 4 & -2 \\ 4 & 9 & -3 \\ -2 & -3 & 7 \end{bmatrix}, \quad \mathbf{b} = \begin{bmatrix} 6 \\ 8 \\ 10 \end{bmatrix}$$
+
+$$
+A = \begin{bmatrix} 2 & 4 & -2 \\ 4 & 9 & -3 \\ -2 & -3 & 7 \end{bmatrix}, \quad \mathbf{b} = \begin{bmatrix} 6 \\ 8 \\ 10 \end{bmatrix}
+$$
 
 #### Langkah 1: Eliminasi Kolom 1
 Pivot pertama adalah $d_1 = a_{11} = 2$.
 1. Hitung pengali baris 2:
-   $$l_{21} = \frac{a_{21}}{a_{11}} = \frac{4}{2} = 2$$
-   Operasi baris: $\text{Baris}_2 \leftarrow \text{Baris}_2 - 2 \times \text{Baris}_1$:
-   $$\begin{bmatrix} 4 & 9 & -3 \end{bmatrix} - 2 \begin{bmatrix} 2 & 4 & -2 \end{bmatrix} = \begin{bmatrix} 4-4 & 9-8 & -3-(-4) \end{bmatrix} = \begin{bmatrix} 0 & 1 & 1 \end{bmatrix}$$
+
+$$
+l_{21} = \frac{a_{21}}{a_{11}} = \frac{4}{2} = 2
+$$
+
+   Operasi baris: $\text{Baris}_2 \leftarrow \text{Baris}_2 - 2 \times \text{Baris}_1$ :
+
+$$
+\begin{bmatrix} 4 & 9 & -3 \end{bmatrix} - 2 \begin{bmatrix} 2 & 4 & -2 \end{bmatrix} = \begin{bmatrix} 4-4 & 9-8 & -3-(-4) \end{bmatrix} = \begin{bmatrix} 0 & 1 & 1 \end{bmatrix}
+$$
 
 2. Hitung pengali baris 3:
-   $$l_{31} = \frac{a_{31}}{a_{11}} = \frac{-2}{2} = -1$$
-   Operasi baris: $\text{Baris}_3 \leftarrow \text{Baris}_3 - (-1) \times \text{Baris}_1$:
-   $$\begin{bmatrix} -2 & -3 & 7 \end{bmatrix} - (-1) \begin{bmatrix} 2 & 4 & -2 \end{bmatrix} = \begin{bmatrix} -2+2 & -3+4 & 7-2 \end{bmatrix} = \begin{bmatrix} 0 & 1 & 5 \end{bmatrix}$$
+
+$$
+l_{31} = \frac{a_{31}}{a_{11}} = \frac{-2}{2} = -1
+$$
+
+   Operasi baris: $\text{Baris}_3 \leftarrow \text{Baris}_3 - (-1) \times \text{Baris}_1$ :
+
+$$
+\begin{bmatrix} -2 & -3 & 7 \end{bmatrix} - (-1) \begin{bmatrix} 2 & 4 & -2 \end{bmatrix} = \begin{bmatrix} -2+2 & -3+4 & 7-2 \end{bmatrix} = \begin{bmatrix} 0 & 1 & 5 \end{bmatrix}
+$$
 
 Matriks sementara setelah eliminasi kolom 1:
-$$A^{(1)} = \begin{bmatrix} 2 & 4 & -2 \\ 0 & 1 & 1 \\ 0 & 1 & 5 \end{bmatrix}$$
+
+$$
+A^{(1)} = \begin{bmatrix} 2 & 4 & -2 \\ 0 & 1 & 1 \\ 0 & 1 & 5 \end{bmatrix}
+$$
 
 #### Langkah 2: Eliminasi Kolom 2
 Pivot kedua adalah $d_2 = a_{22}^{(1)} = 1$.
 1. Hitung pengali baris 3:
-   $$l_{32} = \frac{a_{32}^{(1)}}{a_{22}^{(1)}} = \frac{1}{1} = 1$$
-   Operasi baris: $\text{Baris}_3 \leftarrow \text{Baris}_3 - 1 \times \text{Baris}_2$:
-   $$\begin{bmatrix} 0 & 1 & 5 \end{bmatrix} - 1 \begin{bmatrix} 0 & 1 & 1 \end{bmatrix} = \begin{bmatrix} 0 & 1-1 & 5-1 \end{bmatrix} = \begin{bmatrix} 0 & 0 & 4 \end{bmatrix}$$
+
+$$
+l_{32} = \frac{a_{32}^{(1)}}{a_{22}^{(1)}} = \frac{1}{1} = 1
+$$
+
+   Operasi baris: $\text{Baris}_3 \leftarrow \text{Baris}_3 - 1 \times \text{Baris}_2$ :
+
+$$
+\begin{bmatrix} 0 & 1 & 5 \end{bmatrix} - 1 \begin{bmatrix} 0 & 1 & 1 \end{bmatrix} = \begin{bmatrix} 0 & 1-1 & 5-1 \end{bmatrix} = \begin{bmatrix} 0 & 0 & 4 \end{bmatrix}
+$$
 
 Matriks segitiga atas akhir $U$ adalah:
-$$U = \begin{bmatrix} 2 & 4 & -2 \\ 0 & 1 & 1 \\ 0 & 0 & 4 \end{bmatrix}$$
+
+$$
+U = \begin{bmatrix} 2 & 4 & -2 \\ 0 & 1 & 1 \\ 0 & 0 & 4 \end{bmatrix}
+$$
+
 Elemen diagonal pivot adalah $d_1 = 2, d_2 = 1, d_3 = 4$.
 
-Matriks segitiga bawah $L$ memuat seluruh pengali $l_{ij}$:
-$$L = \begin{bmatrix} 1 & 0 & 0 \\ l_{21} & 1 & 0 \\ l_{31} & l_{32} & 1 \end{bmatrix} = \begin{bmatrix} 1 & 0 & 0 \\ 2 & 1 & 0 \\ -1 & 1 & 1 \end{bmatrix}$$
+Matriks segitiga bawah $L$ memuat seluruh pengali $l_{ij}$ :
+
+$$
+L = \begin{bmatrix} 1 & 0 & 0 \\ l_{21} & 1 & 0 \\ l_{31} & l_{32} & 1 \end{bmatrix} = \begin{bmatrix} 1 & 0 & 0 \\ 2 & 1 & 0 \\ -1 & 1 & 1 \end{bmatrix}
+$$
 
 #### Langkah 3: Verifikasi Autentik Perkalian $LU$
 Mari kita kalikan $L$ dan $U$ secara analitis:
-$$LU = \begin{bmatrix} 1 & 0 & 0 \\ 2 & 1 & 0 \\ -1 & 1 & 1 \end{bmatrix} \begin{bmatrix} 2 & 4 & -2 \\ 0 & 1 & 1 \\ 0 & 0 & 4 \end{bmatrix}$$
+
+$$
+LU = \begin{bmatrix} 1 & 0 & 0 \\ 2 & 1 & 0 \\ -1 & 1 & 1 \end{bmatrix} \begin{bmatrix} 2 & 4 & -2 \\ 0 & 1 & 1 \\ 0 & 0 & 4 \end{bmatrix}
+$$
+
 - Baris 1: $[1\cdot 2, 1\cdot 4, 1\cdot (-2)] = [2, 4, -2]$
 - Baris 2: $[2\cdot 2 + 1\cdot 0, 2\cdot 4 + 1\cdot 1, 2\cdot (-2) + 1\cdot 1] = [4, 9, -3]$
 - Baris 3: $[-1\cdot 2 + 1\cdot 0 + 1\cdot 0, -1\cdot 4 + 1\cdot 1 + 1\cdot 0, -1\cdot (-2) + 1\cdot 1 + 1\cdot 4] = [-2, -3, 7]$
@@ -453,20 +656,31 @@ Hasil tepat sama persis dengan matriks asal $A$!
 
 #### Langkah 4: Penyelesaian Sistem Menggunakan $L\mathbf{y} = \mathbf{b}$ dan $U\mathbf{x} = \mathbf{y}$
 1. **Substitusi Maju (*Forward Substitution*)**: $L\mathbf{y} = \mathbf{b}$
-   $$\begin{bmatrix} 1 & 0 & 0 \\ 2 & 1 & 0 \\ -1 & 1 & 1 \end{bmatrix} \begin{bmatrix} y_1 \\ y_2 \\ y_3 \end{bmatrix} = \begin{bmatrix} 6 \\ 8 \\ 10 \end{bmatrix}$$
+
+$$
+\begin{bmatrix} 1 & 0 & 0 \\ 2 & 1 & 0 \\ -1 & 1 & 1 \end{bmatrix} \begin{bmatrix} y_1 \\ y_2 \\ y_3 \end{bmatrix} = \begin{bmatrix} 6 \\ 8 \\ 10 \end{bmatrix}
+$$
+
    - Baris 1: $y_1 = 6$
    - Baris 2: $2y_1 + y_2 = 8 \implies 2(6) + y_2 = 8 \implies y_2 = 8 - 12 = -4$
    - Baris 3: $-y_1 + y_2 + y_3 = 10 \implies -6 + (-4) + y_3 = 10 \implies y_3 = 10 + 10 = 20$
    Diperoleh vektor antara $\mathbf{y} = \begin{bmatrix} 6 \\ -4 \\ 20 \end{bmatrix}$.
 
 2. **Substitusi Mundur (*Back Substitution*)**: $U\mathbf{x} = \mathbf{y}$
-   $$\begin{bmatrix} 2 & 4 & -2 \\ 0 & 1 & 1 \\ 0 & 0 & 4 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \\ x_3 \end{bmatrix} = \begin{bmatrix} 6 \\ -4 \\ 20 \end{bmatrix}$$
+
+$$
+\begin{bmatrix} 2 & 4 & -2 \\ 0 & 1 & 1 \\ 0 & 0 & 4 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \\ x_3 \end{bmatrix} = \begin{bmatrix} 6 \\ -4 \\ 20 \end{bmatrix}
+$$
+
    - Baris 3: $4x_3 = 20 \implies x_3 = \frac{20}{4} = 5$
    - Baris 2: $x_2 + x_3 = -4 \implies x_2 + 5 = -4 \implies x_2 = -9$
    - Baris 1: $2x_1 + 4x_2 - 2x_3 = 6 \implies 2x_1 + 4(-9) - 2(5) = 6 \implies 2x_1 - 46 = 6 \implies 2x_1 = 52 \implies x_1 = 26$
 
 Vektor solusi akhir:
-$$\mathbf{x} = \begin{bmatrix} 26 \\ -9 \\ 5 \end{bmatrix}$$
+
+$$
+\mathbf{x} = \begin{bmatrix} 26 \\ -9 \\ 5 \end{bmatrix}
+$$
 
 Substitusi balik ke persamaan awal membuktikan kebenaran absolut:
 - $2(26) + 4(-9) - 2(5) = 52 - 36 - 10 = 6$ (Sesuai)
@@ -686,7 +900,11 @@ print("Solusi stabil via solve():", x)
 Pada tanggal 25 Februari 1991, baterai sistem pertahanan udara rudal Patriot di Dhahran, Arab Saudi, gagal mencegat rudal Scud Irak yang masuk, menewaskan 28 prajurit. Laporan analisis komputasi resmi dari [Prof. Douglas Arnold: Patriot Missile Failure Analysis](https://www-users.cse.umn.edu/~arnold/disasters/patriot.html) mengungkapkan bahwa kegagalan tersebut disebabkan oleh galat akumulasi floating-point aritmatika biner:
 - Waktu internal sistem dihitung dalam kelipatan 0,1 detik.
 - Namun, pecahan desimal $1/10$ memiliki representasi biner berulang tak-hingga:
-  $$0{,}1_{10} = 0{,}00011001100110011001100\dots_2$$
+
+$$
+0{,}1_{10} = 0{,}00011001100110011001100\dots_2
+$$
+
 - Register CPU komputer kendali memotong nilai tersebut pada bit ke-24. Setelah sistem menyala terus-menerus selama 100 jam, galat pembulatan kecil tersebut berakumulasi menjadi keterlambatan waktu sebesar $0{,}3433$ detik.
 - Karena rudal Scud bergerak pada kecepatan $1.676 \text{ m/s}$, pergeseran waktu $0{,}34$ detik menggeser jendela pelacakan radar (*range gate*) sejauh lebih dari 687 meter! Radar memindai area kosong dan mengabaikan Scud yang mendekat.
 
@@ -699,7 +917,7 @@ Tautan Rujukan Kuliah: [MIT OCW 18.06 Kuliah 4](https://ocw.mit.edu/courses/18-0
 
 ### Tingkat 1: Pemanasan Bayi / Hitung Jari (Kombinasi Linier & Perkalian Matriks $2 \times 2$)
 **Soal**:
-Diberikan matriks $A = \begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix}$ dan vektor $\mathbf{x} = \begin{bmatrix} 5 \\ 6 \end{bmatrix}$:
+Diberikan matriks $A = \begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix}$ dan vektor $\mathbf{x} = \begin{bmatrix} 5 \\ 6 \end{bmatrix}$ :
 1. Hitunglah perkalian $A\mathbf{x}$ menggunakan Pandangan Baris (*Row Picture* / dot product).
 2. Hitunglah perkalian $A\mathbf{x}$ menggunakan Pandangan Kolom (*Column Picture* / kombinasi linier kolom).
 3. Buktikan bahwa kedua cara pandang menghasilkan vektor hasil yang persis sama.
@@ -713,7 +931,10 @@ Diberikan matriks $A = \begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix}$ dan vektor 
    Hasil: $\begin{bmatrix} 17 \\ 39 \end{bmatrix}$.
 
 2. **Pandangan Kolom (Kombinasi Linier)**:
-   $$5 \begin{bmatrix} 1 \\ 3 \end{bmatrix} + 6 \begin{bmatrix} 2 \\ 4 \end{bmatrix} = \begin{bmatrix} 5(1) + 6(2) \\ 5(3) + 6(4) \end{bmatrix} = \begin{bmatrix} 5 + 12 \\ 15 + 24 \end{bmatrix} = \begin{bmatrix} 17 \\ 39 \end{bmatrix}$$
+
+$$
+5 \begin{bmatrix} 1 \\ 3 \end{bmatrix} + 6 \begin{bmatrix} 2 \\ 4 \end{bmatrix} = \begin{bmatrix} 5(1) + 6(2) \\ 5(3) + 6(4) \end{bmatrix} = \begin{bmatrix} 5 + 12 \\ 15 + 24 \end{bmatrix} = \begin{bmatrix} 17 \\ 39 \end{bmatrix}
+$$
 
 3. **Kesimpulan**:
    Kedua pendekatan terbukti menghasilkan vektor $\begin{bmatrix} 17 \\ 39 \end{bmatrix}$ secara identik.
@@ -723,7 +944,7 @@ Diberikan matriks $A = \begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix}$ dan vektor 
 
 ### Tingkat 2: Pemula / Tulis Tangan (Faktorisasi $LU$ Matriks $2 \times 2$ & Gauss-Jordan)
 **Soal**:
-Diberikan matriks $A = \begin{bmatrix} 3 & 1 \\ 6 & 5 \end{bmatrix}$ dan vektor target $\mathbf{b} = \begin{bmatrix} 5 \\ 16 \end{bmatrix}$:
+Diberikan matriks $A = \begin{bmatrix} 3 & 1 \\ 6 & 5 \end{bmatrix}$ dan vektor target $\mathbf{b} = \begin{bmatrix} 5 \\ 16 \end{bmatrix}$ :
 1. Tentukan pengali eliminasi $l_{21}$ dan faktorisasi $A = LU$.
 2. Nyatakan matriks eliminasi elementer $E_{21}$ dan inversnya $L = E_{21}^{-1}$.
 3. Selesaikan sistem $A\mathbf{x} = \mathbf{b}$ dengan substitusi maju dan mundur.
@@ -734,23 +955,45 @@ Diberikan matriks $A = \begin{bmatrix} 3 & 1 \\ 6 & 5 \end{bmatrix}$ dan vektor 
 1. **Faktorisasi $A = LU$**:
    Pivot pertama $d_1 = a_{11} = 3$.
    Pengali:
-   $$l_{21} = \frac{a_{21}}{a_{11}} = \frac{6}{3} = 2$$
-   Operasi baris: $\text{Baris}_2 - 2 \times \text{Baris}_1$:
-   $$\begin{bmatrix} 6 & 5 \end{bmatrix} - 2 \begin{bmatrix} 3 & 1 \end{bmatrix} = \begin{bmatrix} 0 & 3 \end{bmatrix}$$
+
+$$
+l_{21} = \frac{a_{21}}{a_{11}} = \frac{6}{3} = 2
+$$
+
+   Operasi baris: $\text{Baris}_2 - 2 \times \text{Baris}_1$ :
+
+$$
+\begin{bmatrix} 6 & 5 \end{bmatrix} - 2 \begin{bmatrix} 3 & 1 \end{bmatrix} = \begin{bmatrix} 0 & 3 \end{bmatrix}
+$$
+
    Maka:
-   $$U = \begin{bmatrix} 3 & 1 \\ 0 & 3 \end{bmatrix}, \quad L = \begin{bmatrix} 1 & 0 \\ 2 & 1 \end{bmatrix}$$
+
+$$
+U = \begin{bmatrix} 3 & 1 \\ 0 & 3 \end{bmatrix}, \quad L = \begin{bmatrix} 1 & 0 \\ 2 & 1 \end{bmatrix}
+$$
 
 2. **Matriks Elementer**:
-   $$E_{21} = \begin{bmatrix} 1 & 0 \\ -2 & 1 \end{bmatrix}, \quad L = E_{21}^{-1} = \begin{bmatrix} 1 & 0 \\ 2 & 1 \end{bmatrix}$$
+
+$$
+E_{21} = \begin{bmatrix} 1 & 0 \\ -2 & 1 \end{bmatrix}, \quad L = E_{21}^{-1} = \begin{bmatrix} 1 & 0 \\ 2 & 1 \end{bmatrix}
+$$
 
 3. **Penyelesaian Sistem**:
-   Substitusi maju $L\mathbf{y} = \mathbf{b}$:
-   $$\begin{bmatrix} 1 & 0 \\ 2 & 1 \end{bmatrix} \begin{bmatrix} y_1 \\ y_2 \end{bmatrix} = \begin{bmatrix} 5 \\ 16 \end{bmatrix} \implies y_1 = 5, \quad 2(5) + y_2 = 16 \implies y_2 = 6$$
-   Substitusi mundur $U\mathbf{x} = \mathbf{y}$:
-   $$\begin{aligned}
+   Substitusi maju $L\mathbf{y} = \mathbf{b}$ :
+
+$$
+\begin{bmatrix} 1 & 0 \\ 2 & 1 \end{bmatrix} \begin{bmatrix} y_1 \\ y_2 \end{bmatrix} = \begin{bmatrix} 5 \\ 16 \end{bmatrix} \implies y_1 = 5, \quad 2(5) + y_2 = 16 \implies y_2 = 6
+$$
+
+   Substitusi mundur $U\mathbf{x} = \mathbf{y}$ :
+
+$$
+\begin{aligned}
    3x_2 &= 6 \implies x_2 = 2 \\
    3x_1 + x_2 &= 5 \implies 3x_1 + 2 = 5 \implies x_1 = 1
-   \end{aligned}$$
+\end{aligned}
+$$
+
    Solusi: $\mathbf{x} = \begin{bmatrix} 1 \\ 2 \end{bmatrix}$. Verifikasi: $3(1) + 1(2) = 5$ dan $6(1) + 5(2) = 16$.
 </details>
 
@@ -758,12 +1001,16 @@ Diberikan matriks $A = \begin{bmatrix} 3 & 1 \\ 6 & 5 \end{bmatrix}$ dan vektor 
 
 ### Tingkat 3: Menengah / Pemodelan & Koding (Faktorisasi $PA = LU$ Matriks $3 \times 3$ dengan Pivoting)
 **Soal**:
-Diberikan sistem persamaan linier $3 \times 3$:
-$$\begin{aligned}
+Diberikan sistem persamaan linier $3 \times 3$ :
+
+$$
+\begin{aligned}
 0x_1 + 4x_2 + 2x_3 &= 14 \\
 2x_1 + 2x_2 + 1x_3 &= 9 \\
 4x_1 + 8x_2 + 0x_3 &= 20
-\end{aligned}$$
+\end{aligned}
+$$
+
 1. Jelaskan mengapa eliminasi Gaussian naif langsung gagal pada langkah pertama.
 2. Terapkan strategi *partial pivoting* untuk menentukan matriks permutasi $P$, matriks segitiga bawah $L$, dan matriks segitiga atas $U$ sehingga $PA = LU$.
 3. Selesaikan sistem dan tentukan nilai $\mathbf{x}$.
@@ -777,37 +1024,67 @@ $$\begin{aligned}
 2. **Faktorisasi $PA = LU$**:
    - Kolom 1 memiliki elemen $[0, 2, 4]$. Magnitudo absolut maksimum berada pada Baris 3 ($|4| = 4$).
    - Tukar Baris 1 dengan Baris 3:
-     $$P_1 = \begin{bmatrix} 0 & 0 & 1 \\ 0 & 1 & 0 \\ 1 & 0 & 0 \end{bmatrix}, \quad P_1 A = \begin{bmatrix} 4 & 8 & 0 \\ 2 & 2 & 1 \\ 0 & 4 & 2 \end{bmatrix}$$
+
+$$
+P_1 = \begin{bmatrix} 0 & 0 & 1 \\ 0 & 1 & 0 \\ 1 & 0 & 0 \end{bmatrix}, \quad P_1 A = \begin{bmatrix} 4 & 8 & 0 \\ 2 & 2 & 1 \\ 0 & 4 & 2 \end{bmatrix}
+$$
+
    - Eliminasi Kolom 1:
-     $l_{21} = 2/4 = 0{,}5$. $\text{Baris}_2 \leftarrow \text{Baris}_2 - 0{,}5 \times \text{Baris}_1$:
-     $$\begin{bmatrix} 2 & 2 & 1 \end{bmatrix} - 0{,}5 \begin{bmatrix} 4 & 8 & 0 \end{bmatrix} = \begin{bmatrix} 0 & -2 & 1 \end{bmatrix}$$
+     $l_{21} = 2/4 = 0{,}5$. $\text{Baris}_2 \leftarrow \text{Baris}_2 - 0{,}5 \times \text{Baris}_1$ :
+
+$$
+\begin{bmatrix} 2 & 2 & 1 \end{bmatrix} - 0{,}5 \begin{bmatrix} 4 & 8 & 0 \end{bmatrix} = \begin{bmatrix} 0 & -2 & 1 \end{bmatrix}
+$$
+
      $l_{31} = 0/4 = 0$. $\text{Baris}_3$ tetap $\begin{bmatrix} 0 & 4 & 2 \end{bmatrix}$.
      Matriks sementara:
-     $$\begin{bmatrix} 4 & 8 & 0 \\ 0 & -2 & 1 \\ 0 & 4 & 2 \end{bmatrix}$$
+
+$$
+\begin{bmatrix} 4 & 8 & 0 \\ 0 & -2 & 1 \\ 0 & 4 & 2 \end{bmatrix}
+$$
+
    - Pada kolom 2, elemen di bawah/pada diagonal adalah $-2$ (baris 2) dan $4$ (baris 3). Karena $|4| > |-2|$, tukar Baris 2 dengan Baris 3:
      Pertukaran baris memutasi $P$ menjadi:
-     $$P = \begin{bmatrix} 0 & 0 & 1 \\ 1 & 0 & 0 \\ 0 & 1 & 0 \end{bmatrix}$$
+
+$$
+P = \begin{bmatrix} 0 & 0 & 1 \\ 1 & 0 & 0 \\ 0 & 1 & 0 \end{bmatrix}
+$$
+
      Matriks setelah pertukaran baris:
-     $$\begin{bmatrix} 4 & 8 & 0 \\ 0 & 4 & 2 \\ 0 & -2 & 1 \end{bmatrix}$$
+
+$$
+\begin{bmatrix} 4 & 8 & 0 \\ 0 & 4 & 2 \\ 0 & -2 & 1 \end{bmatrix}
+$$
+
      Tukar entri pengali kolom 1 yang bersesuaian: $l_{21} \leftrightarrow l_{31} \implies l_{21} = 0, l_{31} = 0{,}5$.
    - Eliminasi Kolom 2:
      $l_{32} = -2 / 4 = -0{,}5$.
-     $\text{Baris}_3 \leftarrow \text{Baris}_3 - (-0{,}5) \times \text{Baris}_2$:
-     $$\begin{bmatrix} 0 & -2 & 1 \end{bmatrix} - (-0{,}5) \begin{bmatrix} 0 & 4 & 2 \end{bmatrix} = \begin{bmatrix} 0 & 0 & 1 - (-1) \end{bmatrix} = \begin{bmatrix} 0 & 0 & 2 \end{bmatrix}$$
+     $\text{Baris}_3 \leftarrow \text{Baris}_3 - (-0{,}5) \times \text{Baris}_2$ :
+
+$$
+\begin{bmatrix} 0 & -2 & 1 \end{bmatrix} - (-0{,}5) \begin{bmatrix} 0 & 4 & 2 \end{bmatrix} = \begin{bmatrix} 0 & 0 & 1 - (-1) \end{bmatrix} = \begin{bmatrix} 0 & 0 & 2 \end{bmatrix}
+$$
 
    Hasil akhir:
-   $$P = \begin{bmatrix} 0 & 0 & 1 \\ 1 & 0 & 0 \\ 0 & 1 & 0 \end{bmatrix}, \quad L = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0{,}5 & -0{,}5 & 1 \end{bmatrix}, \quad U = \begin{bmatrix} 4 & 8 & 0 \\ 0 & 4 & 2 \\ 0 & 0 & 2 \end{bmatrix}$$
+
+$$
+P = \begin{bmatrix} 0 & 0 & 1 \\ 1 & 0 & 0 \\ 0 & 1 & 0 \end{bmatrix}, \quad L = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0{,}5 & -0{,}5 & 1 \end{bmatrix}, \quad U = \begin{bmatrix} 4 & 8 & 0 \\ 0 & 4 & 2 \\ 0 & 0 & 2 \end{bmatrix}
+$$
 
 3. **Penyelesaian**:
-   Hitung $P\mathbf{b}$:
-   $$P\mathbf{b} = \begin{bmatrix} 20 \\ 14 \\ 9 \end{bmatrix}$$
-   Substitusi maju $L\mathbf{y} = P\mathbf{b}$:
+   Hitung $P\mathbf{b}$ :
+
+$$
+P\mathbf{b} = \begin{bmatrix} 20 \\ 14 \\ 9 \end{bmatrix}
+$$
+
+   Substitusi maju $L\mathbf{y} = P\mathbf{b}$ :
    - $y_1 = 20$
    - $y_2 = 14$
    - $0{,}5(20) - 0{,}5(14) + y_3 = 9 \implies 10 - 7 + y_3 = 9 \implies y_3 = 6$
    Vektor $\mathbf{y} = \begin{bmatrix} 20 \\ 14 \\ 6 \end{bmatrix}$.
 
-   Substitusi mundur $U\mathbf{x} = \mathbf{y}$:
+   Substitusi mundur $U\mathbf{x} = \mathbf{y}$ :
    - $2x_3 = 6 \implies x_3 = 3$
    - $4x_2 + 2(3) = 14 \implies 4x_2 = 8 \implies x_2 = 2$
    - $4x_1 + 8(2) + 0(3) = 20 \implies 4x_1 = 4 \implies x_1 = 1$
@@ -819,8 +1096,12 @@ $$\begin{aligned}
 
 ### Tingkat 4: Mahir / Tantangan Industri (Analisis Instabilitas Numerik Epsilon IEEE 754)
 **Soal**:
-Perhatikan sistem persamaan linier $2 \times 2$ dengan parameter perturbasi kecil $\epsilon > 0$:
-$$\begin{bmatrix} \epsilon & 1 \\ 1 & 1 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} 1 \\ 2 \end{bmatrix}$$
+Perhatikan sistem persamaan linier $2 \times 2$ dengan parameter perturbasi kecil $\epsilon > 0$ :
+
+$$
+\begin{bmatrix} \epsilon & 1 \\ 1 & 1 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} 1 \\ 2 \end{bmatrix}
+$$
+
 1. Selesaikan sistem secara analitis simbolik presisi eksak untuk sembarang $\epsilon$.
 2. Misalkan komputasi dilakukan pada mesin floating-point dengan presisi terbatas di mana $1 + \frac{1}{\epsilon} \approx \frac{1}{\epsilon}$ (contohnya $\epsilon = 10^{-17}$ pada IEEE 754 64-bit). Tunjukkan bahwa eliminasi Gaussian naif tanpa pertukaran baris menghasilkan $x_1 = 0$ dan $x_2 = 1$ (galat relatif 100% pada $x_1$).
 3. Buktikan secara matematis bahwa menerapkan *partial pivoting* memulihkan stabilitas numerik dan menghasilkan jawaban yang akurat hingga presisi mesin.
@@ -831,42 +1112,86 @@ $$\begin{bmatrix} \epsilon & 1 \\ 1 & 1 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2
 1. **Solusi Analitis Eksak**:
    Dari persamaan (1): $x_2 = 1 - \epsilon x_1$.
    Substitusi ke persamaan (2):
-   $$x_1 + (1 - \epsilon x_1) = 2 \implies (1 - \epsilon) x_1 = 1 \implies x_1 = \frac{1}{1 - \epsilon}$$
+
+$$
+x_1 + (1 - \epsilon x_1) = 2 \implies (1 - \epsilon) x_1 = 1 \implies x_1 = \frac{1}{1 - \epsilon}
+$$
+
    Kemudian:
-   $$x_2 = 1 - \frac{\epsilon}{1 - \epsilon} = \frac{1 - 2\epsilon}{1 - \epsilon}$$
+
+$$
+x_2 = 1 - \frac{\epsilon}{1 - \epsilon} = \frac{1 - 2\epsilon}{1 - \epsilon}
+$$
+
    Untuk $\epsilon \to 0$, solusi eksak mendekati $x_1 \approx 1$ dan $x_2 \approx 1$.
 
 2. **Eliminasi Naif Tanpa Pivoting**:
    Pivot adalah $\epsilon$. Pengali eliminasi:
-   $$l_{21} = \frac{1}{\epsilon}$$
+
+$$
+l_{21} = \frac{1}{\epsilon}
+$$
+
    Operasi baris kedua:
-   $$\begin{aligned}
+
+$$
+\begin{aligned}
    u_{22} &= 1 - \frac{1}{\epsilon} \times 1 = 1 - \frac{1}{\epsilon} \\
    y_2 &= 2 - \frac{1}{\epsilon} \times 1 = 2 - \frac{1}{\epsilon}
-   \end{aligned}$$
+\end{aligned}
+$$
+
    Pada komputer floating-point dengan $\epsilon < \epsilon_{\text{mach}} \approx 10^{-16}$, penambahan angka 1 atau 2 ke nilai raksasa $-1/\epsilon$ hilang akibat *floating point absorption*:
-   $$\text{fl}(u_{22}) = -\frac{1}{\epsilon}, \quad \text{fl}(y_2) = -\frac{1}{\epsilon}$$
+
+$$
+\text{fl}(u_{22}) = -\frac{1}{\epsilon}, \quad \text{fl}(y_2) = -\frac{1}{\epsilon}
+$$
+
    Maka pada substitusi mundur:
-   $$x_2 = \frac{y_2}{u_{22}} = \frac{-1/\epsilon}{-1/\epsilon} = 1$$
+
+$$
+x_2 = \frac{y_2}{u_{22}} = \frac{-1/\epsilon}{-1/\epsilon} = 1
+$$
+
    Lalu substitusi ke baris pertama:
-   $$\epsilon x_1 + 1(1) = 1 \implies \epsilon x_1 = 1 - 1 = 0 \implies x_1 = 0$$
+
+$$
+\epsilon x_1 + 1(1) = 1 \implies \epsilon x_1 = 1 - 1 = 0 \implies x_1 = 0
+$$
+
    Solusi terkomputasi adalah $\mathbf{x}_{\text{naif}} = \begin{bmatrix} 0 \\ 1 \end{bmatrix}$. Nilai $x_1$ salah total (galat $100\%$ terhadap nilai eksak $1$).
 
 3. **Stabilisasi Melalui Partial Pivoting**:
    Karena $|a_{21}| = 1 > |a_{11}| = \epsilon$, algoritma *partial pivoting* menukar baris 1 dan baris 2:
-   $$\begin{bmatrix} 1 & 1 \\ \epsilon & 1 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} 2 \\ 1 \end{bmatrix}$$
+
+$$
+\begin{bmatrix} 1 & 1 \\ \epsilon & 1 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} 2 \\ 1 \end{bmatrix}
+$$
+
    Pivot baru adalah $1$. Pengali eliminasi:
-   $$l_{21} = \frac{\epsilon}{1} = \epsilon \ll 1$$
+
+$$
+l_{21} = \frac{\epsilon}{1} = \epsilon \ll 1
+$$
+
    Operasi baris kedua:
-   $$\begin{aligned}
+
+$$
+\begin{aligned}
    u_{22} &= 1 - \epsilon(1) = 1 - \epsilon \\
    y_2 &= 1 - \epsilon(2) = 1 - 2\epsilon
-   \end{aligned}$$
+\end{aligned}
+$$
+
    Substitusi mundur:
-   $$\begin{aligned}
+
+$$
+\begin{aligned}
    x_2 &= \frac{1 - 2\epsilon}{1 - \epsilon} \approx 1 \\
    x_1 &= 2 - 1(x_2) = 2 - 1 = 1
-   \end{aligned}$$
+\end{aligned}
+$$
+
    Diperoleh solusi $\mathbf{x}_{\text{pivot}} = \begin{bmatrix} 1 \\ 1 \end{bmatrix}$, yang tepat dan stabil secara numerik.
 </details>
 

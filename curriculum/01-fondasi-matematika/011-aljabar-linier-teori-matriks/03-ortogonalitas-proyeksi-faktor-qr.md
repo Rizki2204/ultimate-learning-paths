@@ -46,7 +46,11 @@ Tautan Rujukan Kuliah: [Georgia Tech ILA: Least Squares](https://textbooks.math.
 Dalam buku teks matematika sekolah, kita terbiasa menyelesaikan persamaan dengan jumlah variabel sama dengan jumlah persamaan (misal 3 persamaan dengan 3 variabel). Namun dalam sains data, robotika, dan navigasi satelit nyata, kondisi ideal tersebut hampir tidak pernah terjadi!
 
 Kita hampir selalu berhadapan dengan **sistem overdetermined** ($m \gg n$):
-$$A \mathbf{x} = \mathbf{b}$$
+
+$$
+A \mathbf{x} = \mathbf{b}
+$$
+
 Di mana matriks data $A$ memiliki $m = 100.000$ baris pengukuran telemetri sensor GPS dan hanya $n = 3$ parameter posisi wahana antariksa ($x, y, z$).
 
 Karena setiap sensor fisik di dunia nyata selalu memiliki derau (*thermal noise, atmosferik, toleransi perangkat keras*), vektor target pengukuran $\mathbf{b}$ **hampir pasti berada di luar ruang kolom $C(A)$**. 
@@ -55,7 +59,11 @@ Persamaan $A\mathbf{x} = \mathbf{b}$ **tidak memiliki solusi eksak sama sekali**
 Lantas, apa yang harus dilakukan oleh komputer kendali pesawat tempur atau algoritma regresi machine learning?
 
 Komputer harus mencari **vektor terbaik $\mathbf{p} = A\hat{\mathbf{x}}$ di dalam ruang kolom $C(A)$ yang memiliki jarak paling dekat ke $\mathbf{b}$**. Dengan kata lain, kita meminimalkan panjang kuadrat galat:
-$$\min_{\mathbf{x}} \|A\mathbf{x} - \mathbf{b}\|^2$$
+
+$$
+\min_{\mathbf{x}} \lVert A\mathbf{x} - \mathbf{b} \rVert^2
+$$
+
 Inilah inti dari **Metode Kuadrat Terkecil (*Least Squares Regression*)**. Dan alat komputasi paling stabil, elegan, dan tahan banting untuk menyelesaikan masalah ini adalah **Faktorisasi $A = QR$**!
 
 ---
@@ -64,39 +72,58 @@ Inilah inti dari **Metode Kuadrat Terkecil (*Least Squares Regression*)**. Dan a
 Tautan Rujukan Kuliah: [MIT OCW 18.06 Kuliah 16: Projection Matrices and Least Squares](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-16-projection-matrices-and-least-squares/) | [MIT OCW 18.06 Kuliah 17: Orthogonal Matrices and Gram-Schmidt](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-17-orthogonal-matrices-and-gram-schmidt/)
 
 > **🔤 Kamus Simbol Anti-Pusing — Ortogonalitas & Proyeksi:**
-> - $\mathbf{u} \perp \mathbf{v}$: Dibaca *"u tegak lurus v"* atau *"u ortogonal terhadap v"*.
-> - $\mathbf{u}^T \mathbf{v}$: Hasil kali titik (*dot product*) Euclidean. Dua vektor ortogonal jika $\mathbf{u}^T \mathbf{v} = 0$.
-> - $\mathbf{q}_i$: Vektor satuan ortonormal (panjangnya tepat 1 dan saling tegak lurus terhadap $\mathbf{q}_j$).
-> - $\delta_{ij}$: Delta Kronecker, bernilai 1 jika $i = j$ dan 0 jika $i \ne j$.
-> - $Q$: Matriks ortogonal dengan kolom-kolom ortonormal ($Q^T Q = I$).
-> - $P$: Matriks proyeksi ortogonal, bersifat simetris ($P^T = P$) dan idempoten ($P^2 = P$).
-> - $\mathbf{p}$: Vektor proyeksi titik jatuh bayangan terdekat.
-> - $\mathbf{e} = \mathbf{b} - \mathbf{p}$: Vektor galat (*residual error*), dijamin tegak lurus terhadap subruang proyeksi.
-> - $H$: Matriks refleksi Householder (*Householder reflector*).
+> - $\mathbf{u} \perp \mathbf{v}$ : Dibaca *"u tegak lurus v"* atau *"u ortogonal terhadap v"*.
+> - $\mathbf{u}^T \mathbf{v}$ : Hasil kali titik (*dot product*) Euclidean. Dua vektor ortogonal jika $\mathbf{u}^T \mathbf{v} = 0$.
+> - $\mathbf{q}_i$ : Vektor satuan ortonormal (panjangnya tepat 1 dan saling tegak lurus terhadap $\mathbf{q}_j$).
+> - $\delta_{ij}$ : Delta Kronecker, bernilai 1 jika $i = j$ dan 0 jika $i \ne j$.
+> - $Q$ : Matriks ortogonal dengan kolom-kolom ortonormal ($Q^T Q = I$).
+> - $P$ : Matriks proyeksi ortogonal, bersifat simetris ($P^T = P$) dan idempoten ($P^2 = P$).
+> - $\mathbf{p}$ : Vektor proyeksi titik jatuh bayangan terdekat.
+> - $\mathbf{e} = \mathbf{b} - \mathbf{p}$ : Vektor galat (*residual error*), dijamin tegak lurus terhadap subruang proyeksi.
+> - $H$ : Matriks refleksi Householder (*Householder reflector*).
 
 ### 2.1 Definisi Ortogonalitas & Pembuktian 3 Baris Teorema Pythagoras
 
 Dua buah vektor $\mathbf{a}, \mathbf{b} \in \mathbb{R}^n$ didefinisikan saling **ortogonal** ($\mathbf{a} \perp \mathbf{b}$) jika dan hanya jika hasil kali titik (*dot product*) keduanya bernilai nol mutlak:
-$$\mathbf{a} \cdot \mathbf{b} = \mathbf{a}^T \mathbf{b} = \sum_{i=1}^n a_i b_i = 0$$
+
+$$
+\mathbf{a} \cdot \mathbf{b} = \mathbf{a}^T \mathbf{b} = \sum_{i=1}^n a_i b_i = 0
+$$
 
 Mengapa dot product nol identik dengan sudut siku-siku $90^\circ$? Mari kita buktikan secara deduktif dari Teorema Pythagoras kuno hanya dalam 3 baris logika:
 
-> **🌉 Jembatan Logika — Pembuktian 3 Baris Pythagoras untuk $\mathbf{a}^T \mathbf{b} = 0$:**
+> **🌉 Jembatan Logika — Pembuktian 3 Baris Pythagoras untuk $\mathbf{a}^T \mathbf{b} = 0$ :**
 > 1. **Baris 1 (Premis Pythagoras Geometri)**: Vektor $\mathbf{a}$ dan $\mathbf{b}$ membentuk sudut siku-siku $90^\circ$ jika dan hanya jika kuadrat panjang sisi miring sama dengan jumlah kuadrat panjang sisi-sisinya:
->    $$\|\mathbf{a} + \mathbf{b}\|^2 = \|\mathbf{a}\|^2 + \|\mathbf{b}\|^2$$
+>
+> $$
+> \lVert \mathbf{a} + \mathbf{b} \rVert^2 = \lVert \mathbf{a} \rVert^2 + \lVert \mathbf{b} \rVert^2
+> $$
+>
 > 2. **Baris 2 (Penjabaran Aljabar Norma Euclidean)**: Gunakan sifat distributif hasil kali dalam:
->    $$\|\mathbf{a} + \mathbf{b}\|^2 = (\mathbf{a} + \mathbf{b})^T (\mathbf{a} + \mathbf{b}) = \mathbf{a}^T \mathbf{a} + \mathbf{a}^T \mathbf{b} + \mathbf{b}^T \mathbf{a} + \mathbf{b}^T \mathbf{b} = \|\mathbf{a}\|^2 + 2\mathbf{a}^T \mathbf{b} + \|\mathbf{b}\|^2$$
+>
+> $$
+> \lVert \mathbf{a} + \mathbf{b} \rVert^2 = (\mathbf{a} + \mathbf{b})^T (\mathbf{a} + \mathbf{b}) = \mathbf{a}^T \mathbf{a} + \mathbf{a}^T \mathbf{b} + \mathbf{b}^T \mathbf{a} + \mathbf{b}^T \mathbf{b} = \lVert \mathbf{a} \rVert^2 + 2\mathbf{a}^T \mathbf{b} + \lVert \mathbf{b} \rVert^2
+> $$
+>
 > 3. **Baris 3 (Penyamaan dan Eliminasi Suku Sisi Kiri & Kanan)**:
->    $$\|\mathbf{a}\|^2 + 2\mathbf{a}^T \mathbf{b} + \|\mathbf{b}\|^2 = \|\mathbf{a}\|^2 + \|\mathbf{b}\|^2 \iff 2\mathbf{a}^T \mathbf{b} = 0 \iff \mathbf{a}^T \mathbf{b} = 0. \quad \blacksquare$$
+>
+> $$
+> \lVert \mathbf{a} \rVert^2 + 2\mathbf{a}^T \mathbf{b} + \lVert \mathbf{b} \rVert^2 = \lVert \mathbf{a} \rVert^2 + \lVert \mathbf{b} \rVert^2 \iff 2\mathbf{a}^T \mathbf{b} = 0 \iff \mathbf{a}^T \mathbf{b} = 0. \quad \blacksquare
+> $$
+>
 
 Pembuktian 3 baris ini mengukuhkan bahwa ortogonalitas aljabar $\mathbf{a}^T \mathbf{b} = 0$ dan sudut siku-siku geometri $90^\circ$ adalah dua entitas yang identik 100%!
 
 #### Sifat Ajaib Matriks Ortogonal $Q$ (Isometri):
 Sebuah matriks persegi $Q \in \mathbb{R}^{n \times n}$ disebut **matriks ortogonal murni** jika kolom-kolomnya merupakan himpunan vektor ortonormal:
-$$Q^T Q = I \iff Q^{-1} = Q^T$$
+
+$$
+Q^T Q = I \iff Q^{-1} = Q^T
+$$
+
 Matriks ortogonal bertindak sebagai **isometri kaku (*rigid body isometry*)**:
-1. **Melestarikan Panjang Vektor**: $\|Q\mathbf{x}\| = \|\mathbf{x}\|$.
-   *Bukti*: $\|Q\mathbf{x}\|^2 = (Q\mathbf{x})^T (Q\mathbf{x}) = \mathbf{x}^T Q^T Q \mathbf{x} = \mathbf{x}^T I \mathbf{x} = \|\mathbf{x}\|^2$. $\blacksquare$
+1. **Melestarikan Panjang Vektor**: $\lVert Q\mathbf{x} \rVert = \lVert \mathbf{x} \rVert$.
+   *Bukti*: $\lVert Q\mathbf{x} \rVert^2 = (Q\mathbf{x})^T (Q\mathbf{x}) = \mathbf{x}^T Q^T Q \mathbf{x} = \mathbf{x}^T I \mathbf{x} = \lVert \mathbf{x} \rVert^2$. $\blacksquare$
 2. **Melestarikan Sudut Antar Vektor**: $(Q\mathbf{x})^T (Q\mathbf{y}) = \mathbf{x}^T Q^T Q \mathbf{y} = \mathbf{x}^T \mathbf{y}$.
 
 > **💡 Jembatan Keledai: Transformasi Ortogonal adalah Benda Padat**
@@ -108,18 +135,34 @@ Matriks ortogonal bertindak sebagai **isometri kaku (*rigid body isometry*)**:
 
 Misalkan kita ingin memproyeksikan vektor target $\mathbf{b} \in \mathbb{R}^m$ ke sebuah garis lurus yang direntang oleh vektor arah tak-nol $\mathbf{a} \in \mathbb{R}^m$.
 
-Titik proyeksi $\mathbf{p}$ berada di garis tersebut, sehingga $\mathbf{p}$ adalah kelipatan skalar dari $\mathbf{a}$:
-$$\mathbf{p} = \hat{x} \mathbf{a}, \quad \hat{x} \in \mathbb{R}$$
+Titik proyeksi $\mathbf{p}$ berada di garis tersebut, sehingga $\mathbf{p}$ adalah kelipatan skalar dari $\mathbf{a}$ :
 
-Vektor galat $\mathbf{e} = \mathbf{b} - \mathbf{p} = \mathbf{b} - \hat{x}\mathbf{a}$ wajib tegak lurus terhadap $\mathbf{a}$:
-$$\mathbf{a}^T \mathbf{e} = 0 \implies \mathbf{a}^T (\mathbf{b} - \hat{x}\mathbf{a}) = 0$$
-$$\mathbf{a}^T \mathbf{b} - \hat{x} \mathbf{a}^T \mathbf{a} = 0 \implies \hat{x} = \frac{\mathbf{a}^T \mathbf{b}}{\mathbf{a}^T \mathbf{a}}$$
+$$
+\mathbf{p} = \hat{x} \mathbf{a}, \quad \hat{x} \in \mathbb{R}
+$$
+
+Vektor galat $\mathbf{e} = \mathbf{b} - \mathbf{p} = \mathbf{b} - \hat{x}\mathbf{a}$ wajib tegak lurus terhadap $\mathbf{a}$ :
+
+$$
+\mathbf{a}^T \mathbf{e} = 0 \implies \mathbf{a}^T (\mathbf{b} - \hat{x}\mathbf{a}) = 0
+$$
+
+$$
+\mathbf{a}^T \mathbf{b} - \hat{x} \mathbf{a}^T \mathbf{a} = 0 \implies \hat{x} = \frac{\mathbf{a}^T \mathbf{b}}{\mathbf{a}^T \mathbf{a}}
+$$
 
 Maka vektor proyeksi adalah:
-$$\mathbf{p} = \mathbf{a} \hat{x} = \mathbf{a} \left( \frac{\mathbf{a}^T \mathbf{b}}{\mathbf{a}^T \mathbf{a}} \right) = \left( \frac{\mathbf{a} \mathbf{a}^T}{\mathbf{a}^T \mathbf{a}} \right) \mathbf{b}$$
+
+$$
+\mathbf{p} = \mathbf{a} \hat{x} = \mathbf{a} \left( \frac{\mathbf{a}^T \mathbf{b}}{\mathbf{a}^T \mathbf{a}} \right) = \left( \frac{\mathbf{a} \mathbf{a}^T}{\mathbf{a}^T \mathbf{a}} \right) \mathbf{b}
+$$
 
 Di mana matriks pengali:
-$$P = \frac{\mathbf{a} \mathbf{a}^T}{\mathbf{a}^T \mathbf{a}}$$
+
+$$
+P = \frac{\mathbf{a} \mathbf{a}^T}{\mathbf{a}^T \mathbf{a}}
+$$
+
 disebut sebagai **Matriks Proyeksi 1-Dimensi** (matriks ber-rank 1).
 
 ---
@@ -127,35 +170,65 @@ disebut sebagai **Matriks Proyeksi 1-Dimensi** (matriks ber-rank 1).
 ### 2.3 Proyeksi ke Subruang Multidimensi & Penurunan Persamaan Normal
 
 Sekarang, tinjau subruang berdimensi $n$ yang direntang oleh $n$ kolom bebas linier dari matriks $A \in \mathbb{R}^{m \times n}$ dengan $m > n$.
-Titik proyeksi $\mathbf{p}$ berada di dalam ruang kolom $C(A)$, sehingga merupakan kombinasi linier dari kolom-kolom $A$:
-$$\mathbf{p} = A \hat{\mathbf{x}}, \quad \hat{\mathbf{x}} \in \mathbb{R}^n$$
+Titik proyeksi $\mathbf{p}$ berada di dalam ruang kolom $C(A)$, sehingga merupakan kombinasi linier dari kolom-kolom $A$ :
 
-Vektor galat $\mathbf{e} = \mathbf{b} - A\hat{\mathbf{x}}$ harus tegak lurus terhadap **seluruh ruang kolom $C(A)$**. Artinya, $\mathbf{e}$ harus tegak lurus terhadap setiap kolom pada matriks $A$:
-$$\mathbf{a}_1^T \mathbf{e} = 0, \quad \mathbf{a}_2^T \mathbf{e} = 0, \quad \dots, \quad \mathbf{a}_n^T \mathbf{e} = 0$$
+$$
+\mathbf{p} = A \hat{\mathbf{x}}, \quad \hat{\mathbf{x}} \in \mathbb{R}^n
+$$
+
+Vektor galat $\mathbf{e} = \mathbf{b} - A\hat{\mathbf{x}}$ harus tegak lurus terhadap **seluruh ruang kolom $C(A)$**. Artinya, $\mathbf{e}$ harus tegak lurus terhadap setiap kolom pada matriks $A$ :
+
+$$
+\mathbf{a}_1^T \mathbf{e} = 0, \quad \mathbf{a}_2^T \mathbf{e} = 0, \quad \dots, \quad \mathbf{a}_n^T \mathbf{e} = 0
+$$
 
 Gabungkan seluruh $n$ persamaan ini menjadi bentuk matriks:
-$$A^T \mathbf{e} = \mathbf{0}$$
 
-Substitusikan definisi $\mathbf{e} = \mathbf{b} - A\hat{\mathbf{x}}$:
-$$A^T (\mathbf{b} - A\hat{\mathbf{x}}) = \mathbf{0} \implies A^T \mathbf{b} - A^T A \hat{\mathbf{x}} = \mathbf{0}$$
+$$
+A^T \mathbf{e} = \mathbf{0}
+$$
+
+Substitusikan definisi $\mathbf{e} = \mathbf{b} - A\hat{\mathbf{x}}$ :
+
+$$
+A^T (\mathbf{b} - A\hat{\mathbf{x}}) = \mathbf{0} \implies A^T \mathbf{b} - A^T A \hat{\mathbf{x}} = \mathbf{0}
+$$
 
 Maka kita memperoleh **Persamaan Normal (*The Normal Equations*)**:
-$$A^T A \hat{\mathbf{x}} = A^T \mathbf{b}$$
 
-#### Teorema Invertibilitas Matriks Gram $A^T A$:
+$$
+A^T A \hat{\mathbf{x}} = A^T \mathbf{b}
+$$
+
+#### Teorema Invertibilitas Matriks Gram $A^T A$ :
 Jika kolom-kolom $A \in \mathbb{R}^{m \times n}$ bebas linier ($\text{rank}(A) = n$), maka matriks persegi $A^T A \in \mathbb{R}^{n \times n}$ bersifat simetris definit positif dan dijamin invertibel.
 *Bukti*:
-Tinjau $(A^T A)\mathbf{x} = \mathbf{0}$. Kalikan kedua ruas dari kiri dengan $\mathbf{x}^T$:
-$$\mathbf{x}^T A^T A \mathbf{x} = 0 \implies (A\mathbf{x})^T (A\mathbf{x}) = 0 \implies \|A\mathbf{x}\|^2 = 0 \implies A\mathbf{x} = \mathbf{0}$$
+Tinjau $(A^T A)\mathbf{x} = \mathbf{0}$. Kalikan kedua ruas dari kiri dengan $\mathbf{x}^T$ :
+
+$$
+\mathbf{x}^T A^T A \mathbf{x} = 0 \implies (A\mathbf{x})^T (A\mathbf{x}) = 0 \implies \lVert A\mathbf{x} \rVert^2 = 0 \implies A\mathbf{x} = \mathbf{0}
+$$
+
 Karena kolom-kolom $A$ bebas linier, satu-satunya solusi $A\mathbf{x} = \mathbf{0}$ adalah $\mathbf{x} = \mathbf{0}$ trivial. Maka $A^T A$ tidak memiliki nullspace tak-trivial, sehingga **selalu memiliki balikan unik $(A^T A)^{-1}$**. $\blacksquare$
 
 Dengan demikian:
 1. **Solusi Kuadrat Terkecil Unik**:
-   $$\hat{\mathbf{x}} = (A^T A)^{-1} A^T \mathbf{b}$$
+
+$$
+\hat{\mathbf{x}} = (A^T A)^{-1} A^T \mathbf{b}
+$$
+
 2. **Vektor Proyeksi**:
-   $$\mathbf{p} = A \hat{\mathbf{x}} = A (A^T A)^{-1} A^T \mathbf{b}$$
+
+$$
+\mathbf{p} = A \hat{\mathbf{x}} = A (A^T A)^{-1} A^T \mathbf{b}
+$$
+
 3. **Matriks Proyeksi Ortogonal Universal**:
-   $$P = A (A^T A)^{-1} A^T$$
+
+$$
+P = A (A^T A)^{-1} A^T
+$$
 
 > **Dua Sifat Wajib Matriks Proyeksi:**
 > 1. **Simetris**: $P^T = P$.
@@ -168,11 +241,22 @@ Dengan demikian:
 Diberikan sekumpulan vektor basis sembarang $\{\mathbf{a}_1, \mathbf{a}_2, \dots, \mathbf{a}_n\}$. Bagaimana cara kita mengubahnya menjadi basis ortonormal $\{\mathbf{q}_1, \mathbf{q}_2, \dots, \mathbf{q}_n\}$ yang merentang subruang yang persis sama?
 
 1. **Vektor Pertama**: Ambil arah $\mathbf{a}_1$ lalu normalkan panjangnya:
-   $$\mathbf{v}_1 = \mathbf{a}_1, \quad \mathbf{q}_1 = \frac{\mathbf{v}_1}{\|\mathbf{v}_1\|}$$
-2. **Vektor Kedua**: Kurangkan komponen proyeksi $\mathbf{a}_2$ sepanjang arah $\mathbf{q}_1$:
-   $$\mathbf{v}_2 = \mathbf{a}_2 - (\mathbf{q}_1^T \mathbf{a}_2) \mathbf{q}_1, \quad \mathbf{q}_2 = \frac{\mathbf{v}_2}{\|\mathbf{v}_2\|}$$
+
+$$
+\mathbf{v}_1 = \mathbf{a}_1, \quad \mathbf{q}_1 = \frac{\mathbf{v}_1}{\lVert \mathbf{v}_1 \rVert}
+$$
+
+2. **Vektor Kedua**: Kurangkan komponen proyeksi $\mathbf{a}_2$ sepanjang arah $\mathbf{q}_1$ :
+
+$$
+\mathbf{v}_2 = \mathbf{a}_2 - (\mathbf{q}_1^T \mathbf{a}_2) \mathbf{q}_1, \quad \mathbf{q}_2 = \frac{\mathbf{v}_2}{\lVert \mathbf{v}_2 \rVert}
+$$
+
 3. **Vektor ke-$k$**: Kurangkan komponen proyeksi pada seluruh vektor ortonormal sebelumnya:
-   $$\mathbf{v}_k = \mathbf{a}_k - \sum_{j=1}^{k-1} (\mathbf{q}_j^T \mathbf{a}_k) \mathbf{q}_j, \quad \mathbf{q}_k = \frac{\mathbf{v}_k}{\|\mathbf{v}_k\|}$$
+
+$$
+\mathbf{v}_k = \mathbf{a}_k - \sum_{j=1}^{k-1} (\mathbf{q}_j^T \mathbf{a}_k) \mathbf{q}_j, \quad \mathbf{q}_k = \frac{\mathbf{v}_k}{\lVert \mathbf{v}_k \rVert}
+$$
 
 #### Gram-Schmidt Klasik (CGS) vs Gram-Schmidt Termodifikasi (MGS):
 - **CGS (Classical Gram-Schmidt)**: Menghitung proyeksi langsung terhadap vektor asli $\mathbf{a}_k$. Pada komputasi presisi terbatas (IEEE 754), akumulasi pembulatan menyebabkan vektor-vektor hasil kehilangan ortogonalitas secara katastropik (*loss of orthogonality*).
@@ -186,17 +270,27 @@ Tautan Rujukan Kuliah: [Wikipedia: Householder Transformation](https://en.wikipe
 Meskipun MGS jauh lebih baik daripada CGS, algoritma standar emas industri penerbangan dan software komputasi tingkat tinggi (LAPACK, NumPy, SciPy) menggunakan **Reflektor Householder (*Householder Reflections*)**.
 
 Alih-alih memproyeksikan vektor satu demi satu, Reflektor Householder mencerminkan seluruh vektor $\mathbf{x}$ melintasi cermin hiperbidang ortogonal sehingga vektor tersebut mendarat tepat pada sumbu koordinat pertama:
-$$H \mathbf{x} = \pm \|\mathbf{x}\| \mathbf{e}_1 = \begin{bmatrix} \pm \|\mathbf{x}\| \\ 0 \\ \vdots \\ 0 \end{bmatrix}$$
+
+$$
+H \mathbf{x} = \pm \lVert \mathbf{x} \rVert \mathbf{e}_1 = \begin{bmatrix} \pm \lVert \mathbf{x} \rVert \\ 0 \\ \vdots \\ 0 \end{bmatrix}
+$$
 
 Matriks reflektor Householder didefinisikan sebagai:
-$$H = I - 2 \frac{\mathbf{v} \mathbf{v}^T}{\mathbf{v}^T \mathbf{v}}$$
+
+$$
+H = I - 2 \frac{\mathbf{v} \mathbf{v}^T}{\mathbf{v}^T \mathbf{v}}
+$$
+
 Di mana vektor normal cermin adalah:
-$$\mathbf{v} = \mathbf{x} + \text{sign}(x_1) \|\mathbf{x}\| \mathbf{e}_1$$
+
+$$
+\mathbf{v} = \mathbf{x} + \text{sign}(x_1) \lVert \mathbf{x} \rVert \mathbf{e}_1
+$$
 
 > **❓ Mengapa Tanda Wajib Mengikuti $\text{sign}(x_1)$?**
-> Jika $x_1 > 0$, kita memilih tanda $+$ sehingga $v_1 = x_1 + \|\mathbf{x}\|$.
-> Mengapa tidak memilih tanda $-$ ($v_1 = x_1 - \|\mathbf{x}\|$)?
-> Bayangkan jika $x_1 = 3{,}0000000001$ dan $\|\mathbf{x}\| = 3{,}0000000000$.
+> Jika $x_1 > 0$, kita memilih tanda $+$ sehingga $v_1 = x_1 + \lVert \mathbf{x} \rVert$.
+> Mengapa tidak memilih tanda $-$ ($v_1 = x_1 - \lVert \mathbf{x} \rVert$)?
+> Bayangkan jika $x_1 = 3{,}0000000001$ dan $\lVert \mathbf{x} \rVert = 3{,}0000000000$.
 > Pengurangan dua angka yang sangat berdekatan tersebut akan memicu **pembatalan katastropik (*catastrophic cancellation*)**, di mana seluruh bit presisi signifikan floating-point lenyap seketika!
 > Dengan memilih tanda yang sama ($\text{sign}(x_1)$), kita melakukan **penjumlahan dua angka positif**, yang dijamin 100% bebas dari risiko pembatalan katastropik!
 
@@ -205,19 +299,37 @@ $$\mathbf{v} = \mathbf{x} + \text{sign}(x_1) \|\mathbf{x}\| \mathbf{e}_1$$
 ### 2.6 Faktorisasi $A = QR$ & Penyelesaian Kuadrat Terkecil
 
 Ketika proses ortogonalisasi Gram-Schmidt atau refleksi Householder diterapkan pada seluruh kolom matriks $A \in \mathbb{R}^{m \times n}$, kita memperoleh faktorisasi kanonikal:
-$$A = Q \cdot R$$
+
+$$
+A = Q \cdot R
+$$
+
 Di mana:
 - $Q \in \mathbb{R}^{m \times n}$ memiliki kolom-kolom ortonormal ($Q^T Q = I_n$).
-- $R \in \mathbb{R}^{n \times n}$ adalah matriks segitiga atas (*upper triangular*) yang memuat koefisien proyeksi dengan diagonal $r_{jj} = \|\mathbf{v}_j\| > 0$.
+- $R \in \mathbb{R}^{n \times n}$ adalah matriks segitiga atas (*upper triangular*) yang memuat koefisien proyeksi dengan diagonal $r_{jj} = \lVert \mathbf{v}_j \rVert > 0$.
 
-#### Keajaiban Penyelesaian Kuadrat Terkecil via $QR$:
-Substitusikan $A = QR$ ke dalam Persamaan Normal $A^T A \hat{\mathbf{x}} = A^T \mathbf{b}$:
-$$(QR)^T (QR) \hat{\mathbf{x}} = (QR)^T \mathbf{b}$$
-$$R^T (Q^T Q) R \hat{\mathbf{x}} = R^T Q^T \mathbf{b}$$
-Karena $Q^T Q = I$:
-$$R^T R \hat{\mathbf{x}} = R^T (Q^T \mathbf{b})$$
+#### Keajaiban Penyelesaian Kuadrat Terkecil via $QR$ :
+Substitusikan $A = QR$ ke dalam Persamaan Normal $A^T A \hat{\mathbf{x}} = A^T \mathbf{b}$ :
+
+$$
+(QR)^T (QR) \hat{\mathbf{x}} = (QR)^T \mathbf{b}
+$$
+
+$$
+R^T (Q^T Q) R \hat{\mathbf{x}} = R^T Q^T \mathbf{b}
+$$
+
+Karena $Q^T Q = I$ :
+
+$$
+R^T R \hat{\mathbf{x}} = R^T (Q^T \mathbf{b})
+$$
+
 Karena $R$ ber-rank penuh, $R^T$ dapat dicoret dari kedua sisi:
-$$R \hat{\mathbf{x}} = Q^T \mathbf{b}$$
+
+$$
+R \hat{\mathbf{x}} = Q^T \mathbf{b}
+$$
 
 > **💡 Mengapa Ini Disebut Metode Paling Elegan di Dunia?**
 > Perhatikan sistem terakhir: $R \hat{\mathbf{x}} = Q^T \mathbf{b}$!
@@ -231,29 +343,54 @@ $$R \hat{\mathbf{x}} = Q^T \mathbf{b}$$
 
 ### 3.1 Contoh 1: Proyeksi Vektor 1D Manual dan Matriks Proyeksi $P$
 
-Mari kita lakukan perhitungan tangan proyeksi vektor 1D di $\mathbb{R}^2$:
+Mari kita lakukan perhitungan tangan proyeksi vektor 1D di $\mathbb{R}^2$ :
 Proyeksikan vektor target $\mathbf{b} = \begin{bmatrix} 3 \\ 4 \end{bmatrix}$ ke garis yang direntang oleh vektor $\mathbf{a} = \begin{bmatrix} 2 \\ 1 \end{bmatrix}$.
 
 1. **Hitung Produk Titik**:
-   $$\mathbf{a}^T \mathbf{b} = 2(3) + 1(4) = 6 + 4 = 10$$
-   $$\mathbf{a}^T \mathbf{a} = 2^2 + 1^2 = 4 + 1 = 5$$
+
+$$
+\mathbf{a}^T \mathbf{b} = 2(3) + 1(4) = 6 + 4 = 10
+$$
+
+$$
+\mathbf{a}^T \mathbf{a} = 2^2 + 1^2 = 4 + 1 = 5
+$$
 
 2. **Hitung Koefisien Skalar $\hat{x}$**:
-   $$\hat{x} = \frac{\mathbf{a}^T \mathbf{b}}{\mathbf{a}^T \mathbf{a}} = \frac{10}{5} = 2$$
+
+$$
+\hat{x} = \frac{\mathbf{a}^T \mathbf{b}}{\mathbf{a}^T \mathbf{a}} = \frac{10}{5} = 2
+$$
 
 3. **Hitung Vektor Proyeksi $\mathbf{p}$**:
-   $$\mathbf{p} = \hat{x} \mathbf{a} = 2 \begin{bmatrix} 2 \\ 1 \end{bmatrix} = \begin{bmatrix} 4 \\ 2 \end{bmatrix}$$
+
+$$
+\mathbf{p} = \hat{x} \mathbf{a} = 2 \begin{bmatrix} 2 \\ 1 \end{bmatrix} = \begin{bmatrix} 4 \\ 2 \end{bmatrix}
+$$
 
 4. **Hitung Vektor Galat $\mathbf{e}$**:
-   $$\mathbf{e} = \mathbf{b} - \mathbf{p} = \begin{bmatrix} 3 \\ 4 \end{bmatrix} - \begin{bmatrix} 4 \\ 2 \end{bmatrix} = \begin{bmatrix} -1 \\ 2 \end{bmatrix}$$
+
+$$
+\mathbf{e} = \mathbf{b} - \mathbf{p} = \begin{bmatrix} 3 \\ 4 \end{bmatrix} - \begin{bmatrix} 4 \\ 2 \end{bmatrix} = \begin{bmatrix} -1 \\ 2 \end{bmatrix}
+$$
 
 5. **Uji Ortogonalitas**:
-   $$\mathbf{a}^T \mathbf{e} = 2(-1) + 1(2) = -2 + 2 = 0 \quad (\text{Tegak Lurus Sempurna!})$$
+
+$$
+\mathbf{a}^T \mathbf{e} = 2(-1) + 1(2) = -2 + 2 = 0 \quad (\text{Tegak Lurus Sempurna!})
+$$
 
 6. **Konstruksi Matriks Proyeksi $P$**:
-   $$P = \frac{\mathbf{a} \mathbf{a}^T}{\mathbf{a}^T \mathbf{a}} = \frac{1}{5} \begin{bmatrix} 2 \\ 1 \end{bmatrix} \begin{bmatrix} 2 & 1 \end{bmatrix} = \frac{1}{5} \begin{bmatrix} 4 & 2 \\ 2 & 1 \end{bmatrix} = \begin{bmatrix} 0{,}8 & 0{,}4 \\ 0{,}4 & 0{,}2 \end{bmatrix}$$
+
+$$
+P = \frac{\mathbf{a} \mathbf{a}^T}{\mathbf{a}^T \mathbf{a}} = \frac{1}{5} \begin{bmatrix} 2 \\ 1 \end{bmatrix} \begin{bmatrix} 2 & 1 \end{bmatrix} = \frac{1}{5} \begin{bmatrix} 4 & 2 \\ 2 & 1 \end{bmatrix} = \begin{bmatrix} 0{,}8 & 0{,}4 \\ 0{,}4 & 0{,}2 \end{bmatrix}
+$$
+
    Uji idempoten:
-   $$P^2 = \begin{bmatrix} 0{,}8 & 0{,}4 \\ 0{,}4 & 0{,}2 \end{bmatrix} \begin{bmatrix} 0{,}8 & 0{,}4 \\ 0{,}4 & 0{,}2 \end{bmatrix} = \begin{bmatrix} 0{,}64 + 0{,}16 & 0{,}32 + 0{,}08 \\ 0{,}32 + 0{,}08 & 0{,}16 + 0{,}04 \end{bmatrix} = \begin{bmatrix} 0{,}8 & 0{,}4 \\ 0{,}4 & 0{,}2 \end{bmatrix} = P$$
+
+$$
+P^2 = \begin{bmatrix} 0{,}8 & 0{,}4 \\ 0{,}4 & 0{,}2 \end{bmatrix} \begin{bmatrix} 0{,}8 & 0{,}4 \\ 0{,}4 & 0{,}2 \end{bmatrix} = \begin{bmatrix} 0{,}64 + 0{,}16 & 0{,}32 + 0{,}08 \\ 0{,}32 + 0{,}08 & 0{,}16 + 0{,}04 \end{bmatrix} = \begin{bmatrix} 0{,}8 & 0{,}4 \\ 0{,}4 & 0{,}2 \end{bmatrix} = P
+$$
 
 ---
 
@@ -262,48 +399,96 @@ Proyeksikan vektor target $\mathbf{b} = \begin{bmatrix} 3 \\ 4 \end{bmatrix}$ ke
 Mari kita buat matriks refleksi Householder untuk memetakan vektor $\mathbf{x} = \begin{bmatrix} 3 \\ 4 \end{bmatrix}$ agar seluruh magnitudonya terkonsentrasi pada sumbu pertama $\mathbf{e}_1 = \begin{bmatrix} 1 \\ 0 \end{bmatrix}$.
 
 1. **Hitung Panjang Vektor $\mathbf{x}$**:
-   $$\|\mathbf{x}\| = \sqrt{3^2 + 4^2} = \sqrt{9 + 16} = \sqrt{25} = 5$$
+
+$$
+\lVert \mathbf{x} \rVert = \sqrt{3^2 + 4^2} = \sqrt{9 + 16} = \sqrt{25} = 5
+$$
 
 2. **Tentukan Vektor Normal Cermin $\mathbf{v}$**:
-   Karena $x_1 = 3 > 0$, pilih tanda positif $+5$:
-   $$\mathbf{v} = \mathbf{x} + \text{sign}(x_1) \|\mathbf{x}\| \mathbf{e}_1 = \begin{bmatrix} 3 \\ 4 \end{bmatrix} + 5 \begin{bmatrix} 1 \\ 0 \end{bmatrix} = \begin{bmatrix} 8 \\ 4 \end{bmatrix}$$
+   Karena $x_1 = 3 > 0$, pilih tanda positif $+5$ :
+
+$$
+\mathbf{v} = \mathbf{x} + \text{sign}(x_1) \lVert \mathbf{x} \rVert \mathbf{e}_1 = \begin{bmatrix} 3 \\ 4 \end{bmatrix} + 5 \begin{bmatrix} 1 \\ 0 \end{bmatrix} = \begin{bmatrix} 8 \\ 4 \end{bmatrix}
+$$
 
 3. **Hitung Norma Kuadrat $\mathbf{v}^T \mathbf{v}$**:
-   $$\mathbf{v}^T \mathbf{v} = 8^2 + 4^2 = 64 + 16 = 80$$
+
+$$
+\mathbf{v}^T \mathbf{v} = 8^2 + 4^2 = 64 + 16 = 80
+$$
 
 4. **Konstruksi Matriks Outer Product $\mathbf{v} \mathbf{v}^T$**:
-   $$\mathbf{v} \mathbf{v}^T = \begin{bmatrix} 8 \\ 4 \end{bmatrix} \begin{bmatrix} 8 & 4 \end{bmatrix} = \begin{bmatrix} 64 & 32 \\ 32 & 16 \end{bmatrix}$$
+
+$$
+\mathbf{v} \mathbf{v}^T = \begin{bmatrix} 8 \\ 4 \end{bmatrix} \begin{bmatrix} 8 & 4 \end{bmatrix} = \begin{bmatrix} 64 & 32 \\ 32 & 16 \end{bmatrix}
+$$
 
 5. **Hitung Matriks Reflektor $H = I - 2 \frac{\mathbf{v} \mathbf{v}^T}{\mathbf{v}^T \mathbf{v}}$**:
-   $$\frac{2}{\mathbf{v}^T \mathbf{v}} = \frac{2}{80} = \frac{1}{40} = 0{,}025$$
-   $$2 \frac{\mathbf{v} \mathbf{v}^T}{\mathbf{v}^T \mathbf{v}} = 0{,}025 \begin{bmatrix} 64 & 32 \\ 32 & 16 \end{bmatrix} = \begin{bmatrix} 1{,}6 & 0{,}8 \\ 0{,}8 & 0{,}4 \end{bmatrix}$$
-   $$H = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix} - \begin{bmatrix} 1{,}6 & 0{,}8 \\ 0{,}8 & 0{,}4 \end{bmatrix} = \begin{bmatrix} -0{,}6 & -0{,}8 \\ -0{,}8 & 0{,}6 \end{bmatrix}$$
+
+$$
+\frac{2}{\mathbf{v}^T \mathbf{v}} = \frac{2}{80} = \frac{1}{40} = 0{,}025
+$$
+
+$$
+2 \frac{\mathbf{v} \mathbf{v}^T}{\mathbf{v}^T \mathbf{v}} = 0{,}025 \begin{bmatrix} 64 & 32 \\ 32 & 16 \end{bmatrix} = \begin{bmatrix} 1{,}6 & 0{,}8 \\ 0{,}8 & 0{,}4 \end{bmatrix}
+$$
+
+$$
+H = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix} - \begin{bmatrix} 1{,}6 & 0{,}8 \\ 0{,}8 & 0{,}4 \end{bmatrix} = \begin{bmatrix} -0{,}6 & -0{,}8 \\ -0{,}8 & 0{,}6 \end{bmatrix}
+$$
 
 6. **Uji Transformasi $H\mathbf{x}$**:
-   $$H\mathbf{x} = \begin{bmatrix} -0{,}6 & -0{,}8 \\ -0{,}8 & 0{,}6 \end{bmatrix} \begin{bmatrix} 3 \\ 4 \end{bmatrix} = \begin{bmatrix} -0{,}6(3) - 0{,}8(4) \\ -0{,}8(3) + 0{,}6(4) \end{bmatrix} = \begin{bmatrix} -1{,}8 - 3{,}2 \\ -2{,}4 + 2{,}4 \end{bmatrix} = \begin{bmatrix} -5 \\ 0 \end{bmatrix}$$
+
+$$
+H\mathbf{x} = \begin{bmatrix} -0{,}6 & -0{,}8 \\ -0{,}8 & 0{,}6 \end{bmatrix} \begin{bmatrix} 3 \\ 4 \end{bmatrix} = \begin{bmatrix} -0{,}6(3) - 0{,}8(4) \\ -0{,}8(3) + 0{,}6(4) \end{bmatrix} = \begin{bmatrix} -1{,}8 - 3{,}2 \\ -2{,}4 + 2{,}4 \end{bmatrix} = \begin{bmatrix} -5 \\ 0 \end{bmatrix}
+$$
+
    Elemen kedua lenyap tepat menjadi 0 mutlak!
 
 ---
 
 ### 3.3 Contoh 3: Ortogonalisasi Gram-Schmidt dan Faktorisasi $QR$ Matriks $3 \times 2$
 
-Diberikan matriks $A = \begin{bmatrix} 1 & 1 \\ 1 & 0 \\ 1 & 2 \end{bmatrix}$:
+Diberikan matriks $A = \begin{bmatrix} 1 & 1 \\ 1 & 0 \\ 1 & 2 \end{bmatrix}$ :
 
 1. **Vektor Kolom 1**: $\mathbf{a}_1 = \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix}$
-   $$\|\mathbf{a}_1\| = \sqrt{1^2 + 1^2 + 1^2} = \sqrt{3} \implies r_{11} = \sqrt{3}$$
-   $$\mathbf{q}_1 = \frac{1}{\sqrt{3}} \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix}$$
+
+$$
+\lVert \mathbf{a}_1 \rVert = \sqrt{1^2 + 1^2 + 1^2} = \sqrt{3} \implies r_{11} = \sqrt{3}
+$$
+
+$$
+\mathbf{q}_1 = \frac{1}{\sqrt{3}} \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix}
+$$
 
 2. **Vektor Kolom 2**: $\mathbf{a}_2 = \begin{bmatrix} 1 \\ 0 \\ 2 \end{bmatrix}$
-   Hitung proyeksi $\mathbf{a}_2$ pada $\mathbf{q}_1$:
-   $$r_{12} = \mathbf{q}_1^T \mathbf{a}_2 = \frac{1}{\sqrt{3}} (1(1) + 1(0) + 1(2)) = \frac{3}{\sqrt{3}} = \sqrt{3}$$
+   Hitung proyeksi $\mathbf{a}_2$ pada $\mathbf{q}_1$ :
+
+$$
+r_{12} = \mathbf{q}_1^T \mathbf{a}_2 = \frac{1}{\sqrt{3}} (1(1) + 1(0) + 1(2)) = \frac{3}{\sqrt{3}} = \sqrt{3}
+$$
+
    Kurangkan proyeksi:
-   $$\mathbf{v}_2 = \mathbf{a}_2 - r_{12} \mathbf{q}_1 = \begin{bmatrix} 1 \\ 0 \\ 2 \end{bmatrix} - \sqrt{3} \left( \frac{1}{\sqrt{3}} \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix} \right) = \begin{bmatrix} 1 \\ 0 \\ 2 \end{bmatrix} - \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix} = \begin{bmatrix} 0 \\ -1 \\ 1 \end{bmatrix}$$
-   Hitung norma $\mathbf{v}_2$:
-   $$r_{22} = \|\mathbf{v}_2\| = \sqrt{0^2 + (-1)^2 + 1^2} = \sqrt{2}$$
-   $$\mathbf{q}_2 = \frac{1}{\sqrt{2}} \begin{bmatrix} 0 \\ -1 \\ 1 \end{bmatrix}$$
+
+$$
+\mathbf{v}_2 = \mathbf{a}_2 - r_{12} \mathbf{q}_1 = \begin{bmatrix} 1 \\ 0 \\ 2 \end{bmatrix} - \sqrt{3} \left( \frac{1}{\sqrt{3}} \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix} \right) = \begin{bmatrix} 1 \\ 0 \\ 2 \end{bmatrix} - \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix} = \begin{bmatrix} 0 \\ -1 \\ 1 \end{bmatrix}
+$$
+
+   Hitung norma $\mathbf{v}_2$ :
+
+$$
+r_{22} = \lVert \mathbf{v}_2 \rVert = \sqrt{0^2 + (-1)^2 + 1^2} = \sqrt{2}
+$$
+
+$$
+\mathbf{q}_2 = \frac{1}{\sqrt{2}} \begin{bmatrix} 0 \\ -1 \\ 1 \end{bmatrix}
+$$
 
 3. **Matriks Hasil Faktorisasi $QR$**:
-   $$Q = \begin{bmatrix} \frac{1}{\sqrt{3}} & 0 \\ \frac{1}{\sqrt{3}} & -\frac{1}{\sqrt{2}} \\ \frac{1}{\sqrt{3}} & \frac{1}{\sqrt{2}} \end{bmatrix}, \quad R = \begin{bmatrix} \sqrt{3} & \sqrt{3} \\ 0 & \sqrt{2} \end{bmatrix}$$
+
+$$
+Q = \begin{bmatrix} \frac{1}{\sqrt{3}} & 0 \\ \frac{1}{\sqrt{3}} & -\frac{1}{\sqrt{2}} \\ \frac{1}{\sqrt{3}} & \frac{1}{\sqrt{2}} \end{bmatrix}, \quad R = \begin{bmatrix} \sqrt{3} & \sqrt{3} \\ 0 & \sqrt{2} \end{bmatrix}
+$$
 
 ---
 
@@ -491,9 +676,17 @@ Banyak pemula menerapkan Classical Gram-Schmidt (CGS) secara naif pada kode prod
 
 ### 5.2 Miskonsepsi Kritis: Membentuk Matriks Persamaan Normal $A^T A$ Secara Eksplisit
 Banyak insinyur data pemula menyelesaikan regresi kuadrat terkecil dengan menghitung langsung formula buku teks:
-$$\hat{\mathbf{x}} = (A^T A)^{-1} A^T \mathbf{b}$$
+
+$$
+\hat{\mathbf{x}} = (A^T A)^{-1} A^T \mathbf{b}
+$$
+
 - **Mengapa Ini Berbahaya?** Menghitung perkalian matriks $A^T A$ **mengkuadratkan bilangan kondisi matriks**:
-  $$\kappa(A^T A) = (\kappa(A))^2$$
+
+$$
+\kappa(A^T A) = (\kappa(A))^2
+$$
+
   Jika matriks data $A$ memiliki $\kappa(A) = 10^8$ (angka kondisi sedang), maka $A^T A$ memiliki $\kappa(A^T A) = 10^{16}$.
   Pada komputasi 64-bit IEEE 754 yang memiliki 16 digit presisi desimal, seluruh informasi matriks **rusak total oleh noise pembulatan**!
 - **Praktik Terbaik**: Gunakan selalu faktorisasi $A = QR$ untuk menyelesaikan kuadrat terkecil tanpa pernah membentuk matriks $A^T A$ di memori!
@@ -516,31 +709,51 @@ Tautan Rujukan Kuliah: [MIT OCW 18.06 Kuliah 17](https://ocw.mit.edu/courses/18-
 ### Tingkat 1: Pemanasan Bayi / Hitung Jari (Ortogonalitas & Proyeksi 1D)
 **Soal**:
 1. Ujilah apakah pasangan vektor berikut saling ortogonal:
-   $$\mathbf{u} = \begin{bmatrix} 2 \\ 5 \\ -1 \end{bmatrix}, \quad \mathbf{v} = \begin{bmatrix} 3 \\ -1 \\ 1 \end{bmatrix}$$
+
+$$
+\mathbf{u} = \begin{bmatrix} 2 \\ 5 \\ -1 \end{bmatrix}, \quad \mathbf{v} = \begin{bmatrix} 3 \\ -1 \\ 1 \end{bmatrix}
+$$
+
 2. Tentukan proyeksi skalar $\hat{x}$ dan vektor proyeksi $\mathbf{p}$ dari vektor target $\mathbf{b} = \begin{bmatrix} 6 \\ 2 \end{bmatrix}$ ke garis yang direntang oleh $\mathbf{a} = \begin{bmatrix} 3 \\ 4 \end{bmatrix}$.
 
 <details>
 <summary>Kunci Jawaban & Langkah Pengerjaan Detail</summary>
 
 1. **Uji Dot Product**:
-   $$\mathbf{u} \cdot \mathbf{v} = 2(3) + 5(-1) + (-1)(1) = 6 - 5 - 1 = 0$$
+
+$$
+\mathbf{u} \cdot \mathbf{v} = 2(3) + 5(-1) + (-1)(1) = 6 - 5 - 1 = 0
+$$
+
    Karena hasil kali titik bernilai tepat nol, maka pasangan vektor $\mathbf{u}$ dan $\mathbf{v}$ **terbukti saling ortogonal ($90^\circ$)**.
 
 2. **Proyeksi 1D**:
    - $\mathbf{a}^T \mathbf{b} = 3(6) + 4(2) = 18 + 8 = 26$
    - $\mathbf{a}^T \mathbf{a} = 3^2 + 4^2 = 9 + 16 = 25$
    - Koefisien proyeksi:
-     $$\hat{x} = \frac{\mathbf{a}^T \mathbf{b}}{\mathbf{a}^T \mathbf{a}} = \frac{26}{25} = 1{,}04$$
+
+$$
+\hat{x} = \frac{\mathbf{a}^T \mathbf{b}}{\mathbf{a}^T \mathbf{a}} = \frac{26}{25} = 1{,}04
+$$
+
    - Vektor proyeksi:
-     $$\mathbf{p} = \hat{x} \mathbf{a} = 1{,}04 \begin{bmatrix} 3 \\ 4 \end{bmatrix} = \begin{bmatrix} 3{,}12 \\ 4{,}16 \end{bmatrix}$$
+
+$$
+\mathbf{p} = \hat{x} \mathbf{a} = 1{,}04 \begin{bmatrix} 3 \\ 4 \end{bmatrix} = \begin{bmatrix} 3{,}12 \\ 4{,}16 \end{bmatrix}
+$$
+
 </details>
 
 ---
 
 ### Tingkat 2: Pemula / Tulis Tangan (Gram-Schmidt 2 Vektor & Matriks $Q$)
 **Soal**:
-Diberikan dua vektor basis bebas linier di $\mathbb{R}^3$:
-$$\mathbf{a}_1 = \begin{bmatrix} 1 \\ 2 \\ 2 \end{bmatrix}, \quad \mathbf{a}_2 = \begin{bmatrix} 1 \\ 0 \\ 1 \end{bmatrix}$$
+Diberikan dua vektor basis bebas linier di $\mathbb{R}^3$ :
+
+$$
+\mathbf{a}_1 = \begin{bmatrix} 1 \\ 2 \\ 2 \end{bmatrix}, \quad \mathbf{a}_2 = \begin{bmatrix} 1 \\ 0 \\ 1 \end{bmatrix}
+$$
+
 1. Gunakan algoritma Gram-Schmidt untuk mengonstruksi basis ortonormal $\{\mathbf{q}_1, \mathbf{q}_2\}$.
 2. Tentukan matriks segitiga atas $R$ sehingga $[\mathbf{a}_1 \mid \mathbf{a}_2] = Q R$.
 
@@ -549,19 +762,44 @@ $$\mathbf{a}_1 = \begin{bmatrix} 1 \\ 2 \\ 2 \end{bmatrix}, \quad \mathbf{a}_2 =
 
 1. **Ortogonalisasi Gram-Schmidt**:
    - Vektor pertama:
-     $$\|\mathbf{a}_1\| = \sqrt{1^2 + 2^2 + 2^2} = \sqrt{1 + 4 + 4} = \sqrt{9} = 3 \implies r_{11} = 3$$
-     $$\mathbf{q}_1 = \frac{1}{3} \begin{bmatrix} 1 \\ 2 \\ 2 \end{bmatrix}$$
+
+$$
+\lVert \mathbf{a}_1 \rVert = \sqrt{1^2 + 2^2 + 2^2} = \sqrt{1 + 4 + 4} = \sqrt{9} = 3 \implies r_{11} = 3
+$$
+
+$$
+\mathbf{q}_1 = \frac{1}{3} \begin{bmatrix} 1 \\ 2 \\ 2 \end{bmatrix}
+$$
+
    - Vektor kedua:
-     Hitung proyeksi $\mathbf{a}_2$ pada $\mathbf{q}_1$:
-     $$r_{12} = \mathbf{q}_1^T \mathbf{a}_2 = \frac{1}{3} (1(1) + 2(0) + 2(1)) = \frac{3}{3} = 1$$
+     Hitung proyeksi $\mathbf{a}_2$ pada $\mathbf{q}_1$ :
+
+$$
+r_{12} = \mathbf{q}_1^T \mathbf{a}_2 = \frac{1}{3} (1(1) + 2(0) + 2(1)) = \frac{3}{3} = 1
+$$
+
      Kurangkan proyeksi:
-     $$\mathbf{v}_2 = \mathbf{a}_2 - r_{12} \mathbf{q}_1 = \begin{bmatrix} 1 \\ 0 \\ 1 \end{bmatrix} - 1 \begin{bmatrix} 1/3 \\ 2/3 \\ 2/3 \end{bmatrix} = \begin{bmatrix} 2/3 \\ -2/3 \\ 1/3 \end{bmatrix}$$
-     Hitung panjang $\mathbf{v}_2$:
-     $$r_{22} = \|\mathbf{v}_2\| = \sqrt{(2/3)^2 + (-2/3)^2 + (1/3)^2} = \sqrt{4/9 + 4/9 + 1/9} = \sqrt{9/9} = 1$$
-     $$\mathbf{q}_2 = \begin{bmatrix} 2/3 \\ -2/3 \\ 1/3 \end{bmatrix}$$
+
+$$
+\mathbf{v}_2 = \mathbf{a}_2 - r_{12} \mathbf{q}_1 = \begin{bmatrix} 1 \\ 0 \\ 1 \end{bmatrix} - 1 \begin{bmatrix} 1/3 \\ 2/3 \\ 2/3 \end{bmatrix} = \begin{bmatrix} 2/3 \\ -2/3 \\ 1/3 \end{bmatrix}
+$$
+
+     Hitung panjang $\mathbf{v}_2$ :
+
+$$
+r_{22} = \lVert \mathbf{v}_2 \rVert = \sqrt{(2/3)^2 + (-2/3)^2 + (1/3)^2} = \sqrt{4/9 + 4/9 + 1/9} = \sqrt{9/9} = 1
+$$
+
+$$
+\mathbf{q}_2 = \begin{bmatrix} 2/3 \\ -2/3 \\ 1/3 \end{bmatrix}
+$$
 
 2. **Matriks $Q$ dan $R$**:
-   $$Q = \begin{bmatrix} 1/3 & 2/3 \\ 2/3 & -2/3 \\ 2/3 & 1/3 \end{bmatrix}, \quad R = \begin{bmatrix} 3 & 1 \\ 0 & 1 \end{bmatrix}$$
+
+$$
+Q = \begin{bmatrix} 1/3 & 2/3 \\ 2/3 & -2/3 \\ 2/3 & 1/3 \end{bmatrix}, \quad R = \begin{bmatrix} 3 & 1 \\ 0 & 1 \end{bmatrix}
+$$
+
    Verifikasi: $Q R = \begin{bmatrix} 1/3(3) & 1/3(1)+2/3(1) \\ 2/3(3) & 2/3(1)-2/3(1) \\ 2/3(3) & 2/3(1)+1/3(1) \end{bmatrix} = \begin{bmatrix} 1 & 1 \\ 2 & 0 \\ 2 & 1 \end{bmatrix} = A$. (Sesuai!).
 </details>
 
@@ -569,7 +807,7 @@ $$\mathbf{a}_1 = \begin{bmatrix} 1 \\ 2 \\ 2 \end{bmatrix}, \quad \mathbf{a}_2 =
 
 ### Tingkat 3: Menengah / Pemodelan & Koding (Regresi Kuadrat Terkecil $QR$)
 **Soal**:
-Sebuah eksperimen fisika mengukur data peluruhan partikel pada 3 titik waktu $t = 1, 2, 3$ detik dengan konsentrasi $y = 6, 5, 1$:
+Sebuah eksperimen fisika mengukur data peluruhan partikel pada 3 titik waktu $t = 1, 2, 3$ detik dengan konsentrasi $y = 6, 5, 1$ :
 Kita ingin mencocokkan garis lurus regresi $y = \beta_0 + \beta_1 t$.
 1. Susunlah matriks model overdetermined $A \mathbf{x} = \mathbf{b}$.
 2. Hitung faktorisasi $A = QR$.
@@ -579,33 +817,62 @@ Kita ingin mencocokkan garis lurus regresi $y = \beta_0 + \beta_1 t$.
 <summary>Kunci Jawaban & Langkah Pengerjaan Detail</summary>
 
 1. **Matriks Model**:
-   $$\begin{bmatrix} 1 & 1 \\ 1 & 2 \\ 1 & 3 \end{bmatrix} \begin{bmatrix} \beta_0 \\ \beta_1 \end{bmatrix} = \begin{bmatrix} 6 \\ 5 \\ 1 \end{bmatrix}$$
+
+$$
+\begin{bmatrix} 1 & 1 \\ 1 & 2 \\ 1 & 3 \end{bmatrix} \begin{bmatrix} \beta_0 \\ \beta_1 \end{bmatrix} = \begin{bmatrix} 6 \\ 5 \\ 1 \end{bmatrix}
+$$
 
 2. **Faktorisasi $A = QR$**:
-   - Kolom 1: $\mathbf{a}_1 = [1, 1, 1]^T \implies \|\mathbf{a}_1\| = \sqrt{3} \implies \mathbf{q}_1 = \frac{1}{\sqrt{3}} [1, 1, 1]^T, \; r_{11} = \sqrt{3}$.
+   - Kolom 1: $\mathbf{a}_1 = [1, 1, 1]^T \implies \lVert \mathbf{a}_1 \rVert = \sqrt{3} \implies \mathbf{q}_1 = \frac{1}{\sqrt{3}} [1, 1, 1]^T, \; r_{11} = \sqrt{3}$.
    - Kolom 2: $\mathbf{a}_2 = [1, 2, 3]^T \implies r_{12} = \mathbf{q}_1^T \mathbf{a}_2 = \frac{1+2+3}{\sqrt{3}} = \frac{6}{\sqrt{3}} = 2\sqrt{3}$.
-     $$\mathbf{v}_2 = \begin{bmatrix} 1 \\ 2 \\ 3 \end{bmatrix} - 2\sqrt{3} \left( \frac{1}{\sqrt{3}} \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix} \right) = \begin{bmatrix} 1-2 \\ 2-2 \\ 3-2 \end{bmatrix} = \begin{bmatrix} -1 \\ 0 \\ 1 \end{bmatrix}$$
-     $$r_{22} = \|\mathbf{v}_2\| = \sqrt{(-1)^2 + 0^2 + 1^2} = \sqrt{2} \implies \mathbf{q}_2 = \frac{1}{\sqrt{2}} \begin{bmatrix} -1 \\ 0 \\ 1 \end{bmatrix}$$
+
+$$
+\mathbf{v}_2 = \begin{bmatrix} 1 \\ 2 \\ 3 \end{bmatrix} - 2\sqrt{3} \left( \frac{1}{\sqrt{3}} \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix} \right) = \begin{bmatrix} 1-2 \\ 2-2 \\ 3-2 \end{bmatrix} = \begin{bmatrix} -1 \\ 0 \\ 1 \end{bmatrix}
+$$
+
+$$
+r_{22} = \lVert \mathbf{v}_2 \rVert = \sqrt{(-1)^2 + 0^2 + 1^2} = \sqrt{2} \implies \mathbf{q}_2 = \frac{1}{\sqrt{2}} \begin{bmatrix} -1 \\ 0 \\ 1 \end{bmatrix}
+$$
+
    Maka:
-   $$Q = \begin{bmatrix} 1/\sqrt{3} & -1/\sqrt{2} \\ 1/\sqrt{3} & 0 \\ 1/\sqrt{3} & 1/\sqrt{2} \end{bmatrix}, \quad R = \begin{bmatrix} \sqrt{3} & 2\sqrt{3} \\ 0 & \sqrt{2} \end{bmatrix}$$
+
+$$
+Q = \begin{bmatrix} 1/\sqrt{3} & -1/\sqrt{2} \\ 1/\sqrt{3} & 0 \\ 1/\sqrt{3} & 1/\sqrt{2} \end{bmatrix}, \quad R = \begin{bmatrix} \sqrt{3} & 2\sqrt{3} \\ 0 & \sqrt{2} \end{bmatrix}
+$$
 
 3. **Penyelesaian $R\hat{\mathbf{x}} = Q^T \mathbf{b}$**:
-   Hitung $Q^T \mathbf{b}$:
-   $$Q^T \mathbf{b} = \begin{bmatrix} \frac{6+5+1}{\sqrt{3}} \\ \frac{-6+0+1}{\sqrt{2}} \end{bmatrix} = \begin{bmatrix} \frac{12}{\sqrt{3}} \\ \frac{-5}{\sqrt{2}} \end{bmatrix} = \begin{bmatrix} 4\sqrt{3} \\ -2{,}5\sqrt{2} \end{bmatrix}$$
+   Hitung $Q^T \mathbf{b}$ :
+
+$$
+Q^T \mathbf{b} = \begin{bmatrix} \frac{6+5+1}{\sqrt{3}} \\ \frac{-6+0+1}{\sqrt{2}} \end{bmatrix} = \begin{bmatrix} \frac{12}{\sqrt{3}} \\ \frac{-5}{\sqrt{2}} \end{bmatrix} = \begin{bmatrix} 4\sqrt{3} \\ -2{,}5\sqrt{2} \end{bmatrix}
+$$
+
    Sistem segitiga atas:
-   $$\begin{bmatrix} \sqrt{3} & 2\sqrt{3} \\ 0 & \sqrt{2} \end{bmatrix} \begin{bmatrix} \beta_0 \\ \beta_1 \end{bmatrix} = \begin{bmatrix} 4\sqrt{3} \\ -2{,}5\sqrt{2} \end{bmatrix}$$
+
+$$
+\begin{bmatrix} \sqrt{3} & 2\sqrt{3} \\ 0 & \sqrt{2} \end{bmatrix} \begin{bmatrix} \beta_0 \\ \beta_1 \end{bmatrix} = \begin{bmatrix} 4\sqrt{3} \\ -2{,}5\sqrt{2} \end{bmatrix}
+$$
+
    - Baris 2: $\sqrt{2} \beta_1 = -2{,}5\sqrt{2} \implies \beta_1 = -2{,}5$.
    - Baris 1: $\sqrt{3} \beta_0 + 2\sqrt{3}(-2{,}5) = 4\sqrt{3} \implies \beta_0 - 5 = 4 \implies \beta_0 = 9$.
    Garis regresi kuadrat terkecil terbaik adalah:
-   $$y = 9 - 2{,}5 t$$
+
+$$
+y = 9 - 2{,}5 t
+$$
+
 </details>
 
 ---
 
 ### Tingkat 4: Mahir / Tantangan Industri (Analisis Kehilangan Ortogonalitas *Loss of Orthogonality*)
 **Soal**:
-Tinjau dua vektor di $\mathbb{R}^2$ dengan perturbasi parameter kecil $\epsilon > 0$:
-$$\mathbf{a}_1 = \begin{bmatrix} 1 \\ 0 \end{bmatrix}, \quad \mathbf{a}_2 = \begin{bmatrix} 1 \\ \epsilon \end{bmatrix}$$
+Tinjau dua vektor di $\mathbb{R}^2$ dengan perturbasi parameter kecil $\epsilon > 0$ :
+
+$$
+\mathbf{a}_1 = \begin{bmatrix} 1 \\ 0 \end{bmatrix}, \quad \mathbf{a}_2 = \begin{bmatrix} 1 \\ \epsilon \end{bmatrix}
+$$
+
 1. Hitung faktorisasi $A = QR$ menggunakan Classical Gram-Schmidt (CGS) secara analitis presisi eksak.
 2. Tinjau vektor ketiga $\mathbf{a}_3 = \begin{bmatrix} 1 \\ 0 \end{bmatrix} + \begin{bmatrix} 0 \\ \epsilon^2 \end{bmatrix}$. Jika algoritma CGS dijalankan pada komputer dengan presisi mesin di mana $\epsilon^2 < \epsilon_{\text{mach}} \approx 10^{-16}$, buktikan bahwa vektor hasil $\mathbf{q}_2$ dan $\mathbf{q}_3$ kehilangan ortogonalitas ($\mathbf{q}_2^T \mathbf{q}_3 \approx 1$).
 3. Buktikan secara matematis mengapa proses Re-orthogonalization (Gram-Schmidt dua kali: MGS2) memulihkan ortogonalitas hingga $\mathcal{O}(\epsilon_{\text{mach}})$.
@@ -614,28 +881,47 @@ $$\mathbf{a}_1 = \begin{bmatrix} 1 \\ 0 \end{bmatrix}, \quad \mathbf{a}_2 = \beg
 <summary>Kunci Jawaban & Langkah Pengerjaan Detail</summary>
 
 1. **Faktorisasi Analitis**:
-   - $\mathbf{q}_1 = \frac{\mathbf{a}_1}{\|\mathbf{a}_1\|} = \begin{bmatrix} 1 \\ 0 \end{bmatrix}, \quad r_{11} = 1$.
+   - $\mathbf{q}_1 = \frac{\mathbf{a}_1}{\lVert \mathbf{a}_1 \rVert} = \begin{bmatrix} 1 \\ 0 \end{bmatrix}, \quad r_{11} = 1$.
    - $r_{12} = \mathbf{q}_1^T \mathbf{a}_2 = 1(1) + 0(\epsilon) = 1$.
    - $\mathbf{v}_2 = \mathbf{a}_2 - r_{12} \mathbf{q}_1 = \begin{bmatrix} 1 \\ \epsilon \end{bmatrix} - 1 \begin{bmatrix} 1 \\ 0 \end{bmatrix} = \begin{bmatrix} 0 \\ \epsilon \end{bmatrix}$.
-   - $r_{22} = \|\mathbf{v}_2\| = \epsilon \implies \mathbf{q}_2 = \begin{bmatrix} 0 \\ 1 \end{bmatrix}$.
+   - $r_{22} = \lVert \mathbf{v}_2 \rVert = \epsilon \implies \mathbf{q}_2 = \begin{bmatrix} 0 \\ 1 \end{bmatrix}$.
    Secara analitis eksak, diperoleh $Q = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}$ dan $R = \begin{bmatrix} 1 & 1 \\ 0 & \epsilon \end{bmatrix}$.
 
 2. **Mekanisme Kehilangan Ortogonalitas Numerik**:
    Ketika vektor ketiga $\mathbf{a}_3$ dimasukkan:
-   Dalam komputasi floating-point dengan pembulatan $\text{fl}(\cdot)$:
-   $$\text{fl}(\mathbf{q}_1^T \mathbf{a}_3) = 1$$
-   $$\mathbf{v}_3 = \mathbf{a}_3 - 1 \cdot \mathbf{q}_1 - (\mathbf{q}_2^T \mathbf{a}_3) \mathbf{q}_2$$
+   Dalam komputasi floating-point dengan pembulatan $\text{fl}(\cdot)$ :
+
+$$
+\text{fl}(\mathbf{q}_1^T \mathbf{a}_3) = 1
+$$
+
+$$
+\mathbf{v}_3 = \mathbf{a}_3 - 1 \cdot \mathbf{q}_1 - (\mathbf{q}_2^T \mathbf{a}_3) \mathbf{q}_2
+$$
+
    Namun karena $\epsilon^2 < \epsilon_{\text{mach}}$, suku $\epsilon^2$ terpotong menjadi nol pada pengurangan pertama ($1 - 1 = 0$), sehingga galat pembulatan $\delta \approx \epsilon_{\text{mach}}$ mendominasi vektor sisa.
-   Ketika $\mathbf{v}_3$ dinormalisasi dengan membagi norma yang berukuran sangat kecil ($\|\mathbf{v}_3\| \approx \epsilon_{\text{mach}}$), galat tersebut teramplifikasi secara masif:
-   $$\mathbf{q}_3 \approx \frac{\boldsymbol{\delta}}{\|\boldsymbol{\delta}\|} \implies |\mathbf{q}_2^T \mathbf{q}_3| \approx \mathcal{O}(1)$$
+   Ketika $\mathbf{v}_3$ dinormalisasi dengan membagi norma yang berukuran sangat kecil ($\lVert \mathbf{v}_3 \rVert \approx \epsilon_{\text{mach}}$), galat tersebut teramplifikasi secara masif:
+
+$$
+\mathbf{q}_3 \approx \frac{\boldsymbol{\delta}}{\lVert \boldsymbol{\delta} \rVert} \implies |\mathbf{q}_2^T \mathbf{q}_3| \approx \mathcal{O}(1)
+$$
+
    Vektor $\mathbf{q}_3$ yang seharusnya tegak lurus menjadi sejajar dengan $\mathbf{q}_2$!
 
 3. **Pemulihan via Re-orthogonalization (Teorema Kahan-Parlett)**:
    Dengan menerapkan Gram-Schmidt untuk kedua kalinya (MGS2):
-   $$\mathbf{v}_3^{(2)} = \mathbf{q}_3 - (\mathbf{q}_1^T \mathbf{q}_3)\mathbf{q}_1 - (\mathbf{q}_2^T \mathbf{q}_3)\mathbf{q}_2$$
+
+$$
+\mathbf{v}_3^{(2)} = \mathbf{q}_3 - (\mathbf{q}_1^T \mathbf{q}_3)\mathbf{q}_1 - (\mathbf{q}_2^T \mathbf{q}_3)\mathbf{q}_2
+$$
+
    Galat residual yang tersisa setelah iterasi pertama sekarang diproyeksikan dan dibersihkan kembali.
    Berdasarkan Teorema Kahan:
-   $$\|\mathbf{q}_i^T \mathbf{q}_j\| \le \mathcal{O}(\kappa(A) \epsilon_{\text{mach}})$$
+
+$$
+\lVert \mathbf{q}_i^T \mathbf{q}_j \rVert \le \mathcal{O}(\kappa(A) \epsilon_{\text{mach}})
+$$
+
    Satu langkah re-ortogonalisasi tambahan dijamin memulihkan ortogonalitas matriks $Q$ hingga batas ketelitian mesin IEEE 754.
 </details>
 

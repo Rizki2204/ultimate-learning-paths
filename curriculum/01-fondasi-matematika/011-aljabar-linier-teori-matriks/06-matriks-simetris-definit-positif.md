@@ -11,11 +11,14 @@ Bayangkan Anda meletakkan sebutir kelereng kaca kecil licin di dinding bagian da
 Sekarang, bayangkan bentuk permukaan kedua: pelana kuda (*saddle surface*). Jika Anda bergerak maju atau mundur di sepanjang garis punggung pelana, permukaan melengkung ke atas (membentuk mangkuk). Namun jika Anda melangkah ke samping kiri atau kanan ke arah tempat kaki penunggang menggantung, permukaan melengkung curam ke bawah menuju jurang. Titik tengah pelana kuda adalah titik datar stasioner di mana kemiringan lereng bernilai nol, tetapi titik tersebut sama sekali **tidak stabil**! Hembusan angin sekecil apa pun akan membuat kelereng jatuh menggelinding ke jurang tanpa pernah kembali.
 
 Dua bentuk geometris ini adalah perwujudan visual nyata dari konsep **Bentuk Kuadratik (*Quadratic Form*)** dalam aljabar linier:
-$$f(\mathbf{x}) = \frac{1}{2} \mathbf{x}^T A \mathbf{x} - \mathbf{b}^T \mathbf{x}$$
+
+$$
+f(\mathbf{x}) = \frac{1}{2} \mathbf{x}^T A \mathbf{x} - \mathbf{b}^T \mathbf{x}
+$$
 
 Pertanyaan eksistensial dalam sains dan rekayasa adalah: apakah grafik fungsi energi $f(\mathbf{x})$ membentuk **sebuah mangkuk paraboloid sempurna yang memiliki titik terendah tunggal yang stabil di alam semesta**, ataukah membentuk **titik pelana yang labil**, ataukah **jurang tanpa dasar yang runtuh ke minus tak hingga**?
 
-Jawabannya ditentukan secara mutlak oleh sifat aljabar dari matriks simetris $A$:
+Jawabannya ditentukan secara mutlak oleh sifat aljabar dari matriks simetris $A$ :
 - Jika matriks $A$ adalah **Definit Positif ($A \succ 0$)**, maka energi bentuk kuadratik $\mathbf{x}^T A \mathbf{x} > 0$ untuk setiap arah gangguan $\mathbf{x} \ne \mathbf{0}$. Permukaan membentuk mangkuk sempurna, dan algoritma optimasi (seperti Gradient Descent atau Metode Newton) dijamin konvergen menuju solusi optimal tunggal.
 - Jika $A$ memiliki nilai eigen campuran (sebagian positif dan sebagian negatif), permukaan membentuk **titik pelana (*saddle point*)**.
 - Jika $A$ memiliki nilai eigen negatif murni, sistem mengalami ketidakstabilan katastropik (*energy collapse*).
@@ -35,41 +38,72 @@ Rujukan pembelajaran standar emas:
 ### 2.1 Bentuk Kuadratik $2 \times 2$ & Jembatan "Melengkapkan Kuadrat"
 
 Bentuk kuadratik yang diasosiasikan dengan matriks simetris $A \in \mathbb{R}^{n \times n}$ adalah fungsi skalar:
-$$q(\mathbf{x}) = \mathbf{x}^T A \mathbf{x} = \sum_{i=1}^n \sum_{j=1}^n a_{ij} x_i x_j$$
+
+$$
+q(\mathbf{x}) = \mathbf{x}^T A \mathbf{x} = \sum_{i=1}^n \sum_{j=1}^n a_{ij} x_i x_j
+$$
 
 > **🔤 Kamus Simbol Anti-Pusing — Bentuk Kuadratik ($\mathbf{x}^T A \mathbf{x}$):**
 > - **Cara Membaca Lisan**: *"Vektor x transpose dikali matriks A dikali vektor x."*
 > - **Arti Simbol**:
->   - $\mathbf{x}$: Vektor koordinat input $[x_1, x_2, \dots, x_n]^T$.
->   - $\mathbf{x}^T$: Vektor baris $[x_1, x_2, \dots, x_n]$.
->   - $A$: Matriks simetris berukuran $n \times n$ di mana $a_{ij} = a_{ji}$.
->   - $\mathbf{x}^T A \mathbf{x}$: Nilai skalar tunggal yang menyatakan energi total sistem pada titik $\mathbf{x}$.
+>   - $\mathbf{x}$ : Vektor koordinat input $[x_1, x_2, \dots, x_n]^T$.
+>   - $\mathbf{x}^T$ : Vektor baris $[x_1, x_2, \dots, x_n]$.
+>   - $A$ : Matriks simetris berukuran $n \times n$ di mana $a_{ij} = a_{ji}$.
+>   - $\mathbf{x}^T A \mathbf{x}$ : Nilai skalar tunggal yang menyatakan energi total sistem pada titik $\mathbf{x}$.
 > - **Contoh Mainan $2 \times 2$**:
 >   Misalkan $A = \begin{bmatrix} a & b \\ b & c \end{bmatrix}$ dan $\mathbf{x} = \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}$.
->   $$\mathbf{x}^T A \mathbf{x} = \begin{bmatrix} x_1 & x_2 \end{bmatrix} \begin{bmatrix} a & b \\ b & c \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} x_1 & x_2 \end{bmatrix} \begin{bmatrix} a x_1 + b x_2 \\ b x_1 + c x_2 \end{bmatrix}$$
->   $$= x_1(a x_1 + b x_2) + x_2(b x_1 + c x_2) = a x_1^2 + 2b x_1 x_2 + c x_2^2$$
+>
+> $$
+> \mathbf{x}^T A \mathbf{x} = \begin{bmatrix} x_1 & x_2 \end{bmatrix} \begin{bmatrix} a & b \\ b & c \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} x_1 & x_2 \end{bmatrix} \begin{bmatrix} a x_1 + b x_2 \\ b x_1 + c x_2 \end{bmatrix}
+> $$
+>
+> $$
+> = x_1(a x_1 + b x_2) + x_2(b x_1 + c x_2) = a x_1^2 + 2b x_1 x_2 + c x_2^2
+> $$
+>
 >   Perhatikan bahwa suku silang $x_1 x_2$ digabungkan menjadi satu dengan koefisien $2b$ karena sifat simetri $a_{12} = a_{21} = b$.
 
 Sekarang, mari kita pelajari **Jembatan "Melengkapkan Kuadrat" (*Completing the Square Bridge*)** yang menghubungkan aljabar sekolah dengan eliminasi Gaussian $LDL^T$ dan Cholesky $LL^T$.
 
 Tinjau bentuk kuadratik konkret berikut:
-$$q(x_1, x_2) = 4x_1^2 + 4x_1 x_2 + 10x_2^2$$
+
+$$
+q(x_1, x_2) = 4x_1^2 + 4x_1 x_2 + 10x_2^2
+$$
+
 Matriks simetris yang bersesuaian adalah:
-$$A = \begin{bmatrix} 4 & 2 \\ 2 & 10 \end{bmatrix}$$
+
+$$
+A = \begin{bmatrix} 4 & 2 \\ 2 & 10 \end{bmatrix}
+$$
+
 (karena $a = 4, 2b = 4 \implies b = 2, c = 10$).
 
-Mari kita lengkapi kuadrat terhadap variabel $x_1$:
-$$q(x_1, x_2) = 4 \left( x_1^2 + x_1 x_2 \right) + 10x_2^2$$
+Mari kita lengkapi kuadrat terhadap variabel $x_1$ :
+
+$$
+q(x_1, x_2) = 4 \left( x_1^2 + x_1 x_2 \right) + 10x_2^2
+$$
+
 Tambahkan dan kurangkan $\left(\frac{1}{2} x_2\right)^2 = \frac{1}{4} x_2^2$ di dalam tanda kurung:
-$$q(x_1, x_2) = 4 \left( x_1^2 + x_1 x_2 + \frac{1}{4} x_2^2 \right) + 10x_2^2 - 4\left(\frac{1}{4} x_2^2\right)$$
-$$= 4 \left( x_1 + \frac{1}{2} x_2 \right)^2 + (10 - 1) x_2^2$$
-$$= 4 \left( x_1 + \frac{1}{2} x_2 \right)^2 + 9 x_2^2$$
+
+$$
+q(x_1, x_2) = 4 \left( x_1^2 + x_1 x_2 + \frac{1}{4} x_2^2 \right) + 10x_2^2 - 4\left(\frac{1}{4} x_2^2\right)
+$$
+
+$$
+= 4 \left( x_1 + \frac{1}{2} x_2 \right)^2 + (10 - 1) x_2^2
+$$
+
+$$
+= 4 \left( x_1 + \frac{1}{2} x_2 \right)^2 + 9 x_2^2
+$$
 
 > **🌉 Jembatan Logika — Penyatuan Spektakuler Pivot Gauss dan Cholesky:**
 > Amatilah angka-angka yang muncul dari proses melengkapkan kuadrat di atas:
 > 1. **Koefisien Kuadrat Sempurna ($4$ dan $9$)**:
 >    Dua bilangan di depan kuadrat sempurna adalah **$4$ dan $9$**.
->    Sekarang lakukan eliminasi Gaussian pada matriks $A = \begin{bmatrix} 4 & 2 \\ 2 & 10 \end{bmatrix}$:
+>    Sekarang lakukan eliminasi Gaussian pada matriks $A = \begin{bmatrix} 4 & 2 \\ 2 & 10 \end{bmatrix}$ :
 >    - Pivot pertama adalah $d_1 = 4$.
 >    - Pengali baris: $\ell_{21} = 2/4 = 1/2$.
 >    - Baris kedua berubah menjadi: $10 - \ell_{21}(2) = 10 - (1/2)(2) = 9$.
@@ -77,11 +111,23 @@ $$= 4 \left( x_1 + \frac{1}{2} x_2 \right)^2 + 9 x_2^2$$
 >    Pivot eliminasi Gaussian $LDL^T$ persis sama dengan koefisien melengkapkan kuadrat: $d_1 = 4$ dan $d_2 = 9$!
 > 2. **Hubungan dengan Dekomposisi Cholesky $LL^T$**:
 >    Kita dapat menarik akar kuadrat dari koefisien pivot ke dalam kuadrat sempurna:
->    $$q(x_1, x_2) = \left[ 2\left(x_1 + \frac{1}{2} x_2\right) \right]^2 + \left[ 3 x_2 \right]^2 = (2x_1 + x_2)^2 + (3x_2)^2$$
+>
+> $$
+> q(x_1, x_2) = \left[ 2\left(x_1 + \frac{1}{2} x_2\right) \right]^2 + \left[ 3 x_2 \right]^2 = (2x_1 + x_2)^2 + (3x_2)^2
+> $$
+>
 >    Perhatikan matriks koefisiennya:
->    $$\begin{bmatrix} 2x_1 + x_2 \\ 3x_2 \end{bmatrix} = \begin{bmatrix} 2 & 1 \\ 0 & 3 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = L^T \mathbf{x}$$
+>
+> $$
+> \begin{bmatrix} 2x_1 + x_2 \\ 3x_2 \end{bmatrix} = \begin{bmatrix} 2 & 1 \\ 0 & 3 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = L^T \mathbf{x}
+> $$
+>
 >    Maka matriks segitiga bawah Cholesky adalah:
->    $$L = \begin{bmatrix} 2 & 0 \\ 1 & 3 \end{bmatrix}$$
+>
+> $$
+> L = \begin{bmatrix} 2 & 0 \\ 1 & 3 \end{bmatrix}
+> $$
+>
 >    Elemen diagonal Cholesky adalah $l_{11} = 2 = \sqrt{4} = \sqrt{d_1}$ dan $l_{22} = 3 = \sqrt{9} = \sqrt{d_2}$!
 >    Melengkapkan kuadrat aljabar, pivot eliminasi Gauss $LDL^T$, dan dekomposisi Cholesky $LL^T$ adalah **satu kesatuan entitas matematika yang sama persis**!
 
@@ -99,12 +145,24 @@ Sebelum membuktikan mengapa nilai eigen matriks simetris riil tidak pernah berup
 > **Micro-Primer: Bilangan Kompleks & Konjugat Hermite ($A^H$):**
 > 1. Bilangan kompleks berbentuk $z = a + bi$, di mana $i = \sqrt{-1}$. Konjugat kompleksnya adalah $\overline{z} = a - bi$.
 > 2. Kuadrat modulus suatu bilangan kompleks selalu bilangan riil non-negatif:
->    $$|z|^2 = \overline{z} \cdot z = (a - bi)(a + bi) = a^2 + b^2 \ge 0$$
+>
+> $$
+> |z|^2 = \overline{z} \cdot z = (a - bi)(a + bi) = a^2 + b^2 \ge 0
+> $$
+>
 > 3. Untuk vektor kompleks $\mathbf{x} \in \mathbb{C}^n$, operasi transpose biasa $\mathbf{x}^T \mathbf{x} = \sum x_j^2$ tidak dapat digunakan sebagai panjang karena kuadrat bilangan imajiner bisa negatif ($i^2 = -1$).
 >    Oleh karena itu, kita mendefinisikan **Transpose Konjugat (Konjugat Hermite)**:
->    $$\mathbf{x}^H = \overline{\mathbf{x}}^T = \begin{bmatrix} \overline{x}_1 & \overline{x}_2 & \dots & \overline{x}_n \end{bmatrix}$$
+>
+> $$
+> \mathbf{x}^H = \overline{\mathbf{x}}^T = \begin{bmatrix} \overline{x}_1 & \overline{x}_2 & \dots & \overline{x}_n \end{bmatrix}
+> $$
+>
 >    Panjang norma Euclidean kompleks menjadi:
->    $$\mathbf{x}^H \mathbf{x} = \sum_{j=1}^n \overline{x}_j x_j = \sum_{j=1}^n |x_j|^2 > 0 \quad \text{untuk setiap } \mathbf{x} \ne \mathbf{0}$$
+>
+> $$
+> \mathbf{x}^H \mathbf{x} = \sum_{j=1}^n \overline{x}_j x_j = \sum_{j=1}^n |x_j|^2 > 0 \quad \text{untuk setiap } \mathbf{x} \ne \mathbf{0}
+> $$
+>
 > 4. Untuk sembarang matriks kompleks $A \in \mathbb{C}^{m \times n}$, konjugat Hermite adalah $A^H = \overline{A}^T$.
 >    Jika matriks $A$ bernilai riil murni dan simetris, maka konjugat Hermite identik dengan matriks itu sendiri: $A^H = A^T = A$.
 
@@ -114,25 +172,48 @@ Jika $S = S^T \in \mathbb{R}^{n \times n}$, maka seluruh nilai eigen $\lambda_1,
 
 **Pembuktian Analitis Elegan**:
 Misalkan $\lambda \in \mathbb{C}$ adalah nilai eigen (yang berpotensi memiliki bagian imajiner) dan $\mathbf{x} \in \mathbb{C}^n$ adalah vektor eigen tak-nol yang bersesuaian:
-$$S\mathbf{x} = \lambda \mathbf{x}$$
 
-Kalikan kedua ruas dari sebelah kiri dengan konjugat Hermite $\mathbf{x}^H$:
-$$\mathbf{x}^H S \mathbf{x} = \lambda \mathbf{x}^H \mathbf{x} \quad \text{--- (Persamaan A)}$$
+$$
+S\mathbf{x} = \lambda \mathbf{x}
+$$
+
+Kalikan kedua ruas dari sebelah kiri dengan konjugat Hermite $\mathbf{x}^H$ :
+
+$$
+\mathbf{x}^H S \mathbf{x} = \lambda \mathbf{x}^H \mathbf{x} \quad \text{--- (Persamaan A)}
+$$
 
 Ambil konjugat Hermite dari skalar di kedua ruas Persamaan A:
-$$(\mathbf{x}^H S \mathbf{x})^H = (\lambda \mathbf{x}^H \mathbf{x})^H$$
-Sesuai sifat pembalikan urutan konjugat Hermite:
-$$\mathbf{x}^H S^H (\mathbf{x}^H)^H = \overline{\lambda} \mathbf{x}^H (\mathbf{x}^H)^H \implies \mathbf{x}^H S^H \mathbf{x} = \overline{\lambda} \mathbf{x}^H \mathbf{x}$$
 
-Karena matriks $S$ bernilai riil dan simetris, maka $S^H = \overline{S}^T = S^T = S$:
-$$\mathbf{x}^H S \mathbf{x} = \overline{\lambda} \mathbf{x}^H \mathbf{x} \quad \text{--- (Persamaan B)}$$
+$$
+(\mathbf{x}^H S \mathbf{x})^H = (\lambda \mathbf{x}^H \mathbf{x})^H
+$$
+
+Sesuai sifat pembalikan urutan konjugat Hermite:
+
+$$
+\mathbf{x}^H S^H (\mathbf{x}^H)^H = \overline{\lambda} \mathbf{x}^H (\mathbf{x}^H)^H \implies \mathbf{x}^H S^H \mathbf{x} = \overline{\lambda} \mathbf{x}^H \mathbf{x}
+$$
+
+Karena matriks $S$ bernilai riil dan simetris, maka $S^H = \overline{S}^T = S^T = S$ :
+
+$$
+\mathbf{x}^H S \mathbf{x} = \overline{\lambda} \mathbf{x}^H \mathbf{x} \quad \text{--- (Persamaan B)}
+$$
 
 Kurangkan Persamaan B dari Persamaan A:
-$$\lambda \mathbf{x}^H \mathbf{x} - \overline{\lambda} \mathbf{x}^H \mathbf{x} = 0 \implies (\lambda - \overline{\lambda}) (\mathbf{x}^H \mathbf{x}) = 0$$
+
+$$
+\lambda \mathbf{x}^H \mathbf{x} - \overline{\lambda} \mathbf{x}^H \mathbf{x} = 0 \implies (\lambda - \overline{\lambda}) (\mathbf{x}^H \mathbf{x}) = 0
+$$
 
 Karena $\mathbf{x} \ne \mathbf{0}$, panjang norma kuadrat $\mathbf{x}^H \mathbf{x} = \sum |x_j|^2 > 0$ secara ketat.
 Satu-satunya kesimpulan yang mungkin adalah:
-$$\lambda - \overline{\lambda} = 0 \implies \lambda = \overline{\lambda}$$
+
+$$
+\lambda - \overline{\lambda} = 0 \implies \lambda = \overline{\lambda}
+$$
+
 Bilangan kompleks yang sama dengan konjugatnya adalah **bilangan riil murni**. Terbukti bahwa seluruh nilai eigen matriks simetris riil pasti riil! $\blacksquare$
 
 ---
@@ -144,22 +225,41 @@ Jika $S\mathbf{q}_1 = \lambda_1 \mathbf{q}_1$ dan $S\mathbf{q}_2 = \lambda_2 \ma
 **Pembuktian**:
 Hitung skalar $\mathbf{q}_1^T S \mathbf{q}_2$ melalui dua sudut pandang asosiatif:
 1. Menghitung ke arah kanan:
-   $$\mathbf{q}_1^T (S \mathbf{q}_2) = \mathbf{q}_1^T (\lambda_2 \mathbf{q}_2) = \lambda_2 (\mathbf{q}_1^T \mathbf{q}_2)$$
-2. Menghitung ke arah kiri menggunakan simetri $S = S^T$:
-   $$(S \mathbf{q}_1)^T \mathbf{q}_2 = (\lambda_1 \mathbf{q}_1)^T \mathbf{q}_2 = \lambda_1 (\mathbf{q}_1^T \mathbf{q}_2)$$
+
+$$
+\mathbf{q}_1^T (S \mathbf{q}_2) = \mathbf{q}_1^T (\lambda_2 \mathbf{q}_2) = \lambda_2 (\mathbf{q}_1^T \mathbf{q}_2)
+$$
+
+2. Menghitung ke arah kiri menggunakan simetri $S = S^T$ :
+
+$$
+(S \mathbf{q}_1)^T \mathbf{q}_2 = (\lambda_1 \mathbf{q}_1)^T \mathbf{q}_2 = \lambda_1 (\mathbf{q}_1^T \mathbf{q}_2)
+$$
 
 Samakan kedua hasil:
-$$\lambda_1 (\mathbf{q}_1^T \mathbf{q}_2) = \lambda_2 (\mathbf{q}_1^T \mathbf{q}_2) \implies (\lambda_1 - \lambda_2)(\mathbf{q}_1^T \mathbf{q}_2) = 0$$
+
+$$
+\lambda_1 (\mathbf{q}_1^T \mathbf{q}_2) = \lambda_2 (\mathbf{q}_1^T \mathbf{q}_2) \implies (\lambda_1 - \lambda_2)(\mathbf{q}_1^T \mathbf{q}_2) = 0
+$$
+
 Karena diasumsikan $\lambda_1 \ne \lambda_2$, maka $(\lambda_1 - \lambda_2) \ne 0$.
 Wajib berlaku:
-$$\mathbf{q}_1^T \mathbf{q}_2 = 0$$
+
+$$
+\mathbf{q}_1^T \mathbf{q}_2 = 0
+$$
+
 Kedua vektor eigen saling tegak lurus sempurna! $\blacksquare$
 
 ---
 
 #### Teorema Spektral (Dekomposisi Spektral Matriks Simetris):
-Setiap matriks simetris riil $S \in \mathbb{R}^{n \times n}$ selalu dapat difaktorkan menjadi perkalian matriks ortogonal $Q$ dan matriks diagonal riil $\Lambda$:
-$$S = Q \Lambda Q^T = \sum_{i=1}^n \lambda_i \mathbf{q}_i \mathbf{q}_i^T$$
+Setiap matriks simetris riil $S \in \mathbb{R}^{n \times n}$ selalu dapat difaktorkan menjadi perkalian matriks ortogonal $Q$ dan matriks diagonal riil $\Lambda$ :
+
+$$
+S = Q \Lambda Q^T = \sum_{i=1}^n \lambda_i \mathbf{q}_i \mathbf{q}_i^T
+$$
+
 Di mana:
 - $Q = \begin{bmatrix} \mathbf{q}_1 & \cdots & \mathbf{q}_n \end{bmatrix}$ adalah matriks ortogonal ($Q^T Q = Q Q^T = I$).
 - $\Lambda = \text{diag}(\lambda_1, \dots, \lambda_n)$ adalah matriks diagonal berisi nilai eigen riil.
@@ -172,17 +272,33 @@ Di mana:
 Sebuah matriks simetris riil $A \in \mathbb{R}^{n \times n}$ dikatakan **Definit Positif** ($A \succ 0$) jika dan hanya jika memenuhi salah satu (dan otomatis memenuhi kelima) kriteria ekuivalen berikut:
 
 1. **Tes 1: Energi Bentuk Kuadratik Positif**:
-   Untuk setiap vektor riil tak-nol $\mathbf{x} \ne \mathbf{0}$:
-   $$\mathbf{x}^T A \mathbf{x} > 0$$
+   Untuk setiap vektor riil tak-nol $\mathbf{x} \ne \mathbf{0}$ :
+
+$$
+\mathbf{x}^T A \mathbf{x} > 0
+$$
+
 2. **Tes 2: Seluruh Nilai Eigen Positif**:
    Seluruh nilai eigen riil dari matriks $A$ bernilai positif tegas:
-   $$\lambda_i > 0, \quad \forall i \in \{1, 2, \dots, n\}$$
+
+$$
+\lambda_i > 0, \quad \forall i \in \{1, 2, \dots, n\}
+$$
+
 3. **Tes 3: Seluruh Pivot Eliminasi Gaussian Positif**:
    Jika eliminasi Gaussian diterapkan tanpa pertukaran baris ($A = L D L^T$), seluruh pivot diagonal bernilai positif:
-   $$d_i > 0, \quad \forall i \in \{1, 2, \dots, n\}$$
+
+$$
+d_i > 0, \quad \forall i \in \{1, 2, \dots, n\}
+$$
+
 4. **Tes 4: Kriteria Determinan Minor Utama Sylvester Positif**:
    Seluruh $n$ determinan submatriks terdepan (*leading principal minors*) bernilai positif:
-   $$D_1 = a_{11} > 0, \quad D_2 = \det \begin{bmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{bmatrix} > 0, \quad \dots, \quad D_n = \det(A) > 0$$
+
+$$
+D_1 = a_{11} > 0, \quad D_2 = \det \begin{bmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{bmatrix} > 0, \quad \dots, \quad D_n = \det(A) > 0
+$$
+
 5. **Tes 5: Faktorisasi Matriks Ber-Rank Penuh $A = R^T R$**:
    Terdapat matriks persegi panjang ber-rank penuh $R \in \mathbb{R}^{m \times n}$ ($m \ge n$, kolom-kolom bebas linier) sedemikian rupa sehingga $A = R^T R$.
 
@@ -199,17 +315,30 @@ Sebuah matriks simetris riil $A \in \mathbb{R}^{n \times n}$ dikatakan **Definit
 ### 2.4 Dekomposisi Cholesky $A = L L^T$ & Standarisasi FLOPs
 
 Jika matriks $A$ bersifat simetris definit positif ($A \succ 0$), terdapat matriks segitiga bawah unik $L$ dengan elemen diagonal positif ($l_{ii} > 0$) sedemikian sehingga:
-$$A = L L^T$$
+
+$$
+A = L L^T
+$$
 
 #### Algoritma Cholesky-Banachiewicz:
-Kalikan bentuk segitiga $L$ dengan transposnya $L^T$:
-$$\begin{bmatrix} a_{11} & a_{12} & \cdots \\ a_{21} & a_{22} & \cdots \\ \vdots & \vdots & \ddots \end{bmatrix} = \begin{bmatrix} l_{11} & 0 & \cdots \\ l_{21} & l_{22} & \cdots \\ \vdots & \vdots & \ddots \end{bmatrix} \begin{bmatrix} l_{11} & l_{21} & \cdots \\ 0 & l_{22} & \cdots \\ \vdots & \vdots & \ddots \end{bmatrix}$$
+Kalikan bentuk segitiga $L$ dengan transposnya $L^T$ :
+
+$$
+\begin{bmatrix} a_{11} & a_{12} & \cdots \\ a_{21} & a_{22} & \cdots \\ \vdots & \vdots & \ddots \end{bmatrix} = \begin{bmatrix} l_{11} & 0 & \cdots \\ l_{21} & l_{22} & \cdots \\ \vdots & \vdots & \ddots \end{bmatrix} \begin{bmatrix} l_{11} & l_{21} & \cdots \\ 0 & l_{22} & \cdots \\ \vdots & \vdots & \ddots \end{bmatrix}
+$$
 
 1. **Elemen Diagonal ($j = i$)**:
-   $$a_{ii} = \sum_{k=1}^i l_{ik}^2 = l_{ii}^2 + \sum_{k=1}^{i-1} l_{ik}^2 \implies l_{ii} = \sqrt{a_{ii} - \sum_{k=1}^{i-1} l_{ik}^2}$$
+
+$$
+a_{ii} = \sum_{k=1}^i l_{ik}^2 = l_{ii}^2 + \sum_{k=1}^{i-1} l_{ik}^2 \implies l_{ii} = \sqrt{a_{ii} - \sum_{k=1}^{i-1} l_{ik}^2}
+$$
+
    Karena $A \succ 0$, nilai di dalam akar kuadrat dijamin selalu positif tegas!
 2. **Elemen Non-Diagonal di Bawah Diagonal ($i > j$)**:
-   $$a_{ij} = \sum_{k=1}^j l_{ik} l_{jk} = l_{ij} l_{jj} + \sum_{k=1}^{j-1} l_{ik} l_{jk} \implies l_{ij} = \frac{1}{l_{jj}} \left( a_{ij} - \sum_{k=1}^{j-1} l_{ik} l_{jk} \right)$$
+
+$$
+a_{ij} = \sum_{k=1}^j l_{ik} l_{jk} = l_{ij} l_{jj} + \sum_{k=1}^{j-1} l_{ik} l_{jk} \implies l_{ij} = \frac{1}{l_{jj}} \left( a_{ij} - \sum_{k=1}^{j-1} l_{ik} l_{jk} \right)
+$$
 
 #### Standarisasi Konvensi Kompleksitas Komputasi (FLOPs):
 Dalam literatur komputasi numerik modern (Golub & Van Loan, LAPACK), setiap operasi aritmatika dasar ($+, -, \times, /$) dihitung sebagai 1 FLOP.
@@ -222,18 +351,33 @@ Dalam literatur komputasi numerik modern (Golub & Van Loan, LAPACK), setiap oper
 ### 2.5 Geometri Hiper-Elipsoid Energi
 
 Persamaan kuadratik permukaan kontur energi satuan:
-$$\mathbf{x}^T A \mathbf{x} = 1$$
+
+$$
+\mathbf{x}^T A \mathbf{x} = 1
+$$
+
 Mendefinisikan sebuah **hiper-elipsoid tertutup $n$-dimensi** di ruang $\mathbb{R}^n$.
 
-Dalam sistem koordinat eigen $\mathbf{y} = Q^T \mathbf{x}$:
-$$\mathbf{x}^T A \mathbf{x} = \mathbf{y}^T \Lambda \mathbf{y} = \lambda_1 y_1^2 + \lambda_2 y_2^2 + \dots + \lambda_n y_n^2 = 1$$
+Dalam sistem koordinat eigen $\mathbf{y} = Q^T \mathbf{x}$ :
+
+$$
+\mathbf{x}^T A \mathbf{x} = \mathbf{y}^T \Lambda \mathbf{y} = \lambda_1 y_1^2 + \lambda_2 y_2^2 + \dots + \lambda_n y_n^2 = 1
+$$
+
 Dapat dituliskan dalam bentuk kanonikal elips:
-$$\frac{y_1^2}{(1/\sqrt{\lambda_1})^2} + \frac{y_2^2}{(1/\sqrt{\lambda_2})^2} + \dots + \frac{y_n^2}{(1/\sqrt{\lambda_n})^2} = 1$$
+
+$$
+\frac{y_1^2}{(1/\sqrt{\lambda_1})^2} + \frac{y_2^2}{(1/\sqrt{\lambda_2})^2} + \dots + \frac{y_n^2}{(1/\sqrt{\lambda_n})^2} = 1
+$$
 
 #### Properti Geometris Utama:
 1. **Arah Sumbu Utama (*Principal Axes*)**: Berimpit tepat dengan arah vektor-vektor eigen ortonormal $\mathbf{q}_1, \dots, \mathbf{q}_n$.
 2. **Panjang Setengah Sumbu (*Semi-Axis Length*)**:
-   $$a_i = \frac{1}{\sqrt{\lambda_i}}$$
+
+$$
+a_i = \frac{1}{\sqrt{\lambda_i}}
+$$
+
    - Nilai eigen terbesar $\lambda_{\max}$ bersesuaian dengan sumbu terpendek elipsoid (lereng energi paling curam / varians tersempit).
    - Nilai eigen terkecil $\lambda_{\min}$ bersesuaian dengan sumbu terpanjang elipsoid (lereng energi paling landai / varians terlebar).
 
@@ -242,20 +386,37 @@ $$\frac{y_1^2}{(1/\sqrt{\lambda_1})^2} + \frac{y_2^2}{(1/\sqrt{\lambda_2})^2} + 
 ## 3. Contoh Hitungan Manual Langkah-demi-Langkah
 
 Mari kita lakukan audit pengujian dan perhitungan manual per entri aritmatika untuk matriks simetris tridiagonal $3 \times 3$ yang memodelkan sistem pegas elastis terhubung:
-$$A = \begin{bmatrix} 2 & -1 & 0 \\ -1 & 2 & -1 \\ 0 & -1 & 2 \end{bmatrix}$$
+
+$$
+A = \begin{bmatrix} 2 & -1 & 0 \\ -1 & 2 & -1 \\ 0 & -1 & 2 \end{bmatrix}
+$$
 
 ---
 
 ### Langkah 1: Pengujian Kriteria Minor Utama Sylvester
 Hitung determinan dari ketiga submatriks terdepan:
 1. **Minor Utama Pertama ($1 \times 1$)**:
-   $$D_1 = \det [2] = 2 > 0$$
+
+$$
+D_1 = \det [2] = 2 > 0
+$$
+
 2. **Minor Utama Kedua ($2 \times 2$)**:
-   $$D_2 = \det \begin{bmatrix} 2 & -1 \\ -1 & 2 \end{bmatrix} = (2)(2) - (-1)(-1) = 4 - 1 = 3 > 0$$
+
+$$
+D_2 = \det \begin{bmatrix} 2 & -1 \\ -1 & 2 \end{bmatrix} = (2)(2) - (-1)(-1) = 4 - 1 = 3 > 0
+$$
+
 3. **Minor Utama Ketiga ($3 \times 3$, Determinan Penuh)**:
    Ekspansi Laplace sepanjang baris 1:
-   $$D_3 = \det(A) = 2 \det \begin{bmatrix} 2 & -1 \\ -1 & 2 \end{bmatrix} - (-1) \det \begin{bmatrix} -1 & -1 \\ 0 & 2 \end{bmatrix} + 0$$
-   $$D_3 = 2(3) + 1((-1)(2) - 0) = 6 - 2 = 4 > 0$$
+
+$$
+D_3 = \det(A) = 2 \det \begin{bmatrix} 2 & -1 \\ -1 & 2 \end{bmatrix} - (-1) \det \begin{bmatrix} -1 & -1 \\ 0 & 2 \end{bmatrix} + 0
+$$
+
+$$
+D_3 = 2(3) + 1((-1)(2) - 0) = 6 - 2 = 4 > 0
+$$
 
 Karena $D_1 = 2 > 0$, $D_2 = 3 > 0$, dan $D_3 = 4 > 0$, seluruh minor utama positif. Matriks **terbukti definit positif** via Kriteria Sylvester!
 
@@ -264,17 +425,33 @@ Karena $D_1 = 2 > 0$, $D_2 = 3 > 0$, dan $D_3 = 4 > 0$, seluruh minor utama posi
 ### Langkah 2: Pengujian Kriteria Pivot Eliminasi Gaussian
 Lakukan eliminasi maju tanpa pertukaran baris:
 Matriks awal:
-$$\begin{bmatrix} 2 & -1 & 0 \\ -1 & 2 & -1 \\ 0 & -1 & 2 \end{bmatrix}$$
+
+$$
+\begin{bmatrix} 2 & -1 & 0 \\ -1 & 2 & -1 \\ 0 & -1 & 2 \end{bmatrix}
+$$
+
 - **Pivot 1**: $d_1 = 2$.
-- Eliminasi baris 2: $R_2 \leftarrow R_2 - (-1/2) R_1 = R_2 + \frac{1}{2} R_1$:
-  $$R_2 = \begin{bmatrix} -1 & 2 & -1 \end{bmatrix} + \begin{bmatrix} 1 & -1/4 & 0 \end{bmatrix} = \begin{bmatrix} 0 & 3/2 & -1 \end{bmatrix}$$
+- Eliminasi baris 2: $R_2 \leftarrow R_2 - (-1/2) R_1 = R_2 + \frac{1}{2} R_1$ :
+
+$$
+R_2 = \begin{bmatrix} -1 & 2 & -1 \end{bmatrix} + \begin{bmatrix} 1 & -1/4 & 0 \end{bmatrix} = \begin{bmatrix} 0 & 3/2 & -1 \end{bmatrix}
+$$
+
 - **Pivot 2**: $d_2 = 3/2$.
-- Eliminasi baris 3: $R_3 \leftarrow R_3 - \left(\frac{-1}{3/2}\right) R_2 = R_3 + \frac{2}{3} R_2$:
-  $$R_3 = \begin{bmatrix} 0 & -1 & 2 \end{bmatrix} + \begin{bmatrix} 0 & 1 & -2/3 \end{bmatrix} = \begin{bmatrix} 0 & 0 & 4/3 \end{bmatrix}$$
+- Eliminasi baris 3: $R_3 \leftarrow R_3 - \left(\frac{-1}{3/2}\right) R_2 = R_3 + \frac{2}{3} R_2$ :
+
+$$
+R_3 = \begin{bmatrix} 0 & -1 & 2 \end{bmatrix} + \begin{bmatrix} 0 & 1 & -2/3 \end{bmatrix} = \begin{bmatrix} 0 & 0 & 4/3 \end{bmatrix}
+$$
+
 - **Pivot 3**: $d_3 = 4/3$.
 
 Ketiga pivot eliminasi Gauss:
-$$d_1 = 2 > 0, \quad d_2 = \frac{3}{2} > 0, \quad d_3 = \frac{4}{3} > 0$$
+
+$$
+d_1 = 2 > 0, \quad d_2 = \frac{3}{2} > 0, \quad d_3 = \frac{4}{3} > 0
+$$
+
 Seluruh pivot positif tegas. Lolos tes pivot!
 Perhatikan bahwa $d_1 \times d_2 \times d_3 = 2 \times \frac{3}{2} \times \frac{4}{3} = 4 = \det(A)$.
 
@@ -282,7 +459,10 @@ Perhatikan bahwa $d_1 \times d_2 \times d_3 = 2 \times \frac{3}{2} \times \frac{
 
 ### Langkah 3: Penurunan Manual Dekomposisi Cholesky $A = L L^T$
 Bentuk matriks segitiga bawah:
-$$L = \begin{bmatrix} l_{11} & 0 & 0 \\ l_{21} & l_{22} & 0 \\ l_{31} & l_{32} & l_{33} \end{bmatrix}$$
+
+$$
+L = \begin{bmatrix} l_{11} & 0 & 0 \\ l_{21} & l_{22} & 0 \\ l_{31} & l_{32} & l_{33} \end{bmatrix}
+$$
 
 - **Kolom 1**:
   - $l_{11} = \sqrt{a_{11}} = \sqrt{2}$
@@ -297,23 +477,34 @@ $$L = \begin{bmatrix} l_{11} & 0 & 0 \\ l_{21} & l_{22} & 0 \\ l_{31} & l_{32} &
   - $l_{33} = \sqrt{a_{33} - l_{31}^2 - l_{32}^2} = \sqrt{2 - 0 - (-\sqrt{2/3})^2} = \sqrt{2 - 2/3} = \sqrt{4/3} = \frac{2}{\sqrt{3}}$
 
 Matriks Cholesky lengkap:
-$$L = \begin{bmatrix} \sqrt{2} & 0 & 0 \\ -1/\sqrt{2} & \sqrt{3/2} & 0 \\ 0 & -\sqrt{2/3} & 2/\sqrt{3} \end{bmatrix}$$
+
+$$
+L = \begin{bmatrix} \sqrt{2} & 0 & 0 \\ -1/\sqrt{2} & \sqrt{3/2} & 0 \\ 0 & -\sqrt{2/3} & 2/\sqrt{3} \end{bmatrix}
+$$
 
 Kuadratkan elemen diagonalnya:
-$$l_{11}^2 = 2 = d_1, \quad l_{22}^2 = \frac{3}{2} = d_2, \quad l_{33}^2 = \frac{4}{3} = d_3$$
+
+$$
+l_{11}^2 = 2 = d_1, \quad l_{22}^2 = \frac{3}{2} = d_2, \quad l_{33}^2 = \frac{4}{3} = d_3
+$$
+
 Kuadrat elemen diagonal Cholesky persis sama dengan nilai pivot eliminasi Gaussian!
 
 ---
 
 ### Langkah 4: Evaluasi Geometri Sumbu Elipsoid Energi
-Polinomial karakteristik $\det(A - \lambda I) = 0$:
-$$\det \begin{bmatrix} 2-\lambda & -1 & 0 \\ -1 & 2-\lambda & -1 \\ 0 & -1 & 2-\lambda \end{bmatrix} = (2-\lambda)^3 - 2(2-\lambda) = (2-\lambda) \left[ (2-\lambda)^2 - 2 \right] = 0$$
+Polinomial karakteristik $\det(A - \lambda I) = 0$ :
+
+$$
+\det \begin{bmatrix} 2-\lambda & -1 & 0 \\ -1 & 2-\lambda & -1 \\ 0 & -1 & 2-\lambda \end{bmatrix} = (2-\lambda)^3 - 2(2-\lambda) = (2-\lambda) \left[ (2-\lambda)^2 - 2 \right] = 0
+$$
+
 Nilai-nilai eigen:
 1. $\lambda_1 = 2 - \sqrt{2} \approx 0{,}5858 > 0$
 2. $\lambda_2 = 2{,}0000 > 0$
 3. $\lambda_3 = 2 + \sqrt{2} \approx 3{,}4142 > 0$
 
-Panjang setengah sumbu utama hiper-elipsoid $\mathbf{x}^T A \mathbf{x} = 1$:
+Panjang setengah sumbu utama hiper-elipsoid $\mathbf{x}^T A \mathbf{x} = 1$ :
 - Sumbu Terpanjang: $a_1 = \frac{1}{\sqrt{2 - \sqrt{2}}} \approx \frac{1}{0{,}7654} \approx 1{,}3066$
 - Sumbu Menengah: $a_2 = \frac{1}{\sqrt{2}} \approx 0{,}7071$
 - Sumbu Terpendek: $a_3 = \frac{1}{\sqrt{2 + \sqrt{2}}} \approx \frac{1}{1{,}8478} \approx 0{,}5412$
@@ -330,7 +521,6 @@ Tahap 5A: Pure Python Cholesky Decomposition & Sylvester Leading Minors Test.
 Mengimplementasikan faktorisasi Cholesky O(1/3 n^3 total FLOPs) dan solver SPL.
 """
 import math
-
 
 def pure_cholesky(A: list[list[float]]) -> list[list[float]]:
     """
@@ -352,7 +542,6 @@ def pure_cholesky(A: list[list[float]]) -> list[list[float]]:
                 L[i][j] = (A[i][j] - sum_val) / L[j][j]
     return L
 
-
 def pure_cholesky_solve(L: list[list[float]], b: list[float]) -> list[float]:
     """Menyelesaikan A x = b melalui dua tahap: L y = b (maju), L^T x = y (mundur)."""
     n = len(L)
@@ -369,7 +558,6 @@ def pure_cholesky_solve(L: list[list[float]], b: list[float]) -> list[float]:
         x[i] = (y[i] - s) / L[i][i]
     return x
 
-
 def pure_sylvester_test_3x3(A: list[list[float]]) -> tuple[float, float, float]:
     """Menghitung tiga determinan minor utama Sylvester untuk matriks 3x3."""
     d1 = A[0][0]
@@ -380,7 +568,6 @@ def pure_sylvester_test_3x3(A: list[list[float]]) -> tuple[float, float, float]:
         + A[0][2] * (A[1][0] * A[2][1] - A[1][1] * A[2][0])
     )
     return d1, d2, d3
-
 
 if __name__ == "__main__":
     A_tridiag = [
@@ -430,7 +617,6 @@ Tahap 5B: Implementasi Standar Industri NumPy/SciPy untuk Cholesky & Spektrum.
 """
 import numpy as np
 
-
 def run_numpy_cholesky_suite():
     A = np.array([[2.0, -1.0, 0.0],
                   [-1.0, 2.0, -1.0],
@@ -457,7 +643,6 @@ def run_numpy_cholesky_suite():
     print("Seluruh Nilai Eigen (Semua > 0):", eigenvalues)
     assert np.all(eigenvalues > 0.0)
     print("Matriks Terbukti Definit Positif 100%!")
-
 
 if __name__ == "__main__":
     run_numpy_cholesky_suite()
@@ -508,7 +693,11 @@ Matriks Terbukti Definit Positif 100%!
 ### 5.2 Post-Mortem Industri Finansial: Keruntuhan Portofolio Markowitz Akibat Matriks Kovarians Singular
 
 - **Latar Belakang Kasus**: Dalam teori optimasi portofolio investasi kuantitatif Markowitz (*Modern Portfolio Theory*), manajer investasi mencari bobot alokasi aset $\mathbf{w}$ yang meminimalkan risiko varians portofolio:
-  $$\min_{\mathbf{w}} \frac{1}{2} \mathbf{w}^T \Sigma \mathbf{w} \quad \text{dengan kendala } \mathbf{w}^T \boldsymbol{\mu} = \mu_0, \; \mathbf{w}^T \mathbf{1} = 1$$
+
+$$
+\min_{\mathbf{w}} \frac{1}{2} \mathbf{w}^T \Sigma \mathbf{w} \quad \text{dengan kendala } \mathbf{w}^T \boldsymbol{\mu} = \mu_0, \; \mathbf{w}^T \mathbf{1} = 1
+$$
+
   Di mana $\Sigma \in \mathbb{R}^{p \times p}$ adalah matriks kovarians imbal hasil aset saham.
 - **Akar Masalah Aljabar Linier ($p > n$)**:
   Sebuah dana lindung nilai mengelola $p = 500$ aset saham. Namun, data historis harian yang stabil hanya tersedia selama $n = 252$ hari bursa (1 tahun perdagangan).
@@ -517,7 +706,11 @@ Matriks Terbukti Definit Positif 100%!
   Akibatnya, dari 500 nilai eigen matriks kovarians $\Sigma_{\text{sample}}$, setidaknya **$500 - 252 = 248$ nilai eigen bernilai nol mutlak ($\lambda_i = 0$)**!
 - **Dampak Katastropik**: Solver Quadratic Programming mendeteksi adanya subruang nol $N(\Sigma)$ di mana risiko varians $\mathbf{w}^T \Sigma \mathbf{w} = 0$. Komputer mengira telah menemukan "investasi ajaib tanpa risiko (*free arbitrage*)", dan menyuntikkan leverage raksasa (membeli aset A senilai puluhan miliar dolar dan menjual kosong aset B senilai puluhan miliar dolar). Ketika pasar bergerak nyata pada hari berikutnya, portofolio meledak memicu kerugian modal raksasa.
 - **Pelajaran Rekayasa Modern**: Pustaka kuantitatif modern wajib menerapkan **Penyusutan Spektral Ledoit-Wolf (*Ledoit-Wolf Covariance Shrinkage*)**:
-  $$\Sigma_{\text{shrink}} = (1 - \alpha) \Sigma_{\text{sample}} + \alpha \mu_{\text{target}} I$$
+
+$$
+\Sigma_{\text{shrink}} = (1 - \alpha) \Sigma_{\text{sample}} + \alpha \mu_{\text{target}} I
+$$
+
   Teknik ini menggeser seluruh nilai eigen ke atas sebesar $\alpha \mu_{\text{target}} > 0$, menjamin matriks kembali definit positif murni ($A \succ 0$) dan aman dieksekusi oleh solver Cholesky.
 
 ---
@@ -525,8 +718,12 @@ Matriks Terbukti Definit Positif 100%!
 ## 6. Proyek Latihan & Rubrik Penilaian Mandiri
 
 ### Tingkat 1: Pemanasan Bayi / Hitung Jari
-Diberikan matriks simetris $2 \times 2$:
-$$K = \begin{bmatrix} 4 & 2 \\ 2 & 5 \end{bmatrix}$$
+Diberikan matriks simetris $2 \times 2$ :
+
+$$
+K = \begin{bmatrix} 4 & 2 \\ 2 & 5 \end{bmatrix}
+$$
+
 1. Uji apakah matriks $K$ definit positif menggunakan Kriteria Minor Utama Sylvester.
 2. Turunkan matriks dekomposisi Cholesky $K = L L^T$.
 
@@ -539,20 +736,36 @@ $$K = \begin{bmatrix} 4 & 2 \\ 2 & 5 \end{bmatrix}$$
    Karena kedua minor utama positif, matriks $K$ **terbukti definit positif**.
 
 2. **Dekomposisi Cholesky**:
-   $$L = \begin{bmatrix} l_{11} & 0 \\ l_{21} & l_{22} \end{bmatrix}$$
+
+$$
+L = \begin{bmatrix} l_{11} & 0 \\ l_{21} & l_{22} \end{bmatrix}
+$$
+
    - $l_{11} = \sqrt{a_{11}} = \sqrt{4} = 2$.
    - $l_{21} = \frac{a_{21}}{l_{11}} = \frac{2}{2} = 1$.
    - $l_{22} = \sqrt{a_{22} - l_{21}^2} = \sqrt{5 - 1^2} = \sqrt{4} = 2$.
-   $$L = \begin{bmatrix} 2 & 0 \\ 1 & 2 \end{bmatrix}$$
+
+$$
+L = \begin{bmatrix} 2 & 0 \\ 1 & 2 \end{bmatrix}
+$$
+
    Verifikasi:
-   $$L L^T = \begin{bmatrix} 2 & 0 \\ 1 & 2 \end{bmatrix} \begin{bmatrix} 2 & 1 \\ 0 & 2 \end{bmatrix} = \begin{bmatrix} 4 & 2 \\ 2 & 1 + 4 \end{bmatrix} = \begin{bmatrix} 4 & 2 \\ 2 & 5 \end{bmatrix} = K$$
+
+$$
+L L^T = \begin{bmatrix} 2 & 0 \\ 1 & 2 \end{bmatrix} \begin{bmatrix} 2 & 1 \\ 0 & 2 \end{bmatrix} = \begin{bmatrix} 4 & 2 \\ 2 & 1 + 4 \end{bmatrix} = \begin{bmatrix} 4 & 2 \\ 2 & 5 \end{bmatrix} = K
+$$
+
 </details>
 
 ---
 
 ### Tingkat 2: Pemula / Tulis Tangan
-Diberikan matriks simetris berparameter $c \in \mathbb{R}$:
-$$M(c) = \begin{bmatrix} c & 1 & 1 \\ 1 & c & 1 \\ 1 & 1 & c \end{bmatrix}$$
+Diberikan matriks simetris berparameter $c \in \mathbb{R}$ :
+
+$$
+M(c) = \begin{bmatrix} c & 1 & 1 \\ 1 & c & 1 \\ 1 & 1 & c \end{bmatrix}
+$$
+
 1. Tentukan rentang nilai parameter $c$ agar matriks $M(c)$ bersifat definit positif ($M(c) \succ 0$).
 2. Pada nilai $c = 1$, klasifikasikan sifat matriks tersebut (apakah definit positif, semi-definit positif, atau tak-tentu) serta tentukan rank-nya.
 
@@ -563,14 +776,26 @@ $$M(c) = \begin{bmatrix} c & 1 & 1 \\ 1 & c & 1 \\ 1 & 1 & c \end{bmatrix}$$
    - $D_1 = c > 0 \implies c > 0$.
    - $D_2 = \det \begin{bmatrix} c & 1 \\ 1 & c \end{bmatrix} = c^2 - 1 > 0 \implies c > 1$ (karena $c > 0$).
    - $D_3 = \det(M(c)) = c(c^2 - 1) - 1(c - 1) + 1(1 - c) = (c - 1) [ c(c+1) - 2 ]$
-     $$D_3 = (c - 1)(c^2 + c - 2) = (c - 1)(c - 1)(c + 2) = (c - 1)^2 (c + 2)$$
+
+$$
+D_3 = (c - 1)(c^2 + c - 2) = (c - 1)(c - 1)(c + 2) = (c - 1)^2 (c + 2)
+$$
+
      Agar $D_3 > 0$, maka $(c - 1)^2 > 0 \implies c \ne 1$, dan $(c + 2) > 0 \implies c > -2$.
    Irisan seluruh kondisi ($c > 0$, $c > 1$, $c \ne 1$, $c > -2$) adalah:
-   $$c > 1$$
+
+$$
+c > 1
+$$
+
    Matriks $M(c) \succ 0$ jika dan hanya jika **$c > 1$**.
 
 2. **Kasus $c = 1$**:
-   $$M(1) = \begin{bmatrix} 1 & 1 & 1 \\ 1 & 1 & 1 \\ 1 & 1 & 1 \end{bmatrix}$$
+
+$$
+M(1) = \begin{bmatrix} 1 & 1 & 1 \\ 1 & 1 & 1 \\ 1 & 1 & 1 \end{bmatrix}
+$$
+
    Matriks ini memiliki seluruh baris identik, sehingga $\text{rank}(M(1)) = 1$.
    Nilai-nilai eigennya adalah $\lambda_1 = 3, \lambda_2 = 0, \lambda_3 = 0$.
    Bentuk kuadratiknya: $\mathbf{x}^T M \mathbf{x} = (x_1 + x_2 + x_3)^2 \ge 0$.
@@ -587,18 +812,34 @@ Buktikan bahwa untuk setiap matriks simetris definit positif $A \succ 0$, selalu
 
 **Bukti Analitis Konstruktif**:
 1. Berdasarkan Teorema Spektral, karena $A \succ 0$ adalah matriks simetris riil:
-   $$A = Q \Lambda Q^T$$
+
+$$
+A = Q \Lambda Q^T
+$$
+
    Di mana $Q$ adalah matriks ortogonal ($Q^T Q = I$) dan $\Lambda = \text{diag}(\lambda_1, \dots, \lambda_n)$ dengan seluruh $\lambda_i > 0$.
 2. Karena seluruh $\lambda_i > 0$, akar kuadrat positif $\sqrt{\lambda_i}$ terdefinisi secara unik di $\mathbb{R}$.
    Konstruksi matriks diagonal akar:
-   $$\Lambda^{1/2} = \text{diag}(\sqrt{\lambda_1}, \sqrt{\lambda_2}, \dots, \sqrt{\lambda_n})$$
+
+$$
+\Lambda^{1/2} = \text{diag}(\sqrt{\lambda_1}, \sqrt{\lambda_2}, \dots, \sqrt{\lambda_n})
+$$
+
 3. Definisikan matriks:
-   $$S = Q \Lambda^{1/2} Q^T$$
+
+$$
+S = Q \Lambda^{1/2} Q^T
+$$
+
 4. **Verifikasi Sifat Matriks $S$**:
    - **Simetris**: $S^T = (Q \Lambda^{1/2} Q^T)^T = (Q^T)^T (\Lambda^{1/2})^T Q^T = Q \Lambda^{1/2} Q^T = S$.
    - **Definit Positif**: Seluruh nilai eigen dari $S$ adalah $\sqrt{\lambda_i} > 0$, maka $S \succ 0$.
    - **Kuadrat**:
-     $$S^2 = (Q \Lambda^{1/2} Q^T)(Q \Lambda^{1/2} Q^T) = Q \Lambda^{1/2} (Q^T Q) \Lambda^{1/2} Q^T = Q \Lambda^{1/2} I \Lambda^{1/2} Q^T = Q \Lambda Q^T = A$$
+
+$$
+S^2 = (Q \Lambda^{1/2} Q^T)(Q \Lambda^{1/2} Q^T) = Q \Lambda^{1/2} (Q^T Q) \Lambda^{1/2} Q^T = Q \Lambda^{1/2} I \Lambda^{1/2} Q^T = Q \Lambda Q^T = A
+$$
+
 5. Keunikan matriks $S$ dijamin oleh keunikan akar kuadrat positif skalar pada masing-masing subruang eigen.
 Terbukti bahwa akar kuadrat matriks simetris definit positif selalu ada, unik, dan bersifat simetris definit positif! $\blacksquare$
 </details>
@@ -615,22 +856,46 @@ Diberikan matriks kovarians sampel berukuran $p \times p$ dengan $p > n$ yang me
 
 1. **Singularitas Matriks Sampel**:
    Karena $\text{rank}(\Sigma) = n < p$, maka berdasarkan Teorema Rank-Nullity:
-   $$\dim(N(\Sigma)) = p - n > 0$$
+
+$$
+\dim(N(\Sigma)) = p - n > 0
+$$
+
    Terdapat setidaknya $p - n$ vektor tak-nol $\mathbf{z} \in N(\Sigma)$ sedemikian rupa sehingga $\Sigma \mathbf{z} = \mathbf{0}$.
    Jika terdapat satu solusi $\mathbf{w}_0$, maka $\mathbf{w}_0 + c \mathbf{z}$ juga merupakan solusi untuk sembarang skalar $c$. Sistem kehilangan ketunggalan solusi dan tidak dapat diselesaikan via Cholesky.
 
 2. **Bukti Restorasi Definit Positif via Regularisasi**:
    Berdasarkan Teorema Spektral, $\Sigma = Q \Lambda Q^T$ di mana nilai-nilai eigen terurut adalah:
-   $$\lambda_1 \ge \lambda_2 \ge \dots \ge \lambda_n > \lambda_{n+1} = \dots = \lambda_p = 0$$
+
+$$
+\lambda_1 \ge \lambda_2 \ge \dots \ge \lambda_n > \lambda_{n+1} = \dots = \lambda_p = 0
+$$
+
    Tinjau matriks teregulasi:
-   $$\Sigma_{\text{reg}} = \Sigma + \epsilon I = Q \Lambda Q^T + \epsilon Q I Q^T = Q (\Lambda + \epsilon I) Q^T$$
+
+$$
+\Sigma_{\text{reg}} = \Sigma + \epsilon I = Q \Lambda Q^T + \epsilon Q I Q^T = Q (\Lambda + \epsilon I) Q^T
+$$
+
    Nilai-nilai eigen dari matriks $\Sigma_{\text{reg}}$ adalah:
-   $$\mu_i = \lambda_i + \epsilon, \quad \forall i \in \{1, 2, \dots, p\}$$
+
+$$
+\mu_i = \lambda_i + \epsilon, \quad \forall i \in \{1, 2, \dots, p\}
+$$
+
    Karena $\lambda_i \ge 0$ dan $\epsilon > 0$, maka:
-   $$\mu_i = \lambda_i + \epsilon \ge 0 + \epsilon > 0$$
+
+$$
+\mu_i = \lambda_i + \epsilon \ge 0 + \epsilon > 0
+$$
+
    Seluruh nilai eigen sekarang bernilai **positif tegas secara ketat**! Matriks $\Sigma_{\text{reg}}$ terbukti definit positif murni ($A \succ 0$).
    Bilangan kondisi spektral matriks teregulasi adalah:
-   $$\kappa(\Sigma_{\text{reg}}) = \frac{\mu_{\max}}{\mu_{\min}} = \frac{\lambda_1 + \epsilon}{0 + \epsilon} = 1 + \frac{\lambda_1}{\epsilon} < \infty$$
+
+$$
+\kappa(\Sigma_{\text{reg}}) = \frac{\mu_{\max}}{\mu_{\min}} = \frac{\lambda_1 + \epsilon}{0 + \epsilon} = 1 + \frac{\lambda_1}{\epsilon} < \infty
+$$
+
    Bilangan kondisi terikat terhingga, pembagian dengan nol terhindarkan, dan algoritma Cholesky dijamin berjalan stabil secara numerik! $\blacksquare$
 </details>
 

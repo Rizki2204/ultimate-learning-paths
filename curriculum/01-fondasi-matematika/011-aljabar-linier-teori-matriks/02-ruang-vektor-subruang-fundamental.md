@@ -38,21 +38,37 @@ UJI VISUAL TITIK NOL:
 
 1. **Uji Perkalian Skalar Nol ($c = 0$)**:
    Ambil titik $A(1, 3)$. Titik ini sah berada di garis $L$ karena $2(1) + 1 = 3$.
-   Sekarang kalikan titik ini dengan skalar $c = 0$:
-   $$0 \cdot (1, 3) = (0, 0)$$
+   Sekarang kalikan titik ini dengan skalar $c = 0$ :
+
+$$
+0 \cdot (1, 3) = (0, 0)
+$$
+
    Apakah titik $(0, 0)$ berada di garis $L$? Uji ke persamaan:
-   $$y = 2(0) + 1 = 1 \ne 0$$
+
+$$
+y = 2(0) + 1 = 1 \ne 0
+$$
+
    Titik $(0, 0)$ terlempar keluar dari garis! Garis tersebut bocor dan tidak tertutup terhadap perkalian skalar.
 
 2. **Uji Penjumlahan Dua Titik**:
    Ambil titik $A(1, 3) \in L$ dan titik $B(2, 5) \in L$ ($2(2) + 1 = 5$).
    Jumlahkan kedua vektor posisi ini:
-   $$(1, 3) + (2, 5) = (3, 8)$$
-   Uji apakah titik hasil $(3, 8)$ berada di garis $L$:
-   $$2(3) + 1 = 6 + 1 = 7 \ne 8$$
+
+$$
+(1, 3) + (2, 5) = (3, 8)
+$$
+
+   Uji apakah titik hasil $(3, 8)$ berada di garis $L$ :
+
+$$
+2(3) + 1 = 6 + 1 = 7 \ne 8
+$$
+
    Hasil penjumlahannya kembali terlempar keluar dari garis!
 
-Sebaliknya, perhatikan garis $y = 2x$ yang melewati titik asal $(0, 0)$:
+Sebaliknya, perhatikan garis $y = 2x$ yang melewati titik asal $(0, 0)$ :
 - Titik $(1, 2)$ dan $(2, 4)$ berada di garis.
 - Jumlahnya: $(1, 2) + (2, 4) = (3, 6)$. Uji: $2(3) = 6$ (sah berada di garis!).
 - Dikali skalar apa pun: $c(x, 2x) = (cx, 2cx)$, tetap memenuhi $y = 2x$.
@@ -69,8 +85,11 @@ Bayangkan Anda seorang insinyur sipil yang sedang menganalisis kerangka jembatan
 
 Struktur rangka jembatan merespons beban tersebut dan mendistribusikan tegangan mekanik ke 3 tumpuan fondasi beton di dalam tanah, diwakili oleh vektor reaksi luaran $\mathbf{y} = [y_1, y_2, y_3]^T \in \mathbb{R}^3$.
 
-Hubungan mekanik elastis ini dimodelkan oleh sebuah matriks kekakuan (*stiffness matrix*) $A \in \mathbb{R}^{3 \times 4}$:
-$$\mathbf{y} = A\mathbf{x}$$
+Hubungan mekanik elastis ini dimodelkan oleh sebuah matriks kekakuan (*stiffness matrix*) $A \in \mathbb{R}^{3 \times 4}$ :
+
+$$
+\mathbf{y} = A\mathbf{x}
+$$
 
 Pertanyaan rekayasa krusial yang menentukan keselamatan jembatan:
 1. *Beban-beban macam apa yang dapat ditahan secara aman oleh tumpuan fondasi?* Himpunan seluruh kemungkinan gaya reaksi $\mathbf{y}$ yang dapat dihasilkan adalah **Ruang Kolom $C(A)$**.
@@ -83,7 +102,11 @@ Pertanyaan rekayasa krusial yang menentukan keselamatan jembatan:
 
 Dalam era kecerdasan buatan modern, transformasi matriks adalah unit pemrosesan fundamental di dalam Large Language Model (LLM) seperti GPT-4 atau LLaMA.
 Setiap lapisan *dense linear layer* pada arsitektur Transformer menghitung operasi:
-$$\mathbf{y} = W \mathbf{x}$$
+
+$$
+\mathbf{y} = W \mathbf{x}
+$$
+
 Di mana $\mathbf{x} \in \mathbb{R}^n$ adalah vektor embedding kata masukan, $W \in \mathbb{R}^{m \times n}$ adalah matriks bobot sinapsis, dan $\mathbf{y} \in \mathbb{R}^m$ adalah representasi fitur baru.
 
 - **Peran Nullspace $N(W)$**: Jika masukan teks mengandung informasi derau yang berada di dalam nullspace matriks ($x_{\text{derau}} \in N(W)$), maka $W \mathbf{x}_{\text{derau}} = \mathbf{0}$. Lapisan syaraf secara cerdas memfilter dan melenyapkan informasi yang tidak relevan tersebut!
@@ -91,7 +114,11 @@ Di mana $\mathbf{x} \in \mathbb{R}^n$ adalah vektor embedding kata masukan, $W \
 - **Jembatan ke LoRA (Low-Rank Adaptation)**:
   Pada model bahasa besar dengan dimensi fitur $d = 4096$, matriks bobot $W$ berukuran $4096 \times 4096$ memiliki lebih dari 16 juta parameter. Menyesuaikan (*fine-tuning*) seluruh parameter ini untuk setiap tugas baru membutuhkan memori GPU yang luar biasa besar.
   Metode **LoRA** memanfaatkan fakta bahwa perubahan bobot $\Delta W$ beroperasi pada subruang intrinsik berpangkat rendah (*low intrinsic dimension*). Kita memfaktorkan pembaruan bobot menjadi dua matriks kurus:
-  $$\Delta W = B \cdot A, \quad B \in \mathbb{R}^{4096 \times r}, \; A \in \mathbb{R}^{r \times 4096}$$
+
+$$
+\Delta W = B \cdot A, \quad B \in \mathbb{R}^{4096 \times r}, \; A \in \mathbb{R}^{r \times 4096}
+$$
+
   Di mana rank adaptasi $r$ hanya berukuran kecil (misalnya $r = 8$). Ruang kolom $\Delta W$ dikunci pada subruang 8-dimensi $C(B)$, menghemat parameter hingga $99{,}6\%$ namun tetap mempertahankan kecerdasan adaptasi model!
 
 ---
@@ -100,16 +127,16 @@ Di mana $\mathbf{x} \in \mathbb{R}^n$ adalah vektor embedding kata masukan, $W \
 Tautan Rujukan Kuliah: [MIT OCW 18.06 Kuliah 7: Solving Ax = 0](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-7-solving-ax-0-pivot-variables-special-solutions/) | [MIT OCW 18.06 Kuliah 9: Independence, Basis, and Dimension](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-9-independence-basis-and-dimension/)
 
 > **🔤 Kamus Simbol Anti-Pusing — Ruang Vektor & Subruang:**
-> - $V, W$: Simbol himpunan ruang vektor.
-> - $S \le V$: Dibaca *"S adalah subruang dari V"*. Artinya himpunan bagian $S$ mewarisi sifat ruang vektor lengkap di dalam $V$.
-> - $\text{span}(\mathbf{v}_1, \dots, \mathbf{v}_k)$: Himpunan seluruh kemungkinan kombinasi linier $c_1\mathbf{v}_1 + \dots + c_k\mathbf{v}_k$.
-> - $\dim(V)$: Dimensi ruang vektor, yaitu jumlah minimum vektor pembentuk basis.
-> - $r = \text{rank}(A)$: Pangkat matriks, jumlah kolom pivot independen.
-> - $C(A)$: Ruang kolom (*Column Space*) matriks $A$.
-> - $C(A^T)$: Ruang baris (*Row Space*) matriks $A$.
-> - $N(A)$: Ruang nol (*Nullspace*) matriks $A$, yaitu himpunan solusi $A\mathbf{x} = \mathbf{0}$.
-> - $N(A^T)$: Ruang nol kiri (*Left Nullspace*) matriks $A$, solusi $A^T \mathbf{y} = \mathbf{0}$.
-> - $\perp$: Simbol tegak lurus / ortogonalitas. $V \perp W$ berarti setiap vektor di $V$ tegak lurus terhadap setiap vektor di $W$.
+> - $V, W$ : Simbol himpunan ruang vektor.
+> - $S \le V$ : Dibaca *"S adalah subruang dari V"*. Artinya himpunan bagian $S$ mewarisi sifat ruang vektor lengkap di dalam $V$.
+> - $\text{span}(\mathbf{v}_1, \dots, \mathbf{v}_k)$ : Himpunan seluruh kemungkinan kombinasi linier $c_1\mathbf{v}_1 + \dots + c_k\mathbf{v}_k$.
+> - $\dim(V)$ : Dimensi ruang vektor, yaitu jumlah minimum vektor pembentuk basis.
+> - $r = \text{rank}(A)$ : Pangkat matriks, jumlah kolom pivot independen.
+> - $C(A)$ : Ruang kolom (*Column Space*) matriks $A$.
+> - $C(A^T)$ : Ruang baris (*Row Space*) matriks $A$.
+> - $N(A)$ : Ruang nol (*Nullspace*) matriks $A$, yaitu himpunan solusi $A\mathbf{x} = \mathbf{0}$.
+> - $N(A^T)$ : Ruang nol kiri (*Left Nullspace*) matriks $A$, solusi $A^T \mathbf{y} = \mathbf{0}$.
+> - $\perp$ : Simbol tegak lurus / ortogonalitas. $V \perp W$ berarti setiap vektor di $V$ tegak lurus terhadap setiap vektor di $W$.
 
 ### 2.1 Aksioma Ruang Vektor & Tiga Syarat Ketertutupan Subruang
 
@@ -117,7 +144,7 @@ Sebuah **ruang vektor** $(V, +, \cdot)$ atas medan skalar riil $\mathbb{R}$ adal
 1. **Penjumlahan Vektor**: $+ : V \times V \to V$ yang memetakan $(\mathbf{u}, \mathbf{v}) \mapsto \mathbf{u} + \mathbf{v}$.
 2. **Perkalian Skalar**: $\cdot : \mathbb{R} \times V \to V$ yang memetakan $(c, \mathbf{v}) \mapsto c\mathbf{v}$.
 
-Kedua operasi ini wajib memenuhi **8 Aksioma Ruang Vektor** untuk setiap $\mathbf{u}, \mathbf{v}, \mathbf{w} \in V$ dan setiap skalar $c, d \in \mathbb{R}$:
+Kedua operasi ini wajib memenuhi **8 Aksioma Ruang Vektor** untuk setiap $\mathbf{u}, \mathbf{v}, \mathbf{w} \in V$ dan setiap skalar $c, d \in \mathbb{R}$ :
 1. **Komutatif Penjumlahan**: $\mathbf{u} + \mathbf{v} = \mathbf{v} + \mathbf{u}$.
 2. **Asosiatif Penjumlahan**: $(\mathbf{u} + \mathbf{v}) + \mathbf{w} = \mathbf{u} + (\mathbf{v} + \mathbf{w})$.
 3. **Identitas Penjumlahan**: Terdapat elemen unik $\mathbf{0} \in V$ sedemikian sehingga $\mathbf{v} + \mathbf{0} = \mathbf{v}$.
@@ -141,12 +168,20 @@ Misalkan $S = \{\mathbf{v}_1, \mathbf{v}_2, \dots, \mathbf{v}_k\}$ adalah sekump
 
 1. **Kombinasi Linier & Rentang (*Span*)**:
    Rentang dari himpunan vektor $S$ adalah himpunan semua kemungkinan hasil kombinasi linier:
-   $$\text{span}(S) = \left\{ \sum_{i=1}^k c_i \mathbf{v}_i \;\middle|\; c_1, \dots, c_k \in \mathbb{R} \right\}$$
+
+$$
+\text{span}(S) = \left\{ \sum_{i=1}^k c_i \mathbf{v}_i \;\middle|\; c_1, \dots, c_k \in \mathbb{R} \right\}
+$$
+
    $\text{span}(S)$ selalu membentuk subruang terkecil di $V$ yang memuat seluruh vektor $S$.
 
 2. **Kebebasan Linier (*Linear Independence*)**:
    Vektor-vektor $\{\mathbf{v}_1, \dots, \mathbf{v}_k\}$ dikatakan **bebas linier** jika persamaan kombinasi nol:
-   $$c_1 \mathbf{v}_1 + c_2 \mathbf{v}_2 + \dots + c_k \mathbf{v}_k = \mathbf{0}$$
+
+$$
+c_1 \mathbf{v}_1 + c_2 \mathbf{v}_2 + \dots + c_k \mathbf{v}_k = \mathbf{0}
+$$
+
    **hanya** dipenuhi oleh solusi nol trivial: $c_1 = c_2 = \dots = c_k = 0$.
    Jika terdapat setidaknya satu skalar $c_j \ne 0$ yang menghasilkan $\mathbf{0}$, himpunan tersebut dikatakan **bergantung linier (*linearly dependent*)**, yang berarti setidaknya ada satu vektor yang mubazir dan dapat dinyatakan sebagai kombinasi vektor-vektor lainnya.
 
@@ -177,7 +212,7 @@ Jumlah total pivot pada $R$ mendefinisikan **rank matriks** $r = \text{rank}(A)$
 ### 2.4 Empat Subruang Fundamental Gilbert Strang & Diagram Big Picture
 Tautan Rujukan Kuliah: [MIT OCW 18.06 Kuliah 10](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-10-the-four-fundamental-subspaces/)
 
-Untuk setiap matriks riil $A \in \mathbb{R}^{m \times n}$ dengan rank $r$:
+Untuk setiap matriks riil $A \in \mathbb{R}^{m \times n}$ dengan rank $r$ :
 
 | Subruang | Notasi | Ruang Lingkup | Dimensi | Basis Kanonikal |
 |---|:---:|:---:|:---:|---|
@@ -209,10 +244,17 @@ RUANG MASUKAN R^n                                   RUANG LUARAN R^m
 ```
 
 Setiap vektor masukan $\mathbf{x} \in \mathbb{R}^n$ dapat dipecah secara tunggal menjadi dua komponen yang saling tegak lurus:
-$$\mathbf{x} = \mathbf{x}_{\text{row}} + \mathbf{x}_{\text{null}}, \quad \text{di mana } \mathbf{x}_{\text{row}} \in C(A^T) \text{ dan } \mathbf{x}_{\text{null}} \in N(A)$$
 
-Ketika dikalikan dengan matriks $A$:
-$$A\mathbf{x} = A(\mathbf{x}_{\text{row}} + \mathbf{x}_{\text{null}}) = A\mathbf{x}_{\text{row}} + A\mathbf{x}_{\text{null}} = A\mathbf{x}_{\text{row}} + \mathbf{0} = A\mathbf{x}_{\text{row}}$$
+$$
+\mathbf{x} = \mathbf{x}_{\text{row}} + \mathbf{x}_{\text{null}}, \quad \text{di mana } \mathbf{x}_{\text{row}} \in C(A^T) \text{ dan } \mathbf{x}_{\text{null}} \in N(A)
+$$
+
+Ketika dikalikan dengan matriks $A$ :
+
+$$
+A\mathbf{x} = A(\mathbf{x}_{\text{row}} + \mathbf{x}_{\text{null}}) = A\mathbf{x}_{\text{row}} + A\mathbf{x}_{\text{null}} = A\mathbf{x}_{\text{row}} + \mathbf{0} = A\mathbf{x}_{\text{row}}
+$$
+
 - Bagian $\mathbf{x}_{\text{null}}$ dilenyapkan sepenuhnya menjadi nol.
 - Bagian $\mathbf{x}_{\text{row}}$ dipetakan secara satu-ke-satu (*bijektif dan invertibel*) menuju ruang kolom $C(A)$!
 
@@ -221,7 +263,7 @@ $$A\mathbf{x} = A(\mathbf{x}_{\text{row}} + \mathbf{x}_{\text{null}}) = A\mathbf
 ### 2.5 Teorema Fundamental Aljabar Linier (FTLA Bagian 1 & Bagian 2)
 
 **Teorema 2.1 (FTLA Bagian 1 — Dimensi Keempat Subruang)**:
-*Untuk setiap matriks $A \in \mathbb{R}^{m \times n}$ dengan rank $r$:*
+*Untuk setiap matriks $A \in \mathbb{R}^{m \times n}$ dengan rank $r$ :*
 1. $\dim(C(A)) = r$ dan $\dim(C(A^T)) = r$ (Rank Baris Selalu Tepat Sama dengan Rank Kolom!).
 2. $\dim(N(A)) = n - r$ (Teorema Rank-Nullity: $r + \text{nullity} = n$).
 3. $\dim(N(A^T)) = m - r$ (Teorema Rank-Nullity Kiri: $r + \text{left-nullity} = m$).
@@ -235,33 +277,48 @@ $$A\mathbf{x} = A(\mathbf{x}_{\text{row}} + \mathbf{x}_{\text{null}}) = A\mathbf
 > Karena kedua besaran tersebut sama-sama dihitung dari jumlah pivot yang persis sama, maka terbukti mutlak bahwa **dimensi ruang baris selalu sama dengan dimensi ruang kolom**!
 
 **Teorema 2.2 (FTLA Bagian 2 — Ortogonalitas Komplementer)**:
-*Subruang baris dan subruang nol adalah komplemen ortogonal di dalam $\mathbb{R}^n$:*
-$$C(A^T) \perp N(A) \quad \text{dan} \quad C(A^T) \oplus N(A) = \mathbb{R}^n$$
-*Subruang kolom dan subruang nol kiri adalah komplemen ortogonal di dalam $\mathbb{R}^m$:*
-$$C(A) \perp N(A^T) \quad \text{dan} \quad C(A) \oplus N(A^T) = \mathbb{R}^m$$
+*Subruang baris dan subruang nol adalah komplemen ortogonal di dalam $\mathbb{R}^n$ :*
+
+$$
+C(A^T) \perp N(A) \quad \text{dan} \quad C(A^T) \oplus N(A) = \mathbb{R}^n
+$$
+
+*Subruang kolom dan subruang nol kiri adalah komplemen ortogonal di dalam $\mathbb{R}^m$ :*
+
+$$
+C(A) \perp N(A^T) \quad \text{dan} \quad C(A) \oplus N(A^T) = \mathbb{R}^m
+$$
 
 *Pembuktian Lengkap*:
 Misalkan $\mathbf{x} \in N(A)$. Berdasarkan definisi, $A\mathbf{x} = \mathbf{0}$.
 Tuliskan perkalian matriks-vektor ini per baris:
-$$\begin{bmatrix} \text{Baris}_1(A) \cdot \mathbf{x} \\ \text{Baris}_2(A) \cdot \mathbf{x} \\ \vdots \\ \text{Baris}_m(A) \cdot \mathbf{x} \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \\ \vdots \\ 0 \end{bmatrix}$$
+
+$$
+\begin{bmatrix} \text{Baris}_1(A) \cdot \mathbf{x} \\ \text{Baris}_2(A) \cdot \mathbf{x} \\ \vdots \\ \text{Baris}_m(A) \cdot \mathbf{x} \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \\ \vdots \\ 0 \end{bmatrix}
+$$
+
 Artinya, vektor $\mathbf{x}$ tegak lurus terhadap Baris 1, Baris 2, ..., dan Baris $m$ dari matriks $A$.
 Karena $\mathbf{x}$ tegak lurus terhadap seluruh baris pembentuk ruang baris $C(A^T)$, maka $\mathbf{x}$ otomatis tegak lurus terhadap setiap kombinasi linier dari baris-baris tersebut!
 Maka terbukti bahwa setiap elemen di $N(A)$ tegak lurus terhadap seluruh elemen di $C(A^T)$. $\blacksquare$
 
 ---
 
-### 2.6 Faktorisasi Kolom-Baris $A = CR$: Dekomposisi Rank Penuh
+### 2.6 Faktorisasi Kolom-Baris $A = CR$ : Dekomposisi Rank Penuh
 Tautan Rujukan Kuliah: [MIT OCW 18.065 Kuliah 1: The Column-Row Factorization](https://www.youtube.com/watch?v=YiqIkSHSjIE)
 
 Buku teks klasik sering kali menunda faktorisasi hingga bab-bab akhir. Profesor Gilbert Strang merevolusi kurikulum aljabar linier dengan memperkenalkan **Faktorisasi $A = CR$** sebagai faktorisasi pertama paling elegan dalam sains data modern:
 
 Setiap matriks $A \in \mathbb{R}^{m \times n}$ dengan rank $r$ dapat difaktorkan secara eksak menjadi:
-$$A = C \cdot R$$
+
+$$
+A = C \cdot R
+$$
+
 Di mana:
 - $C \in \mathbb{R}^{m \times r}$ berisi **$r$ kolom pivot pertama yang bebas linier langsung dari matriks asli $A$** (*kolom-kolom sejati*).
 - $R \in \mathbb{R}^{r \times n}$ berisi **$r$ baris tak-nol dari matriks eselon baris tereduksi $\text{rref}(A)$** (*baris-baris kanonikal*).
 
-Sifat luar biasa dari $A = CR$:
+Sifat luar biasa dari $A = CR$ :
 1. Matriks $C$ berukuran tinggi dan kurus (*tall-thin*), memuat basis ruang kolom.
 2. Matriks $R$ berukuran pendek dan lebar (*short-wide*), memuat koefisien rekonstruksi seluruh kolom $A$.
 3. Ini adalah **kompresi rank penuh tanpa kehilangan informasi (*lossless full-rank compression*)**: $m \times n$ angka dipadatkan menjadi $r(m + n)$ angka saja!
@@ -273,7 +330,10 @@ Sifat luar biasa dari $A = CR$:
 ### 3.1 Contoh 1: Matriks Mainan $2 \times 3$ dan Rahasia Variabel Bebas Nullspace
 
 Mari kita mulai dengan matriks ukuran terkecil yang memiliki variabel bebas non-trivial:
-$$A = \begin{bmatrix} 1 & 3 & 4 \\ 2 & 6 & 8 \end{bmatrix}$$
+
+$$
+A = \begin{bmatrix} 1 & 3 & 4 \\ 2 & 6 & 8 \end{bmatrix}
+$$
 
 Perhatikan polanya:
 - Baris 2 adalah tepat $2 \times$ Baris 1: $\begin{bmatrix} 2 & 6 & 8 \end{bmatrix} = 2 \times \begin{bmatrix} 1 & 3 & 4 \end{bmatrix}$.
@@ -281,19 +341,33 @@ Perhatikan polanya:
 - Kolom 3 adalah $4 \times$ Kolom 1.
 
 #### Langkah 1: Hitung RREF
-Operasi baris: $\text{Baris}_2 \leftarrow \text{Baris}_2 - 2 \times \text{Baris}_1$:
-$$\begin{bmatrix} 1 & 3 & 4 \\ 2-2 & 6-6 & 8-8 \end{bmatrix} = \begin{bmatrix} 1 & 3 & 4 \\ 0 & 0 & 0 \end{bmatrix} = R$$
+Operasi baris: $\text{Baris}_2 \leftarrow \text{Baris}_2 - 2 \times \text{Baris}_1$ :
+
+$$
+\begin{bmatrix} 1 & 3 & 4 \\ 2-2 & 6-6 & 8-8 \end{bmatrix} = \begin{bmatrix} 1 & 3 & 4 \\ 0 & 0 & 0 \end{bmatrix} = R
+$$
+
 - Kolom pivot: Kolom 1 (karena memuat leading-1). Maka rank $r = 1$.
 - Kolom bebas: Kolom 2 dan Kolom 3. Variabel bebas adalah $x_2$ dan $x_3$.
 
 #### Langkah 2: Menemukan Basis Nullspace $N(A)$
 Sistem homogen $R\mathbf{x} = \mathbf{0}$ hanya memiliki 1 persamaan aktif:
-$$1x_1 + 3x_2 + 4x_3 = 0 \implies x_1 = -3x_2 - 4x_3$$
+
+$$
+1x_1 + 3x_2 + 4x_3 = 0 \implies x_1 = -3x_2 - 4x_3
+$$
+
 Vektor umum solusi parametrik adalah:
-$$\mathbf{x} = \begin{bmatrix} x_1 \\ x_2 \\ x_3 \end{bmatrix} = \begin{bmatrix} -3x_2 - 4x_3 \\ x_2 \\ x_3 \end{bmatrix}$$
+
+$$
+\mathbf{x} = \begin{bmatrix} x_1 \\ x_2 \\ x_3 \end{bmatrix} = \begin{bmatrix} -3x_2 - 4x_3 \\ x_2 \\ x_3 \end{bmatrix}
+$$
 
 Pecah vektor ini berdasarkan variabel bebasnya:
-$$\mathbf{x} = x_2 \begin{bmatrix} -3 \\ 1 \\ 0 \end{bmatrix} + x_3 \begin{bmatrix} -4 \\ 0 \\ 1 \end{bmatrix}$$
+
+$$
+\mathbf{x} = x_2 \begin{bmatrix} -3 \\ 1 \\ 0 \end{bmatrix} + x_3 \begin{bmatrix} -4 \\ 0 \\ 1 \end{bmatrix}
+$$
 
 > **❓ Pertanyaan Pemula: Mengapa Kita Menyetel Variabel Bebas ke $(1, 0)$ dan $(0, 1)$?**
 > Perhatikan pemecahan di atas!
@@ -303,8 +377,15 @@ $$\mathbf{x} = x_2 \begin{bmatrix} -3 \\ 1 \\ 0 \end{bmatrix} + x_3 \begin{bmatr
 
 #### Langkah 3: Verifikasi Ortogonalitas
 Uji dot product antara vektor ruang baris $\mathbf{r} = [1, 3, 4]^T$ dengan kedua basis nullspace:
-$$\mathbf{r} \cdot \mathbf{s}_1 = 1(-3) + 3(1) + 4(0) = -3 + 3 + 0 = 0 \quad (\text{Tegak Lurus!})$$
-$$\mathbf{r} \cdot \mathbf{s}_2 = 1(-4) + 3(0) + 4(1) = -4 + 0 + 4 = 0 \quad (\text{Tegak Lurus!})$$
+
+$$
+\mathbf{r} \cdot \mathbf{s}_1 = 1(-3) + 3(1) + 4(0) = -3 + 3 + 0 = 0 \quad (\text{Tegak Lurus!})
+$$
+
+$$
+\mathbf{r} \cdot \mathbf{s}_2 = 1(-4) + 3(0) + 4(1) = -4 + 0 + 4 = 0 \quad (\text{Tegak Lurus!})
+$$
+
 Teorema Fundamental Aljabar Linier terbukti bekerja sempurna!
 
 ---
@@ -312,28 +393,56 @@ Teorema Fundamental Aljabar Linier terbukti bekerja sempurna!
 ### 3.2 Contoh 2: Analisis Lengkap Matriks $3 \times 4$ dan Faktorisasi $A = CR$
 
 Sekarang mari kita bedah matriks berukuran $3 \times 4$ yang lebih kaya:
-$$A = \begin{bmatrix} 1 & 2 & 2 & 2 \\ 2 & 4 & 6 & 8 \\ 3 & 6 & 8 & 10 \end{bmatrix}$$
+
+$$
+A = \begin{bmatrix} 1 & 2 & 2 & 2 \\ 2 & 4 & 6 & 8 \\ 3 & 6 & 8 & 10 \end{bmatrix}
+$$
 
 #### Langkah 1: Eliminasi Menuju RREF
 1. **Nolkan Kolom 1 di Bawah Pivot 1 ($a_{11} = 1$)**:
-   - $R_2 \leftarrow R_2 - 2R_1$:
-     $$\begin{bmatrix} 2 & 4 & 6 & 8 \end{bmatrix} - 2\begin{bmatrix} 1 & 2 & 2 & 2 \end{bmatrix} = \begin{bmatrix} 0 & 0 & 2 & 4 \end{bmatrix}$$
-   - $R_3 \leftarrow R_3 - 3R_1$:
-     $$\begin{bmatrix} 3 & 6 & 8 & 10 \end{bmatrix} - 3\begin{bmatrix} 1 & 2 & 2 & 2 \end{bmatrix} = \begin{bmatrix} 0 & 0 & 2 & 4 \end{bmatrix}$$
+   - $R_2 \leftarrow R_2 - 2R_1$ :
+
+$$
+\begin{bmatrix} 2 & 4 & 6 & 8 \end{bmatrix} - 2\begin{bmatrix} 1 & 2 & 2 & 2 \end{bmatrix} = \begin{bmatrix} 0 & 0 & 2 & 4 \end{bmatrix}
+$$
+
+   - $R_3 \leftarrow R_3 - 3R_1$ :
+
+$$
+\begin{bmatrix} 3 & 6 & 8 & 10 \end{bmatrix} - 3\begin{bmatrix} 1 & 2 & 2 & 2 \end{bmatrix} = \begin{bmatrix} 0 & 0 & 2 & 4 \end{bmatrix}
+$$
+
    Matriks eselon sementara:
-   $$\begin{bmatrix} 1 & 2 & 2 & 2 \\ 0 & 0 & 2 & 4 \\ 0 & 0 & 2 & 4 \end{bmatrix}$$
+
+$$
+\begin{bmatrix} 1 & 2 & 2 & 2 \\ 0 & 0 & 2 & 4 \\ 0 & 0 & 2 & 4 \end{bmatrix}
+$$
 
 2. **Perhatikan Kolom 2**: Seluruh entri di bawah baris 1 bernilai nol. Kolom 2 adalah kolom bebas!
 3. **Pindah ke Kolom 3**: Pivot berikutnya berada pada baris 2 kolom 3 ($a_{23} = 2$).
    - Bagi baris 2 dengan 2 ($R_2 \leftarrow \frac{1}{2} R_2$):
-     $$\begin{bmatrix} 0 & 0 & 1 & 2 \end{bmatrix}$$
+
+$$
+\begin{bmatrix} 0 & 0 & 1 & 2 \end{bmatrix}
+$$
+
    - Nolkan baris 3 ($R_3 \leftarrow R_3 - 2 R_2$):
-     $$\begin{bmatrix} 0 & 0 & 2 & 4 \end{bmatrix} - 2\begin{bmatrix} 0 & 0 & 1 & 2 \end{bmatrix} = \begin{bmatrix} 0 & 0 & 0 & 0 \end{bmatrix}$$
+
+$$
+\begin{bmatrix} 0 & 0 & 2 & 4 \end{bmatrix} - 2\begin{bmatrix} 0 & 0 & 1 & 2 \end{bmatrix} = \begin{bmatrix} 0 & 0 & 0 & 0 \end{bmatrix}
+$$
+
    - Bersihkan elemen di atas pivot pada baris 1 ($R_1 \leftarrow R_1 - 2 R_2$):
-     $$\begin{bmatrix} 1 & 2 & 2 & 2 \end{bmatrix} - 2\begin{bmatrix} 0 & 0 & 1 & 2 \end{bmatrix} = \begin{bmatrix} 1 & 2 & 0 & -2 \end{bmatrix}$$
+
+$$
+\begin{bmatrix} 1 & 2 & 2 & 2 \end{bmatrix} - 2\begin{bmatrix} 0 & 0 & 1 & 2 \end{bmatrix} = \begin{bmatrix} 1 & 2 & 0 & -2 \end{bmatrix}
+$$
 
 Diperoleh matriks RREF final:
-$$R = \text{rref}(A) = \begin{bmatrix} 1 & 2 & 0 & -2 \\ 0 & 0 & 1 & 2 \\ 0 & 0 & 0 & 0 \end{bmatrix}$$
+
+$$
+R = \text{rref}(A) = \begin{bmatrix} 1 & 2 & 0 & -2 \\ 0 & 0 & 1 & 2 \\ 0 & 0 & 0 & 0 \end{bmatrix}
+$$
 
 #### Langkah 2: Ekstraksi Keempat Subruang Fundamental
 Dari matriks $R$, kita mencatat:
@@ -342,36 +451,69 @@ Dari matriks $R$, kita mencatat:
 
 1. **Ruang Kolom $C(A)$**:
    Diambil dari Kolom 1 dan Kolom 3 **matriks asli $A$**:
-   $$\text{Basis } C(A) = \left\{ \begin{bmatrix} 1 \\ 2 \\ 3 \end{bmatrix}, \begin{bmatrix} 2 \\ 6 \\ 8 \end{bmatrix} \right\}, \quad \dim(C(A)) = r = 2$$
+
+$$
+\text{Basis } C(A) = \left\{ \begin{bmatrix} 1 \\ 2 \\ 3 \end{bmatrix}, \begin{bmatrix} 2 \\ 6 \\ 8 \end{bmatrix} \right\}, \quad \dim(C(A)) = r = 2
+$$
 
 2. **Ruang Baris $C(A^T)$**:
-   Diambil dari $r = 2$ baris tak-nol pada $R$:
-   $$\text{Basis } C(A^T) = \left\{ \begin{bmatrix} 1 \\ 2 \\ 0 \\ -2 \end{bmatrix}, \begin{bmatrix} 0 \\ 0 \\ 1 \\ 2 \end{bmatrix} \right\}, \quad \dim(C(A^T)) = r = 2$$
+   Diambil dari $r = 2$ baris tak-nol pada $R$ :
+
+$$
+\text{Basis } C(A^T) = \left\{ \begin{bmatrix} 1 \\ 2 \\ 0 \\ -2 \end{bmatrix}, \begin{bmatrix} 0 \\ 0 \\ 1 \\ 2 \end{bmatrix} \right\}, \quad \dim(C(A^T)) = r = 2
+$$
 
 3. **Ruang Nol $N(A)$**:
-   Sistem persamaan $R\mathbf{x} = \mathbf{0}$:
-   $$\begin{aligned}
+   Sistem persamaan $R\mathbf{x} = \mathbf{0}$ :
+
+$$
+\begin{aligned}
    x_1 + 2x_2 - 2x_4 &= 0 \implies x_1 = -2x_2 + 2x_4 \\
    x_3 + 2x_4 &= 0 \implies x_3 = -2x_4
-   \end{aligned}$$
+\end{aligned}
+$$
+
    Bentuk vektor umum:
-   $$\mathbf{x} = \begin{bmatrix} x_1 \\ x_2 \\ x_3 \\ x_4 \end{bmatrix} = x_2 \begin{bmatrix} -2 \\ 1 \\ 0 \\ 0 \end{bmatrix} + x_4 \begin{bmatrix} 2 \\ 0 \\ -2 \\ 1 \end{bmatrix}$$
-   $$\text{Basis } N(A) = \left\{ \begin{bmatrix} -2 \\ 1 \\ 0 \\ 0 \end{bmatrix}, \begin{bmatrix} 2 \\ 0 \\ -2 \\ 1 \end{bmatrix} \right\}, \quad \dim(N(A)) = n - r = 4 - 2 = 2$$
+
+$$
+\mathbf{x} = \begin{bmatrix} x_1 \\ x_2 \\ x_3 \\ x_4 \end{bmatrix} = x_2 \begin{bmatrix} -2 \\ 1 \\ 0 \\ 0 \end{bmatrix} + x_4 \begin{bmatrix} 2 \\ 0 \\ -2 \\ 1 \end{bmatrix}
+$$
+
+$$
+\text{Basis } N(A) = \left\{ \begin{bmatrix} -2 \\ 1 \\ 0 \\ 0 \end{bmatrix}, \begin{bmatrix} 2 \\ 0 \\ -2 \\ 1 \end{bmatrix} \right\}, \quad \dim(N(A)) = n - r = 4 - 2 = 2
+$$
 
 4. **Ruang Nol Kiri $N(A^T)$**:
    Mencari kombinasi baris $A$ yang menghasilkan baris nol: $\mathbf{y}^T A = \mathbf{0}^T$.
    Dari operasi baris $R_3 \leftarrow R_3 - R_2 - R_1$, kita menemukan bahwa Baris 3 adalah penjumlahan Baris 1 dan Baris 2:
-   $$\begin{bmatrix} 1 & 2 & 2 & 2 \end{bmatrix} + \begin{bmatrix} 2 & 4 & 6 & 8 \end{bmatrix} = \begin{bmatrix} 3 & 6 & 8 & 10 \end{bmatrix}$$
+
+$$
+\begin{bmatrix} 1 & 2 & 2 & 2 \end{bmatrix} + \begin{bmatrix} 2 & 4 & 6 & 8 \end{bmatrix} = \begin{bmatrix} 3 & 6 & 8 & 10 \end{bmatrix}
+$$
+
    Sehingga:
-   $$1 \times \text{Baris}_1 + 1 \times \text{Baris}_2 - 1 \times \text{Baris}_3 = \mathbf{0}^T$$
-   $$\text{Basis } N(A^T) = \left\{ \begin{bmatrix} 1 \\ 1 \\ -1 \end{bmatrix} \right\}, \quad \dim(N(A^T)) = m - r = 3 - 2 = 1$$
+
+$$
+1 \times \text{Baris}_1 + 1 \times \text{Baris}_2 - 1 \times \text{Baris}_3 = \mathbf{0}^T
+$$
+
+$$
+\text{Basis } N(A^T) = \left\{ \begin{bmatrix} 1 \\ 1 \\ -1 \end{bmatrix} \right\}, \quad \dim(N(A^T)) = m - r = 3 - 2 = 1
+$$
 
 #### Langkah 3: Faktorisasi Kolom-Baris $A = CR$
-Ambil kolom pivot asli untuk membentuk matriks $C \in \mathbb{R}^{3 \times 2}$ dan baris tak-nol RREF untuk membentuk matriks $R \in \mathbb{R}^{2 \times 4}$:
-$$C = \begin{bmatrix} 1 & 2 \\ 2 & 6 \\ 3 & 8 \end{bmatrix}, \quad R = \begin{bmatrix} 1 & 2 & 0 & -2 \\ 0 & 0 & 1 & 2 \end{bmatrix}$$
+Ambil kolom pivot asli untuk membentuk matriks $C \in \mathbb{R}^{3 \times 2}$ dan baris tak-nol RREF untuk membentuk matriks $R \in \mathbb{R}^{2 \times 4}$ :
 
-Mari kita kalikan $C$ dan $R$:
-$$C R = \begin{bmatrix} 1 & 2 \\ 2 & 6 \\ 3 & 8 \end{bmatrix} \begin{bmatrix} 1 & 2 & 0 & -2 \\ 0 & 0 & 1 & 2 \end{bmatrix}$$
+$$
+C = \begin{bmatrix} 1 & 2 \\ 2 & 6 \\ 3 & 8 \end{bmatrix}, \quad R = \begin{bmatrix} 1 & 2 & 0 & -2 \\ 0 & 0 & 1 & 2 \end{bmatrix}
+$$
+
+Mari kita kalikan $C$ dan $R$ :
+
+$$
+C R = \begin{bmatrix} 1 & 2 \\ 2 & 6 \\ 3 & 8 \end{bmatrix} \begin{bmatrix} 1 & 2 & 0 & -2 \\ 0 & 0 & 1 & 2 \end{bmatrix}
+$$
+
 - Kolom 1: $1 \begin{bmatrix} 1 \\ 2 \\ 3 \end{bmatrix} + 0 \begin{bmatrix} 2 \\ 6 \\ 8 \end{bmatrix} = \begin{bmatrix} 1 \\ 2 \\ 3 \end{bmatrix}$ (Sesuai kolom 1 $A$)
 - Kolom 2: $2 \begin{bmatrix} 1 \\ 2 \\ 3 \end{bmatrix} + 0 \begin{bmatrix} 2 \\ 6 \\ 8 \end{bmatrix} = \begin{bmatrix} 2 \\ 4 \\ 6 \end{bmatrix}$ (Sesuai kolom 2 $A$)
 - Kolom 3: $0 \begin{bmatrix} 1 \\ 2 \\ 3 \end{bmatrix} + 1 \begin{bmatrix} 2 \\ 6 \\ 8 \end{bmatrix} = \begin{bmatrix} 2 \\ 6 \\ 8 \end{bmatrix}$ (Sesuai kolom 3 $A$)
@@ -586,7 +728,11 @@ Pada tanggal 7 November 1940, jembatan gantung Tacoma Narrows di Washington, AS,
 Analisis dinamika struktur modern menunjukkan bahwa perancang jembatan hanya memperhitungkan respon beban statis terhadap gravitasi (ruang kolom matriks gaya vertikal). Namun, mereka mengabaikan **modus getar puntir tak-teredam (*torsional flutter resonance*)** yang bersemayam di dalam struktur kopling aerodinamis.
 
 Dalam pemodelan mekanika getaran:
-$$M \ddot{\mathbf{x}} + K \mathbf{x} = \mathbf{f}(t)$$
+
+$$
+M \ddot{\mathbf{x}} + K \mathbf{x} = \mathbf{f}(t)
+$$
+
 Di mana $K$ adalah matriks kekakuan (*stiffness matrix*). Angin berhembus membentuk pusaran von Kármán yang frekuensinya tepat mengunci pada vektor eigen yang berada di dekat nullspace kekakuan puntir struktur. Keruntuhan ini menjadi monumen peringatan abadi bagi seluruh insinyur: mengabaikan analisis subruang tersembunyi dapat meruntuhkan mahakarya rekayasa bernilai ratusan juta dolar.
 
 ---
@@ -615,17 +761,25 @@ Tautan Rujukan Kuliah: [MIT OCW 18.06 Kuliah 9](https://ocw.mit.edu/courses/18-0
 2. **Analisis Matriks $A$**:
    Eliminasi: Baris 2 dikurangi $2 \times$ Baris 1 menghasilkan $\begin{bmatrix} 1 & 3 \\ 0 & 0 \end{bmatrix}$.
    - Kolom pivot: Kolom 1 $\implies \text{rank}(A) = 1$.
-   - Basis Ruang Kolom $C(A)$: Diambil dari kolom 1 matriks asli $A$:
-     $$\text{Basis } C(A) = \left\{ \begin{bmatrix} 1 \\ 2 \end{bmatrix} \right\}$$
-   - Basis Ruang Nol $N(A)$: Dari persamaan $x_1 + 3x_2 = 0 \implies x_1 = -3x_2$. Setel $x_2 = 1$:
-     $$\text{Basis } N(A) = \left\{ \begin{bmatrix} -3 \\ 1 \end{bmatrix} \right\}$$
+   - Basis Ruang Kolom $C(A)$ : Diambil dari kolom 1 matriks asli $A$ :
+
+$$
+\text{Basis } C(A) = \left\{ \begin{bmatrix} 1 \\ 2 \end{bmatrix} \right\}
+$$
+
+   - Basis Ruang Nol $N(A)$ : Dari persamaan $x_1 + 3x_2 = 0 \implies x_1 = -3x_2$. Setel $x_2 = 1$ :
+
+$$
+\text{Basis } N(A) = \left\{ \begin{bmatrix} -3 \\ 1 \end{bmatrix} \right\}
+$$
+
 </details>
 
 ---
 
 ### Tingkat 2: Pemula / Tulis Tangan (Matriks $2 \times 3$ & Basis Nullspace)
 **Soal**:
-Diberikan matriks $A = \begin{bmatrix} 2 & 4 & 6 \\ 1 & 2 & 5 \end{bmatrix}$:
+Diberikan matriks $A = \begin{bmatrix} 2 & 4 & 6 \\ 1 & 2 & 5 \end{bmatrix}$ :
 1. Reduksi matriks $A$ menuju bentuk eselon baris tereduksi $R = \text{rref}(A)$.
 2. Identifikasi kolom pivot, kolom bebas, dan tentukan rank $r$.
 3. Tentukan basis bagi Ruang Baris $C(A^T)$ dan Ruang Nol $N(A)$.
@@ -636,15 +790,34 @@ Diberikan matriks $A = \begin{bmatrix} 2 & 4 & 6 \\ 1 & 2 & 5 \end{bmatrix}$:
 
 1. **Reduksi RREF**:
    - Tukar Baris 1 dan Baris 2 agar pivot pertama bernilai 1:
-     $$\begin{bmatrix} 1 & 2 & 5 \\ 2 & 4 & 6 \end{bmatrix}$$
+
+$$
+\begin{bmatrix} 1 & 2 & 5 \\ 2 & 4 & 6 \end{bmatrix}
+$$
+
    - Kurangkan Baris 2 dengan $2 \times$ Baris 1:
-     $$\begin{bmatrix} 2 & 4 & 6 \end{bmatrix} - 2\begin{bmatrix} 1 & 2 & 5 \end{bmatrix} = \begin{bmatrix} 0 & 0 & -4 \end{bmatrix}$$
-   - Bagi Baris 2 dengan $-4$:
-     $$\begin{bmatrix} 0 & 0 & 1 \end{bmatrix}$$
+
+$$
+\begin{bmatrix} 2 & 4 & 6 \end{bmatrix} - 2\begin{bmatrix} 1 & 2 & 5 \end{bmatrix} = \begin{bmatrix} 0 & 0 & -4 \end{bmatrix}
+$$
+
+   - Bagi Baris 2 dengan $-4$ :
+
+$$
+\begin{bmatrix} 0 & 0 & 1 \end{bmatrix}
+$$
+
    - Nolkan kolom 3 pada Baris 1 ($R_1 \leftarrow R_1 - 5 R_2$):
-     $$\begin{bmatrix} 1 & 2 & 5 \end{bmatrix} - 5\begin{bmatrix} 0 & 0 & 1 \end{bmatrix} = \begin{bmatrix} 1 & 2 & 0 \end{bmatrix}$$
+
+$$
+\begin{bmatrix} 1 & 2 & 5 \end{bmatrix} - 5\begin{bmatrix} 0 & 0 & 1 \end{bmatrix} = \begin{bmatrix} 1 & 2 & 0 \end{bmatrix}
+$$
+
    Diperoleh:
-   $$R = \begin{bmatrix} 1 & 2 & 0 \\ 0 & 0 & 1 \end{bmatrix}$$
+
+$$
+R = \begin{bmatrix} 1 & 2 & 0 \\ 0 & 0 & 1 \end{bmatrix}
+$$
 
 2. **Identifikasi Pivot**:
    - Kolom pivot: Kolom 1 dan Kolom 3 $\implies \text{rank } r = 2$.
@@ -652,12 +825,19 @@ Diberikan matriks $A = \begin{bmatrix} 2 & 4 & 6 \\ 1 & 2 & 5 \end{bmatrix}$:
 
 3. **Basis Subruang**:
    - **Basis Ruang Baris $C(A^T)$**:
-     $$\text{Basis } C(A^T) = \left\{ \begin{bmatrix} 1 \\ 2 \\ 0 \end{bmatrix}, \begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix} \right\}$$
+
+$$
+\text{Basis } C(A^T) = \left\{ \begin{bmatrix} 1 \\ 2 \\ 0 \end{bmatrix}, \begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix} \right\}
+$$
+
    - **Basis Ruang Nol $N(A)$**:
      Dari baris 1: $x_1 + 2x_2 = 0 \implies x_1 = -2x_2$.
      Dari baris 2: $x_3 = 0$.
-     Setel variabel bebas $x_2 = 1$:
-     $$\text{Basis } N(A) = \left\{ \begin{bmatrix} -2 \\ 1 \\ 0 \end{bmatrix} \right\}$$
+     Setel variabel bebas $x_2 = 1$ :
+
+$$
+\text{Basis } N(A) = \left\{ \begin{bmatrix} -2 \\ 1 \\ 0 \end{bmatrix} \right\}
+$$
 
 4. **Uji Ortogonalitas**:
    - Vektor baris 1: $[1, 2, 0] \cdot [-2, 1, 0] = 1(-2) + 2(1) + 0(0) = -2 + 2 = 0$.
@@ -669,7 +849,7 @@ Diberikan matriks $A = \begin{bmatrix} 2 & 4 & 6 \\ 1 & 2 & 5 \end{bmatrix}$:
 
 ### Tingkat 3: Menengah / Pemodelan & Koding (Matriks $3 \times 4$ & Faktorisasi $A = CR$)
 **Soal**:
-Diberikan matriks $A = \begin{bmatrix} 1 & 1 & 2 & 4 \\ 2 & 2 & 4 & 8 \\ 1 & 0 & 1 & 1 \end{bmatrix}$:
+Diberikan matriks $A = \begin{bmatrix} 1 & 1 & 2 & 4 \\ 2 & 2 & 4 & 8 \\ 1 & 0 & 1 & 1 \end{bmatrix}$ :
 1. Tentukan rank $r$ dan carilah faktorisasi kolom-baris $A = CR$.
 2. Tentukan basis bagi Ruang Nol Kiri $N(A^T)$.
 3. Tunjukkan bahwa vektor target $\mathbf{b} = \begin{bmatrix} 7 \\ 14 \\ 3 \end{bmatrix}$ berada di dalam ruang kolom $C(A)$, lalu nyatakan $\mathbf{b}$ sebagai kombinasi linier dari kolom-kolom matriks $C$.
@@ -678,33 +858,66 @@ Diberikan matriks $A = \begin{bmatrix} 1 & 1 & 2 & 4 \\ 2 & 2 & 4 & 8 \\ 1 & 0 &
 <summary>Kunci Jawaban & Langkah Pengerjaan Detail</summary>
 
 1. **Faktorisasi $A = CR$**:
-   Perhatikan baris-baris $A$: Baris 2 adalah tepat $2 \times$ Baris 1.
+   Perhatikan baris-baris $A$ : Baris 2 adalah tepat $2 \times$ Baris 1.
    Tukar Baris 2 dengan Baris 3:
-   $$\begin{bmatrix} 1 & 1 & 2 & 4 \\ 1 & 0 & 1 & 1 \\ 2 & 2 & 4 & 8 \end{bmatrix}$$
+
+$$
+\begin{bmatrix} 1 & 1 & 2 & 4 \\ 1 & 0 & 1 & 1 \\ 2 & 2 & 4 & 8 \end{bmatrix}
+$$
+
    Eliminasi Gauss-Jordan menghasilkan:
-   $$R = \text{rref}(A) = \begin{bmatrix} 1 & 0 & 1 & 1 \\ 0 & 1 & 1 & 3 \\ 0 & 0 & 0 & 0 \end{bmatrix}$$
+
+$$
+R = \text{rref}(A) = \begin{bmatrix} 1 & 0 & 1 & 1 \\ 0 & 1 & 1 & 3 \\ 0 & 0 & 0 & 0 \end{bmatrix}
+$$
+
    - Kolom pivot: Kolom 1 dan Kolom 2 $\implies r = 2$.
    - Kolom bebas: Kolom 3 dan Kolom 4.
-   Matriks $C$ memuat kolom 1 dan kolom 2 dari matriks asli $A$:
-   $$C = \begin{bmatrix} 1 & 1 \\ 2 & 2 \\ 1 & 0 \end{bmatrix}$$
+   Matriks $C$ memuat kolom 1 dan kolom 2 dari matriks asli $A$ :
+
+$$
+C = \begin{bmatrix} 1 & 1 \\ 2 & 2 \\ 1 & 0 \end{bmatrix}
+$$
+
    Matriks $R$ memuat baris tak-nol dari RREF:
-   $$R = \begin{bmatrix} 1 & 0 & 1 & 1 \\ 0 & 1 & 1 & 3 \end{bmatrix}$$
+
+$$
+R = \begin{bmatrix} 1 & 0 & 1 & 1 \\ 0 & 1 & 1 & 3 \end{bmatrix}
+$$
 
 2. **Ruang Nol Kiri $N(A^T)$**:
    Kita mencari kombinasi baris yang menghasilkan baris nol:
-   $$y_1 \begin{bmatrix} 1 & 1 & 2 & 4 \end{bmatrix} + y_2 \begin{bmatrix} 2 & 2 & 4 & 8 \end{bmatrix} + y_3 \begin{bmatrix} 1 & 0 & 1 & 1 \end{bmatrix} = \mathbf{0}^T$$
+
+$$
+y_1 \begin{bmatrix} 1 & 1 & 2 & 4 \end{bmatrix} + y_2 \begin{bmatrix} 2 & 2 & 4 & 8 \end{bmatrix} + y_3 \begin{bmatrix} 1 & 0 & 1 & 1 \end{bmatrix} = \mathbf{0}^T
+$$
+
    Karena Baris 2 adalah $2 \times$ Baris 1, kita langsung memperoleh hubungan:
-   $$-2 \times \text{Baris}_1 + 1 \times \text{Baris}_2 + 0 \times \text{Baris}_3 = \mathbf{0}^T$$
-   $$\text{Basis } N(A^T) = \left\{ \begin{bmatrix} -2 \\ 1 \\ 0 \end{bmatrix} \right\}, \quad \dim(N(A^T)) = m - r = 3 - 2 = 1$$
+
+$$
+-2 \times \text{Baris}_1 + 1 \times \text{Baris}_2 + 0 \times \text{Baris}_3 = \mathbf{0}^T
+$$
+
+$$
+\text{Basis } N(A^T) = \left\{ \begin{bmatrix} -2 \\ 1 \\ 0 \end{bmatrix} \right\}, \quad \dim(N(A^T)) = m - r = 3 - 2 = 1
+$$
 
 3. **Kombinasi Linier Vektor Target**:
-   Kita menyelesaikan sistem $C \mathbf{z} = \mathbf{b}$:
-   $$\begin{bmatrix} 1 & 1 \\ 2 & 2 \\ 1 & 0 \end{bmatrix} \begin{bmatrix} z_1 \\ z_2 \end{bmatrix} = \begin{bmatrix} 7 \\ 14 \\ 3 \end{bmatrix}$$
+   Kita menyelesaikan sistem $C \mathbf{z} = \mathbf{b}$ :
+
+$$
+\begin{bmatrix} 1 & 1 \\ 2 & 2 \\ 1 & 0 \end{bmatrix} \begin{bmatrix} z_1 \\ z_2 \end{bmatrix} = \begin{bmatrix} 7 \\ 14 \\ 3 \end{bmatrix}
+$$
+
    Dari baris 3: $z_1 = 3$.
    Dari baris 1: $3 + z_2 = 7 \implies z_2 = 4$.
    Uji baris 2: $2(3) + 2(4) = 6 + 8 = 14$ (Sesuai!).
    Maka:
-   $$\mathbf{b} = 3 \mathbf{c}_1 + 4 \mathbf{c}_2 = 3 \begin{bmatrix} 1 \\ 2 \\ 1 \end{bmatrix} + 4 \begin{bmatrix} 1 \\ 2 \\ 0 \end{bmatrix}$$
+
+$$
+\mathbf{b} = 3 \mathbf{c}_1 + 4 \mathbf{c}_2 = 3 \begin{bmatrix} 1 \\ 2 \\ 1 \end{bmatrix} + 4 \begin{bmatrix} 1 \\ 2 \\ 0 \end{bmatrix}
+$$
+
 </details>
 
 ---
@@ -723,21 +936,44 @@ Dalam fine-tuning Large Language Model menggunakan metode LoRA (Low-Rank Adaptat
 
 1. **Bukti Ketidaksamaan Rank Perkalian Matriks**:
    Tinjau perkalian $\Delta W = B A$.
-   Berdasarkan Pandangan Kolom perkalian matriks, setiap kolom dari $\Delta W$ adalah kombinasi linier dari kolom-kolom matriks $B$:
-   $$\mathbf{w}_j = B \mathbf{a}_j \implies \mathbf{w}_j \in C(B) \quad \forall j$$
-   Akibatnya, ruang kolom $\Delta W$ merupakan subruang dari ruang kolom $B$:
-   $$C(\Delta W) \subseteq C(B) \implies \dim(C(\Delta W)) \le \dim(C(B)) \implies \text{rank}(\Delta W) \le \text{rank}(B)$$
-   Secara simetris, tinjau transpose $(\Delta W)^T = A^T B^T$. Ruang baris $\Delta W$ adalah subruang dari ruang baris $A$:
-   $$C((\Delta W)^T) \subseteq C(A^T) \implies \text{rank}(\Delta W) \le \text{rank}(A)$$
+   Berdasarkan Pandangan Kolom perkalian matriks, setiap kolom dari $\Delta W$ adalah kombinasi linier dari kolom-kolom matriks $B$ :
+
+$$
+\mathbf{w}_j = B \mathbf{a}_j \implies \mathbf{w}_j \in C(B) \quad \forall j
+$$
+
+   Akibatnya, ruang kolom $\Delta W$ merupakan subruang dari ruang kolom $B$ :
+
+$$
+C(\Delta W) \subseteq C(B) \implies \dim(C(\Delta W)) \le \dim(C(B)) \implies \text{rank}(\Delta W) \le \text{rank}(B)
+$$
+
+   Secara simetris, tinjau transpose $(\Delta W)^T = A^T B^T$. Ruang baris $\Delta W$ adalah subruang dari ruang baris $A$ :
+
+$$
+C((\Delta W)^T) \subseteq C(A^T) \implies \text{rank}(\Delta W) \le \text{rank}(A)
+$$
+
    Menggabungkan kedua ketidaksamaan:
-   $$\text{rank}(\Delta W) \le \min(\text{rank}(B), \text{rank}(A)) \le r = 16. \quad \blacksquare$$
+
+$$
+\text{rank}(\Delta W) \le \min(\text{rank}(B), \text{rank}(A)) \le r = 16. \quad \blacksquare
+$$
 
 2. **Analisis Geometri Rank Collapse**:
    - Jika $\text{rank}(A)$ runtuh menjadi 2, maka batas atas rank pembaruan bobot menjadi:
-     $$\text{rank}(\Delta W) \le \min(16, 2) = 2$$
+
+$$
+\text{rank}(\Delta W) \le \min(16, 2) = 2
+$$
+
      Maka dimensi maksimum ruang kolom $C(\Delta W)$ anjlok drastis dari 16 menjadi **hanya 2 dimensi**!
    - Berdasarkan Teorema Rank-Nullity:
-     $$\dim(N(\Delta W)) = d - \text{rank}(\Delta W) \ge 4096 - 2 = 4094$$
+
+$$
+\dim(N(\Delta W)) = d - \text{rank}(\Delta W) \ge 4096 - 2 = 4094
+$$
+
      Dimensi ruang nol membengkak menjadi **minimal 4094 dimensi**!
 
 3. **Dampak Kognitif pada Model Bahasa Besar**:

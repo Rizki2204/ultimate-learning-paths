@@ -38,11 +38,20 @@ Bayangkan Anda dan seorang teman sedang makan di warung makan:
 
 Berapa harga 1 piring nasi goreng ($x_1$) dan 1 gelas es teh ($x_2$)?
 Di SMP, Anda menuliskan dua persamaan ini:
-$$2x_1 + 1x_2 = 25.000$$
-$$1x_1 + 2x_2 = 20.000$$
+
+$$
+2x_1 + 1x_2 = 25.000
+$$
+
+$$
+1x_1 + 2x_2 = 20.000
+$$
 
 Dalam aljabar linier, kita tidak lagi menulis huruf $x_1$ dan $x_2$ berulang-ulang. Kita pisahkan **tabel koefisien pesanan** ($A$), **vektor barang yang dicari** ($\mathbf{x}$), dan **vektor total harga** ($\mathbf{b}$):
-$$\begin{bmatrix} 2 & 1 \\ 1 & 2 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} 25.000 \\ 20.000 \end{bmatrix} \iff A\mathbf{x} = \mathbf{b}$$
+
+$$
+\begin{bmatrix} 2 & 1 \\ 1 & 2 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} 25.000 \\ 20.000 \end{bmatrix} \iff A\mathbf{x} = \mathbf{b}
+$$
 
 - **Tabel Angka (Matriks $A$)**: Wadah kotak 2 dimensi untuk menyimpan angka koefisien. Angka di baris ke-$i$ dan kolom ke-$j$ ditulis $a_{ij}$.
   - Baris ke-1 ($i=1$): Pesanan hari Senin ($2$ porsi nasi, $1$ es teh).
@@ -73,7 +82,7 @@ Tabel berikut adalah kamus referensi cepat untuk seluruh lambang matematika yang
 | $\otimes$ | "Produk Kronecker" | Perkalian blok di mana setiap elemen matriks pertama mengalikan seluruh matriks kedua. | $\begin{bmatrix} 1 & 2 \end{bmatrix} \otimes \begin{bmatrix} 3 \\ 4 \end{bmatrix} = \begin{bmatrix} 3 & 6 \\ 4 & 8 \end{bmatrix}$. |
 | $\times_n$ | "Produk mode-$n$ tensor" | Mengalikan serat-serat tensor sepanjang sumbu ke-$n$ dengan sebuah matriks transformasi. | $\boldsymbol{\mathcal{Y}} = \boldsymbol{\mathcal{X}} \times_1 U$. |
 | $\delta_{ij}$ | "Delta Kronecker" | Bernilai 1 jika indeksnya kembar ($i = j$), dan bernilai 0 jika indeksnya berbeda ($i \neq j$). | $\delta_{11} = 1$, $\delta_{12} = 0$. |
-| $\|\mathbf{x}\|_2$ | "Norma dua atau panjang Euclidean" | Jarak lurus vektor dari titik pusat: $\sqrt{x_1^2 + x_2^2 + \dots + x_n^2}$. | $\|[3, 4]^T\|_2 = \sqrt{3^2 + 4^2} = 5$. |
+| $\lVert \mathbf{x} \rVert_2$ | "Norma dua atau panjang Euclidean" | Jarak lurus vektor dari titik pusat: $\sqrt{x_1^2 + x_2^2 + \dots + x_n^2}$. | $\lVert [3, 4]^T \rVert_2 = \sqrt{3^2 + 4^2} = 5$. |
 
 ---
 
@@ -81,8 +90,12 @@ Tabel berikut adalah kamus referensi cepat untuk seluruh lambang matematika yang
 
 Salah satu sumber kebingungan terbesar bagi pemula saat menerjemahkan rumus aljabar ke dalam program komputer adalah **perbedaan titik awal indeks**:
 - **Dunia Matematika (1-Based)**: Elemen pertama pada baris atau kolom dimulai dari angka **1**.
-  Elemen pojok kiri atas matriks disebut $a_{11}$. Jika sebuah vektor memiliki panjang $n$, indeksnya berjalan dari $1$ sampai $n$:
-  $$\mathbf{x} = \begin{bmatrix} x_1 \\ x_2 \\ \vdots \\ x_n \end{bmatrix}, \quad \text{dan rumus penjumlahan: } \sum_{k=1}^n x_k$$
+  Elemen pojok kiri atas matriks disebut $a_{11}$. Jika sebuah vektor memiliki panjang $n$, indeksnya berjalan dari $1$ sampai $n$ :
+
+$$
+\mathbf{x} = \begin{bmatrix} x_1 \\ x_2 \\ \vdots \\ x_n \end{bmatrix}, \quad \text{dan rumus penjumlahan: } \sum_{k=1}^n x_k
+$$
+
 - **Dunia Komputer & Python (0-Based)**: Bahasa pemrograman modern (seperti Python, C, C++, dan Rust) menempatkan data di alamat memori offset, sehingga elemen pertama dimulai dari angka **0**.
   Elemen pojok kiri atas matriks adalah `A[0][0]`. Jika daftar memiliki panjang $n$, indeksnya berjalan dari `0` sampai `n - 1`:
 
@@ -215,9 +228,9 @@ flowchart TD
     Sub02 --> Sub09
     Sub07 --> Sub09
 
-    classDef foundation fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
-    classDef spectral fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px;
-    classDef advanced fill:#e8f5e9,stroke:#388e3c,stroke-width:2px;
+    classDef foundation fill:#e1f5fe,stroke:#0288d1,stroke-width:2px,color:#0f172a;
+    classDef spectral fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#0f172a;
+    classDef advanced fill:#e8f5e9,stroke:#388e3c,stroke-width:2px,color:#0f172a;
 
     class Sub01,Sub02,Sub03,Sub04 foundation;
     class Sub05,Sub06 spectral;
@@ -232,13 +245,13 @@ Kurikulum ini dirancang untuk diselesaikan dalam durasi **60 jam studi mendalam*
 
 | Bab Subtopik | Dokumen Berkas | Estimasi Waktu | Fokus Konsep, Teorema & Penurunan Kunci | Penerapan Industri & Rekayasa Komputasi | Rujukan Silabus Otoritatif |
 |:---:|---|:---:|---|---|---|
-| **01** | [01-vektor-eliminasi-matriks.md](./01-vektor-eliminasi-matriks.md) | **6 Jam** | - Vektor di $\mathbb{R}^n$, kombinasi linier, rentang (*span*).<br>- Geometri $Ax=b$: *row picture* vs *column picture*.<br>- **4 Pandangan Perkalian Matriks (Strang's 4 Views)**.<br>- Eliminasi Gaussian dengan matriks elementer $E_{ij}$.<br>- *Partial Pivoting* & permutasi baris $PA=LU$.<br>- Bukti kompleksitas eliminasi LU $\frac{2}{3}n^3$ total FLOPs ($\frac{1}{3}n^3$ tambah + $\frac{1}{3}n^3$ kali).<br>- Eliminasi Gauss-Jordan $[A \mid I] \to [I \mid A^{-1}]$. | Solver linier LAPACK `dgetrf`, penanganan pembagian nol pada floating point CPU, pencegahan singularitas sistem. | MIT 18.06 Kuliah 1, 2, 4, 5;<br>Strang (6th Ed.) Bab 1 & 2. |
+| **01** | [01-vektor-eliminasi-matriks.md](./01-vektor-eliminasi-matriks.md) | **6 Jam** | - Vektor di $\mathbb{R}^n$, kombinasi linier, rentang (*span*).<br>- Geometri $Ax=b$ : *row picture* vs *column picture*.<br>- **4 Pandangan Perkalian Matriks (Strang's 4 Views)**.<br>- Eliminasi Gaussian dengan matriks elementer $E_{ij}$.<br>- *Partial Pivoting* & permutasi baris $PA=LU$.<br>- Bukti kompleksitas eliminasi LU $\frac{2}{3}n^3$ total FLOPs ($\frac{1}{3}n^3$ tambah + $\frac{1}{3}n^3$ kali).<br>- Eliminasi Gauss-Jordan $[A \mid I] \to [I \mid A^{-1}]$. | Solver linier LAPACK `dgetrf`, penanganan pembagian nol pada floating point CPU, pencegahan singularitas sistem. | MIT 18.06 Kuliah 1, 2, 4, 5;<br>Strang (6th Ed.) Bab 1 & 2. |
 | **02** | [02-ruang-vektor-subruang-fundamental.md](./02-ruang-vektor-subruang-fundamental.md) | **7 Jam** | - 8 Aksioma ruang vektor & subruang aljabar (wajib lewat $\mathbf{0}$).<br>- Kebebasan linier, basis, dimensi ruang, dan rank $r$.<br>- Bentuk eselon baris tereduksi (RREF) $R = \text{rref}(A)$.<br>- **Empat Subruang Fundamental**: $C(A), N(A), C(A^T), N(A^T)$.<br>- Teorema Fundamental Aljabar Linier (FTLA Bagian 1 & 2).<br>- Bukti Teorema Rank-Nullity: $r + (n-r) = n$.<br>- **Faktorisasi Kolom-Baris Modern**: $A = CR$. | Ekstraksi fitur ortogonal, deteksi multikolinieritas fitur pada machine learning, representasi basis kompak. | MIT 18.06 Kuliah 6, 7, 8, 9, 10;<br>Strang (6th Ed.) Bab 3. |
 | **03** | [03-ortogonalitas-proyeksi-faktor-qr.md](./03-ortogonalitas-proyeksi-faktor-qr.md) | **7 Jam** | - Ortogonalitas vektor & subruang: $Q^T Q = I$.<br>- Matriks proyeksi: $P = A(A^T A)^{-1} A^T$, sifat $P^2 = P, P^T = P$.<br>- Penurunan Persamaan Normal Kuadrat Terkecil: $A^T A \hat{x} = A^T b$.<br>- Ortogonalisasi Gram-Schmidt Klasik (CGS) vs Termodifikasi (MGS).<br>- **Faktorisasi $A = QR$** via MGS & Reflektor Householder.<br>- Solusi kuadrat terkecil stabil: $R \hat{x} = Q^T b$. | Regresi linier numerik stabil, peredaman derau Kalman filter, algoritma LAPACK `dgeqrf`, penghindaran pengkuadratan kondisi $\kappa(A)^2$. | MIT 18.06 Kuliah 14, 15, 16, 17;<br>MIT 18.065 Bagian II. |
 | **04** | [04-determinan-teori-matriks.md](./04-determinan-teori-matriks.md) | **6 Jam** | - 3 Aksioma esensial determinan & 7 sifat turunan.<br>- Rumus eliminasi pivot: $\det(A) = (-1)^s \prod d_i$.<br>- Rumus permutasi Leibniz lengkap atas $n!$ elemen $S_n$.<br>- Ekspansi Kofaktor Laplace baris/kolom sembarang.<br>- Rumus invers aljabar via matriks adjugat: $A^{-1} = \frac{1}{\det(A)} C^T$.<br>- Aturan Cramer dan kelemahan asimtotiknya ($O(n!)$).<br>- Geometri volume kotak hiperdimensi & orientasi koordinat. | Transformasi koordinat Jacobian kalkulus multivariabel, deteksi singularitas analitik, grafika komputer 3D. | MIT 18.06 Kuliah 18, 19, 20;<br>Strang (5th Ed.) Bab 5. |
 | **05** | [05-nilai-vektor-eigen-diagonalisasi.md](./05-nilai-vektor-eigen-diagonalisasi.md) | **8 Jam** | - Geometri nilai & vektor eigen: $Av = \lambda v$.<br>- Polinomial karakteristik $\det(A - \lambda I) = 0$.<br>- Multiplicitas aljabar ($AM$) vs geometris ($GM$); matriks cacat.<br>- **Teorema Diagonalisasi**: $A = X \Lambda X^{-1}$.<br>- Pangkat matriks $A^k = X \Lambda^k X^{-1}$ (Rumus Binet Fibonacci).<br>- Persamaan diferensial linier $\dot{u} = Au$ & eksponensial matriks $e^{At}$.<br>- Matriks Markov & Teorema Perron-Frobenius (PageRank). | Algoritma Google PageRank, simulasi sistem dinamik kontinu, pemodelan getaran mekanika struktur, graf spektral. | MIT 18.06 Kuliah 21, 22, 23, 24;<br>Strang (6th Ed.) Bab 6. |
-| **06** | [06-matriks-simetris-definit-positif.md](./06-matriks-simetris-definit-positif.md) | **7 Jam** | - Sifat simetris $S = S^T$: seluruh $\lambda_i \in \mathbb{R}$, vektor eigen ortonormal.<br>- **Teorema Spektral**: $S = Q \Lambda Q^T = \sum \lambda_i q_i q_i^T$.<br>- Bentuk kuadratik $f(x) = x^T A x$ & Rasio Rayleigh.<br>- **5 Tes Ekuivalen Matriks Definit Positif** ($A \succ 0$): eigenvalue, energi, pivot, kriteria minor utama Sylvester, $A = R^T R$.<br>- **Dekomposisi Cholesky**: $A = L L^T$ (biaya $\frac{1}{3}n^3$ total FLOPs: $\frac{1}{6}n^3$ tambah + $\frac{1}{6}n^3$ kali).<br>- Geometri elipsoid energi & sumbu utama $1/\sqrt{\lambda_i}$. | Optimasi konveks kuadratik, estimasi kovarians portofolio HFT, penentuan kurvatur Hessian (Newton-Raphson), LAPACK `dpotrf`. | MIT 18.06 Kuliah 25, 27;<br>MIT 18.065 Bagian I & VI. |
-| **07** | [07-svd-dan-pseudoinverse.md](./07-svd-dan-pseudoinverse.md) | **8 Jam** | - **Singular Value Decomposition (SVD)** universal: $A = U \Sigma V^T$.<br>- Geometri pemetaan bola satuan ke hiper-elipsoid.<br>- Hubungan spektral: $v_i \in \text{eig}(A^T A)$, $u_i \in \text{eig}(A A^T)$, $\sigma_i = \sqrt{\lambda_i}$.<br>- **Teorema Eckart-Young-Mirsky**: bukti aproksimasi low-rank optimal $\|A - A_k\|_F = \sqrt{\sum_{j=k+1}^r \sigma_j^2}$.<br>- **Moore-Penrose Pseudoinverse**: $A^+ = V \Sigma^+ U^T$ & 4 aksioma Penrose.<br>- Solusi kuadrat terkecil norma minimum $x^+ = A^+ b$.<br>- Bilangan kondisi matriks $\kappa(A) = \sigma_{\max} / \sigma_{\min}$. | Kompresi citra digital, reduksi kebisingan sinyal, solusi sistem over/under-determined, regularisasi pemangkasan rank SVD. | MIT 18.06 Kuliah 29;<br>MIT 18.065 Kuliah 6, 7, 11;<br>Golub & Van Loan. |
+| **06** | [06-matriks-simetris-definit-positif.md](./06-matriks-simetris-definit-positif.md) | **7 Jam** | - Sifat simetris $S = S^T$ : seluruh $\lambda_i \in \mathbb{R}$, vektor eigen ortonormal.<br>- **Teorema Spektral**: $S = Q \Lambda Q^T = \sum \lambda_i q_i q_i^T$.<br>- Bentuk kuadratik $f(x) = x^T A x$ & Rasio Rayleigh.<br>- **5 Tes Ekuivalen Matriks Definit Positif** ($A \succ 0$): eigenvalue, energi, pivot, kriteria minor utama Sylvester, $A = R^T R$.<br>- **Dekomposisi Cholesky**: $A = L L^T$ (biaya $\frac{1}{3}n^3$ total FLOPs: $\frac{1}{6}n^3$ tambah + $\frac{1}{6}n^3$ kali).<br>- Geometri elipsoid energi & sumbu utama $1/\sqrt{\lambda_i}$. | Optimasi konveks kuadratik, estimasi kovarians portofolio HFT, penentuan kurvatur Hessian (Newton-Raphson), LAPACK `dpotrf`. | MIT 18.06 Kuliah 25, 27;<br>MIT 18.065 Bagian I & VI. |
+| **07** | [07-svd-dan-pseudoinverse.md](./07-svd-dan-pseudoinverse.md) | **8 Jam** | - **Singular Value Decomposition (SVD)** universal: $A = U \Sigma V^T$.<br>- Geometri pemetaan bola satuan ke hiper-elipsoid.<br>- Hubungan spektral: $v_i \in \text{eig}(A^T A)$, $u_i \in \text{eig}(A A^T)$, $\sigma_i = \sqrt{\lambda_i}$.<br>- **Teorema Eckart-Young-Mirsky**: bukti aproksimasi low-rank optimal $\lVert A - A_k \rVert_F = \sqrt{\sum_{j=k+1}^r \sigma_j^2}$.<br>- **Moore-Penrose Pseudoinverse**: $A^+ = V \Sigma^+ U^T$ & 4 aksioma Penrose.<br>- Solusi kuadrat terkecil norma minimum $x^+ = A^+ b$.<br>- Bilangan kondisi matriks $\kappa(A) = \sigma_{\max} / \sigma_{\min}$. | Kompresi citra digital, reduksi kebisingan sinyal, solusi sistem over/under-determined, regularisasi pemangkasan rank SVD. | MIT 18.06 Kuliah 29;<br>MIT 18.065 Kuliah 6, 7, 11;<br>Golub & Van Loan. |
 | **08** | [08-pca-analisis-komponen-utama.md](./08-pca-analisis-komponen-utama.md) | **5 Jam** | - Matriks data terpusat $X_c = X - \mathbf{1}\mu^T$.<br>- Matriks Kovarians Sampel: $S = \frac{1}{n-1} X_c^T X_c$.<br>- Dua sudut penurunan formal: maksimasi varians proyeksi (Pengali Lagrange) vs minimasi galat rekonstruksi.<br>- Ekuivalensi matematis PCA dengan SVD data terpusat: $S = \frac{1}{n-1} V \Sigma^2 V^T$.<br>- Skor Komponen Utama $Z = X_c V = U \Sigma$.<br>- Proporsi Varians Terjelaskan (*Explained Variance Ratio*) & *Scree Plot*. | Reduksi dimensi fitur data sains, visualisasi data multidimensi, deteksi anomali fraud, pra-pemrosesan data deep learning. | MIT 18.065 Kuliah 28;<br>Jonathon Shlens (2014);<br>Strang (2019) Bab V. |
 | **09** | [09-aljabar-multilinier-dekomposisi-tensor.md](./09-aljabar-multilinier-dekomposisi-tensor.md) | **6 Jam** | - Definisi formal tensor orde-$N$ berwujud array multidimensi $\boldsymbol{\mathcal{X}} \in \mathbb{R}^{I_1 \times \dots \times I_N}$.<br>- Serat (*fibers*), irisan (*slices*), norma Frobenius tensor.<br>- Matrisasi / Unfolding Mode-$n$ ($X_{(n)}$) & Produk Mode-$n$ ($\boldsymbol{\mathcal{X}} \times_n U$).<br>- **Dekomposisi CANDECOMP/PARAFAC (CP)**: $[\![\boldsymbol{\lambda}; A, B, C]\!]$, ALS via produk Khatri-Rao $C \odot B$, kondisi Kruskal.<br>- **Dekomposisi Tucker & Higher-Order SVD (HOSVD)**: $\boldsymbol{\mathcal{X}} \approx \boldsymbol{\mathcal{G}} \times_1 U^{(1)} \times_2 U^{(2)} \times_3 U^{(3)}$.<br>- Algoritma HOOI (*Higher-Order Orthogonal Iteration*).<br>- Paradoks rank tensor: masalah NP-hard (Håstad) & fenomena *swamping*. | Kompresi jaringan saraf mendalam (Tensor Train / CP), faktorisasi data multi-aspek multimodal, pemrosesan sinyal sensor multi-array. | Kolda & Bader (SIAM Review 2009);<br>De Lathauwer et al. (2000);<br>Dokumentasi TensorLy. |
 | **TOTAL** | **9 Subtopik Lengkap** | **60 Jam** | **Seluruh Silabus Inti & Lanjutan Aljabar Linier Terapan Dunia** | **Kesiapan Penuh untuk AI, HFT, Robotika & Riset Teoretis** | **Standar Emas Global** |
@@ -261,8 +274,15 @@ flowchart LR
     PAIEng --> MasteryAI(["Penguasaan Deep Learning & Kompresi SVD/Tensor"])
     PHFT --> MasteryHFT(["Penguasaan Eksekusi Nanodetik & Cholesky"])
 
-    classDef path fill:#fff3e0,stroke:#e65100,stroke-width:2px;
+    classDef startNode fill:#e0f2fe,stroke:#0369a1,stroke-width:2px,color:#0f172a;
+    classDef coreNode fill:#f1f5f9,stroke:#475569,stroke-width:2px,color:#0f172a;
+    classDef path fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#0f172a;
+    classDef mastery fill:#dcfce7,stroke:#15803d,stroke-width:2px,color:#0f172a;
+
+    class Start startNode;
+    class Core coreNode;
     class PMath,PAIEng,PHFT path;
+    class MasteryMath,MasteryAI,MasteryHFT mastery;
 ```
 
 ### Jalur 1: Matematika Murni & Fondasi Teoretis (*Pure Mathematics & Theoretical Foundations*)
