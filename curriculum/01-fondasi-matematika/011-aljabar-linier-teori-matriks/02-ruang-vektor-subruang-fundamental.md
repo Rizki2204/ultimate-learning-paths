@@ -7,11 +7,11 @@
 ## 1. Intuisi Dasar & Motivasi dari Titik Nol
 Tautan Rujukan Kuliah: [MIT OCW 18.06 Kuliah 6: Column Space and Nullspace](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-6-column-space-and-nullspace/) | [MIT OCW 18.06 Kuliah 10: The Four Fundamental Subspaces](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-10-the-four-fundamental-subspaces/) | [Georgia Tech ILA: Subspaces](https://textbooks.math.gatech.edu/ila/subspaces.html) | [Immersive Math Bab 8: Rank](https://immersivemath.com/ila/ch08_rank/ch08.html)
 
-Selamat datang di jantung konseptual aljabar linier! Di Bab 01, kita telah melihat bagaimana eliminasi Gaussian menyelesaikan persamaan $A\mathbf{x} = \mathbf{b}$. Namun, aljabar linier modern tidak berhenti pada hitung-menghitung angka eliminasi. Pertanyaan yang jauh lebih dalam adalah: *Ke mana sebenarnya perginya vektor $\mathbf{x}$ ketika dikalikan dengan matriks $A$? Struktur geometri apa yang menampung seluruh kemungkinan hasil perkalian tersebut?*
+Selamat datang di jantung konseptual aljabar linier! Di Bab 01, kita telah melihat bagaimana eliminasi Gaussian menyelesaikan persamaan $A\mathbf{x} = \mathbf{b}$. Namun, aljabar linier modern tidak berhenti pada hitung-menghitung angka eliminasi. Pertanyaan yang jauh lebih dalam adalah: Ke mana sebenarnya perginya vektor $\mathbf{x}$ ketika dikalikan dengan matriks $A$? Struktur geometri apa yang menampung seluruh kemungkinan hasil perkalian tersebut?
 
 ### 1.1 Mengapa Subruang Wajib Melewati Titik Nol? (Bukti Visual Garis $y = 2x + 1$)
 
-Sebelum kita membahas definisi matematika yang formal, mari kita renungkan satu pertanyaan yang sering membingungkan pemula: *Mengapa para matematikawan begitu fanatik mewajibkan bahwa setiap "subruang" harus melewati titik asal $\mathbf{0} = (0, 0)$? Mengapa garis lurus biasa seperti $y = 2x + 1$ ditolak mentah-mentah sebagai subruang?*
+Sebelum kita membahas definisi matematika yang formal, mari kita renungkan satu pertanyaan yang sering membingungkan pemula: Mengapa para matematikawan begitu fanatik mewajibkan bahwa setiap "subruang" harus melewati titik asal $\mathbf{0} = (0, 0)$? Mengapa garis lurus biasa seperti $y = 2x + 1$ ditolak mentah-mentah sebagai subruang?
 
 Bayangkan Anda memiliki sebuah arena bermain aljabar. Aturan main di arena ini sangat sederhana:
 1. Jika Anda mengambil dua anggota arena lalu menjumlahkannya, hasilnya **wajib masih berada di dalam arena**.
@@ -92,9 +92,9 @@ $$
 $$
 
 Pertanyaan rekayasa krusial yang menentukan keselamatan jembatan:
-1. *Beban-beban macam apa yang dapat ditahan secara aman oleh tumpuan fondasi?* Himpunan seluruh kemungkinan gaya reaksi $\mathbf{y}$ yang dapat dihasilkan adalah **Ruang Kolom $C(A)$**.
-2. *Apakah ada kombinasi beban tertentu yang berbahaya, di mana gaya-gaya internal jembatan saling meniadakan sehingga tumpuan fondasi tidak merasakan gaya sama sekali ($A\mathbf{x} = \mathbf{0}$), namun jembatan mengalami resonansi tekuk internal yang mematikan?* Himpunan beban rahasia ini adalah **Ruang Nol / Nullspace $N(A)$**!
-3. *Bagaimana kita membuang informasi tiang penopang yang redundan/mubazir agar biaya material jembatan dapat dihemat tanpa mengurangi kekuatan struktural?* Jawabannya adalah mencari **basis independen** dan melakukan **Faktorisasi Kolom-Baris $A = CR$**!
+1. Beban-beban macam apa yang dapat ditahan secara aman oleh tumpuan fondasi? Himpunan seluruh kemungkinan gaya reaksi $\mathbf{y}$ yang dapat dihasilkan adalah **Ruang Kolom $C(A)$**.
+2. Apakah ada kombinasi beban tertentu yang berbahaya, di mana gaya-gaya internal jembatan saling meniadakan sehingga tumpuan fondasi tidak merasakan gaya sama sekali ($A\mathbf{x} = \mathbf{0}$), namun jembatan mengalami resonansi tekuk internal yang mematikan? Himpunan beban rahasia ini adalah **Ruang Nol / Nullspace $N(A)$**!
+3. Bagaimana kita membuang informasi tiang penopang yang redundan/mubazir agar biaya material jembatan dapat dihemat tanpa mengurangi kekuatan struktural? Jawabannya adalah mencari **basis independen** dan melakukan **Faktorisasi Kolom-Baris $A = CR$**!
 
 ---
 
@@ -263,7 +263,7 @@ $$
 ### 2.5 Teorema Fundamental Aljabar Linier (FTLA Bagian 1 & Bagian 2)
 
 **Teorema 2.1 (FTLA Bagian 1 — Dimensi Keempat Subruang)**:
-*Untuk setiap matriks $A \in \mathbb{R}^{m \times n}$ dengan rank $r$ :*
+Untuk setiap matriks $A \in \mathbb{R}^{m \times n}$ dengan rank $r$ :
 1. $\dim(C(A)) = r$ dan $\dim(C(A^T)) = r$ (Rank Baris Selalu Tepat Sama dengan Rank Kolom!).
 2. $\dim(N(A)) = n - r$ (Teorema Rank-Nullity: $r + \text{nullity} = n$).
 3. $\dim(N(A^T)) = m - r$ (Teorema Rank-Nullity Kiri: $r + \text{left-nullity} = m$).
@@ -277,13 +277,13 @@ $$
 > Karena kedua besaran tersebut sama-sama dihitung dari jumlah pivot yang persis sama, maka terbukti mutlak bahwa **dimensi ruang baris selalu sama dengan dimensi ruang kolom**!
 
 **Teorema 2.2 (FTLA Bagian 2 — Ortogonalitas Komplementer)**:
-*Subruang baris dan subruang nol adalah komplemen ortogonal di dalam $\mathbb{R}^n$ :*
+Subruang baris dan subruang nol adalah komplemen ortogonal di dalam $\mathbb{R}^n$ :
 
 $$
 C(A^T) \perp N(A) \quad \text{dan} \quad C(A^T) \oplus N(A) = \mathbb{R}^n
 $$
 
-*Subruang kolom dan subruang nol kiri adalah komplemen ortogonal di dalam $\mathbb{R}^m$ :*
+Subruang kolom dan subruang nol kiri adalah komplemen ortogonal di dalam $\mathbb{R}^m$ :
 
 $$
 C(A) \perp N(A^T) \quad \text{dan} \quad C(A) \oplus N(A^T) = \mathbb{R}^m

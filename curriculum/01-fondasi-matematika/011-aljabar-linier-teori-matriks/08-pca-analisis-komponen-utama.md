@@ -66,6 +66,10 @@ flowchart TD
     class X,Correl orig;
     class Rotasi,PC1,PC2 trans;
     class Z,Decoupled latent;
+
+    style RuangAsli fill:#fef2f2,stroke:#dc2626,stroke-width:1.5px,color:#0f172a;
+    style TransformasiPCA fill:#f0f9ff,stroke:#0284c7,stroke-width:1.5px,color:#0f172a;
+    style RuangLaten fill:#f0fdf4,stroke:#16a34a,stroke-width:1.5px,color:#0f172a;
 ```
 
 ---
@@ -158,6 +162,8 @@ Formulasi matriks data terpusat dan kovarians sampel:
 $$
 X_c = X - \mathbf{1}_n \boldsymbol{\mu}^T = \begin{bmatrix} x_{11} - \mu_1 & x_{12} - \mu_2 & \cdots & x_{1p} - \mu_p \\ x_{21} - \mu_1 & x_{22} - \mu_2 & \cdots & x_{2p} - \mu_p \\ \vdots & \vdots & \ddots & \vdots \\ x_{n1} - \mu_1 & x_{n2} - \mu_2 & \cdots & x_{np} - \mu_p \end{bmatrix}
 $$
+
+Dan matriks kovarians sampel $S$ :
 
 $$
 S = \frac{1}{n - 1} X_c^T X_c = \begin{bmatrix} \text{Var}(X_1) & \text{Cov}(X_1, X_2) & \cdots & \text{Cov}(X_1, X_p) \\ \text{Cov}(X_2, X_1) & \text{Var}(X_2) & \cdots & \text{Cov}(X_2, X_p) \\ \vdots & \vdots & \ddots & \vdots \\ \text{Cov}(X_p, X_1) & \text{Cov}(X_p, X_2) & \cdots & \text{Var}(X_p) \end{bmatrix}
@@ -253,11 +259,10 @@ di mana $\alpha_1 \in \mathbb{R}$ adalah skalar pengali Lagrange.
 Turunkan $\mathcal{L}$ terhadap vektor $\mathbf{w}_1$ menggunakan turunan matriks:
 
 $$
-\frac{\partial}{\partial \mathbf{w}_1} (\mathbf{w}_1^T S \mathbf{w}_1) = 2 S \mathbf{w}_1 \quad (\text{karena } S = S^T)
-$$
-
-$$
-\frac{\partial}{\partial \mathbf{w}_1} (\alpha_1 \mathbf{w}_1^T \mathbf{w}_1) = 2 \alpha_1 \mathbf{w}_1
+\begin{aligned}
+\frac{\partial}{\partial \mathbf{w}_1} (\mathbf{w}_1^T S \mathbf{w}_1) &= 2 S \mathbf{w}_1 \quad (\text{karena } S = S^T) \\
+\frac{\partial}{\partial \mathbf{w}_1} (\alpha_1 \mathbf{w}_1^T \mathbf{w}_1) &= 2 \alpha_1 \mathbf{w}_1
+\end{aligned}
 $$
 
 Menetapkan gradien sama dengan vektor nol:
@@ -534,35 +539,26 @@ $$
 Selesaikan persamaan karakteristik $\det(S - \lambda I) = 0$ :
 
 $$
-\det \begin{bmatrix} 10.0 - \lambda & 6.0 \\ 6.0 & 6.5 - \lambda \end{bmatrix} = 0
-$$
-
-$$
-(10.0 - \lambda)(6.5 - \lambda) - (6.0)^2 = 0
-$$
-
-$$
-\lambda^2 - 16.5 \lambda + 65.0 - 36.0 = 0 \implies \lambda^2 - 16.5 \lambda + 29.0 = 0
+\begin{aligned}
+\det \begin{bmatrix} 10.0 - \lambda & 6.0 \\ 6.0 & 6.5 - \lambda \end{bmatrix} &= 0 \\
+(10.0 - \lambda)(6.5 - \lambda) - (6.0)^2 &= 0 \\
+\lambda^2 - 16.5 \lambda + 65.0 - 36.0 &= 0 \implies \lambda^2 - 16.5 \lambda + 29.0 = 0
+\end{aligned}
 $$
 
 Gunakan rumus kuadratik abc:
 
 $$
-\text{Diskriminan } D = (-16.5)^2 - 4(1)(29.0) = 272.25 - 116.00 = 156.25
-$$
-
-$$
-\sqrt{D} = \sqrt{156.25} = 12.5
+\text{Diskriminan } D = (-16.5)^2 - 4(1)(29.0) = 272.25 - 116.00 = 156.25 \implies \sqrt{D} = \sqrt{156.25} = 12.5
 $$
 
 Kedua nilai eigen eksak adalah:
 
 $$
-\lambda_1 = \frac{16.5 + 12.5}{2} = \frac{29.0}{2} = \mathbf{14.5}
-$$
-
-$$
-\lambda_2 = \frac{16.5 - 12.5}{2} = \frac{4.0}{2} = \mathbf{2.0}
+\begin{aligned}
+\lambda_1 &= \frac{16.5 + 12.5}{2} = \frac{29.0}{2} = \mathbf{14.5} \\
+\lambda_2 &= \frac{16.5 - 12.5}{2} = \frac{4.0}{2} = \mathbf{2.0}
+\end{aligned}
 $$
 
 Uji cek cepat jejak matriks: $\text{tr}(S) = 10.0 + 6.5 = 16.5 = \lambda_1 + \lambda_2$ (Cocok 100%!).
@@ -570,21 +566,19 @@ Uji cek cepat jejak matriks: $\text{tr}(S) = 10.0 + 6.5 = 16.5 = \lambda_1 + \la
 Proporsi Varians Terjelaskan (PVE):
 
 $$
-\text{PVE}_1 = \frac{14.5}{16.5} = \frac{29}{33} \approx 0.878788 \implies \mathbf{87.88\%}
-$$
-
-$$
-\text{PVE}_2 = \frac{2.0}{16.5} = \frac{4}{33} \approx 0.121212 \implies \mathbf{12.12\%}
+\begin{aligned}
+\text{PVE}_1 &= \frac{14.5}{16.5} = \frac{29}{33} \approx 0.878788 \implies \mathbf{87.88\%} \\
+\text{PVE}_2 &= \frac{2.0}{16.5} = \frac{4}{33} \approx 0.121212 \implies \mathbf{12.12\%}
+\end{aligned}
 $$
 
 #### Mencari Vektor Eigen Pertama ($\mathbf{w}_1$ untuk $\lambda_1 = 14.5$):
 
 $$
-(S - 14.5 I) \mathbf{w}_1 = \mathbf{0} \implies \begin{bmatrix} 10.0 - 14.5 & 6.0 \\ 6.0 & 6.5 - 14.5 \end{bmatrix} \begin{bmatrix} w_{11} \\ w_{12} \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}
-$$
-
-$$
-\begin{bmatrix} -4.5 & 6.0 \\ 6.0 & -8.0 \end{bmatrix} \begin{bmatrix} w_{11} \\ w_{12} \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}
+\begin{aligned}
+(S - 14.5 I) \mathbf{w}_1 = \mathbf{0} &\implies \begin{bmatrix} 10.0 - 14.5 & 6.0 \\ 6.0 & 6.5 - 14.5 \end{bmatrix} \begin{bmatrix} w_{11} \\ w_{12} \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix} \\
+&\implies \begin{bmatrix} -4.5 & 6.0 \\ 6.0 & -8.0 \end{bmatrix} \begin{bmatrix} w_{11} \\ w_{12} \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}
+\end{aligned}
 $$
 
 Dari baris pertama: $-4.5 w_{11} + 6.0 w_{12} = 0 \implies w_{12} = \frac{4.5}{6.0} w_{11} = 0.75 w_{11} = \frac{3}{4} w_{11}$.
@@ -635,11 +629,10 @@ $$
 $$
 
 $$
-\text{Var}(\mathbf{z}_1) = \frac{1}{4} \left[ (-4.2)^2 + (-1.6)^2 + (-2.0)^2 + (2.6)^2 + (5.2)^2 \right]
-$$
-
-$$
-\text{Var}(\mathbf{z}_1) = \frac{1}{4} [17.64 + 2.56 + 4.00 + 6.76 + 27.04] = \frac{58.00}{4} = \mathbf{14.50}
+\begin{aligned}
+\text{Var}(\mathbf{z}_1) &= \frac{1}{4} \left[ (-4.2)^2 + (-1.6)^2 + (-2.0)^2 + (2.6)^2 + (5.2)^2 \right] \\
+&= \frac{1}{4} [17.64 + 2.56 + 4.00 + 6.76 + 27.04] = \frac{58.00}{4} = \mathbf{14.50}
+\end{aligned}
 $$
 
 **Varians skor terproyeksi persis sama dengan nilai eigen $\lambda_1 = 14.50$! Teorema terbukti autentik.**

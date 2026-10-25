@@ -46,7 +46,7 @@ A\mathbf{v} = \lambda \mathbf{v}
 $$
 
 > **🔤 Kamus Simbol Anti-Pusing — Persamaan Nilai Eigen Dasar ($A\mathbf{v} = \lambda \mathbf{v}$):**
-> - **Cara Membaca Lisan**: *"Matriks $A$ dikalikan vektor eigen $v$ sama dengan skalar lambda dikalikan vektor $v$."*
+> - **Cara Membaca Lisan**: "Matriks $A$ dikalikan vektor eigen $v$ sama dengan skalar lambda dikalikan vektor $v$."
 > - **Arti Simbol**:
 >   - $A$ : Matriks transformasi linier berukuran bujur sangkar $n \times n$.
 >   - $\mathbf{v}$ : Vektor kolom arah eigen (panjang $n \times 1$) yang orientasinya tidak berubah di bawah transformasi $A$.
@@ -156,25 +156,20 @@ $$
 > Kita mengalikan suku-suku linear diagonal utama:
 >
 > $$
-> (a_{11} - \lambda)(a_{22} - \lambda)\cdots(a_{nn} - \lambda) = (-\lambda)^n + (-\lambda)^{n-1} \sum_{i=1}^n a_{ii} + \dots
-> $$
->
-> $$
-> = (-1)^n \lambda^n + (-1)^{n-1} \left(\sum_{i=1}^n a_{ii}\right) \lambda^{n-1} + \dots + \det(A)
+> \begin{aligned}
+> (a_{11} - \lambda)(a_{22} - \lambda)\cdots(a_{nn} - \lambda) &= (-\lambda)^n + (-\lambda)^{n-1} \sum_{i=1}^n a_{ii} + \dots \\
+> &= (-1)^n \lambda^n + (-1)^{n-1} \left(\sum_{i=1}^n a_{ii}\right) \lambda^{n-1} + \dots + \det(A)
+> \end{aligned}
 > $$
 >
 > Di sisi lain, jika polinomial tersebut difaktorkan berdasarkan akar-akar nilai eigennya:
 >
 > $$
-> p(\lambda) = (-1)^n (\lambda - \lambda_1)(\lambda - \lambda_2)\cdots(\lambda - \lambda_n)
-> $$
->
-> $$
-> = (-1)^n \left[ \lambda^n - \left(\sum_{i=1}^n \lambda_i\right) \lambda^{n-1} + \dots + (-1)^n \prod_{i=1}^n \lambda_i \right]
-> $$
->
-> $$
-> = (-1)^n \lambda^n + (-1)^{n-1} \left(\sum_{i=1}^n \lambda_i\right) \lambda^{n-1} + \dots + \prod_{i=1}^n \lambda_i
+> \begin{aligned}
+> p(\lambda) &= (-1)^n (\lambda - \lambda_1)(\lambda - \lambda_2)\cdots(\lambda - \lambda_n) \\
+> &= (-1)^n \left[ \lambda^n - \left(\sum_{i=1}^n \lambda_i\right) \lambda^{n-1} + \dots + (-1)^n \prod_{i=1}^n \lambda_i \right] \\
+> &= (-1)^n \lambda^n + (-1)^{n-1} \left(\sum_{i=1}^n \lambda_i\right) \lambda^{n-1} + \dots + \prod_{i=1}^n \lambda_i
+> \end{aligned}
 > $$
 >
 > Dengan menyamakan koefisien pangkat $\lambda^{n-1}$, kita peroleh:
@@ -436,7 +431,7 @@ $$
 e^{\Lambda t} = \begin{bmatrix} e^{\lambda_1 t} & 0 & \cdots & 0 \\ 0 & e^{\lambda_2 t} & \cdots & 0 \\ \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & \cdots & e^{\lambda_n t} \end{bmatrix}
 $$
 
-*Contoh Angka Nyata $2 \times 2$*:
+**Contoh Angka Nyata $2 \times 2$**:
 Misalkan $A = \begin{bmatrix} 0 & 1 \\ -2 & -3 \end{bmatrix}$.
 Nilai eigen: $\lambda_1 = -1, \lambda_2 = -2$.
 Vektor eigen: $\mathbf{v}_1 = [1, -1]^T, \mathbf{v}_2 = [1, -2]^T$.
@@ -513,19 +508,12 @@ $$
 Hitung determinan matriks $2 \times 2$ :
 
 $$
-(0{,}8 - \lambda)(0{,}7 - \lambda) - (0{,}3)(0{,}2) = 0
-$$
-
-$$
-\lambda^2 - 0{,}7\lambda - 0{,}8\lambda + (0{,}8 \times 0{,}7) - 0{,}06 = 0
-$$
-
-$$
-\lambda^2 - 1{,}5\lambda + 0{,}56 - 0{,}06 = 0
-$$
-
-$$
-\lambda^2 - 1{,}5\lambda + 0{,}50 = 0
+\begin{aligned}
+(0{,}8 - \lambda)(0{,}7 - \lambda) - (0{,}3)(0{,}2) &= 0 \\
+\lambda^2 - 0{,}7\lambda - 0{,}8\lambda + (0{,}8 \times 0{,}7) - 0{,}06 &= 0 \\
+\lambda^2 - 1{,}5\lambda + 0{,}56 - 0{,}06 &= 0 \\
+\lambda^2 - 1{,}5\lambda + 0{,}50 &= 0
+\end{aligned}
 $$
 
 Faktorkan persamaan kuadrat:
@@ -624,15 +612,11 @@ $$
 Kalikan dengan $X^{-1}$ :
 
 $$
-X\Lambda X^{-1} = \begin{bmatrix} 3{,}0 & 0{,}5 \\ 2{,}0 & -0{,}5 \end{bmatrix} \begin{bmatrix} 0{,}2 & 0{,}2 \\ 0{,}4 & -0{,}6 \end{bmatrix}
-$$
-
-$$
-= \begin{bmatrix} (3{,}0)(0{,}2) + (0{,}5)(0{,}4) & (3{,}0)(0{,}2) + (0{,}5)(-0{,}6) \\ (2{,}0)(0{,}2) + (-0{,}5)(0{,}4) & (2{,}0)(0{,}2) + (-0{,}5)(-0{,}6) \end{bmatrix}
-$$
-
-$$
-= \begin{bmatrix} 0{,}6 + 0{,}2 & 0{,}6 - 0{,}3 \\ 0{,}4 - 0{,}2 & 0{,}4 + 0{,}3 \end{bmatrix} = \begin{bmatrix} 0{,}8 & 0{,}3 \\ 0{,}2 & 0{,}7 \end{bmatrix} = A
+\begin{aligned}
+X\Lambda X^{-1} &= \begin{bmatrix} 3{,}0 & 0{,}5 \\ 2{,}0 & -0{,}5 \end{bmatrix} \begin{bmatrix} 0{,}2 & 0{,}2 \\ 0{,}4 & -0{,}6 \end{bmatrix} \\
+&= \begin{bmatrix} (3{,}0)(0{,}2) + (0{,}5)(0{,}4) & (3{,}0)(0{,}2) + (0{,}5)(-0{,}6) \\ (2{,}0)(0{,}2) + (-0{,}5)(0{,}4) & (2{,}0)(0{,}2) + (-0{,}5)(-0{,}6) \end{bmatrix} \\
+&= \begin{bmatrix} 0{,}6 + 0{,}2 & 0{,}6 - 0{,}3 \\ 0{,}4 - 0{,}2 & 0{,}4 + 0{,}3 \end{bmatrix} = \begin{bmatrix} 0{,}8 & 0{,}3 \\ 0{,}2 & 0{,}7 \end{bmatrix} = A
+\end{aligned}
 $$
 
 Terbukti presisi sempurna 100%!
@@ -643,11 +627,10 @@ Terbukti presisi sempurna 100%!
 Formula analitis untuk $A^k$ :
 
 $$
-A^k = X \Lambda^k X^{-1} = \begin{bmatrix} 3 & 1 \\ 2 & -1 \end{bmatrix} \begin{bmatrix} 1^k & 0 \\ 0 & (0{,}5)^k \end{bmatrix} \begin{bmatrix} 0{,}2 & 0{,}2 \\ 0{,}4 & -0{,}6 \end{bmatrix}
-$$
-
-$$
-= \begin{bmatrix} 0{,}6 + 0{,}4(0{,}5)^k & 0{,}6 - 0{,}6(0{,}5)^k \\ 0{,}4 - 0{,}4(0{,}5)^k & 0{,}4 + 0{,}6(0{,}5)^k \end{bmatrix}
+\begin{aligned}
+A^k &= X \Lambda^k X^{-1} = \begin{bmatrix} 3 & 1 \\ 2 & -1 \end{bmatrix} \begin{bmatrix} 1^k & 0 \\ 0 & (0{,}5)^k \end{bmatrix} \begin{bmatrix} 0{,}2 & 0{,}2 \\ 0{,}4 & -0{,}6 \end{bmatrix} \\
+&= \begin{bmatrix} 0{,}6 + 0{,}4(0{,}5)^k & 0{,}6 - 0{,}6(0{,}5)^k \\ 0{,}4 - 0{,}4(0{,}5)^k & 0{,}4 + 0{,}6(0{,}5)^k \end{bmatrix}
+\end{aligned}
 $$
 
 Ketika $k \to \infty$, karena $(0{,}5)^k \to 0$ :
@@ -950,11 +933,10 @@ $$
    Matriks modal $X = \begin{bmatrix} 1 & 2 \\ 0 & 1 \end{bmatrix}$ dengan $X^{-1} = \begin{bmatrix} 1 & -2 \\ 0 & 1 \end{bmatrix}$.
 
 $$
-M^{10} = X \begin{bmatrix} 3^{10} & 0 \\ 0 & 4^{10} \end{bmatrix} X^{-1} = \begin{bmatrix} 1 & 2 \\ 0 & 1 \end{bmatrix} \begin{bmatrix} 59049 & 0 \\ 0 & 1048576 \end{bmatrix} \begin{bmatrix} 1 & -2 \\ 0 & 1 \end{bmatrix}
-$$
-
-$$
-= \begin{bmatrix} 59049 & 2(1048576) \\ 0 & 1048576 \end{bmatrix} \begin{bmatrix} 1 & -2 \\ 0 & 1 \end{bmatrix} = \begin{bmatrix} 59049 & 2097152 - 118098 \\ 0 & 1048576 \end{bmatrix} = \begin{bmatrix} 59049 & 1979054 \\ 0 & 1048576 \end{bmatrix}
+\begin{aligned}
+M^{10} &= X \begin{bmatrix} 3^{10} & 0 \\ 0 & 4^{10} \end{bmatrix} X^{-1} = \begin{bmatrix} 1 & 2 \\ 0 & 1 \end{bmatrix} \begin{bmatrix} 59049 & 0 \\ 0 & 1048576 \end{bmatrix} \begin{bmatrix} 1 & -2 \\ 0 & 1 \end{bmatrix} \\
+&= \begin{bmatrix} 59049 & 2(1048576) \\ 0 & 1048576 \end{bmatrix} \begin{bmatrix} 1 & -2 \\ 0 & 1 \end{bmatrix} = \begin{bmatrix} 59049 & 2097152 - 118098 \\ 0 & 1048576 \end{bmatrix} = \begin{bmatrix} 59049 & 1979054 \\ 0 & 1048576 \end{bmatrix}
+\end{aligned}
 $$
 
 2. **Matriks $N$**:

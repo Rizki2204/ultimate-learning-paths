@@ -52,19 +52,19 @@ $$
 Jelaskan intuisi geometris dari kondisi kelonggaran komplementer (*Complementary Slackness*):
 
 $$
-\lambda_i g_i(x^st) = 0, \quad \lambda_i \ge 0
+\lambda_i g_i(x^\ast) = 0, \quad \lambda_i \ge 0
 $$
 
-Mengapa mustahil bagi $\lambda_i > 0$ dan $g_i(x^st) < 0$ terjadi secara bersamaan pada titik optimal $x^st$?
+Mengapa mustahil bagi $\lambda_i > 0$ dan $g_i(x^\ast) < 0$ terjadi secara bersamaan pada titik optimal $x^\ast$?
 
 <details>
 <summary><b>🔍 Buka Solusi Sokratik & Analisis Mental Model</b></summary>
 
 **Analisis Geometris Pengali Lagrange**:
 1. **Dua Keadaan Pembatas Pertidaksamaan pada Titik Optimum**:
-   - **Kasus 1: Pembatas Tidak Aktif (*Inactive Constraint*)**: Titik optimum $x^st$ berada di dalam interior daerah layak (*feasible region*), sehingga $g_i(x^st) < 0$. Pembatas ini tidak menghalangi $f(x)$ untuk turun lebih jauh di sekitarnya. Dengan kata lain, jika pembatas ini dihapus dari persoalan, titik minimum $x^st$ tidak akan bergeser sama sekali. Karena pembatas tidak memberikan gaya penahan, pengali Lagrange-nya harus bernilai nol: $\lambda_i = 0$.
-   - **Kasus 2: Pembatas Aktif (*Active / Binding Constraint*)**: Titik optimum $x^st$ tertahan persis pada batas permukaan layak, sehingga $g_i(x^st) = 0$. Di titik ini, gradien fungsi objektif $\nabla f(x^st)$ ingin mendorong keluar daerah layak, namun ditahan oleh gradien batas $-\nabla g_i(x^st)$. Agar kesetimbangan tercapai (stasionaritas $\nabla f(x^st) + \sum \lambda_i \nabla g_i(x^st) = 0$), pengali $\lambda_i$ harus bernilai positif ($\lambda_i > 0$).
-2. **Interpretasi Persamaan** $\lambda_i g_i(x^st) = 0$ :
+   - **Kasus 1: Pembatas Tidak Aktif (*Inactive Constraint*)**: Titik optimum $x^\ast$ berada di dalam interior daerah layak (*feasible region*), sehingga $g_i(x^\ast) < 0$. Pembatas ini tidak menghalangi $f(x)$ untuk turun lebih jauh di sekitarnya. Dengan kata lain, jika pembatas ini dihapus dari persoalan, titik minimum $x^\ast$ tidak akan bergeser sama sekali. Karena pembatas tidak memberikan gaya penahan, pengali Lagrange-nya harus bernilai nol: $\lambda_i = 0$.
+   - **Kasus 2: Pembatas Aktif (*Active / Binding Constraint*)**: Titik optimum $x^\ast$ tertahan persis pada batas permukaan layak, sehingga $g_i(x^\ast) = 0$. Di titik ini, gradien fungsi objektif $\nabla f(x^\ast)$ ingin mendorong keluar daerah layak, namun ditahan oleh gradien batas $-\nabla g_i(x^\ast)$. Agar kesetimbangan tercapai (stasionaritas $\nabla f(x^\ast) + \sum \lambda_i \nabla g_i(x^\ast) = 0$), pengali $\lambda_i$ harus bernilai positif ($\lambda_i > 0$).
+2. **Interpretasi Persamaan** $\lambda_i g_i(x^\ast) = 0$ :
    Persamaan ini menegaskan bahwa tidak ada kasus di mana pembatas yang tidak aktif ($g_i < 0$) memberikan gaya penahan ($\lambda_i > 0$). Hubungan ini adalah landasan matematis algoritma Support Vector Machine (SVM), di mana hanya vektor-vektor pendukung (*support vectors*) yang terletak persis di margin ($g_i = 0$) yang memiliki koefisien $\alpha_i > 0$, sedangkan seluruh titik data lain memiliki $\alpha_i = 0$.
 </details>
 
@@ -319,11 +319,10 @@ $$
 Bandingkan kedua persamaan:
 
 $$
-\frac{1}{2} (y - x)^T A (y - x) \ge \frac{\mu}{2} (y - x)^T I (y - x)
-$$
-
-$$
-\iff (y - x)^T (A - \mu I) (y - x) \ge 0 \quad \forall (y - x) \in \mathbb{R}^n
+\begin{aligned}
+\frac{1}{2} (y - x)^T A (y - x) &\ge \frac{\mu}{2} (y - x)^T I (y - x) \\
+&\iff (y - x)^T (A - \mu I) (y - x) \ge 0 \quad \forall (y - x) \in \mathbb{R}^n
+\end{aligned}
 $$
 
 Pernyataan di atas setara dengan menyatakan bahwa matriks $A - \mu I$ adalah semidefinit positif ($A - \mu I \succeq 0$).
@@ -796,7 +795,7 @@ Diberikan matriks berukuran $A \in \mathbb{R}^{m \times n}$ ($m \ge n$) dengan k
 <details>
 <summary>💡 Petunjuk Bertahap (Hint)</summary>
 
-- **Petunjuk 1 (Pembatalan Katastropik):** Pada CGS, jika vektor $a_1$ dan $a_2$ hampir searah, $q_2^st = a_2 - (q_1^T a_2)q_1$ menghasilkan pengurangan dua angka yang hampir persis sama. Sebagian besar bit presisi float64 musnah. Saat dinormalisasi dengan membaginya dengan bilangan sangat kecil $\lVert q_2^st \rVert$, galat pembulatan meledak ke atas.
+- **Petunjuk 1 (Pembatalan Katastropik):** Pada CGS, jika vektor $a_1$ dan $a_2$ hampir searah, $q_2^\ast = a_2 - (q_1^T a_2)q_1$ menghasilkan pengurangan dua angka yang hampir persis sama. Sebagian besar bit presisi float64 musnah. Saat dinormalisasi dengan membaginya dengan bilangan sangat kecil $\lVert q_2^\ast \rVert$, galat pembulatan meledak ke atas.
 - **Petunjuk 2 (Pembersihan Galat MGS):** Pada MGS, proyeksi dilakukan secara *in-place* terhadap sisa residual terbaru. Komponen galat yang bocor dari langkah sebelumnya secara langsung dikurangi pada proyeksi berikutnya, mencegah akumulasi kuadratik.
 - **Petunjuk 3 (Bahaya Persamaan Normal):** Mengalikan $A^T$ dengan $A$ mengkuadratkan nilai-nilai singular. Jika $\kappa(A) = 10^9$, maka $\kappa(A^T A) = 10^{18}$, yang melampaui kemampuan resolusi float64 ($10^{16}$), sehingga matriks menjadi singular numerik total.
 </details>
@@ -810,11 +809,11 @@ Tujuan faktorisasi QR adalah mendekomposisi $A = QR$, di mana $Q \in \mathbb{R}^
    Untuk setiap langkah $k = 1, 2, \dots, n$ :
 
 $$
-q_k^st = a_k - \sum_{j=1}^{k-1} r_{jk} q_j \quad \text{di mana } r_{jk} = q_j^T a_k
+q_k^\ast = a_k - \sum_{j=1}^{k-1} r_{jk} q_j \quad \text{di mana } r_{jk} = q_j^T a_k
 $$
 
 $$
-r_{kk} = \lVert q_k^st \rVert_2, \quad q_k = \frac{q_k^st}{r_{kk}}
+r_{kk} = \lVert q_k^\ast \rVert_2, \quad q_k = \frac{q_k^\ast}{r_{kk}}
 $$
 
    Perhatikan bahwa semua koefisien proyeksi $r_{jk} = q_j^T a_k$ dihitung langsung terhadap vektor input mentah $a_k$.
@@ -844,10 +843,10 @@ $$
    Pada langkah 2, vektor residual ortogonal adalah:
 
 $$
-q_2^st = a_2 - (q_1^T a_2) q_1
+q_2^\ast = a_2 - (q_1^T a_2) q_1
 $$
 
-   Karena $a_2 \approx (q_1^T a_2) q_1$, pengurangan dua bilangan besar yang hampir identik ini memicu **pembatalan katastropik (*catastrophic cancellation*)**. Sebagian besar bit mantissa signifikan musnah, menyisakan galat pembulatan floating-point $\epsilon_{\text{mach}}$. Ketika $q_2^st$ dinormalisasi dengan membaginya dengan bilangan sangat kecil $r_{22} = \lVert q_2^st \rVert_2 \approx 0$, galat pembulatan tersebut diamplifikasi secara drastis.
+   Karena $a_2 \approx (q_1^T a_2) q_1$, pengurangan dua bilangan besar yang hampir identik ini memicu **pembatalan katastropik (*catastrophic cancellation*)**. Sebagian besar bit mantissa signifikan musnah, menyisakan galat pembulatan floating-point $\epsilon_{\text{mach}}$. Ketika $q_2^\ast$ dinormalisasi dengan membaginya dengan bilangan sangat kecil $r_{22} = \lVert q_2^\ast \rVert_2 \approx 0$, galat pembulatan tersebut diamplifikasi secara drastis.
    Pada langkah berikutnya ($k = 3$), CGS menghitung proyeksi terhadap vektor $a_3$ menggunakan $q_1^T a_3$ dan $q_2^T a_3$. Karena galat pada $q_2$ tidak pernah dieliminasi dari representasi $a_3$, galat ortogonalitas $q_2^T q_3$ tidak terkendali. Björck (1967) membuktikan bahwa:
 
 $$
@@ -876,11 +875,10 @@ $$
    Perluas matriks ortogonal $Q \in \mathbb{R}^{m \times n}$ menjadi basis uniter penuh $\tilde{Q} = [Q \mid Q_\perp] \in \mathbb{R}^{m \times m}$. Karena transformasi ortogonal mempertahankan norma Euclidean ($\lVert \tilde{Q}^T y \rVert_2 = \lVert y \rVert_2$):
 
 $$
-\lVert Ax - b \rVert_2^2 = \lVert \tilde{Q}^T (QRx - b) \rVert_2^2 = \left\lVert \begin{bmatrix} Q^T \\ Q_\perp^T \end{bmatrix} (QRx - b) \right\rVert_2^2 = \left\lVert \begin{bmatrix} Rx - Q^T b \\ -Q_\perp^T b \end{bmatrix} \right\rVert_2^2
-$$
-
-$$
-= \lVert Rx - Q^T b \rVert_2^2 + \lVert Q_\perp^T b \rVert_2^2
+\begin{aligned}
+\lVert Ax - b \rVert_2^2 &= \lVert \tilde{Q}^T (QRx - b) \rVert_2^2 = \left\lVert \begin{bmatrix} Q^T \\ Q_\perp^T \end{bmatrix} (QRx - b) \right\rVert_2^2 = \left\lVert \begin{bmatrix} Rx - Q^T b \\ -Q_\perp^T b \end{bmatrix} \right\rVert_2^2 \\
+&= \lVert Rx - Q^T b \rVert_2^2 + \lVert Q_\perp^T b \rVert_2^2
+\end{aligned}
 $$
 
    Suku kedua $\lVert Q_\perp^T b \rVert_2^2$ mewakili jarak tegak lurus dari target $b$ ke subruang rentang kolom $C(A)$, yang bernilai konstan terhadap $x$.
@@ -1345,11 +1343,10 @@ Karena $L$ matriks segitiga bawah ($L_{ik} = 0$ untuk $k > i$):
 1. **Penurunan Elemen Diagonal ($i = j$)**:
 
 $$
-a_{jj} = \sum_{k=1}^{j-1} L_{jk}^2 + L_{jj}^2 \implies L_{jj}^2 = a_{jj} - \sum_{k=1}^{j-1} L_{jk}^2
-$$
-
-$$
-L_{jj} = \sqrt{a_{jj} - \sum_{k=1}^{j-1} L_{jk}^2}
+\begin{aligned}
+a_{jj} = \sum_{k=1}^{j-1} L_{jk}^2 + L_{jj}^2 &\implies L_{jj}^2 = a_{jj} - \sum_{k=1}^{j-1} L_{jk}^2 \\
+&\implies L_{jj} = \sqrt{a_{jj} - \sum_{k=1}^{j-1} L_{jk}^2}
+\end{aligned}
 $$
 
 2. **Penurunan Elemen Non-Diagonal ($i > j$)**:
@@ -1501,11 +1498,10 @@ $$
    - Tinjau dimensi irisan kedua subruang tersebut di dalam $\mathbb{R}^n$ :
 
 $$
-\dim(N(B) \cap W_{k+1}) = \dim(N(B)) + \dim(W_{k+1}) - \dim(N(B) + W_{k+1})
-$$
-
-$$
-\ge (n - k) + (k + 1) - n = 1
+\begin{aligned}
+\dim(N(B) \cap W_{k+1}) &= \dim(N(B)) + \dim(W_{k+1}) - \dim(N(B) + W_{k+1}) \\
+&\ge (n - k) + (k + 1) - n = 1
+\end{aligned}
 $$
 
    - Karena dimensi irisan minimal 1, terdapat vektor satuan $z \in N(B) \cap W_{k+1}$ sedemikian hingga $\lVert z \rVert_2 = 1$.
@@ -1519,11 +1515,7 @@ $$
    - Evaluasi aksi matriks selisih $(A - B)$ terhadap vektor uji $z$ :
 
 $$
-(A - B) z = A z - B z = A z - 0 = A z
-$$
-
-$$
-A z = A \left( \sum_{i=1}^{k+1} \alpha_i v_i \right) = \sum_{i=1}^{k+1} \alpha_i (A v_i) = \sum_{i=1}^{k+1} \alpha_i \sigma_i u_i
+(A - B) z = A z - B z = A z = A \left( \sum_{i=1}^{k+1} \alpha_i v_i \right) = \sum_{i=1}^{k+1} \alpha_i (A v_i) = \sum_{i=1}^{k+1} \alpha_i \sigma_i u_i
 $$
 
    - Hitung kuadrat norma Euclidean dari $(A - B) z$ :
@@ -1535,11 +1527,7 @@ $$
      Karena $\sigma_1 \ge \sigma_2 \ge \dots \ge \sigma_{k+1} > 0$, maka $\sigma_i^2 \ge \sigma_{k+1}^2$ untuk seluruh $i \le k+1$ :
 
 $$
-\lVert (A - B) z \rVert_2^2 \ge \sigma_{k+1}^2 \sum_{i=1}^{k+1} \alpha_i^2 = \sigma_{k+1}^2 \cdot 1 = \sigma_{k+1}^2
-$$
-
-$$
-\implies \lVert (A - B) z \rVert_2 \ge \sigma_{k+1}
+\lVert (A - B) z \rVert_2^2 \ge \sigma_{k+1}^2 \sum_{i=1}^{k+1} \alpha_i^2 = \sigma_{k+1}^2 \cdot 1 = \sigma_{k+1}^2 \implies \lVert (A - B) z \rVert_2 \ge \sigma_{k+1}
 $$
 
    - Dari definisi norma spektral matriks sebagai supremum rasio vektor:
@@ -1594,13 +1582,13 @@ $$
    Maka vektor $y$ optimal adalah:
 
 $$
-y^st = \Sigma^+ g = \Sigma^+ U^T b
+y^\ast = \Sigma^+ g = \Sigma^+ U^T b
 $$
 
    Sehingga solusi optimal unik adalah:
 
 $$
-\hat{x} = V y^st = V \Sigma^+ U^T b = A^+ b
+\hat{x} = V y^\ast = V \Sigma^+ U^T b = A^+ b
 $$
 
    Q.E.D. Solusi pseudoinverse Moore-Penrose terbukti analitis meminimalkan galat kuadrat terkecil dan memiliki norma Euclidean minimum.
@@ -1889,7 +1877,7 @@ $$
    Karena kolom $U^{(1)}$ ortonormal, $(U^{(1)})^T U^{(1)} = I_{R_1}$. Maka operasi mode-1 tereduksi menjadi identitas:
 
 $$
-= \mathcal{G} \times_1 I \times_2 U^{(2)} \times_3 U^{(3)} = \mathcal{G} \times_2 U^{(2)} \times_3 U^{(3)}
+\mathcal{G} \times_1 \left( (U^{(1)})^T U^{(1)} \right) \times_2 U^{(2)} \times_3 U^{(3)} = \mathcal{G} \times_1 I \times_2 U^{(2)} \times_3 U^{(3)} = \mathcal{G} \times_2 U^{(2)} \times_3 U^{(3)}
 $$
 
    Lanjutkan dengan mengalikan berturut-turut dengan $(U^{(2)})^T$ pada mode-2 dan $(U^{(3)})^T$ pada mode-3:

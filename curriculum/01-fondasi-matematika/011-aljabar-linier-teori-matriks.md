@@ -363,6 +363,12 @@ flowchart LR
     class VT,U opNode;
     class Sigma scaleNode;
     class y targetNode;
+
+    style InputSpace fill:#f0f9ff,stroke:#0284c7,stroke-width:1.5px,color:#0f172a;
+    style Rotation1 fill:#faf5ff,stroke:#7c3aed,stroke-width:1.5px,color:#0f172a;
+    style Stretching fill:#fffbeb,stroke:#d97706,stroke-width:1.5px,color:#0f172a;
+    style Rotation2 fill:#faf5ff,stroke:#7c3aed,stroke-width:1.5px,color:#0f172a;
+    style OutputSpace fill:#f0fdf4,stroke:#16a34a,stroke-width:1.5px,color:#0f172a;
 ```
 
 ---

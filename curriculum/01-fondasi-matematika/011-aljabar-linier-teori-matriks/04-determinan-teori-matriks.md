@@ -7,7 +7,7 @@
 ## 1. Intuisi Dasar & Motivasi dari Titik Nol
 Tautan Rujukan Kuliah: [MIT OCW 18.06 Kuliah 18: Properties of Determinants](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-18-properties-of-determinants/) | [MIT OCW 18.06 Kuliah 20: Cramer's Rule, Inverse Matrix, and Volume](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-20-cramers-rule-inverse-matrix-and-volume/) | [Georgia Tech ILA: Determinants and Volumes](https://textbooks.math.gatech.edu/ila/determinants-volumes.html) | [Immersive Math Bab 7: Determinants](https://immersivemath.com/ila/ch07_determinants/ch07.html)
 
-Selamat datang di bab determinan! Di sekolah menengah, Anda mungkin pernah diajari rumus cepat $ad - bc$ untuk matriks $2 \times 2$ atau metode garis silang diagonal (Aturan Sarrus) untuk matriks $3 \times 3$. Namun, pernahkah guru Anda menjelaskan *apa sebenarnya makna fisik dari angka determinan tersebut? Mengapa rumus $ad - bc$ bisa muncul di alam semesta?*
+Selamat datang di bab determinan! Di sekolah menengah, Anda mungkin pernah diajari rumus cepat $ad - bc$ untuk matriks $2 \times 2$ atau metode garis silang diagonal (Aturan Sarrus) untuk matriks $3 \times 3$. Namun, pernahkah guru Anda menjelaskan apa sebenarnya makna fisik dari angka determinan tersebut? Mengapa rumus $ad - bc$ bisa muncul di alam semesta?
 
 Mari kita buang jauh-jauh hafalan rumus mekanis tersebut dan membangun intuisi geometri dari titik nol mutlak.
 

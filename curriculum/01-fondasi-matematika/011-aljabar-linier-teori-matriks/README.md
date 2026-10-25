@@ -235,6 +235,10 @@ flowchart TD
     class Sub01,Sub02,Sub03,Sub04 foundation;
     class Sub05,Sub06 spectral;
     class Sub07,Sub08,Sub09 advanced;
+
+    style CoreFoundations fill:#f0f9ff,stroke:#0288d1,stroke-width:1.5px,color:#0f172a;
+    style SpectralTheory fill:#faf5ff,stroke:#7b1fa2,stroke-width:1.5px,color:#0f172a;
+    style AdvancedDecompositions fill:#f0fdf4,stroke:#388e3c,stroke-width:1.5px,color:#0f172a;
 ```
 
 ---
@@ -335,7 +339,7 @@ Modul 011 dirancang sebagai gerbang teoretis langsung menuju laboratorium rekaya
 | **Rank-1 Update & LoRA (Bab 02)**: $\Delta W = B \cdot A$ | *Low-Rank Adaptation Fine-Tuning Engine* | Melatih model bahasa raksasa (LLM) dengan hanya mengabari matriks rank rendah $r \ll d$. |
 | **Proyeksi Ortogonal (Bab 03)**: $P = Q Q^T$ | *Gram-Schmidt Latent Projection* | Menjaga stabilitas ortogonalitas representasi fitur tersembunyi (*latent feature orthogonalization*). |
 | **Norma Spektral & Bilangan Kondisi (Bab 07)**: $\kappa(A) = \frac{\sigma_{\max}}{\sigma_{\min}}$ | *Gradient Clipping & Spectral Normalization* | Mencegah ledakan gradien (*exploding gradients*) pada pelatihan jaringan saraf dalam (*deep neural networks*). |
-| **Produk Mode-$n$ Tensor (Bab 09)**: $\boldsymbol{\mathcal{X}} \times_n U$ | *Fused Multi-Head Attention Kernel* | Menghitung kontraksi tensor $Q \cdot K^T \cdot V$ dalam satu kernel GPU tunggal tanpa alokasi memori berulang (*FlashAttention pattern*). |
+| **Produk Mode**-$n$ **Tensor (Bab 09)**: $\boldsymbol{\mathcal{X}} \times_n U$ | *Fused Multi-Head Attention Kernel* | Menghitung kontraksi tensor $Q \cdot K^T \cdot V$ dalam satu kernel GPU tunggal tanpa alokasi memori berulang (*FlashAttention pattern*). |
 
 ---
 

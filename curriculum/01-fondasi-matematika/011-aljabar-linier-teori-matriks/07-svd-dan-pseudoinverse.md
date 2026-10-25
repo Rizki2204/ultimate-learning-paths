@@ -82,11 +82,10 @@ $$
 >   Karena nilai singular **wajib non-negatif**, kita tidak boleh membiarkan $-2$ berada di dalam $\Sigma$. SVD menyerap tanda minus ke dalam matriks rotasi $U$ :
 >
 > $$
-> U = \begin{bmatrix} 1 & 0 \\ 0 & -1 \end{bmatrix}, \quad \Sigma = \begin{bmatrix} 3 & 0 \\ 0 & 2 \end{bmatrix}, \quad V^T = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}
-> $$
->
-> $$
-> U \Sigma V^T = \begin{bmatrix} 1 & 0 \\ 0 & -1 \end{bmatrix} \begin{bmatrix} 3 & 0 \\ 0 & 2 \end{bmatrix} \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix} = \begin{bmatrix} 3 & 0 \\ 0 & -2 \end{bmatrix} = A
+> \begin{aligned}
+> U &= \begin{bmatrix} 1 & 0 \\ 0 & -1 \end{bmatrix}, \quad \Sigma = \begin{bmatrix} 3 & 0 \\ 0 & 2 \end{bmatrix}, \quad V^T = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix} \\
+> U \Sigma V^T &= \begin{bmatrix} 1 & 0 \\ 0 & -1 \end{bmatrix} \begin{bmatrix} 3 & 0 \\ 0 & 2 \end{bmatrix} \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix} = \begin{bmatrix} 3 & 0 \\ 0 & -2 \end{bmatrix} = A
+> \end{aligned}
 > $$
 >
 >   Nilai singular adalah $\sigma_1 = 3$ dan $\sigma_2 = 2$. Sempurna!
@@ -278,6 +277,8 @@ $$
 \lVert (A - B)\mathbf{w} \rVert_2 = \lVert A\mathbf{w} - B\mathbf{w} \rVert_2 = \lVert A\mathbf{w} \rVert_2
 $$
 
+di mana ekspansi vektor terhadap basis singular adalah:
+
 $$
 A\mathbf{w} = A \left( \sum_{i=1}^{k+1} c_i \mathbf{v}_i \right) = \sum_{i=1}^{k+1} c_i (A\mathbf{v}_i) = \sum_{i=1}^{k+1} c_i \sigma_i \mathbf{u}_i
 $$
@@ -360,11 +361,10 @@ $$
 Hitung polinomial karakteristik $\det(A A^T - \lambda I) = 0$ :
 
 $$
-\det \begin{bmatrix} 17 - \lambda & 8 \\ 8 & 17 - \lambda \end{bmatrix} = (17 - \lambda)^2 - 64 = 0
-$$
-
-$$
-(17 - \lambda)^2 = 64 \implies 17 - \lambda = \pm 8
+\begin{aligned}
+\det \begin{bmatrix} 17 - \lambda & 8 \\ 8 & 17 - \lambda \end{bmatrix} &= (17 - \lambda)^2 - 64 = 0 \\
+(17 - \lambda)^2 &= 64 \implies 17 - \lambda = \pm 8
+\end{aligned}
 $$
 
 - $\lambda_1 = 17 + 8 = 25 \implies \sigma_1 = \sqrt{25} = 5$
@@ -475,11 +475,10 @@ Rekonstruksi aljabar terbukti presisi 100%!
 ### Langkah 5: Menghitung Moore-Penrose Pseudoinverse $A^+$
 
 $$
-A^+ = \frac{1}{\sigma_1} \mathbf{v}_1 \mathbf{u}_1^T + \frac{1}{\sigma_2} \mathbf{v}_2 \mathbf{u}_2^T
-$$
-
-$$
-= \frac{1}{10} \begin{bmatrix} 1 & 1 \\ 1 & 1 \\ 0 & 0 \end{bmatrix} + \frac{1}{18} \begin{bmatrix} 1 & -1 \\ -1 & 1 \\ 4 & -4 \end{bmatrix} = \frac{1}{90} \left( 9 \begin{bmatrix} 1 & 1 \\ 1 & 1 \\ 0 & 0 \end{bmatrix} + 5 \begin{bmatrix} 1 & -1 \\ -1 & 1 \\ 4 & -4 \end{bmatrix} \right) = \frac{1}{90} \begin{bmatrix} 14 & 4 \\ 4 & 14 \\ 20 & -20 \end{bmatrix}
+\begin{aligned}
+A^+ &= \frac{1}{\sigma_1} \mathbf{v}_1 \mathbf{u}_1^T + \frac{1}{\sigma_2} \mathbf{v}_2 \mathbf{u}_2^T \\
+&= \frac{1}{10} \begin{bmatrix} 1 & 1 \\ 1 & 1 \\ 0 & 0 \end{bmatrix} + \frac{1}{18} \begin{bmatrix} 1 & -1 \\ -1 & 1 \\ 4 & -4 \end{bmatrix} = \frac{1}{90} \left( 9 \begin{bmatrix} 1 & 1 \\ 1 & 1 \\ 0 & 0 \end{bmatrix} + 5 \begin{bmatrix} 1 & -1 \\ -1 & 1 \\ 4 & -4 \end{bmatrix} \right) = \frac{1}{90} \begin{bmatrix} 14 & 4 \\ 4 & 14 \\ 20 & -20 \end{bmatrix}
+\end{aligned}
 $$
 
 Uji sifat invers kanan ($A A^+ = I_2$):
@@ -938,11 +937,7 @@ $$
    Turunan terhadap $\mathbf{x}$ disamadengankan nol:
 
 $$
-\nabla J(\mathbf{x}) = 2 A^T (A\mathbf{x} - \mathbf{b}) + 2 \alpha^2 \mathbf{x} = \mathbf{0} \implies (A^T A + \alpha^2 I)\mathbf{x} = A^T \mathbf{b}
-$$
-
-$$
-\mathbf{x}_{\text{reg}} = (A^T A + \alpha^2 I)^{-1} A^T \mathbf{b}
+\nabla J(\mathbf{x}) = 2 A^T (A\mathbf{x} - \mathbf{b}) + 2 \alpha^2 \mathbf{x} = \mathbf{0} \implies \mathbf{x}_{\text{reg}} = (A^T A + \alpha^2 I)^{-1} A^T \mathbf{b}
 $$
 
    Substitusikan SVD $A = U \Sigma V^T$ :

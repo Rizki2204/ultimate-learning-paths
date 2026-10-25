@@ -31,7 +31,7 @@ Penguasaan prinsip kognitif, penalaran first-principles, logika proposisional/pr
 | 13 | Mathematical Identities | Ekspansi deret Taylor untuk fungsi analitik f(x) di sekitar titik a dirumuskan dengan... | `tier-01::matematika` |
 | 14 | Mathematical Identities | Identitas Euler yang menghubungkan lima konstanta fundamental matematika (e, i, pi, 1... | `tier-01::matematika` |
 | 15 | Mathematical Identities | Ketidaksamaan Cauchy-Schwarz untuk dua vektor u dan v dalam ruang hasil kali dalam me... | `tier-01::matematika` |
-| 16 | Mathematical Identities | Teorema Bayes untuk probabilitas bersyarat merumuskan peluang posterior P(A\|B) sebaga... | `tier-01::matematika` |
+| 16 | Mathematical Identities | Teorema Bayes untuk probabilitas bersyarat merumuskan peluang posterior P(A \mid B) sebaga... | `tier-01::matematika` |
 | 17 | Architecture Constants | Format floating-point presisi tunggal standar IEEE 754 (float32) memiliki alokasi 32-... | `tier-01::matematika` |
 | 18 | Architecture Constants | Format floating-point presisi ganda standar IEEE 754 (float64) mengalokasikan 64 bit ... | `tier-01::matematika` |
 | 19 | Architecture Constants | Dalam format Google Bfloat16 (brain floating point), alokasi bit tetap 16 bit namun e... | `tier-01::matematika` |
@@ -310,7 +310,7 @@ Penguasaan prinsip kognitif, penalaran first-principles, logika proposisional/pr
 > Teorema Bayes untuk probabilitas bersyarat merumuskan peluang posterior P(A|B) sebagai: {{c1::P(A|B) = \frac{P(B|A) P(A)}{P(B)}}}.
 
 **Tampilan Jawaban Terbuka**:
-> Teorema Bayes untuk probabilitas bersyarat merumuskan peluang posterior P(A|B) sebagai: **[P(A|B) = \frac{P(B|A) P(A)}{P(B)]**}.
+> Teorema Bayes untuk probabilitas bersyarat merumuskan peluang posterior P(A|B) sebagai: **[P(A|B) = \frac{P(B|A) P(A)}{P(B)}]**.
 
 **Penjelasan Ekstra & Konteks Teknis**:
 > P(A) adalah prior, P(B|A) adalah likelihood, P(B) adalah evidence (marginal likelihood), dan P(A|B) adalah posterior. Ini adalah landasan filter Bayesian, estimasi MAP, dan inferensi probabilistik.

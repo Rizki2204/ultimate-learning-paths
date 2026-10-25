@@ -6,7 +6,7 @@
 
 Selamat datang di **Bab 09: Aljabar Multilinier, Matrisasi & Dekomposisi Tensor**. Bab ini merupakan puncak dan batas terdepan (*frontier*) dari keseluruhan materi Aljabar Linier dan Teori Matriks pada Topik 011. Di sinilah kita melangkah melampaui dunia matriks dua dimensi konvensional menuju struktur data multidimensi yang menggerakkan sistem kecerdasan artifisial, kompresi model *Deep Learning*, pemrosesan sinyal biomedis, dan analisis jaringan berskala petabyte.
 
-Melalui bab ini, Anda akan dipandu memahami bagaimana tensor merepresentasikan data berdimensi jamak tanpa merusak korelasi intrinsiknya, bagaimana membuka lipatan tensor menjadi matriks (*unfolding*), bagaimana melakukan perkalian multi-arah (*mode-$n$ products*), hingga menguasai dua arsitektur dekomposisi multilinier paling masyhur di dunia: **Dekomposisi CP (CANDECOMP/PARAFAC)** dan **Dekomposisi Tucker / Higher-Order SVD (HOSVD)**.
+Melalui bab ini, Anda akan dipandu memahami bagaimana tensor merepresentasikan data berdimensi jamak tanpa merusak korelasi intrinsiknya, bagaimana membuka lipatan tensor menjadi matriks (*unfolding*), bagaimana melakukan perkalian multi-arah (*mode*-$n$ *products*), hingga menguasai dua arsitektur dekomposisi multilinier paling masyhur di dunia: **Dekomposisi CP (CANDECOMP/PARAFAC)** dan **Dekomposisi Tucker / Higher-Order SVD (HOSVD)**.
 
 ---
 
@@ -76,7 +76,7 @@ Dekomposisi tensor memperluas konsep faktorisasi matriks (seperti SVD $A = U \Si
 ### 2.1 Definisi Formal Tensor Orde-$N$ & Anatomi Geometris
 Tautan Pendukung: [SIAM Review 2009: Section 2 - Tensor Basics](https://arxiv.org/abs/0904.3131) | [TensorLy Basics Guide](https://tensorly.org/stable/user_guide/tensor_basics.html)
 
-Sebuah **tensor riil orde-$N$** (juga disebut tensor berdimensi $N$ atau *way-$N$ tensor*) adalah elemen dari ruang hasil kali tensor ruang-ruang vektor:
+Sebuah **tensor riil orde-$N$** (juga disebut tensor berdimensi $N$ atau tensor *way*-$N$) adalah elemen dari ruang hasil kali tensor ruang-ruang vektor:
 
 $$
 \boldsymbol{\mathcal{X}} \in \mathbb{R}^{I_1 \times I_2 \times \dots \times I_N}
@@ -313,15 +313,11 @@ di mana:
 #### Bentuk Matrisasi CP via Khatri-Rao:
 
 $$
-X_{(1)} \approx A \Lambda (C \odot B)^T
-$$
-
-$$
-X_{(2)} \approx B \Lambda (C \odot A)^T
-$$
-
-$$
-X_{(3)} \approx C \Lambda (B \odot A)^T
+\begin{aligned}
+X_{(1)} &\approx A \Lambda (C \odot B)^T \\
+X_{(2)} &\approx B \Lambda (C \odot A)^T \\
+X_{(3)} &\approx C \Lambda (B \odot A)^T
+\end{aligned}
 $$
 
 #### Algoritma Alternating Least Squares (ALS) untuk Dekomposisi CP:
@@ -514,11 +510,10 @@ Perhatikan jumlah nilai eigen: $\text{trace} = 66 + 138 = 204 = \lVert \boldsymb
 Akar-akar kuadratik:
 
 $$
-\lambda_1 = \frac{204 + \sqrt{204^2 - 4(272)}}{2} = \frac{204 + \sqrt{40528}}{2} \approx \frac{204 + 201{,}3156}{2} \approx \mathbf{202{,}6578}
-$$
-
-$$
-\lambda_2 = \frac{204 - 201{,}3156}{2} \approx \mathbf{1{,}3422}
+\begin{aligned}
+\lambda_1 &= \frac{204 + \sqrt{204^2 - 4(272)}}{2} = \frac{204 + \sqrt{40528}}{2} \approx \frac{204 + 201{,}3156}{2} \approx \mathbf{202{,}6578} \\
+\lambda_2 &= \frac{204 - 201{,}3156}{2} \approx \mathbf{1{,}3422}
+\end{aligned}
 $$
 
 Nilai singular mode-1:
@@ -944,11 +939,10 @@ $$
 2. Dalam bentuk irisan frontal, setiap irisan merupakan kombinasi linier dari dua matriks rank-1 $\mathbf{a}_1 \mathbf{b}_1^T$ dan $\mathbf{a}_2 \mathbf{b}_2^T$ :
 
 $$
-W_{::1} = c_{11} (\mathbf{a}_1 \mathbf{b}_1^T) + c_{21} (\mathbf{a}_2 \mathbf{b}_2^T)
-$$
-
-$$
-W_{::2} = c_{12} (\mathbf{a}_1 \mathbf{b}_1^T) + c_{22} (\mathbf{a}_2 \mathbf{b}_2^T)
+\begin{aligned}
+W_{::1} &= c_{11} (\mathbf{a}_1 \mathbf{b}_1^T) + c_{21} (\mathbf{a}_2 \mathbf{b}_2^T) \\
+W_{::2} &= c_{12} (\mathbf{a}_1 \mathbf{b}_1^T) + c_{22} (\mathbf{a}_2 \mathbf{b}_2^T)
+\end{aligned}
 $$
 
    Artinya, seluruh irisan frontal dari $\boldsymbol{\mathcal{W}}$ berada di dalam subruang matriks berdimensi 2 yang direntang oleh $\{\mathbf{a}_1 \mathbf{b}_1^T, \mathbf{a}_2 \mathbf{b}_2^T\}$.

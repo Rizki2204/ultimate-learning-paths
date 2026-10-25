@@ -153,7 +153,7 @@ $$
 x_1 \begin{bmatrix} 2 \\ 1 \end{bmatrix} + x_2 \begin{bmatrix} 1 \\ 2 \end{bmatrix} = \begin{bmatrix} 25.000 \\ 20.000 \end{bmatrix}
 $$
 
-   Pertanyaannya berubah menjadi: *Berapa kali kita harus meregangkan kolom 1, lalu menjumlahkannya dengan regangan kolom 2, agar ujung vektornya tepat mendarat di target $\mathbf{b}$?*
+   Pertanyaannya berubah menjadi: Berapa kali kita harus meregangkan kolom 1, lalu menjumlahkannya dengan regangan kolom 2, agar ujung vektornya tepat mendarat di target $\mathbf{b}$?
    Pandangan kolom inilah yang menyatukan aljabar linier dengan konsep ruang rentang (*span*), ruang kolom $C(A)$, dan kebebasan linier.
 
 ---
@@ -328,7 +328,7 @@ Di sini, $a_{jj}^{(j-1)}$ disebut sebagai **elemen pivot** (*pivot element*). Sy
 
 ### 2.3 Teorema Faktorisasi Matriks Segitiga $A = LU$
 **Teorema 1.1 (Faktorisasi Segitiga LU Tanpa Pivoting)**:
-*Jika matriks bujursangkar $A \in \mathbb{R}^{n \times n}$ dapat direduksi menjadi matriks eselon segitiga atas $U$ melalui eliminasi Gaussian tanpa pertukaran baris sama sekali, maka terdapat faktorisasi tunggal $A = LU$, di mana $L$ adalah matriks segitiga bawah dengan entri diagonal utama bernilai 1 (*unit lower triangular*) dan $U$ adalah matriks segitiga atas dengan entri diagonal berupa elemen pivot.*
+Jika matriks bujursangkar $A \in \mathbb{R}^{n \times n}$ dapat direduksi menjadi matriks eselon segitiga atas $U$ melalui eliminasi Gaussian tanpa pertukaran baris sama sekali, maka terdapat faktorisasi tunggal $A = LU$, di mana $L$ adalah matriks segitiga bawah dengan entri diagonal utama bernilai 1 (*unit lower triangular*) dan $U$ adalah matriks segitiga atas dengan entri diagonal berupa elemen pivot.
 
 **Pembuktian Lengkap Langkah-demi-Langkah**:
 Misalkan proses eliminasi Gaussian membutuhkan eliminasi bertahap dari kolom $j = 1$ hingga $n-1$.

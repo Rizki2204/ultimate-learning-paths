@@ -54,11 +54,10 @@ $$
 >   Misalkan $A = \begin{bmatrix} a & b \\ b & c \end{bmatrix}$ dan $\mathbf{x} = \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}$.
 >
 > $$
-> \mathbf{x}^T A \mathbf{x} = \begin{bmatrix} x_1 & x_2 \end{bmatrix} \begin{bmatrix} a & b \\ b & c \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} x_1 & x_2 \end{bmatrix} \begin{bmatrix} a x_1 + b x_2 \\ b x_1 + c x_2 \end{bmatrix}
-> $$
->
-> $$
-> = x_1(a x_1 + b x_2) + x_2(b x_1 + c x_2) = a x_1^2 + 2b x_1 x_2 + c x_2^2
+> \begin{aligned}
+> \mathbf{x}^T A \mathbf{x} &= \begin{bmatrix} x_1 & x_2 \end{bmatrix} \begin{bmatrix} a & b \\ b & c \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} x_1 & x_2 \end{bmatrix} \begin{bmatrix} a x_1 + b x_2 \\ b x_1 + c x_2 \end{bmatrix} \\
+> &= x_1(a x_1 + b x_2) + x_2(b x_1 + c x_2) = a x_1^2 + 2b x_1 x_2 + c x_2^2
+> \end{aligned}
 > $$
 >
 >   Perhatikan bahwa suku silang $x_1 x_2$ digabungkan menjadi satu dengan koefisien $2b$ karena sifat simetri $a_{12} = a_{21} = b$.
@@ -88,15 +87,11 @@ $$
 Tambahkan dan kurangkan $\left(\frac{1}{2} x_2\right)^2 = \frac{1}{4} x_2^2$ di dalam tanda kurung:
 
 $$
-q(x_1, x_2) = 4 \left( x_1^2 + x_1 x_2 + \frac{1}{4} x_2^2 \right) + 10x_2^2 - 4\left(\frac{1}{4} x_2^2\right)
-$$
-
-$$
-= 4 \left( x_1 + \frac{1}{2} x_2 \right)^2 + (10 - 1) x_2^2
-$$
-
-$$
-= 4 \left( x_1 + \frac{1}{2} x_2 \right)^2 + 9 x_2^2
+\begin{aligned}
+q(x_1, x_2) &= 4 \left( x_1^2 + x_1 x_2 + \frac{1}{4} x_2^2 \right) + 10x_2^2 - 4\left(\frac{1}{4} x_2^2\right) \\
+&= 4 \left( x_1 + \frac{1}{2} x_2 \right)^2 + (10 - 1) x_2^2 \\
+&= 4 \left( x_1 + \frac{1}{2} x_2 \right)^2 + 9 x_2^2
+\end{aligned}
 $$
 
 > **🌉 Jembatan Logika — Penyatuan Spektakuler Pivot Gauss dan Cholesky:**
