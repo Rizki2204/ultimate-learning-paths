@@ -3010,3 +3010,452 @@ Akar sebenarnya adalah $r \approx 1{,}67169988$. Hanya dalam 2 langkah, tebakan 
    Algoritma selalu memelihara interval kurung $[a, b]$ di mana akar dijamin berada ($f(a) \cdot f(b) < 0$).
    Pada setiap langkah, ia mencoba melakukan interpolasi kuadratik terbalik atau langkah sekan/Newton. Namun jika langkah tersebut melompat ke luar interval kurung atau laju konvergensinya melambat, algoritma otomatis beralih (*fallback*) ke langkah Biseksi. Metode Brent menjamin konvergensi 100% stabil pada semua fungsi kontinu di pustaka standar seperti `scipy.optimize.brentq`.
 </details>
+
+---
+
+## Modul 014: Kalkulus Multivariabel & Geometri Vektor
+
+Bagian ini menyajikan rangkaian latihan diagnostik Sokratik mendalam yang disinkronkan secara presisi dengan silabus komprehensif pada [Modul 014: Kalkulus Multivariabel & Geometri Vektor](../curriculum/01-fondasi-matematika/014-kalkulus-multivariabel-vektor.md). Setiap butir soal menguji batas pemahaman intuisi geometris dimensi banyak, topologi ruang $\mathbb{R}^n$, gradien, matriks Jacobian, matriks Hessian, kondisi KKT, integral lipat, serta trilogi Teorema Green, Stokes, dan Divergensi Gauss dari prinsip pertama.
+
+---
+
+### Soal 014.1: Topologi Ruang Vektor $\mathbb{R}^n$, Kurva Level & Uji Dua Jalur Limit
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Mengapa menguji limit fungsi multivariabel pada ribuan garis lurus tidak pernah cukup untuk membuktikan keberadaan limit, dan bagaimana membuktikan secara analitis bahwa limit di titik asal tidak ada?
+
+Tinjau fungsi dua variabel berikut yang didefinisikan pada $\mathbb{R}^2 \setminus \{(0, 0)\}$:
+$$f(x, y) = \frac{x y^2}{x^2 + y^4}$$
+1. Hitunglah limit dari $f(x, y)$ saat $(x, y) \to (0, 0)$ di sepanjang sembarang garis lurus yang melalui titik asal: $y = kx$ untuk sembarang kemiringan $k \in \mathbb{R}$.
+2. Hitunglah limit dari $f(x, y)$ saat $(x, y) \to (0, 0)$ di sepanjang kurva parabola $x = k y^2$.
+3. Berdasarkan prinsip topologi ruang metrik Euclidean, simpulkan keberadaan $\lim_{(x, y) \to (0, 0)} f(x, y)$ dan jelaskan mengapa fenomena ini terjadi secara geometris!
+
+<details>
+<summary>💡 Petunjuk Sokratik</summary>
+Perhatikan derajat variabel pada penyebut: suku $x^2$ berderajat 2 dan suku $y^4$ berderajat 4. Hubungan kuadratik $x = y^2$ membuat kedua suku penyebut memiliki derajat homogen yang sama! Uji apakah hasil limit di sepanjang parabola bergantung pada konstanta proporsionalitas.
+</details>
+
+<details>
+<summary>✅ Solusi Aksiomatik & Pembahasan Lengkap</summary>
+
+**Langkah 1: Uji Pendekatan Sepanjang Garis Lurus $y = kx$**
+Substitusikan $y = kx$ ke dalam fungsi $f(x, y)$:
+$$f(x, kx) = \frac{x (kx)^2}{x^2 + (kx)^4} = \frac{k^2 x^3}{x^2 + k^4 x^4} = \frac{k^2 x}{1 + k^4 x^2}$$
+Ambil limit saat $x \to 0$:
+$$\lim_{x \to 0} \frac{k^2 x}{1 + k^4 x^2} = \frac{0}{1 + 0} = 0$$
+Untuk garis vertikal $x = 0$ ($y \neq 0$): $f(0, y) = \frac{0}{y^4} = 0 \implies \lim_{y \to 0} 0 = 0$.
+Hasil ini menunjukkan bahwa di sepanjang **setiap garis lurus mana pun di alam semesta** yang melintasi titik asal, nilai limit selalu bernilai $0$.
+
+**Langkah 2: Uji Pendekatan Sepanjang Kurva Parabola $x = k y^2$**
+Sekarang dekati titik asal di sepanjang kurva parabola simetris $x = k y^2$:
+$$f(k y^2, y) = \frac{(k y^2) y^2}{(k y^2)^2 + y^4} = \frac{k y^4}{k^2 y^4 + y^4} = \frac{k y^4}{(k^2 + 1) y^4} = \frac{k}{k^2 + 1}$$
+Ambil limit saat $y \to 0$:
+$$\lim_{y \to 0} f(k y^2, y) = \frac{k}{k^2 + 1}$$
+Nilai limit ini **secara mutlak bergantung pada pemilihan parabola $k$**:
+- Jika mendekati lewat parabola standar $x = y^2$ ($k = 1$): limit bernilai $\frac{1}{1 + 1} = \frac{1}{2}$.
+- Jika mendekati lewat parabola terbalik $x = -y^2$ ($k = -1$): limit bernilai $\frac{-1}{1 + 1} = -\frac{1}{2}$.
+- Jika mendekati lewat parabola landai $x = 2y^2$ ($k = 2$): limit bernilai $\frac{2}{4 + 1} = \frac{2}{5}$.
+
+**Langkah 3: Kesimpulan Topologis & Uji Dua Jalur**
+Berdasarkan **Teorema Uji Dua Jalur (Two-Path Test)**: Jika terdapat setidaknya dua lintasan kontinu berbeda yang menghasilkan nilai limit berbeda saat mendekati titik yang sama, maka limit simultan multivariabel:
+$$\lim_{(x, y) \to (0, 0)} \frac{x y^2}{x^2 + y^4} \quad \text{TIDAK ADA!}$$
+Secara geometris, permukaan grafik fungsi ini memiliki punggungan dan lembah terpelintir di dekat titik asal: kurva level memancar rapat dari titik asal dengan ketinggian berbeda-beda, sehingga tidak ada nilai ketinggian tunggal yang konsisten di dalam sembarang bola lingkungan buka $\mathcal{B}_\delta(0, 0)$.
+</details>
+
+---
+
+### Soal 014.2: Gradien, Bidang Singgung & Laju Kenaikan Maksimal
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Bagaimana memprogram kompas pendakian tercepat pada medan permukaan melengkung dan mencari arah mata angin yang menghasilkan nol perubahan elevasi?
+
+Diberikan fungsi elevasi medan pegunungan $z = f(x, y) = 12 - 2x^2 - 3y^2$ pada titik pengamatan $P(1, 2)$.
+1. Tentukan vektor gradien $\nabla f(1, 2)$ dan hitung laju kenaikan maksimum di titik tersebut.
+2. Tentukan persamaan bidang singgung (*tangent plane*) terhadap permukaan di titik $P(1, 2, f(1, 2))$.
+3. Carilah sebuah vektor satuan $\mathbf{u}$ sedemikian rupa sehingga turunan berarah $D_{\mathbf{u}} f(1, 2) = 0$ (arah kontur mendatar tanpa perubahan elevasi).
+
+<details>
+<summary>💡 Petunjuk Sokratik</summary>
+Ingat bahwa turunan berarah adalah perkalian titik $D_{\mathbf{u}} f = \nabla f \cdot \mathbf{u} = \|\nabla f\| \cos\theta$. Laju maksimum terjadi saat $\cos\theta = 1$ (searah gradien), dan laju nol terjadi saat $\cos\theta = 0$ (tegak lurus gradien).
+</details>
+
+<details>
+<summary>✅ Solusi Aksiomatik & Pembahasan Lengkap</summary>
+
+**Langkah 1: Menghitung Gradien dan Laju Kenaikan Maksimum**
+Turunan parsial:
+$$\frac{\partial f}{\partial x} = -4x \implies f_x(1, 2) = -4(1) = -4$$
+$$\frac{\partial f}{\partial y} = -6y \implies f_y(1, 2) = -6(2) = -12$$
+Maka vektor gradien di titik $P$ adalah:
+$$\nabla f(1, 2) = (-4)\mathbf{i} + (-12)\mathbf{j} = (-4, -12)$$
+Laju kenaikan maksimum adalah magnitudo dari gradien:
+$$\|\nabla f(1, 2)\| = \sqrt{(-4)^2 + (-12)^2} = \sqrt{16 + 144} = \sqrt{160} = 4\sqrt{10} \approx 12{,}649$$
+Arah pendakian paling terjal adalah vektor satuan $\hat{\mathbf{u}}_{\max} = \frac{1}{\sqrt{10}}(-\mathbf{i} - 3\mathbf{j})$.
+
+**Langkah 2: Menentukan Persamaan Bidang Singgung**
+Nilai ketinggian di titik $P$:
+$$z_0 = f(1, 2) = 12 - 2(1)^2 - 3(2)^2 = 12 - 2 - 12 = -2$$
+Persamaan bidang singgung di $(x_0, y_0, z_0) = (1, 2, -2)$:
+$$z - z_0 = f_x(x_0, y_0)(x - x_0) + f_y(x_0, y_0)(y - y_0)$$
+$$z - (-2) = -4(x - 1) - 12(y - 2)$$
+$$z + 2 = -4x + 4 - 12y + 24 \implies 4x + 12y + z = 26$$
+
+**Langkah 3: Menentukan Arah Kontur Mendatar ($D_{\mathbf{u}} f = 0$)**
+Turunan berarah bernilai nol jika dan hanya jika vektor satuan $\mathbf{u} = (u_x, u_y)$ tegak lurus (*ortogonal*) terhadap vektor gradien $\nabla f(1, 2) = (-4, -12)$:
+$$\nabla f \cdot \mathbf{u} = -4 u_x - 12 u_y = 0 \implies u_x = -3 u_y$$
+Karena $\mathbf{u}$ harus merupakan vektor satuan ($u_x^2 + u_y^2 = 1$):
+$$(-3u_y)^2 + u_y^2 = 1 \implies 10 u_y^2 = 1 \implies u_y = \pm \frac{1}{\sqrt{10}}$$
+Jika $u_y = \frac{1}{\sqrt{10}}$, maka $u_x = -\frac{3}{\sqrt{10}}$.
+Vektor satuan arah kontur mendatar adalah $\mathbf{u} = \left( -\frac{3}{\sqrt{10}}, \frac{1}{\sqrt{10}} \right)$ atau kebalikannya $\left( \frac{3}{\sqrt{10}}, -\frac{1}{\sqrt{10}} \right)$. Bergerak ke arah ini menyusuri garis kontur ketinggian konstan!
+</details>
+
+---
+
+### Soal 014.3: Matriks Jacobian, Diferensial Total & Aturan Rantai Multivariabel
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Bagaimana merumuskan turunan linear terbaik dari transformasi koordinat polar ke kartesius dan membuktikan aturan rantai ranting turunan secara aljabar matriks?
+
+Diberikan pemetaan fungsi bernilai vektor $\mathbf{f}: \mathbb{R}^2 \to \mathbb{R}^2$ yang merepresentasikan konversi koordinat polar ke kartesius:
+$$x(r, \theta) = r \cos\theta, \quad y(r, \theta) = r \sin\theta$$
+dan sebuah fungsi medan skalar temperatur pada bidang kartesius $T(x, y) = x^2 + 2y^2$.
+1. Tentukan Matriks Jacobian $\mathbf{J}_{\mathbf{f}}(r, \theta)$ dari transformasi koordinat dan hitung determinannya $\det(\mathbf{J}_{\mathbf{f}})$.
+2. Gunakan Aturan Rantai Multivariabel dalam format perkalian matriks untuk menghitung laju perubahan temperatur $\frac{\partial T}{\partial r}$ dan $\frac{\partial T}{\partial \theta}$.
+3. Evaluasi diferensial total $dT$ pada titik $(r, \theta) = (2, \pi/4)$ jika terdapat perturbasi $dr = 0{,}02$ dan $d\theta = -0{,}01\text{ rad}$.
+
+<details>
+<summary>💡 Petunjuk Sokratik</summary>
+Matriks Jacobian adalah matriks turunan parsial baris fungsi kolom input. Aturan rantai matriks dinyatakan sebagai perkalian baris gradien kartesius $\nabla T$ dengan matriks Jacobian transformasi: $\nabla_{(r, \theta)} T = \nabla_{(x, y)} T \cdot \mathbf{J}_{\mathbf{f}}$.
+</details>
+
+<details>
+<summary>✅ Solusi Aksiomatik & Pembahasan Lengkap</summary>
+
+**Langkah 1: Matriks Jacobian & Determinan**
+Fungsi komponen: $f_1(r, \theta) = r\cos\theta$ dan $f_2(r, \theta) = r\sin\theta$.
+Matriks Jacobian $2 \times 2$:
+$$\mathbf{J} = \begin{bmatrix} \frac{\partial x}{\partial r} & \frac{\partial x}{\partial \theta} \\ \frac{\partial y}{\partial r} & \frac{\partial y}{\partial \theta} \end{bmatrix} = \begin{bmatrix} \cos\theta & -r\sin\theta \\ \sin\theta & r\cos\theta \end{bmatrix}$$
+Determinan Jacobian:
+$$\det(\mathbf{J}) = (\cos\theta)(r\cos\theta) - (-r\sin\theta)(\sin\theta) = r\cos^2\theta + r\sin^2\theta = r(\cos^2\theta + \sin^2\theta) = r$$
+
+**Langkah 2: Aturan Rantai Multivariabel Matriks**
+Turunan temperatur terhadap $(x, y)$:
+$$\nabla_{(x, y)} T = \begin{bmatrix} \frac{\partial T}{\partial x} & \frac{\partial T}{\partial y} \end{bmatrix} = \begin{bmatrix} 2x & 4y \end{bmatrix}$$
+Berdasarkan aturan rantai matriks:
+$$\begin{bmatrix} \frac{\partial T}{\partial r} & \frac{\partial T}{\partial \theta} \end{bmatrix} = \begin{bmatrix} 2x & 4y \end{bmatrix} \begin{bmatrix} \cos\theta & -r\sin\theta \\ \sin\theta & r\cos\theta \end{bmatrix}$$
+$$\frac{\partial T}{\partial r} = 2x\cos\theta + 4y\sin\theta = 2(r\cos\theta)\cos\theta + 4(r\sin\theta)\sin\theta = 2r\cos^2\theta + 4r\sin^2\theta$$
+$$\frac{\partial T}{\partial \theta} = 2x(-r\sin\theta) + 4y(r\cos\theta) = -2r^2\sin\theta\cos\theta + 4r^2\sin\theta\cos\theta = 2r^2\sin\theta\cos\theta = r^2\sin(2\theta)$$
+
+**Langkah 3: Evaluasi Diferensial Total $dT$**
+Pada $(r, \theta) = (2, \pi/4)$:
+$$\frac{\partial T}{\partial r} = 2(2)\left(\frac{1}{\sqrt{2}}\right)^2 + 4(2)\left(\frac{1}{\sqrt{2}}\right)^2 = 4\left(\frac{1}{2}\right) + 8\left(\frac{1}{2}\right) = 2 + 4 = 6$$
+$$\frac{\partial T}{\partial \theta} = (2^2)\sin\left(2 \times \frac{\pi}{4}\right) = 4\sin\left(\frac{\pi}{2}\right) = 4(1) = 4$$
+Diferensial total:
+$$dT = \frac{\partial T}{\partial r} dr + \frac{\partial T}{\partial \theta} d\theta$$
+Substitusikan $dr = 0{,}02$ dan $d\theta = -0{,}01$:
+$$dT = 6(0{,}02) + 4(-0{,}01) = 0{,}12 - 0{,}04 = +0{,}08$$
+Temperatur bertambah sekitar $0{,}08$ satuan akibat kombinasi kedua pergeseran tersebut.
+</details>
+
+---
+
+### Soal 014.4: Matriks Hessian, Nilai Eigen Spektral & Titik Pelana
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Bagaimana membedakan dasar lembah mangkok dari celah pelana kuda dengan menganalisis nilai eigen matriks kelengkungan orde dua?
+
+Tinjau fungsi dua variabel $f(x, y) = x^3 + y^3 - 3xy$.
+1. Tentukan seluruh titik kritis stasioner dari fungsi tersebut di mana $\nabla f(x, y) = \mathbf{0}$.
+2. Bentuklah matriks Hessian $\mathbf{H}(x, y)$ dan hitung diskriminan $D = f_{xx}f_{yy} - (f_{xy})^2$ pada setiap titik kritis.
+3. Tentukan nilai-nilai eigen dari matriks Hessian pada setiap titik kritis dan klasifikasikan apakah masing-masing merupakan Minimum Lokal, Maksimum Lokal, atau Titik Pelana (*Saddle Point*)!
+
+<details>
+<summary>💡 Petunjuk Sokratik</summary>
+Titik kritis stasioner diperoleh dari sistem persamaan simultan $f_x = 0$ dan $f_y = 0$. Pada titik kritis, jika determinan Hessian $D < 0$, nilai eigen berlawanan tanda $\implies$ Titik Pelana. Jika $D > 0$ dan $f_{xx} > 0$, kedua nilai eigen positif $\implies$ Minimum Lokal.
+</details>
+
+<details>
+<summary>✅ Solusi Aksiomatik & Pembahasan Lengkap</summary>
+
+**Langkah 1: Menentukan Titik Kritis Stasioner**
+Turunan parsial pertama:
+$$f_x = 3x^2 - 3y = 0 \implies y = x^2$$
+$$f_y = 3y^2 - 3x = 0 \implies x = y^2$$
+Substitusikan $y = x^2$ ke dalam persamaan kedua:
+$$x = (x^2)^2 = x^4 \implies x^4 - x = 0 \implies x(x^3 - 1) = 0$$
+Akar-akar riil: $x = 0$ atau $x = 1$.
+- Jika $x = 0 \implies y = 0^2 = 0$. Titik stasioner pertama: $(0, 0)$.
+- Jika $x = 1 \implies y = 1^2 = 1$. Titik stasioner kedua: $(1, 1)$.
+
+**Langkah 2: Pembentukan Matriks Hessian**
+Turunan parsial kedua:
+$$f_{xx} = 6x, \quad f_{yy} = 6y, \quad f_{xy} = f_{yx} = -3$$
+Matriks Hessian simetris:
+$$\mathbf{H}(x, y) = \begin{bmatrix} 6x & -3 \\ -3 & 6y \end{bmatrix}$$
+Diskriminan Hessian: $D(x, y) = \det(\mathbf{H}) = (6x)(6y) - (-3)^2 = 36xy - 9$.
+
+**Langkah 3: Analisis Spektral & Klasifikasi Titik Kritis**
+1. **Pada Titik Kritis $P_1(0, 0)$**:
+   $$\mathbf{H}(0, 0) = \begin{bmatrix} 0 & -3 \\ -3 & 0 \end{bmatrix}$$
+   Determinan: $D = 0 - 9 = -9 < 0$.
+   Persamaan karakteristik nilai eigen: $\det(\mathbf{H} - \lambda \mathbf{I}) = \lambda^2 - 9 = 0 \implies \lambda_1 = +3, \, \lambda_2 = -3$.
+   Karena terdapat satu nilai eigen positif dan satu nilai eigen negatif, kelengkungan melengkung ke atas pada satu arah dan melengkung ke bawah pada arah lainnya.
+   **Kesimpulan**: Titik $(0, 0)$ adalah **Titik Pelana (Saddle Point)**!
+
+2. **Pada Titik Kritis $P_2(1, 1)$**:
+   $$\mathbf{H}(1, 1) = \begin{bmatrix} 6 & -3 \\ -3 & 6 \end{bmatrix}$$
+   Determinan: $D = (6)(6) - (-3)^2 = 36 - 9 = 27 > 0$.
+   Karena $D > 0$ dan $f_{xx} = 6 > 0$, matriks Hessian definit positif.
+   Persamaan karakteristik nilai eigen:
+   $$\det \begin{bmatrix} 6 - \lambda & -3 \\ -3 & 6 - \lambda \end{bmatrix} = (6 - \lambda)^2 - 9 = 0 \implies 6 - \lambda = \pm 3$$
+   $$\lambda_1 = 6 - 3 = +3, \quad \lambda_2 = 6 + 3 = +9$$
+   Kedua nilai eigen bertanda strictly positif ($\lambda_1, \lambda_2 > 0$).
+   **Kesimpulan**: Titik $(1, 1)$ adalah **Minimum Lokal Kuat (Strict Local Minimum)** dengan nilai fungsi $f(1, 1) = 1^3 + 1^3 - 3(1)(1) = 2 - 3 = -1$.
+</details>
+
+---
+
+### Soal 014.5: Optimasi Berpembatas, Pengali Lagrange & Kondisi KKT
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Bagaimana membagi alokasi sumber daya secara matematis agar biaya minimum tercapai tanpa melanggar batas kapasitas fisik?
+
+Sebuah perusahaan teknologi ingin meminimalkan fungsi biaya transmisi cloud:
+$$f(x_1, x_2) = (x_1 - 3)^2 + (x_2 - 2)^2$$
+dengan pembatas kapasitas anggaran ketidaksamaan $g_1(x_1, x_2) = x_1 + x_2 \le 3$, serta pembatas non-negativitas $x_1 \ge 0$ ($g_2(x) = -x_1 \le 0$) dan $x_2 \ge 0$ ($g_3(x) = -x_2 \le 0$).
+1. Tentukan titik minimum tanpa pembatas dan tunjukkan bahwa titik tersebut melanggar pembatas anggaran.
+2. Tuliskan 4 pilar kondisi Karush-Kuhn-Tucker (KKT) untuk masalah ini.
+3. Selesaikan sistem KKT menggunakan strategi himpunan aktif (*active-set*) dan temukan titik solusi optimal $\mathbf{x}^*$ beserta nilai pengali Lagrange $\boldsymbol{\mu}^*$.
+
+<details>
+<summary>💡 Petunjuk Sokratik</summary>
+Jika titik tanpa pembatas berada di luar daerah layak, maka pembatas anggaran $g_1$ harus aktif ($x_1 + x_2 = 3$) dengan pengali dual $\mu_1 > 0$. Gunakan stasionaritas gradien Lagrangian untuk mengisolasi $x_1$ dan $x_2$ sebagai fungsi $\mu_1$.
+</details>
+
+<details>
+<summary>✅ Solusi Aksiomatik & Pembahasan Lengkap</summary>
+
+**Langkah 1: Titik Tanpa Pembatas & Uji Kelayakan**
+Titik minimum bebas dari $f(x_1, x_2)$ adalah ketika $\nabla f = \mathbf{0}$:
+$$2(x_1 - 3) = 0 \implies x_1 = 3$$
+$$2(x_2 - 2) = 0 \implies x_2 = 2$$
+Uji pembatas anggaran: $g_1(3, 2) = 3 + 2 = 5 > 3$. Titik ini melanggar pembatas (infeasible), sehingga solusi optimal pasti menempel di dinding pembatas!
+
+**Langkah 2: Perumusan 4 Pilar Kondisi KKT**
+Lagrangian: $\mathcal{L}(\mathbf{x}, \boldsymbol{\mu}) = (x_1 - 3)^2 + (x_2 - 2)^2 + \mu_1(x_1 + x_2 - 3) - \mu_2 x_1 - \mu_3 x_2$.
+1. **Stasionaritas**:
+   $$\frac{\partial \mathcal{L}}{\partial x_1} = 2(x_1 - 3) + \mu_1 - \mu_2 = 0$$
+   $$\frac{\partial \mathcal{L}}{\partial x_2} = 2(x_2 - 2) + \mu_1 - \mu_3 = 0$$
+2. **Kelayakan Prima**: $x_1 + x_2 - 3 \le 0, \, -x_1 \le 0, \, -x_2 \le 0$.
+3. **Kelayakan Dual**: $\mu_1 \ge 0, \, \mu_2 \ge 0, \, \mu_3 \ge 0$.
+4. **Kelonggaran Komplementer**: $\mu_1(x_1 + x_2 - 3) = 0, \, \mu_2(-x_1) = 0, \, \mu_3(-x_2) = 0$.
+
+**Langkah 3: Penyelesaian Active-Set**
+Asumsikan pembatas $g_1$ aktif ($x_1 + x_2 = 3$), sedangkan variabel berada di interior positif $x_1 > 0, x_2 > 0$ sehingga $\mu_2 = 0, \mu_3 = 0$.
+Dari stasionaritas:
+$$2(x_1 - 3) + \mu_1 = 0 \implies x_1 = 3 - \frac{\mu_1}{2}$$
+$$2(x_2 - 2) + \mu_1 = 0 \implies x_2 = 2 - \frac{\mu_1}{2}$$
+Substitusikan ke pembatas aktif $x_1 + x_2 = 3$:
+$$\left(3 - \frac{\mu_1}{2}\right) + \left(2 - \frac{\mu_1}{2}\right) = 3 \implies 5 - \mu_1 = 3 \implies \mu_1 = 2$$
+Evaluasi koordinat solusi:
+$$x_1^* = 3 - \frac{2}{2} = 2, \quad x_2^* = 2 - \frac{2}{2} = 1$$
+Verifikasi seluruh kondisi KKT:
+- Primal Feasibility: $x_1^* = 2 \ge 0, x_2^* = 1 \ge 0$, dan $2 + 1 = 3 \le 3$ (Lolos).
+- Dual Feasibility: $\mu_1 = 2 \ge 0, \mu_2 = 0, \mu_3 = 0$ (Lolos).
+- Complementary Slackness: $\mu_1(2 + 1 - 3) = 2(0) = 0$ (Lolos).
+Maka titik solusi optimal KKT adalah $\mathbf{x}^* = (2, 1)$ dengan pengali Lagrange $\mu_1^* = 2$ dan biaya minimum $f(2, 1) = (2 - 3)^2 + (1 - 2)^2 = 1 + 1 = 2$.
+</details>
+
+---
+
+### Soal 014.6: Integral Lipat Dua & Tiga, Teorema Fubini & Transformasi Jacobian
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Mengapa integral fungsi lonceng Gaussian satu dimensi tidak dapat diselesaikan secara langsung, namun dapat dihitung secara eksak saat dikuadratkan menjadi dua dimensi menggunakan koordinat polar?
+
+1. Buktikan secara aksiomatik nilai integral Gaussian universal $\int_{-\infty}^\infty e^{-x^2} \, dx = \sqrt{\pi}$ menggunakan kuadrat integral lipat dua dalam koordinat polar.
+2. Gunakan koordinat bola untuk menghitung volume dan massa dari benda pejal bola homogen $B: x^2 + y^2 + z^2 \le R^2$ dengan massa jenis konstan $\rho_0$. Tunjukkan bagaimana faktor determinan Jacobian $\rho^2 \sin\phi$ muncul secara geometris.
+
+<details>
+<summary>💡 Petunjuk Sokratik</summary>
+Kuadratkan integral satu variabel $I = \int e^{-x^2} dx$, tuliskan sebagai $I^2 = \iint e^{-(x^2+y^2)} dx dy$, lalu ubah ke koordinat polar $x^2+y^2 = r^2$ dengan $dx dy = r dr d	heta$.
+</details>
+
+<details>
+<summary>✅ Solusi Aksiomatik & Pembahasan Lengkap</summary>
+
+**Langkah 1: Pembuktian Eksak Integral Gaussian**
+Misalkan $I = \int_{-\infty}^\infty e^{-x^2} \, dx$. Karena variabel integrasi adalah dummy, kita dapat menulis $I = \int_{-\infty}^\infty e^{-y^2} \, dy$.
+Kalikan kedua integral independen:
+$$I^2 = \left( \int_{-\infty}^\infty e^{-x^2} \, dx \right) \left( \int_{-\infty}^\infty e^{-y^2} \, dy \right) = \int_{-\infty}^\infty \int_{-\infty}^\infty e^{-(x^2 + y^2)} \, dx \, dy$$
+Transformasikan ke sistem koordinat polar:
+$$x = r\cos\theta, \quad y = r\sin\theta, \quad x^2 + y^2 = r^2$$
+Elemen luas Jacobian: $dA = dx \, dy = r \, dr \, d\theta$.
+Batas integrasi atas seluruh bidang $\mathbb{R}^2$: $r \in [0, \infty)$ dan $\theta \in [0, 2\pi]$.
+$$I^2 = \int_0^{2\pi} d\theta \int_0^\infty e^{-r^2} r \, dr$$
+Integral sudut: $\int_0^{2\pi} d\theta = 2\pi$.
+Integral radial dengan substitusi $u = r^2 \implies du = 2r \, dr$:
+$$\int_0^\infty e^{-r^2} r \, dr = \frac{1}{2} \int_0^\infty e^{-u} \, du = \frac{1}{2} \left[ -e^{-u} \right]_0^\infty = \frac{1}{2}(0 - (-1)) = \frac{1}{2}$$
+Maka:
+$$I^2 = 2\pi \times \frac{1}{2} = \pi \implies I = \sqrt{\pi} \quad \blacksquare$$
+
+**Langkah 2: Volume Benda Bola via Koordinat Bola**
+Transformasi koordinat bola:
+$$x = \rho\sin\phi\cos\theta, \quad y = \rho\sin\phi\sin\theta, \quad z = \rho\cos\phi$$
+Determinan matriks Jacobian transformasi:
+$$\det(\mathbf{J}) = \rho^2 \sin\phi \implies dV = \rho^2 \sin\phi \, d\rho \, d\phi \, d\theta$$
+Batas integrasi bola penuh berjari-jari $R$:
+$$\rho \in [0, R], \quad \phi \in [0, \pi], \quad \theta \in [0, 2\pi]$$
+Massa total benda bola berdensitas $\rho_0$:
+$$M = \iiint_B \rho_0 \, dV = \rho_0 \int_0^{2\pi} d\theta \int_0^\pi \sin\phi \, d\phi \int_0^R \rho^2 \, d\rho$$
+Evaluasi ketiga integral independen:
+- $\int_0^{2\pi} d\theta = 2\pi$
+- $\int_0^\pi \sin\phi \, d\phi = [-\cos\phi]_0^\pi = -(-1) - (-1) = 2$
+- $\int_0^R \rho^2 \, d\rho = \left[ \frac{\rho^3}{3} \right]_0^R = \frac{R^3}{3}$
+Maka massa dan volume bola adalah:
+$$M = \rho_0 \cdot (2\pi) \cdot (2) \cdot \left(\frac{R^3}{3}\right) = \rho_0 \left( \frac{4}{3} \pi R^3 \right) \implies V = \frac{4}{3}\pi R^3 \quad \blacksquare$$
+</details>
+
+---
+
+### Soal 014.7: Integral Garis, Usaha Medan Vektor & Teorema Dasar Integral Garis
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Bagaimana memverifikasi apakah medan gaya bersifat hemat energi (konservatif) dan menghitung usaha tanpa peduli jalur lintasan yang ditempuh?
+
+Diberikan medan gaya di $\mathbb{R}^3$:
+$$\mathbf{F}(x, y, z) = (2xy + z^2)\mathbf{i} + (x^2 + 2yz)\mathbf{j} + (2xz + y^2)\mathbf{k}$$
+1. Buktikan secara diferensial bahwa medan gaya ini bersifat konservatif dengan menunjukkan bahwa $\nabla \times \mathbf{F} = \mathbf{0}$ di seluruh $\mathbb{R}^3$.
+2. Rekonstruksikan fungsi energi potensial skalar $\phi(x, y, z)$ sedemikian rupa sehingga $\mathbf{F} = \nabla \phi$.
+3. Gunakan Teorema Dasar Integral Garis untuk menghitung usaha total yang dilakukan medan gaya saat memindahkan partikel dari titik $A(0, 1, -1)$ ke titik $B(2, 1, 3)$ di sepanjang lintasan heliks spiral sembarang!
+
+<details>
+<summary>💡 Petunjuk Sokratik</summary>
+Hitung ketiga komponen curl: $
+abla 	imes \mathbf{F} = (R_y - Q_z)\mathbf{i} + (P_z - R_x)\mathbf{j} + (Q_x - P_y)\mathbf{k}$. Jika semuanya nol pada domain $\mathbb{R}^3$, cari $\phi$ dengan mengintegralkan $P$ terhadap $x$, lalu turunkan terhadap $y$ dan $z$. Usaha hanyalah $\phi(B) - \phi(A)$.
+</details>
+
+<details>
+<summary>✅ Solusi Aksiomatik & Pembahasan Lengkap</summary>
+
+**Langkah 1: Pembuktian Medan Konservatif via Curl**
+Komponen medan: $P = 2xy + z^2, \, Q = x^2 + 2yz, \, R = 2xz + y^2$.
+Hitung komponen curl:
+- $(\nabla \times \mathbf{F})_x = \frac{\partial R}{\partial y} - \frac{\partial Q}{\partial z} = 2y - 2y = 0$
+- $(\nabla \times \mathbf{F})_y = \frac{\partial P}{\partial z} - \frac{\partial R}{\partial x} = 2z - 2z = 0$
+- $(\nabla \times \mathbf{F})_z = \frac{\partial Q}{\partial x} - \frac{\partial P}{\partial y} = 2x - 2x = 0$
+Karena $\nabla \times \mathbf{F} = \mathbf{0}$ di seluruh domain $\mathbb{R}^3$ yang terhubung sederhana, medan terbukti $100\%$ konservatif!
+
+**Langkah 2: Rekonstruksi Fungsi Potensial Skalar $\phi$**
+Kita mencari $\phi$ sedemikian rupa sehingga $\nabla \phi = \mathbf{F}$:
+1. Integralkan komponen $P$ terhadap $x$:
+   $$\phi(x, y, z) = \int (2xy + z^2) \, dx = x^2 y + x z^2 + g(y, z)$$
+2. Turunkan terhadap $y$ dan samakan dengan $Q$:
+   $$\frac{\partial \phi}{\partial y} = x^2 + \frac{\partial g}{\partial y} = x^2 + 2yz \implies \frac{\partial g}{\partial y} = 2yz \implies g(y, z) = y^2 z + h(z)$$
+   Sehingga $\phi(x, y, z) = x^2 y + x z^2 + y^2 z + h(z)$.
+3. Turunkan terhadap $z$ dan samakan dengan $R$:
+   $$\frac{\partial \phi}{\partial z} = 2xz + y^2 + h'(z) = 2xz + y^2 \implies h'(z) = 0 \implies h(z) = C$$
+Maka fungsi potensial skalar adalah:
+$$\phi(x, y, z) = x^2 y + x z^2 + y^2 z + C$$
+
+**Langkah 3: Evaluasi Usaha via Teorema Dasar Integral Garis**
+Berdasarkan Teorema Dasar Integral Garis:
+$$W = \int_C \mathbf{F} \cdot d\mathbf{r} = \phi(B) - \phi(A)$$
+Titik awal $A(0, 1, -1)$:
+$$\phi(A) = 0^2(1) + 0(-1)^2 + (1)^2(-1) = 0 + 0 - 1 = -1$$
+Titik akhir $B(2, 1, 3)$:
+$$\phi(B) = (2^2)(1) + 2(3^2) + (1^2)(3) = 4(1) + 2(9) + 3 = 4 + 18 + 3 = 25$$
+Total usaha:
+$$W = 25 - (-1) = 26\text{ Joules}$$
+Usaha bernilai eksak $26\text{ J}$ terlepas dari betapa rumitnya jalur heliks spiral yang dilalui partikel!
+</details>
+
+---
+
+### Soal 014.8: Teorema Green Dua Dimensi & Formula Luas Shoelace
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Bagaimana Teorema Green mengubah integrasi garis keliling yang melelahkan menjadi integral luas yang dapat diselesaikan dalam 5 detik?
+
+Tinjau kurva elips tertutup $C: \frac{x^2}{9} + \frac{y^2}{4} = 1$ berorientasi berlawanan arah jarum jam (CCW).
+1. Gunakan Teorema Green untuk menghitung integral garis tertutup:
+   $$\oint_C (e^x - y^3) \, dx + (\cos y + x^3) \, dy$$
+2. Terapkan Teorema Green formula luas $\text{Luas}(D) = \frac{1}{2} \oint_C (x \, dy - y \, dx)$ untuk membuktikan luas elips tersebut dan verifikasi hasil numeriknya.
+
+<details>
+<summary>💡 Petunjuk Sokratik</summary>
+Identifikasi $P = e^x - y^3$ dan $Q = \cos y + x^3$. Saat menghitung $Q_x - P_y$, suku transendental $e^x$ dan $\cos y$ akan lenyap! Sisa integrannya adalah $3x^2 + 3y^2 = 3(x^2+y^2)$. Gunakan koordinat polar elips.
+</details>
+
+<details>
+<summary>✅ Solusi Aksiomatik & Pembahasan Lengkap</summary>
+
+**Langkah 1: Terapkan Teorema Green Bentuk Sirkulasi**
+Komponen medan:
+$$P(x, y) = e^x - y^3 \implies \frac{\partial P}{\partial y} = -3y^2$$
+$$Q(x, y) = \cos y + x^3 \implies \frac{\partial Q}{\partial x} = 3x^2$$
+Berdasarkan Teorema Green:
+$$\oint_C (P \, dx + Q \, dy) = \iint_D \left( \frac{\partial Q}{\partial x} - \frac{\partial P}{\partial y} \right) dA$$
+$$= \iint_D (3x^2 - (-3y^2)) \, dA = 3 \iint_D (x^2 + y^2) \, dA$$
+
+**Langkah 2: Evaluasi Integral Lipat Dua pada Domain Elips**
+Gunakan transformasi elips-polar: $x = 3r\cos\theta, \, y = 2r\sin\theta$, dengan $r \in [0, 1]$ dan $\theta \in [0, 2\pi]$.
+Elemen luas Jacobian: $dA = (3)(2)r \, dr \, d\theta = 6r \, dr \, d\theta$.
+Substitusikan $x^2 + y^2 = 9r^2\cos^2\theta + 4r^2\sin^2\theta$:
+$$\oint_C = 3 \int_0^{2\pi} \int_0^1 (9r^2\cos^2\theta + 4r^2\sin^2\theta) (6r) \, dr \, d\theta = 18 \left( \int_0^1 r^3 \, dr \right) \left( \int_0^{2\pi} (9\cos^2\theta + 4\sin^2\theta) \, d\theta \right)$$
+Evaluasi:
+- $\int_0^1 r^3 \, dr = \left[ \frac{r^4}{4} \right]_0^1 = \frac{1}{4}$
+- $\int_0^{2\pi} \cos^2\theta \, d\theta = \pi$ dan $\int_0^{2\pi} \sin^2\theta \, d\theta = \pi$. Maka integral sudut adalah $9\pi + 4\pi = 13\pi$.
+Kalikan seluruh komponen:
+$$\oint_C = 18 \times \frac{1}{4} \times 13\pi = \frac{9}{2} \times 13\pi = \frac{117\pi}{2} = 58{,}5\pi \approx 183{,}783$$
+
+**Langkah 3: Pembuktian Luas Elips via Teorema Green**
+Parameter elips: $x(t) = 3\cos t, y(t) = 2\sin t \implies dx = -3\sin t dt, dy = 2\cos t dt$.
+$$x \, dy - y \, dx = (3\cos t)(2\cos t dt) - (2\sin t)(-3\sin t dt) = 6(\cos^2 t + \sin^2 t) dt = 6 dt$$
+Maka:
+$$\text{Luas}(D) = \frac{1}{2} \oint_C (x \, dy - y \, dx) = \frac{1}{2} \int_0^{2\pi} 6 \, dt = \frac{1}{2}(6)(2\pi) = 6\pi$$
+Hasil ini tepat cocok dengan rumus analitis $\pi a b = \pi(3)(2) = 6\pi \approx 18{,}8496$!
+</details>
+
+---
+
+### Soal 014.9: Teorema Stokes 3D, Teorema Divergensi Gauss & Persamaan Maxwell
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Bagaimana dua mahakarya kalkulus vektor ruang menyatukan seluruh hukum kelistrikan dan kemagnetan alam semesta?
+
+1. **Teorema Stokes 3D**: Gunakan Teorema Stokes untuk mengevaluasi sirkulasi $\oint_C \mathbf{F} \cdot d\mathbf{r}$ pada medan $\mathbf{F} = -y\mathbf{i} + x\mathbf{j} + z^2\mathbf{k}$, di mana $C$ adalah kurva perpotongan antara silinder $x^2 + y^2 = 1$ dan bidang miring $z = y + 2$ berorientasi berlawanan jarum jam jika dilihat dari atas.
+2. **Teorema Divergensi Gauss 3D**: Tentukan fluks medan vektor $\mathbf{F}(x, y, z) = x^3\mathbf{i} + y^3\mathbf{j} + z^3\mathbf{k}$ yang menembus keluar dari permukaan bola pejal tertutup $S: x^2 + y^2 + z^2 = 4$.
+
+<details>
+<summary>💡 Petunjuk Sokratik</summary>
+Untuk Stokes, curl dari medan adalah $
+abla 	imes \mathbf{F} = 2\mathbf{k}$. Proyeksikan ke bidang singgung bidang $z = y + 2$ atau pilih permukaan penutup elips miring.
+Untuk Gauss, divergensi adalah $
+abla \cdot \mathbf{F} = 3(x^2 + y^2 + z^2) = 3ho^2$. Integralkan dalam koordinat bola dengan radius $R = 2$.
+</details>
+
+<details>
+<summary>✅ Solusi Aksiomatik & Pembahasan Lengkap</summary>
+
+**Langkah 1: Penerapan Teorema Stokes 3D**
+Hitung curl dari $\mathbf{F} = -y\mathbf{i} + x\mathbf{j} + z^2\mathbf{k}$:
+$$\nabla \times \mathbf{F} = \det \begin{bmatrix} \mathbf{i} & \mathbf{j} & \mathbf{k} \\ \partial_x & \partial_y & \partial_z \\ -y & x & z^2 \end{bmatrix} = (0 - 0)\mathbf{i} - (0 - 0)\mathbf{j} + (1 - (-1))\mathbf{k} = 2\mathbf{k}$$
+Pilih permukaan $S$ sebagai daerah elips pada bidang miring $z = y + 2$ di dalam silinder $x^2 + y^2 \le 1$.
+Vektor normal berarah ke atas dari permukaan $z - y = 2$:
+$$\mathbf{n} \, dS = (-z_x, -z_y, 1) \, dx \, dy = (0, -1, 1) \, dx \, dy$$
+Perkalian titik curl dengan normal:
+$$(\nabla \times \mathbf{F}) \cdot (\mathbf{n} \, dS) = (0\mathbf{i} + 0\mathbf{j} + 2\mathbf{k}) \cdot (0\mathbf{i} - 1\mathbf{j} + 1\mathbf{k}) \, dx \, dy = 2 \, dx \, dy$$
+Berdasarkan Teorema Stokes:
+$$\oint_C \mathbf{F} \cdot d\mathbf{r} = \iint_S (\nabla \times \mathbf{F}) \cdot d\mathbf{S} = \iint_D 2 \, dx \, dy = 2 \times \text{Luas}(D)$$
+Domain $D$ pada bidang $xy$ adalah lingkaran satuan $x^2 + y^2 \le 1$ dengan luas $\pi(1^2) = \pi$.
+Maka nilai sirkulasi adalah:
+$$\oint_C \mathbf{F} \cdot d\mathbf{r} = 2\pi \approx 6{,}283185$$
+
+**Langkah 2: Penerapan Teorema Divergensi Gauss 3D**
+Medan vektor: $\mathbf{F} = x^3\mathbf{i} + y^3\mathbf{j} + z^3\mathbf{k}$.
+Hitung divergensi:
+$$\nabla \cdot \mathbf{F} = \frac{\partial}{\partial x}(x^3) + \frac{\partial}{\partial y}(y^3) + \frac{\partial}{\partial z}(z^3) = 3x^2 + 3y^2 + 3z^2 = 3(x^2 + y^2 + z^2)$$
+Berdasarkan Teorema Divergensi Gauss:
+$$\iint_S \mathbf{F} \cdot d\mathbf{S} = \iiint_V 3(x^2 + y^2 + z^2) \, dV$$
+Gunakan koordinat bola di mana $x^2 + y^2 + z^2 = \rho^2$ dan $dV = \rho^2 \sin\phi \, d\rho \, d\phi \, d\theta$ dengan radius $R = 2$:
+$$\Phi = 3 \int_0^{2\pi} d\theta \int_0^\pi \sin\phi \, d\phi \int_0^2 \rho^4 \, d\rho$$
+Evaluasi masing-masing integral:
+- $\int_0^{2\pi} d\theta = 2\pi$
+- $\int_0^\pi \sin\phi \, d\phi = 2$
+- $\int_0^2 \rho^4 \, d\rho = \left[ \frac{\rho^5}{5} \right]_0^2 = \frac{32}{5}$
+Kalikan seluruh komponen:
+$$\Phi = 3 \times (2\pi) \times (2) \times \left(\frac{32}{5}\right) = 12\pi \times \frac{32}{5} = \frac{384\pi}{5} = 76{,}8\pi \approx 241{,}2743$$
+Fluks total yang memancar menembus permukaan bola adalah $\frac{384\pi}{5}$ satuan fluks!
+</details>

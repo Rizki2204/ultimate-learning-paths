@@ -1075,3 +1075,180 @@ Penguasaan prinsip kognitif, penalaran first-principles, logika proposisional/pr
 
 **Tags**: `tier-01::matematika math::calculus numerical-methods newton-raphson`  
 **Kategori**: `Computational Calculus`
+
+---
+
+### Kartu 64: Modul 014.1: Kalkulus Multivariabel - Gradien & Turunan Berarah
+**Pertanyaan Cloze (Anki Text)**:
+> Vektor gradien 
+abla f(\mathbf{x}) selalu menunjuk ke arah {{c1::laju pertambahan maksimum (steepest ascent)}} dengan nilai laju sebesar {{c2::\|
+abla f(\mathbf{x})\|}}, dan turunan berarah diberikan oleh perkalian titik {{c3::D_{\mathbf{u}} f = 
+abla f \cdot \mathbf{u}}}.
+
+**Tampilan Jawaban Terbuka**:
+> Vektor gradien 
+abla f(\mathbf{x}) selalu menunjuk ke arah **[laju pertambahan maksimum (steepest ascent)]** dengan nilai laju sebesar **[\|
+abla f(\mathbf{x})\|]**, dan turunan berarah diberikan oleh perkalian titik **[D_{\mathbf{u}} f = 
+abla f \cdot \mathbf{u}]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Vektor gradien selalu tegak lurus (ortogonal) terhadap kurva level atau permukaan kontur f(x, y, z) = c.
+
+**Tags**: `tier-01::matematika math::multivariable-calculus gradient directional-derivative`  
+**Kategori**: `Multivariable Calculus`
+
+---
+
+### Kartu 65: Modul 014.2: Kalkulus Multivariabel - Matriks Jacobian
+**Pertanyaan Cloze (Anki Text)**:
+> Matriks Jacobian \mathbf{J} \in \mathbb{R}^{m 	imes n} dari pemetaan \mathbf{f}: \mathbb{R}^n 	o \mathbb{R}^m merepresentasikan {{c1::hampiran linier terbaik (best linear approximation)}} pemetaan, di mana elemen baris i kolom j adalah {{c2::J_{ij} = rac{\partial f_i}{\partial x_j}}}.
+
+**Tampilan Jawaban Terbuka**:
+> Matriks Jacobian \mathbf{J} \in \mathbb{R}^{m 	imes n} dari pemetaan \mathbf{f}: \mathbb{R}^n 	o \mathbb{R}^m merepresentasikan **[hampiran linier terbaik (best linear approximation)]** pemetaan, di mana elemen baris i kolom j adalah **[J_{ij} = rac{\partial f_i}{\partial x_j}]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Nilai mutlak determinan Jacobian |\det(\mathbf{J})| mengukur faktor distorsi perbesaran elemen volume lokal saat terjadi transformasi koordinat.
+
+**Tags**: `tier-01::matematika math::multivariable-calculus jacobian-matrix chain-rule`  
+**Kategori**: `Multivariable Calculus`
+
+---
+
+### Kartu 66: Modul 014.3: Kalkulus Multivariabel - Matriks Hessian & Uji Titik Pelana
+**Pertanyaan Cloze (Anki Text)**:
+> Matriks Hessian \mathbf{H} adalah matriks simetris turunan kedua H_{ij} = rac{\partial^2 f}{\partial x_i \partial x_j}. Jika pada titik stasioner terdapat nilai eigen positif dan negatif, titik tersebut diklasifikasikan sebagai {{c1::Titik Pelana (Saddle Point)}}.
+
+**Tampilan Jawaban Terbuka**:
+> Matriks Hessian \mathbf{H} adalah matriks simetris turunan kedua H_{ij} = rac{\partial^2 f}{\partial x_i \partial x_j}. Jika pada titik stasioner terdapat nilai eigen positif dan negatif, titik tersebut diklasifikasikan sebagai **[Titik Pelana (Saddle Point)]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Pada fungsi dua variabel, kondisi pelana ditandai oleh determinan diskriminan negatif: D = f_{xx}f_{yy} - (f_{xy})^2 < 0.
+
+**Tags**: `tier-01::matematika math::multivariable-calculus hessian-matrix saddle-point`  
+**Kategori**: `Multivariable Calculus`
+
+---
+
+### Kartu 67: Modul 014.4: Kalkulus Multivariabel - Pengali Lagrange & Shadow Price
+**Pertanyaan Cloze (Anki Text)**:
+> Pada optimasi dengan pembatas g(\mathbf{x}) = c, titik ekstrim memenuhi kondisi kesejajaran gradien {{c1::
+abla f = \lambda 
+abla g}}, di mana pengali Lagrange \lambda merepresentasikan {{c2::Shadow Price (rac{df^*}{dc}, nilai sensitivitas marjinal)}}.
+
+**Tampilan Jawaban Terbuka**:
+> Pada optimasi dengan pembatas g(\mathbf{x}) = c, titik ekstrim memenuhi kondisi kesejajaran gradien **[
+abla f = \lambda 
+abla g]**, di mana pengali Lagrange \lambda merepresentasikan **[Shadow Price (rac{df^*}{dc}, nilai sensitivitas marjinal)]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Pengali Lagrange mengukur berapa pertambahan nilai optimal f^* jika kapasitas pembatas c dilonggarkan sebesar satu satuan.
+
+**Tags**: `tier-01::matematika math::multivariable-calculus lagrange-multipliers shadow-price`  
+**Kategori**: `Optimization`
+
+---
+
+### Kartu 68: Modul 014.5: Kalkulus Multivariabel - 4 Pilar Kondisi Karush-Kuhn-Tucker (KKT)
+**Pertanyaan Cloze (Anki Text)**:
+> Empat pilar kondisi KKT untuk optimasi berpembatas ketidaksamaan g_i(\mathbf{x}) \le 0 adalah: 1. {{c1::Stasionaritas (
+abla \mathcal{L} = \mathbf{0})}}, 2. {{c2::Kelayakan Prima (g_i \le 0)}}, 3. {{c3::Kelayakan Dual (\mu_i \ge 0)}}, dan 4. {{c4::Kelonggaran Komplementer (\mu_i g_i = 0)}}.
+
+**Tampilan Jawaban Terbuka**:
+> Empat pilar kondisi KKT untuk optimasi berpembatas ketidaksamaan g_i(\mathbf{x}) \le 0 adalah: 1. **[Stasionaritas (
+abla \mathcal{L} = \mathbf{0})]**, 2. **[Kelayakan Prima (g_i \le 0)]**, 3. **[Kelayakan Dual (\mu_i \ge 0)]**, dan 4. **[Kelonggaran Komplementer (\mu_i g_i = 0)]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Kondisi kelonggaran komplementer bertindak sebagai saklar: jika pembatas longgar (g_i < 0), pengali nol (\mu_i = 0); jika pengali aktif (\mu_i > 0), titik berada di batas (g_i = 0).
+
+**Tags**: `tier-01::matematika math::optimization kkt-conditions complementary-slackness`  
+**Kategori**: `Optimization`
+
+---
+
+### Kartu 69: Modul 014.6: Kalkulus Multivariabel - Transformasi Jacobian Integrasi Polar & Bola
+**Pertanyaan Cloze (Anki Text)**:
+> Elemen luas infinitesimal dalam koordinat polar adalah {{c1::dA = r \, dr \, d	heta}}, sedangkan elemen volume dalam koordinat bola adalah {{c2::dV = 
+ho^2 \sin\phi \, d
+ho \, d\phi \, d	heta}}.
+
+**Tampilan Jawaban Terbuka**:
+> Elemen luas infinitesimal dalam koordinat polar adalah **[dA = r \, dr \, d	heta]**, sedangkan elemen volume dalam koordinat bola adalah **[dV = 
+ho^2 \sin\phi \, d
+ho \, d\phi \, d	heta]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Faktor r dan 
+ho^2 \sin\phi adalah determinan Jacobian yang mengoreksi peregangan kisi koordinat melengkung.
+
+**Tags**: `tier-01::matematika math::multivariable-calculus multiple-integrals jacobian-change-of-variables`  
+**Kategori**: `Multivariable Calculus`
+
+---
+
+### Kartu 70: Modul 014.7: Kalkulus Multivariabel - Medan Vektor Konservatif
+**Pertanyaan Cloze (Anki Text)**:
+> Sebuah medan vektor \mathbf{F} bersifat konservatif jika terdapat potensial skalar \mathbf{F} = 
+abla \phi, yang ekuivalen dengan {{c1::independensi lintasan (path independence)}}, sirkulasi tertutup {{c2::\oint_C \mathbf{F} \cdot d\mathbf{r} = 0}}, dan {{c3::
+abla 	imes \mathbf{F} = \mathbf{0}}} pada domain terhubung sederhana.
+
+**Tampilan Jawaban Terbuka**:
+> Sebuah medan vektor \mathbf{F} bersifat konservatif jika terdapat potensial skalar \mathbf{F} = 
+abla \phi, yang ekuivalen dengan **[independensi lintasan (path independence)]**, sirkulasi tertutup **[\oint_C \mathbf{F} \cdot d\mathbf{r} = 0]**, dan **[
+abla 	imes \mathbf{F} = \mathbf{0}]** pada domain terhubung sederhana.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Berdasarkan Teorema Dasar Integral Garis, usaha yang dilakukan medan konservatif selalu bernilai W = \phi(B) - \phi(A).
+
+**Tags**: `tier-01::matematika math::multivariable-calculus conservative-vector-fields potential-function`  
+**Kategori**: `Vector Calculus`
+
+---
+
+### Kartu 71: Modul 014.8: Kalkulus Multivariabel - Teorema Green Dua Dimensi
+**Pertanyaan Cloze (Anki Text)**:
+> Teorema Green menghubungkan integral garis keliling dengan integral lipat dua area melalui formula: {{c1::\oint_{\partial D} (P \, dx + Q \, dy) = \iint_D \left( rac{\partial Q}{\partial x} - rac{\partial P}{\partial y} 
+ight) dA}}.
+
+**Tampilan Jawaban Terbuka**:
+> Teorema Green menghubungkan integral garis keliling dengan integral lipat dua area melalui formula: **[\oint_{\partial D} (P \, dx + Q \, dy) = \iint_D \left( rac{\partial Q}{\partial x} - rac{\partial P}{\partial y} 
+ight) dA]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Formula luas Shoelace 	ext{Luas} = rac{1}{2}\oint (x dy - y dx) diturunkan langsung dari Teorema Green.
+
+**Tags**: `tier-01::matematika math::vector-calculus greens-theorem curl-divergence-2d`  
+**Kategori**: `Vector Calculus`
+
+---
+
+### Kartu 72: Modul 014.9: Kalkulus Multivariabel - Teorema Stokes Tiga Dimensi
+**Pertanyaan Cloze (Anki Text)**:
+> Teorema Stokes menyatakan bahwa sirkulasi medan vektor sepanjang kurva batas tertutup \partial S sama dengan fluks curl yang menembus permukaan terbuka S: {{c1::\oint_{\partial S} \mathbf{F} \cdot d\mathbf{r} = \iint_S (
+abla 	imes \mathbf{F}) \cdot d\mathbf{S}}}.
+
+**Tampilan Jawaban Terbuka**:
+> Teorema Stokes menyatakan bahwa sirkulasi medan vektor sepanjang kurva batas tertutup \partial S sama dengan fluks curl yang menembus permukaan terbuka S: **[\oint_{\partial S} \mathbf{F} \cdot d\mathbf{r} = \iint_S (
+abla 	imes \mathbf{F}) \cdot d\mathbf{S}]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Bentuk permukaan S bebas merdeka (surface independent); hanya kurva cincin bibir pembatas \partial S yang menentukan nilai sirkulasi.
+
+**Tags**: `tier-01::matematika math::vector-calculus stokes-theorem curl-flux`  
+**Kategori**: `Vector Calculus`
+
+---
+
+### Kartu 73: Modul 014.10: Kalkulus Multivariabel - Teorema Divergensi Gauss
+**Pertanyaan Cloze (Anki Text)**:
+> Teorema Divergensi Gauss menyatakan bahwa total fluks yang keluar menembus permukaan tertutup kedap \partial V sama dengan integral divergensi di dalam volume V: {{c1::\iint_{\partial V} \mathbf{F} \cdot d\mathbf{S} = \iiint_V (
+abla \cdot \mathbf{F}) \, dV}}.
+
+**Tampilan Jawaban Terbuka**:
+> Teorema Divergensi Gauss menyatakan bahwa total fluks yang keluar menembus permukaan tertutup kedap \partial V sama dengan integral divergensi di dalam volume V: **[\iint_{\partial V} \mathbf{F} \cdot d\mathbf{S} = \iiint_V (
+abla \cdot \mathbf{F}) \, dV]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Teorema Gauss adalah fondasi Hukum Gauss Elektromagnetik (\iint \mathbf{E} \cdot d\mathbf{S} = rac{Q}{\epsilon_0}) dan hukum kekekalan massa fluida kontinu.
+
+**Tags**: `tier-01::matematika math::vector-calculus gauss-divergence-theorem flux-volume`  
+**Kategori**: `Vector Calculus`
