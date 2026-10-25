@@ -751,3 +751,176 @@ Penguasaan prinsip kognitif, penalaran first-principles, logika proposisional/pr
 **Kategori**: `Foundational Definitions`
 
 ---
+
+
+## Modul 012: Matematika Diskrit, Kombinatorika & Teori Graf
+
+### Kartu 44: Modul 012: De Morgan & Logika Predikat
+
+**Pertanyaan Cloze (Anki Text)**:
+> Negasi dari proposisi berkuantor ganda \forall x, \exists y : P(x, y) menurut hukum De Morgan adalah {{c1::\exists x, \forall y : \neg P(x, y)}}.
+
+**Tampilan Jawaban Terbuka**:
+> Negasi dari proposisi berkuantor ganda \forall x, \exists y : P(x, y) menurut hukum De Morgan adalah **[\exists x, \forall y : \neg P(x, y)]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Menegasikan pernyataan berkuantor membalik seluruh jenis kuantor (\forall menjadi \exists, dan sebaliknya) serta menegasikan predikat internalnya.
+
+**Tags**: `tier-01::matematika math::discrete-math logic`  
+
+**Kategori**: `Mathematical Logic`
+
+---
+
+### Kartu 45: Modul 012: Poset & Sifat Relasi
+
+**Pertanyaan Cloze (Anki Text)**:
+> Sebuah relasi biner R pada himpunan A disebut Poset (Partially Ordered Set) jika memenuhi 3 aksioma: {{c1::refleksif, antisimetris, dan transitif}}.
+
+**Tampilan Jawaban Terbuka**:
+> Sebuah relasi biner R pada himpunan A disebut Poset (Partially Ordered Set) jika memenuhi 3 aksioma: **[refleksif, antisimetris, dan transitif]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Poset memodelkan dependensi paket perangkat lunak dan dapat diurutkan menjadi urutan linier total menggunakan Algoritma Topological Sort.
+
+**Tags**: `tier-01::matematika math::discrete-math order-theory`  
+
+**Kategori**: `Order Theory`
+
+---
+
+### Kartu 46: Modul 012: Kombinatorika Stars and Bars
+
+**Pertanyaan Cloze (Anki Text)**:
+> Banyaknya cara mendistribusikan n objek identik ke dalam k wadah berbeda dengan setiap wadah menerima x_i \ge 0 objek adalah {{c1::\binom{n + k - 1}{k - 1}}}.
+
+**Tampilan Jawaban Terbuka**:
+> Banyaknya cara mendistribusikan n objek identik ke dalam k wadah berbeda dengan setiap wadah menerima x_i \ge 0 objek adalah **[\binom{n + k - 1}{k - 1}]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Jika setiap wadah disyaratkan menerima minimal 1 objek (x_i \ge 1), rumusnya menjadi \binom{n - 1}{k - 1}.
+
+**Tags**: `tier-01::matematika math::combinatorics counting`  
+
+**Kategori**: `Combinatorics`
+
+---
+
+### Kartu 47: Modul 012: Derangement Subfaktorial
+
+**Pertanyaan Cloze (Anki Text)**:
+> Banyaknya derangement (permutasi tanpa titik tetap) dari n objek dinotasikan !n = {{c1::n! \sum_{k=0}^n \frac{(-1)^k}{k!}}}, dengan probabilitas pengacakan acak konvergen ke {{c2::1/e \approx 0{,}3679}}.
+
+**Tampilan Jawaban Terbuka**:
+> Banyaknya derangement (permutasi tanpa titik tetap) dari n objek dinotasikan !n = **[n! \sum_{k=0}^n \frac{(-1)^k}{k!}]**, dengan probabilitas pengacakan acak konvergen ke **[1/e \approx 0{,}3679]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Nilai !n dapat dihitung via pembulatan terdekat \lfloor \frac{n!}{e} + 0{,}5 \rfloor.
+
+**Tags**: `tier-01::matematika math::combinatorics derangement`  
+
+**Kategori**: `Combinatorics`
+
+---
+
+### Kartu 48: Modul 012: Teorema Master Divide and Conquer
+
+**Pertanyaan Cloze (Anki Text)**:
+> Pada relasi rekurensi divide-and-conquer T(n) = a T(n/b) + \Theta(n^d), jika d < \log_b a, maka kompleksitas waktunya didominasi daun pohon rekursi dengan nilai {{c1::\Theta(n^{\log_b a})}}.
+
+**Tampilan Jawaban Terbuka**:
+> Pada relasi rekurensi divide-and-conquer T(n) = a T(n/b) + \Theta(n^d), jika d < \log_b a, maka kompleksitas waktunya didominasi daun pohon rekursi dengan nilai **[\Theta(n^{\log_b a})]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Contoh klasik adalah algoritma perkalian Karatsuba: T(n) = 3 T(n/2) + \Theta(n) memiliki d = 1 < \log_2 3 \approx 1{,}585 sehingga T(n) = \Theta(n^{1{,}585}).
+
+**Tags**: `tier-01::matematika math::algorithms complexity`  
+
+**Kategori**: `Recurrence Relations`
+
+---
+
+### Kartu 49: Modul 012: Handshaking Lemma Euler
+
+**Pertanyaan Cloze (Anki Text)**:
+> Teorema Handshaking Lemma Euler menyatakan bahwa pada sembarang graf tak berarah, jumlahan derajat seluruh simpul sama dengan {{c1::2 |E|}}, sehingga banyaknya simpul berderajat ganjil selalu {{c2::berjumlah genap}}.
+
+**Tampilan Jawaban Terbuka**:
+> Teorema Handshaking Lemma Euler menyatakan bahwa pada sembarang graf tak berarah, jumlahan derajat seluruh simpul sama dengan **[2 |E|]**, sehingga banyaknya simpul berderajat ganjil selalu **[berjumlah genap]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Pada graf berarah, jumlahan in-degree sama dengan jumlahan out-degree dan masing-masing tepat sama dengan |E|.
+
+**Tags**: `tier-01::matematika math::graph-theory foundational`  
+
+**Kategori**: `Graph Theory`
+
+---
+
+### Kartu 50: Modul 012: Karakterisasi Pohon & Rumus Cayley
+
+**Pertanyaan Cloze (Anki Text)**:
+> Pohon merentang berlabel pada n simpul memiliki tepat {{c1::n - 1}} sisi tanpa siklus, dan banyaknya pohon berlabel berbeda dihitung melalui Rumus Cayley {{c2::n^{n-2}}}.
+
+**Tampilan Jawaban Terbuka**:
+> Pohon merentang berlabel pada n simpul memiliki tepat **[n - 1]** sisi tanpa siklus, dan banyaknya pohon berlabel berbeda dihitung melalui Rumus Cayley **[n^{n-2}]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Bukti Rumus Cayley diturunkan melalui bijeksi barisan Prüfer dengan panjang n - 2.
+
+**Tags**: `tier-01::matematika math::graph-theory trees`  
+
+**Kategori**: `Graph Theory`
+
+---
+
+### Kartu 51: Modul 012: Sirkuit Euler vs Graf Planar
+
+**Pertanyaan Cloze (Anki Text)**:
+> Graf terhubung memiliki Sirkuit Euler jika dan hanya jika {{c1::seluruh simpul berderajat genap}}, sedangkan graf planar terhubung memenuhi Rumus Polihedron Euler {{c2::V - E + F = 2}}.
+
+**Tampilan Jawaban Terbuka**:
+> Graf terhubung memiliki Sirkuit Euler jika dan hanya jika **[seluruh simpul berderajat genap]**, sedangkan graf planar terhubung memenuhi Rumus Polihedron Euler **[V - E + F = 2]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Graf K_5 dan K_{3,3} adalah graf non-planar kanonik menurut Teorema Kuratowski.
+
+**Tags**: `tier-01::matematika math::graph-theory planar-graphs`  
+
+**Kategori**: `Graph Theory`
+
+---
+
+### Kartu 52: Modul 012: Pewarnaan Graf DSATUR
+
+**Pertanyaan Cloze (Anki Text)**:
+> Algoritma pewarnaan graf heuristik DSATUR memprioritaskan simpul yang memiliki {{c1::derajat saturasi tertinggi (jumlah warna berbeda pada tetangganya)}}, dengan pemecah dasi (tie-breaker) menggunakan {{c2::derajat simpul asli tertinggi}}.
+
+**Tampilan Jawaban Terbuka**:
+> Algoritma pewarnaan graf heuristik DSATUR memprioritaskan simpul yang memiliki **[derajat saturasi tertinggi (jumlah warna berbeda pada tetangganya)]**, dengan pemecah dasi (tie-breaker) menggunakan **[derajat simpul asli tertinggi]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Batas bawah bilangan kromatik dibatasi oleh ukuran klik maksimum: \chi(G) \ge \omega(G).
+
+**Tags**: `tier-01::matematika math::graph-theory coloring`  
+
+**Kategori**: `Graph Theory`
+
+---
+
+### Kartu 53: Modul 012: Matriks Laplacian & Nilai Eigen Fiedler
+
+**Pertanyaan Cloze (Anki Text)**:
+> Matriks Laplacian kombinatorial L = D - A selalu bersifat semidefinit positif dengan vektor satu memenuhi L \mathbf{1} = \mathbf{0}, di mana nilai eigen terkecil kedua {{c1::\lambda_2(L) (Konektivitas Aljabar Fiedler)}} bernilai positif jika dan hanya jika {{c2::graf terhubung}}.
+
+**Tampilan Jawaban Terbuka**:
+> Matriks Laplacian kombinatorial L = D - A selalu bersifat semidefinit positif dengan vektor satu memenuhi L \mathbf{1} = \mathbf{0}, di mana nilai eigen terkecil kedua **[\lambda_2(L) (Konektivitas Aljabar Fiedler)]** bernilai positif jika dan hanya jika **[graf terhubung]**.
+
+**Penjelasan Ekstra & Konteks Teknis**:
+> Vektor eigen yang bersesuaian dengan \lambda_2 (vektor Fiedler) membagi graf menjadi dua klaster dengan potongan sisi (edge cut) paling minimal (Spectral Bipartitioning).
+
+**Tags**: `tier-01::matematika math::spectral-graph-theory laplacian`  
+
+**Kategori**: `Spectral Graph Theory`
+
+---

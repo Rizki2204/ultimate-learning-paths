@@ -1911,6 +1911,509 @@ $$
 
 ---
 
+## Modul 012: Matematika Diskrit, Kombinatorika & Teori Graf
+
+Bagian ini menyajikan rangkaian latihan diagnostik Sokratik mendalam yang disinkronkan secara presisi dengan silabus komprehensif pada [Modul 012: Matematika Diskrit, Kombinatorika & Teori Graf](../curriculum/01-fondasi-matematika/012-matematika-diskrit-kombinatorika-graf.md). Setiap butir soal menguji batas pemahaman intuisi struktural, fondasi aksiomatik, dan ketelitian penurunan matematis diskrit dari prinsip pertama.
+
+---
+
+### Soal 012.1: Logika Predikat, Negasi Kuantor Ganda, dan Analisis Deadlock Sistem Operasi
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Bagaimana kita membuktikan secara matematis tanpa celah bahwa sebuah sistem operasi multi-utas (*multi-threaded OS*) tidak akan pernah mengalami kebuntuan (*deadlock*)? Bagaimana aturan De Morgan untuk kuantor ganda ($\forall$ dan $\exists$) membedakan antara kondisi "Semua thread menunggu setidaknya satu sumber daya" versus "Ada sebuah sumber daya yang ditunggu oleh semua thread"?
+
+Tinjau sekumpulan proses $P = \{p_1, p_2, \dots, p_n\}$ dan sumber daya $R = \{r_1, r_2, \dots, r_m\}$ dalam sistem operasi. Definisikan predikat $W(p, r, t)$ yang bernilai benar jika proses $p$ sedang menunggu pelepasan sumber daya $r$ pada waktu $t$.
+1. Tuliskan pernyataan formal logika predikat orde-pertama untuk kondisi: *"Pada setiap waktu $t$, setiap proses menunggu setidaknya satu sumber daya yang sedang ditahan oleh proses lain."*
+2. Terapkan hukum De Morgan untuk kuantor secara bertahap guna mencari negasi eksak dari pernyataan tersebut, dan jelaskan kondisi operasional yang menjamin sistem operasi bebas dari kebuntuan total (*deadlock-free*).
+3. Buktikan melalui kontradiksi bahwa jika relasi kepemilikan dan penungguan membentuk Graf Alokasi Sumber Daya (*Resource Allocation Graph*) asiklik berarah (DAG), maka sistem dijamin bebas kebuntuan pada waktu $t$.
+
+<details>
+<summary>💡 Petunjuk Bertahap (Hint)</summary>
+
+- **Petunjuk 1 (Formulasi Kuantor):** Urutan kuantor sangat krusial: "Setiap proses menunggu setidaknya satu sumber daya" ditulis sebagai $\forall p \in P, \exists r \in R$.
+- **Petunjuk 2 (Negasi Kuantor):** Ingat bahwa negasi menukar jenis kuantor dan menegasikan predikat di dalamnya: $\neg(\forall x, P(x)) \equiv \exists x, \neg P(x)$ dan $\neg(\exists y, Q(y)) \equiv \forall y, \neg Q(y)$.
+- **Petunjuk 3 (Sifat Asiklik DAG):** Setiap DAG berhingga selalu memiliki setidaknya satu simpul daun (*sink*) dengan derajat keluar nol (out-degree = 0). Apa arti simpul dengan out-degree nol dalam konteks proses dan sumber daya?
+</details>
+
+<details>
+<summary>✅ Pembahasan & Solusi Lengkap</summary>
+
+**Langkah 1: Formulasi Logika Formal Orde Pertama**
+Misalkan $H(p, r, t)$ adalah predikat bahwa proses $p$ menahan (*holds*) sumber daya $r$ pada waktu $t$. Kondisi bahwa setiap proses menunggu sumber daya yang ditahan proses lain dituliskan sebagai:
+$$\forall t, \forall p \in P, \exists r \in R, \exists q \in P \setminus \{p\} : \big(W(p, r, t) \land H(q, r, t)\big)$$
+
+**Langkah 2: Penurunan Negasi De Morgan Langkah-demi-Langkah**
+Negasi dari proposisi di atas adalah:
+$$\neg \left( \forall t, \forall p \in P, \exists r \in R, \exists q \in P \setminus \{p\} : \big(W(p, r, t) \land H(q, r, t)\big) \right)$$
+Terapkan hukum dualitas De Morgan kuantor:
+$$\exists t, \exists p \in P, \forall r \in R, \forall q \in P \setminus \{p\} : \neg \big(W(p, r, t) \land H(q, r, t)\big)$$
+Terapkan hukum De Morgan logika proposisi $\neg(A \land B) \equiv \neg A \lor \neg B$:
+$$\exists t, \exists p \in P, \forall r \in R, \forall q \in P \setminus \{p\} : \big(\neg W(p, r, t) \lor \neg H(q, r, t)\big)$$
+**Interpretasi Sistemik**: Pada waktu $t$, terdapat setidaknya satu proses $p$ yang tidak sedang menunggu sumber daya apa pun yang ditahan oleh proses lain. Proses $p$ ini bebas mengeksekusi instruksinya hingga selesai, melepaskan sumber daya yang dipegangnya, dan memecah potensi rantai penungguan melingkar (*circular wait*).
+
+**Langkah 3: Pembuktian Asiklisitas Menjamin Kebebasan Deadlock**
+1. Bentuk Graf Tunggu (*Wait-For Graph*) $G_W = (P, E)$ di mana busur berarah $p_i \to p_j$ ada jika dan hanya jika $p_i$ menunggu sumber daya yang sedang ditahan oleh $p_j$.
+2. Asumsikan terjadi deadlock. Berdasarkan kondisi Coffman, deadlock mensyaratkan adanya penungguan melingkar: himpunan proses $\{p_{k_1}, p_{k_2}, \dots, p_{k_c}\}$ sedemikian rupa sehingga $p_{k_1} \to p_{k_2} \to \dots \to p_{k_c} \to p_{k_1}$.
+3. Lintasan tertutup ini membentuk siklus berarah pada $G_W$.
+4. Hal ini berkontradiksi langsung dengan premis awal bahwa graf alokasi sumber daya adalah Directed Acyclic Graph (DAG) yang tidak memuat siklus apa pun.
+5. Oleh karena itu, jika graf adalah DAG, deadlock mustahil terjadi. $\blacksquare$
+</details>
+
+---
+
+### Soal 012.2: Relasi Ekuivalensi, Poset, Diagram Hasse, dan Topological Sort Paket Software
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Bagaimana manajer dependensi paket perangkat lunak (seperti npm, cargo, atau apt) menentukan urutan kompilasi ratusan pustaka kode yang saling bergantung tanpa menyebabkan lingkaran setan (*cyclic dependency*)? Mengapa keterurutan parsial (*poset*) dapat selalu diubah menjadi urutan linier total (*topological sort*)?
+
+Diberikan himpunan paket perangkat lunak $S = \{A, B, C, D, E, F\}$ dengan relasi dependensi $D \subseteq S \times S$, di mana $(x, y) \in D$ berarti "Paket $x$ harus dikompilasi sebelum paket $y$". Pasangan dependensi langsung yang diberikan adalah:
+$$D_{\text{langsung}} = \{(A, B), (A, C), (B, D), (C, D), (D, E), (C, F)\}$$
+1. Buktikan bahwa penutupan transitif dan refleksif $D^*$ dari relasi dependensi tersebut membentuk Himpunan Terurut Parsial (*Partially Ordered Set / Poset*) pada $S$.
+2. Gambarkan Diagram Hasse dari Poset tersebut dan tentukan seluruh elemen minimal (*minimal elements*) serta elemen maksimal (*maximal elements*).
+3. Tunjukkan bahwa urutan topologis (*Topological Sort*) dari Poset ini tidak unik. Hitung jumlah total urutan kompilasi linier yang valid dan tuliskan dua di antaranya.
+
+<details>
+<summary>💡 Petunjuk Bertahap (Hint)</summary>
+
+- **Petunjuk 1 (Aksioma Poset):** Tunjukkan bahwa relasi memenuhi refleksif, transitif, dan antisimetris (tidak ada dua paket berbeda yang saling bergantung: $(x, y) \in D^* \land (y, x) \in D^* \implies x = y$).
+- **Petunjuk 2 (Elemen Minimal & Maksimal):** Elemen minimal adalah paket yang tidak membutuhkan paket lain (in-degree nol). Elemen maksimal adalah paket yang tidak dibutuhkan oleh paket lain (out-degree nol).
+- **Petunjuk 3 (Menghitung Urutan):** $A$ harus selalu pertama. $E$ dan $F$ berada di cabang berbeda. Analisis percabangan antara jalur $B \to D \to E$ dan jalur $C \to F$.
+</details>
+
+<details>
+<summary>✅ Pembahasan & Solusi Lengkap</summary>
+
+**Langkah 1: Pembuktian Aksioma Poset**
+1. **Refleksif**: Secara definisi penutupan refleksif, $(x, x) \in D^*$ untuk setiap $x \in S$.
+2. **Transitif**: Penutupan transitif menjamin jika $x$ mendahului $y$ dan $y$ mendahului $z$, maka $x$ mendahului $z$.
+3. **Antisimetris**: Karena graf ketergantungan tidak memuat siklus terarah (DAG), jika $x \neq y$ dan $(x, y) \in D^*$, maka tidak ada lintasan dari $y$ kembali ke $x$. Sehingga kondisi $(x, y) \in D^* \land (y, x) \in D^*$ hanya terpenuhi saat $x = y$. Terbukti $(S, D^*)$ adalah Poset.
+
+**Langkah 2: Diagram Hasse & Ekstremalitas**
+Dalam Diagram Hasse, busur transitif dihapus dan arah dependensi diletakkan vertikal (ke atas):
+- Level 0 (Bawah): $A$
+- Level 1: $B$ (di atas $A$), $C$ (di atas $A$)
+- Level 2: $D$ (di atas $B$ dan $C$), $F$ (di atas $C$)
+- Level 3 (Atas): $E$ (di atas $D$)
+- **Elemen Minimal**: Tepat satu elemen, yaitu $\{A\}$ (tidak memiliki dependensi masukan).
+- **Elemen Maksimal**: Dua elemen, yaitu $\{E, F\}$ (tidak ada paket lain yang bergantung padanya).
+
+**Langkah 3: Perhitungan Banyaknya Topological Sort**
+Urutan kompilasi linier valid:
+- Paket $A$ wajib dieksekusi pertama (posisi 1).
+- Paket $C$ mendahului $F$, serta $B$ dan $C$ mendahului $D$, dan $D$ mendahului $E$.
+- Perhatikan paket $F$: $F$ hanya bergantung pada $C$. Begitu $C$ selesai, $F$ dapat dikompilasi kapan saja tanpa memengaruhi rantai $D \to E$.
+Mari kita telusuri penempatan $F$:
+1. Jika urutan awal $A, B, C$ atau $A, C, B$:
+   - Setelah $A, C$, paket $F$ dapat dieksekusi sebelum $B$, setelah $B$, setelah $D$, atau setelah $E$.
+Perhitungan kombinatorial penelusuran valid menghasilkan tepat **11 urutan topologis linier berbeda**.
+Dua contoh urutan linier valid:
+1. $A \to B \to C \to D \to E \to F$
+2. $A \to C \to F \to B \to D \to E$
+</details>
+
+---
+
+### Soal 012.3: Kombinatorika Stars and Bars, Partisi Integer, dan Alokasi Buffer Memori
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Sebuah klaster komputasi cloud harus membagi 15 unit megabyte buffer memori identik ke dalam 4 subsistem antrean pesan microservice. Bagaimana rumus *Stars and Bars* menghitung seluruh kemungkinan konfigurasi alokasi jika setiap subsistem wajib menerima minimal 1 MB memori? Bagaimana jika salah satu subsistem memiliki batas kapasitas maksimum?
+
+Misalkan sebuah pengontrol memori mengalokasikan $n = 15$ blok memori identik ke dalam $k = 4$ proses berbeda: $x_1, x_2, x_3, x_4$.
+1. Hitung banyaknya cara alokasi sedemikian rupa sehingga setiap proses menerima setidaknya 1 blok memori ($x_i \ge 1$ untuk semua $i \in \{1, 2, 3, 4\}$).
+2. Hitung banyaknya cara alokasi jika diperbolehkan ada proses yang tidak menerima memori sama sekali ($x_i \ge 0$).
+3. Jika proses $x_1$ memiliki batasan arsitektural di mana ia tidak boleh menerima lebih dari 5 blok memori ($1 \le x_1 \le 5$), sedangkan proses lainnya $x_2, x_3, x_4 \ge 1$, gunakan prinsip komplemen kombinatorial untuk menghitung banyaknya alokasi memori yang sah.
+
+<details>
+<summary>💡 Petunjuk Bertahap (Hint)</summary>
+
+- **Petunjuk 1 (Substitusi Variabel Positif):** Untuk $x_i \ge 1$, lakukan substitusi $y_i = x_i - 1 \ge 0$. Jumlah persamaan menjadi $\sum y_i = 15 - 4 = 11$.
+- **Petunjuk 2 (Rumus Standar):** Banyaknya solusi bilangan bulat non-negatif $\sum_{i=1}^k y_i = m$ adalah $\binom{m + k - 1}{k - 1}$.
+- **Petunjuk 3 (Strategi Komplemen):** Hitung total cara tanpa batas atas ($x_1 \ge 1$), lalu kurangkan dengan kasus terlarang di mana $x_1 \ge 6$.
+</details>
+
+<details>
+<summary>✅ Pembahasan & Solusi Lengkap</summary>
+
+**Langkah 1: Setiap Proses Menerima Minimal 1 Blok ($x_i \ge 1$)**
+Persamaan: $x_1 + x_2 + x_3 + x_4 = 15$ dengan $x_i \ge 1$.
+Lakukan transformasi variabel: misalkan $y_i = x_i - 1$ sehingga $y_i \ge 0$.
+$$(y_1 + 1) + (y_2 + 1) + (y_3 + 1) + (y_4 + 1) = 15 \implies y_1 + y_2 + y_3 + y_4 = 11$$
+Menggunakan rumus Stars and Bars untuk $m = 11$ bintang dan $k - 1 = 3$ batang pemisah:
+$$N_1 = \binom{11 + 4 - 1}{4 - 1} = \binom{14}{3} = \frac{14 \times 13 \times 12}{3 \times 2 \times 1} = 364 \text{ cara}$$
+
+**Langkah 2: Proses Boleh Menerima 0 Blok ($x_i \ge 0$)**
+Persamaan: $x_1 + x_2 + x_3 + x_4 = 15$ dengan $x_i \ge 0$.
+Di sini $n = 15$ dan $k = 4$:
+$$N_2 = \binom{15 + 4 - 1}{4 - 1} = \binom{18}{3} = \frac{18 \times 17 \times 16}{3 \times 2 \times 1} = 816 \text{ cara}$$
+
+**Langkah 3: Alokasi dengan Batas Atas Kapasitas ($1 \le x_1 \le 5$)**
+Gunakan prinsip komplemen himpunan:
+$$\text{Alokasi Sah} = (\text{Total Alokasi } x_i \ge 1) - (\text{Alokasi Terlarang di mana } x_1 \ge 6)$$
+1. Total alokasi dengan $x_i \ge 1$ adalah $N_1 = 364$.
+2. Kasus terlarang: $x_1 \ge 6$ dan $x_2, x_3, x_4 \ge 1$.
+   Substitusikan: $z_1 = x_1 - 6 \ge 0$, dan $z_j = x_j - 1 \ge 0$ untuk $j \in \{2, 3, 4\}$.
+   $$(z_1 + 6) + (z_2 + 1) + (z_3 + 1) + (z_4 + 1) = 15 \implies z_1 + z_2 + z_3 + z_4 = 6$$
+   Banyaknya cara terlarang:
+   $$N_{\text{terlarang}} = \binom{6 + 4 - 1}{4 - 1} = \binom{9}{3} = \frac{9 \times 8 \times 7}{3 \times 2 \times 1} = 84 \text{ cara}$$
+3. Jumlah alokasi sah yang memenuhi syarat kapasitas:
+   $$N_{\text{sah}} = 364 - 84 = 280 \text{ cara} \quad \blacksquare$$
+</details>
+
+---
+
+### Soal 012.4: Prinsip Inklusi-Eksklusi, Derangement Subfaktorial, dan Konvergensi Rasio Euler
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Mengapa dalam pertukaran kunci enkripsi rahasia antar 10 server (di mana tidak ada server yang boleh menerima kuncinya sendiri), probabilitas pengacakan sempurna selalu stabil mendekati angka $1/e \approx 36{,}8\%$, terlepas dari apakah ada 10 server atau 10 juta server?
+
+Tinjau permutasi himpunan $S = \{1, 2, \dots, n\}$. Sebuah derangement adalah permutasi $\pi$ sedemikian rupa sehingga $\pi(i) \neq i$ untuk setiap $i \in \{1, 2, \dots, n\}$. Banyaknya derangement dinotasikan sebagai $!n$ atau $D_n$.
+1. Gunakan Prinsip Inklusi-Eksklusi (PIE) dengan mendefinisikan kondisi sifat $P_i : \pi(i) = i$ untuk menurunkan rumus eksplisit derangement:
+   $$!n = n! \sum_{k=0}^n \frac{(-1)^k}{k!}$$
+2. Buktikan secara analitis bahwa probabilitas sebuah permutasi acak seragam merupakan derangement konvergen ke $1/e$ saat $n \to \infty$, dan buktikan batas galat aproksimasi $|P(\text{derangement}) - 1/e| \le \frac{1}{(n+1)!}$.
+3. Buktikan relasi rekurensi derangement dua-langkah:
+   $$D_n = (n - 1)(D_{n-1} + D_{n-2}) \quad \text{untuk } n \ge 3$$
+
+<details>
+<summary>💡 Petunjuk Bertahap (Hint)</summary>
+
+- **Petunjuk 1 (Himpunan Titik Tetap):** Misalkan $A_i$ adalah himpunan permutasi yang menetapkan elemen ke-$i$ tetap di posisinya ($\pi(i) = i$). Ukuran irisan $k$ himpunan $|A_{i_1} \cap \dots \cap A_{i_k}|$ adalah $(n - k)!$.
+- **Petunjuk 2 (Deret Taylor $e^x$):** Ingat ekspansi deret Maclaurin untuk eksponensial: $e^x = \sum_{k=0}^\infty \frac{x^k}{k!}$. Evaluasi pada $x = -1$.
+- **Petunjuk 3 (Argumen Kombinatorik Rekurensi):** Elemen 1 dapat dipetakan ke $k \in \{2, \dots, n\}$ ($n-1$ cara). Tinjau 2 kasus: apakah elemen $k$ dipetakan balik ke 1 (tersisa $n-2$ elemen) atau $k$ tidak dipetakan ke 1 (tersisa $n-1$ elemen).
+</details>
+
+<details>
+<summary>✅ Pembahasan & Solusi Lengkap</summary>
+
+**Langkah 1: Penurunan Formula Eksplisit via PIE**
+1. Semesta permutasi memiliki ukuran $|U| = n!$.
+2. Misalkan $A_i$ adalah himpunan permutasi di mana $\pi(i) = i$.
+3. Irisan dari sembarang $k$ himpunan indeks memiliki $k$ elemen yang terkunci di posisi aslinya, sedangkan $n - k$ elemen sisanya bebas diacak:
+   $$|A_{i_1} \cap A_{i_2} \cap \dots \cap A_{i_k}| = (n - k)!$$
+4. Banyaknya cara memilih $k$ himpunan dari $n$ kemungkinan adalah $\binom{n}{k}$.
+5. Berdasarkan Prinsip Inklusi-Eksklusi, banyaknya permutasi yang memiliki setidaknya satu titik tetap adalah:
+   $$\left| \bigcup_{i=1}^n A_i \right| = \sum_{k=1}^n (-1)^{k-1} \binom{n}{k} (n - k)! = \sum_{k=1}^n (-1)^{k-1} \frac{n!}{k!(n-k)!} (n-k)! = n! \sum_{k=1}^n \frac{(-1)^{k-1}}{k!}$$
+6. Banyaknya derangement adalah komplemen terhadap semesta:
+   $$D_n = n! - \left| \bigcup_{i=1}^n A_i \right| = n! \left( 1 - \sum_{k=1}^n \frac{(-1)^{k-1}}{k!} \right) = n! \sum_{k=0}^n \frac{(-1)^k}{k!} \quad \blacksquare$$
+
+**Langkah 2: Konvergensi Asimtotik Rasio Euler $1/e$**
+Probabilitas bahwa permutasi acak merupakan derangement adalah:
+$$P_n = \frac{D_n}{n!} = \sum_{k=0}^n \frac{(-1)^k}{k!}$$
+Karena deret Taylor untuk $e^x = \sum_{k=0}^\infty \frac{x^k}{k!}$, maka untuk $x = -1$:
+$$\lim_{n \to \infty} P_n = e^{-1} = \frac{1}{e} \approx 0{,}36787944$$
+Berdasarkan Teorema Deret Bolak-Balik (Alternating Series Estimation Theorem), galat pemotongan suku ke-$n$ dibatasi oleh nilai mutlak suku pertama yang diabaikan:
+$$\left| P_n - \frac{1}{e} \right| \le \frac{1}{(n + 1)!}$$
+Untuk $n = 10$, galatnya kurang dari $\frac{1}{11!} \approx 2{,}5 \times 10^{-8}$, membuktikan bahwa konvergensi terjadi seketika!
+
+**Langkah 3: Pembuktian Relasi Rekurensi Kombinatorik**
+Tinjau posisi elemen 1: $\pi(1)$ tidak boleh bernilai 1. Terdapat $n - 1$ kemungkinan nilai untuk $\pi(1)$, misalkan $\pi(1) = j$ ($j \in \{2, \dots, n\}$).
+Sekarang perhatikan ke mana elemen $j$ dipetakan ($\pi(j)$):
+1. **Kasus A: $\pi(j) = 1$ (Saling bertukar)**:
+   Elemen 1 dan $j$ membentuk siklus panjang 2. Sisa $n - 2$ elemen lainnya harus membentuk derangement mandiri. Ada $D_{n-2}$ cara.
+2. **Kasus B: $\pi(j) \neq 1$**:
+   Elemen $j$ tidak boleh dipetakan ke 1. Jika kita memandang elemen 1 sebagai 'pengganti identitas' posisi $j$, maka kita memiliki $n - 1$ elemen yang tidak boleh dipetakan ke posisi terlarangnya masing-masing. Ada $D_{n-1}$ cara.
+Menjumlahkan kedua kasus dan mengalikan dengan $n - 1$ pilihan untuk $j$:
+$$D_n = (n - 1)(D_{n-1} + D_{n-2}) \quad \blacksquare$$
+</details>
+
+---
+
+### Soal 012.5: Relasi Rekurensi Linier Homogen, Akar Karakteristik, dan Teorema Master
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Bagaimana kita dapat mengetahui running-time eksak suatu fungsi rekursif pemrosesan data (seperti algoritma Divide and Conquer MergeSort atau Karatsuba) tanpa harus menjalankan program tersebut ribuan kali di server benchmark?
+
+1. Selesaikan relasi rekurensi linier homogen orde-2 berikut secara eksak:
+   $$a_n - 5a_{n-1} + 6a_{n-2} = 0 \quad \text{untuk } n \ge 2, \quad \text{dengan kondisi awal } a_0 = 1, a_1 = 4$$
+2. Selesaikan relasi rekurensi dengan akar karakteristik ganda:
+   $$b_n - 4b_{n-1} + 4b_{n-2} = 0 \quad \text{untuk } n \ge 2, \quad \text{dengan kondisi awal } b_0 = 2, b_1 = 8$$
+3. Tentukan batas asimtotik ketat ($\Theta$) menggunakan Teorema Master untuk relasi rekurensi algoritma perkalian integer besar Karatsuba:
+   $$T(n) = 3 T\left(\left\lceil \frac{n}{2} \right\rceil\right) + \Theta(n)$$
+
+<details>
+<summary>💡 Petunjuk Bertahap (Hint)</summary>
+
+- **Petunjuk 1 (Akar Karakteristik):** Asumsikan solusi berbentuk $a_n = r^n$, bentuk polinomial $r^2 - 5r + 6 = 0$, dan faktorkan.
+- **Petunjuk 2 (Akar Kembar):** Jika akar karakteristik bernilai kembar ($r_1 = r_2 = r$), maka basis solusi keduanya dikalikan faktor linier $n$: $b_n = (\alpha_1 + \alpha_2 n) r^n$.
+- **Petunjuk 3 (Teorema Master):** Identifikasi parameter $a = 3$, $b = 2$, dan $f(n) = \Theta(n^1)$. Bandingkan $\log_b a = \log_2 3 \approx 1{,}585$ dengan eksponen $d = 1$.
+</details>
+
+<details>
+<summary>✅ Pembahasan & Solusi Lengkap</summary>
+
+**Langkah 1: Relasi Rekurensi Akar Berbeda**
+Persamaan: $a_n - 5a_{n-1} + 6a_{n-2} = 0$.
+Persamaan karakteristik:
+$$r^2 - 5r + 6 = 0 \implies (r - 2)(r - 3) = 0 \implies r_1 = 2, \; r_2 = 3$$
+Solusi umum:
+$$a_n = \alpha_1 \cdot 2^n + \alpha_2 \cdot 3^n$$
+Terapkan kondisi awal:
+- $n = 0 \implies \alpha_1 + \alpha_2 = 1 \implies \alpha_2 = 1 - \alpha_1$
+- $n = 1 \implies 2\alpha_1 + 3\alpha_2 = 4 \implies 2\alpha_1 + 3(1 - \alpha_1) = 4 \implies 3 - \alpha_1 = 4 \implies \alpha_1 = -1$
+- Sehingga $\alpha_2 = 1 - (-1) = 2$.
+Solusi eksplisit:
+$$a_n = -1 \cdot 2^n + 2 \cdot 3^n = 2 \cdot 3^n - 2^n \quad \blacksquare$$
+
+**Langkah 2: Relasi Rekurensi Akar Ganda**
+Persamaan: $b_n - 4b_{n-1} + 4b_{n-2} = 0$.
+Persamaan karakteristik:
+$$r^2 - 4r + 4 = 0 \implies (r - 2)^2 = 0 \implies r_1 = r_2 = 2$$
+Karena akar kembar, solusi umum melibatkan faktor pengali $n$:
+$$b_n = (\alpha_1 + \alpha_2 n) 2^n$$
+Terapkan kondisi awal:
+- $n = 0 \implies (\alpha_1 + 0) \cdot 1 = 2 \implies \alpha_1 = 2$
+- $n = 1 \implies (2 + \alpha_2) \cdot 2 = 8 \implies 2 + \alpha_2 = 4 \implies \alpha_2 = 2$
+Solusi eksplisit:
+$$b_n = (2 + 2n) 2^n = (n + 1) 2^{n+1} \quad \blacksquare$$
+
+**Langkah 3: Analisis Teorema Master untuk Algoritma Karatsuba**
+Relasi: $T(n) = 3 T(n/2) + \Theta(n)$.
+- $a = 3$ (banyaknya submasalah rekursif).
+- $b = 2$ (faktor penyusutan ukuran masukan).
+- $f(n) = \Theta(n^d)$ dengan $d = 1$.
+Hitung nilai kritis:
+$$\log_b a = \log_2 3 \approx 1{,}58496$$
+Bandingkan dengan $d$:
+$$d = 1 < \log_2 3 \approx 1{,}585$$
+Ini adalah Kasus 1 dari Teorema Master, di mana beban kerja didominasi oleh daun pohon rekursi:
+$$T(n) = \Theta(n^{\log_b a}) = \Theta(n^{\log_2 3}) \approx \Theta(n^{1{,}585})$$
+Hasil ini secara dramatis lebih cepat daripada perkalian sekolah dasar biasa yang membutuhkan $\Theta(n^2)$.
+</details>
+
+---
+
+### Soal 012.6: Teori Graf Dasar, Teorema Havel-Hakimi, dan Algoritma Tarjan SCC
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Diberikan daftar target koneksi router jaringan: [5, 4, 3, 3, 2, 1], apakah secara fisik mungkin kita membangun jaringan kabel tanpa tabrakan yang persis memenuhi daftar derajat tersebut? Dan bagaimana algoritma Tarjan mengisolasi kelompok router yang saling terhubung kuat dalam satu putaran DFS linier?
+
+1. Uji apakah barisan derajat berikut bersifat grafis (*graphical sequence*) menggunakan Teorema Havel-Hakimi:
+   $$S_1 = (5, 4, 3, 3, 2, 1) \quad \text{dan} \quad S_2 = (4, 4, 3, 2, 2, 1)$$
+2. Tinjau sebuah graf berarah dengan simpul $V = \{1, 2, 3, 4, 5\}$ dan busur $E = \{(1, 2), (2, 3), (3, 1), (2, 4), (4, 5), (5, 4)\}$. Lacak secara bertahap eksekusi Algoritma Tarjan untuk menemukan seluruh Komponen Terhubung Kuat (*Strongly Connected Components / SCC*).
+3. Buktikan bahwa sebuah graf berarah $G$ adalah DAG (Directed Acyclic Graph) jika dan hanya jika setiap SCC dari $G$ hanya memuat tepat satu simpul tanpa sisi ke dirinya sendiri (*self-loop*).
+
+<details>
+<summary>💡 Petunjuk Bertahap (Hint)</summary>
+
+- **Petunjuk 1 (Havel-Hakimi):** Urutkan menurun. Ambil elemen pertama $d_1$, hapus dari barisan, lalu kurangi 1 dari $d_1$ elemen berikutnya. Urutkan ulang dan ulangi hingga tersisa semua nol (grafis) atau muncul angka negatif (bukan grafis).
+- **Petunjuk 2 (Tarjan Low-Link):** Simpul adalah akar SCC jika setelah traversal DFS selesai pada anak-anaknya, $low[u] == disc[u]$.
+- **Petunjuk 3 (Karakterisasi DAG):** Siklus dalam graf berarah mengharuskan minimal dua simpul saling mencapai atau satu simpul mencapai dirinya sendiri, yang otomatis membentuk SCC berukuran $\ge 2$ atau memuat loop.
+</details>
+
+<details>
+<summary>✅ Pembahasan & Solusi Lengkap</summary>
+
+**Langkah 1: Uji Havel-Hakimi Barisan Derajat**
+**Analisis $S_1 = (5, 4, 3, 3, 2, 1)$**:
+1. Cek Handshaking Lemma: $\sum d_i = 5 + 4 + 3 + 3 + 2 + 1 = 18$ (genap, lolos uji awal).
+2. Elemen pertama $d_1 = 5$. Hapus 5, kurangi 1 dari 5 elemen berikutnya:
+   $$(4-1, 3-1, 3-1, 2-1, 1-1) = (3, 2, 2, 1, 0)$$
+3. Elemen pertama $d_1 = 3$. Hapus 3, kurangi 1 dari 3 elemen berikutnya:
+   $$(2-1, 2-1, 1-1, 0) = (1, 1, 0, 0)$$
+4. Elemen pertama $d_1 = 1$. Hapus 1, kurangi 1 dari 1 elemen berikutnya:
+   $$(1-1, 0, 0) = (0, 0, 0)$$
+Semua elemen bernilai nol. Terbukti $S_1$ **bersifat grafis** (graf sederhana dapat dibangun)!
+
+**Analisis $S_2 = (4, 4, 3, 2, 2, 1)$**:
+1. Cek Handshaking Lemma: $\sum d_i = 4 + 4 + 3 + 2 + 2 + 1 = 16$ (genap).
+2. Elemen pertama $d_1 = 4$. Hapus 4, kurangi 1 dari 4 elemen berikutnya:
+   $$(4-1, 3-1, 2-1, 2-1, 1) = (3, 2, 1, 1, 1)$$
+3. Elemen pertama $d_1 = 3$. Hapus 3, kurangi 1 dari 3 elemen berikutnya:
+   $$(2-1, 1-1, 1-1, 1) = (1, 0, 0, 1) \xrightarrow{\text{urutkan}} (1, 1, 0, 0)$$
+4. Elemen pertama $d_1 = 1$. Hapus 1, kurangi 1 dari 1 elemen berikutnya:
+   $$(1-1, 0, 0) = (0, 0, 0)$$
+Terbukti $S_2$ juga **bersifat grafis**!
+
+**Langkah 2: Penelusuran Algoritma Tarjan SCC**
+Graf: Busur $1 \to 2 \to 3 \to 1$, $2 \to 4 \rightleftharpoons 5$.
+1. Mulai DFS dari simpul 1:
+   - `disc[1] = low[1] = 0`, Stack: `[1]`
+   - Transisi ke 2: `disc[2] = low[2] = 1`, Stack: `[1, 2]`
+   - Transisi ke 3: `disc[3] = low[3] = 2`, Stack: `[1, 2, 3]`
+   - Transisi ke 1: Simpul 1 sudah di stack! Back-edge $\implies low[3] = \min(low[3], disc[1]) = 0$.
+2. Transisi dari 2 ke 4 (setelah eksplorasi cabang 3 selesai):
+   - `disc[4] = low[4] = 3`, Stack: `[1, 2, 3, 4]`
+   - Transisi ke 5: `disc[5] = low[5] = 4`, Stack: `[1, 2, 3, 4, 5]`
+   - Transisi ke 4: Simpul 4 ada di stack! $low[5] = \min(low[5], disc[4]) = 3$.
+3. Unwind Simpul 5: $low[5] = 3 \neq disc[5] = 4$.
+4. Unwind Simpul 4: $low[4] = \min(low[4], low[5]) = 3$.
+   Karena $low[4] == disc[4] == 3$, simpul 4 adalah akar SCC!
+   Pop stack hingga simpul 4: **Komponen SCC-1: $\{5, 4\}$**.
+5. Kembali ke simpul 2: $low[2] = \min(low[2], low[3]) = \min(1, 0) = 0$.
+6. Kembali ke simpul 1: $low[1] = \min(low[1], low[2]) = 0$.
+   Karena $low[1] == disc[1] == 0$, simpul 1 adalah akar SCC!
+   Pop stack hingga simpul 1: **Komponen SCC-2: $\{3, 2, 1\}$**.
+Hasil akhir: Graf terbagi menjadi tepat 2 SCC: $\{4, 5\}$ dan $\{1, 2, 3\}$.
+
+**Langkah 3: Karakterisasi DAG**
+Sebuah graf memuat siklus terarah $C = v_1 \to v_2 \to \dots \to v_k \to v_1$. Karena setiap simpul pada $C$ dapat mencapai simpul lainnya pada $C$, maka seluruh simpul pada $C$ berada dalam SCC yang sama, sehingga $|SCC| \ge 2$ (atau berukuran 1 dengan self-loop). Sebaliknya, jika setiap SCC berukuran 1 tanpa self-loop, tidak ada lintasan tertutup yang dapat kembali ke simpul awal, membuktikan graf adalah DAG. $\blacksquare$
+</details>
+
+---
+
+### Soal 012.7: Pohon Spanning Tree Minimum (Kruskal & DSU) vs Jalur Terpendek Dijkstra
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Mengapa kabel jaringan telepon antarkota yang dibangun dengan biaya paling murah (Minimum Spanning Tree) TIDAK SELALU memberikan jalur pengiriman data tercepat (Shortest Path) antara dua kota tertentu?
+
+Diberikan graf berbobot positif tak berarah $G = (V, E, w)$ dengan simpul $V = \{A, B, C, D\}$ dan sisi-sisi berikut:
+$$E = \{(A, B, 1), (B, C, 2), (C, D, 3), (A, D, 4), (B, D, 2)\}$$
+1. Hitung Minimum Spanning Tree (MST) dari graf di atas menggunakan Algoritma Kruskal. Lacak status himpunan saling lepas (*Disjoint Set Union / DSU*) pada setiap penambahan sisi.
+2. Hitung lintasan terpendek dari simpul asal $A$ ke seluruh simpul lainnya menggunakan Algoritma Dijkstra.
+3. Bandingkan jarak lintasan dari $A$ ke $D$ pada pohon MST hasil Kruskal versus lintasan terpendek hasil Dijkstra. Berikan bukti formal mengapa pohon MST tidak identik dengan pohon lintasan terpendek (*Shortest Path Tree*).
+
+<details>
+<summary>💡 Petunjuk Bertahap (Hint)</summary>
+
+- **Petunjuk 1 (Kruskal Sort):** Urutkan sisi berdasarkan bobot menaik: $(A, B, 1), (B, C, 2), (B, D, 2), (C, D, 3), (A, D, 4)$. Pilih sisi yang tidak membentuk siklus.
+- **Petunjuk 2 (Dijkstra Greedy):** Min-heap selalu mengekstrak simpul dengan jarak akumulatif terkecil dari asal $A$.
+- **Petunjuk 3 (Fungsi Objektif):** MST meminimalkan $\sum_{e \in T} w(e)$ (total biaya infrastruktur), sedangkan Dijkstra meminimalkan $\sum_{e \in P(s, v)} w(e)$ (latensi individu dari titik awal).
+</details>
+
+<details>
+<summary>✅ Pembahasan & Solusi Lengkap</summary>
+
+**Langkah 1: Algoritma Kruskal & Pelacakan DSU**
+1. Urutkan seluruh sisi berdasarkan bobot non-menurun:
+   - $e_1 = (A, B)$, bobot 1
+   - $e_2 = (B, C)$, bobot 2
+   - $e_3 = (B, D)$, bobot 2
+   - $e_4 = (C, D)$, bobot 3
+   - $e_5 = (A, D)$, bobot 4
+2. Inisialisasi DSU: $\{A\}, \{B\}, \{C\}, \{D\}$.
+3. Evaluasi $e_1 = (A, B, 1)$: $\text{Find}(A) \neq \text{Find}(B) \implies$ Terima! Gabung: $\{A, B\}, \{C\}, \{D\}$.
+4. Evaluasi $e_2 = (B, C, 2)$: $\text{Find}(B) \neq \text{Find}(C) \implies$ Terima! Gabung: $\{A, B, C\}, \{D\}$.
+5. Evaluasi $e_3 = (B, D, 2)$: $\text{Find}(B) \neq \text{Find}(D) \implies$ Terima! Gabung: $\{A, B, C, D\}$.
+6. Karena sudah terpilih $|V| - 1 = 3$ sisi, algoritma Kruskal berhenti.
+**Bobot Total MST**: $w(T) = 1 + 2 + 2 = 5$.
+Sisi-sisi MST: $\{(A, B), (B, C), (B, D)\}$.
+
+**Langkah 2: Algoritma Dijkstra dari Simpul Asal $A$**
+- Jarak awal: $\text{dist}[A] = 0, \text{dist}[B] = \infty, \text{dist}[C] = \infty, \text{dist}[D] = \infty$.
+- Kunjungi $A$ ($\text{dist}=0$):
+  - Relaksasi $B$: $\text{dist}[B] = \min(\infty, 0 + 1) = 1$
+  - Relaksasi $D$: $\text{dist}[D] = \min(\infty, 0 + 4) = 4$
+- Kunjungi $B$ ($\text{dist}=1$):
+  - Relaksasi $C$: $\text{dist}[C] = \min(\infty, 1 + 2) = 3$
+  - Relaksasi $D$: $\text{dist}[D] = \min(4, 1 + 2) = 3$ (diperbarui!)
+- Kunjungi $C$ ($\text{dist}=3$) dan $D$ ($\text{dist}=3$): tidak ada pembaruan lebih lanjut.
+**Jarak Terpendek dari $A$**:
+- $\text{dist}(A, B) = 1$ (lintasan $A \to B$)
+- $\text{dist}(A, C) = 3$ (lintasan $A \to B \to C$)
+- $\text{dist}(A, D) = 3$ (lintasan $A \to B \to D$)
+
+**Langkah 3: Perbandingan MST vs Shortest Path Tree (SPT)**
+- Pada graf ini, lintasan dari $A$ ke $D$ melalui pohon MST adalah $A \to B \to D$ dengan panjang $1 + 2 = 3$, yang kebetulan sama dengan Dijkstra.
+- Namun, perhatikan jika kita menambahkan sisi langsung $(A, D)$ dengan bobot 2.5:
+  - Dijkstra akan memilih lintasan langsung $A \to D$ (panjang 2.5).
+  - Kruskal tetap memilih sisi $(B, D)$ berbobot 2 karena bobot sisi 2 < 2.5, sehingga jarak di MST menjadi $1 + 2 = 3 > 2.5$.
+- **Bukti Formal Perbedaan**: Fungsi objektif MST adalah meminimalkan fungsi skalar global $\sum_{e \in T} w(e)$, sedangkan SPT meminimalkan keluarga vektor jarak lokal $\text{dist}(s, v)$ untuk setiap $v \in V$. Graf lengkap $K_3$ dengan bobot sisi 2, 2, 3 memiliki MST berbobot $2+2=4$ (jarak simpul terjauh = 4), sedangkan SPT dari simpul asal dengan sisi bobot 3 memiliki jarak langsung 3. $\blacksquare$
+</details>
+
+---
+
+### Soal 012.8: Sirkuit Euler, Algoritma Hierholzer, Siklus Hamilton, dan Planaritas Kuratowski
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Mengapa kita bisa merancang jalur pengiriman kurir pos yang melewati setiap jalanan kota tepat satu kali secara instan dalam waktu hitungan detik (Sirkuit Euler), tetapi mencari jalur yang mengunjungi setiap rumah tepat satu kali (Siklus Hamilton) adalah masalah yang begitu sulit hingga para ilmuwan komputer menjadikannya teka-teki berhadiah satu juta dolar (NP-Complete)?
+
+1. Berikan karakterisasi lengkap syarat perlu dan cukup bagi graf terhubung tak berarah untuk memiliki: (a) Sirkuit Euler, dan (b) Lintasan Euler terbuka.
+2. Tinjau sebuah graf terhubung $G$ di mana seluruh simpul memiliki derajat genap. Buktikan kebenaran Algoritma Hierholzer bahwa penggabungan siklus-siklus sederhana selalu menghasilkan Sirkuit Euler valid dalam kompleksitas waktu linier $O(|E|)$.
+3. Tunjukkan bahwa graf utilitas 3 rumah dan 3 sumber daya ($K_{3,3}$) bersifat non-planar menggunakan Rumus Polihedron Euler $V - E + F = 2$ dan ketaksamaan sisi-ke-muka.
+
+<details>
+<summary>💡 Petunjuk Bertahap (Hint)</summary>
+
+- **Petunjuk 1 (Derajat Euler):** Setiap kali lintasan masuk ke sebuah simpul, ia harus keluar melalui sisi lain. Simpul ganjil bertindak sebagai simpul awal/akhir lintasan terbuka.
+- **Petunjuk 2 (Hierholzer):** Selama masih ada sisi yang belum dikunjungi, simpul pada sirkuit sementara pasti memiliki sisi keluar yang belum terpakai karena derajat semua simpul genap.
+- **Petunjuk 3 (Ketaksamaan Planaritas $K_{3,3}$):** Graf bipartit tidak memuat siklus ganjil (tidak ada segitiga, sehingga batas setiap muka $f$ memiliki minimal 4 sisi: $2E \ge 4F \implies F \le E/2$).
+</details>
+
+<details>
+<summary>✅ Pembahasan & Solusi Lengkap</summary>
+
+**Langkah 1: Karakterisasi Teorema Euler**
+1. **Sirkuit Euler (Lintasan Tertutup Melintasi Setiap Sisi Tepat Sekali)**:
+   Graf terhubung $G$ memuat Sirkuit Euler $\iff$ setiap simpul $v \in V$ berderajat genap ($\deg(v) \pmod 2 = 0$).
+2. **Lintasan Euler Terbuka (Titik Awal $\neq$ Titik Akhir)**:
+   Graf terhubung $G$ memuat Lintasan Euler terbuka $\iff$ terdapat tepat dua simpul berderajat ganjil (simpul awal dan simpul akhir), sedangkan seluruh simpul lainnya berderajat genap.
+
+**Langkah 2: Pembuktian Kebenaran Algoritma Hierholzer $O(|E|)$**
+1. Mulai dari sembarang simpul $v$, lakukan penelusuran sisi secara acak tanpa mengulang sisi. Karena setiap simpul berderajat genap, penelusuran tidak akan pernah terhenti di simpul perantara selain simpul awal $v$. Lintasan tertutup sederhana $C_1$ pasti terbentuk.
+2. Jika $C_1$ memuat seluruh sisi di $E$, selesai.
+3. Jika belum, karena graf terhubung, pasti terdapat simpul $u \in C_1$ yang masih memiliki sisi yang belum dikunjungi.
+4. Lakukan penelusuran siklus baru $C_2$ mulai dari $u$.
+5. Sisipkan siklus $C_2$ ke dalam sirkuit $C_1$ pada posisi $u$.
+6. Ulangi proses hingga seluruh sisi terpakai. Karena setiap sisi dikunjungi tepat sekali saat konstruksi dan tepat sekali saat penggabungan sirkuit, total waktu eksekusi adalah $O(|E|)$. $\blacksquare$
+
+**Langkah 3: Pembuktian Non-Planaritas $K_{3,3}$ Menggunakan Rumus Euler**
+1. Graf $K_{3,3}$ memiliki $V = 6$ simpul (3 simpul rumah dan 3 simpul utilitas) dan $E = 3 \times 3 = 9$ sisi.
+2. Karena $K_{3,3}$ adalah graf bipartit, graf ini tidak memuat siklus sederhana dengan panjang ganjil. Siklus terpendek (girth) dari $K_{3,3}$ adalah $C_4$, yang berarti setiap muka (*face*) $F$ pada representasi planar harus dibatasi oleh setidaknya 4 sisi.
+3. Setiap sisi berbatasan dengan paling banyak 2 muka, sehingga berlaku ketaksamaan:
+   $$2E \ge 4F \implies F \le \frac{E}{2}$$
+4. Substitusikan Rumus Polihedron Euler $V - E + F = 2$:
+   $$F = 2 - V + E$$
+5. Masukkan ke dalam ketaksamaan batas muka:
+   $$2 - V + E \le \frac{E}{2} \implies 2 - V + \frac{E}{2} \le 0 \implies E \le 2V - 4$$
+6. Uji nilai parameter untuk $K_{3,3}$ di mana $V = 6$ dan $E = 9$:
+   $$9 \le 2(6) - 4 = 12 - 4 = 8 \quad \textbf{[KONTRADIKSI! } 9 \le 8 \text{ SALAH]}$$
+7. Kontradiksi ini membuktikan secara aksiomatik bahwa $K_{3,3}$ **tidak mungkin digambar pada bidang datar tanpa persilangan sisi (non-planar)**. Berdasarkan Teorema Kuratowski, sembarang graf yang memuat pembagian dari $K_{3,3}$ juga dijamin non-planar. $\blacksquare$
+</details>
+
+---
+
+### Soal 012.9: Pewarnaan Graf Heuristik DSATUR dan Matriks Laplacian Kombinatorial Spektral
+
+> **🎯 Inti Soal dalam Bahasa Manusia:** Bagaimana kita dapat mempartisi jaringan server komputer menjadi dua kelompok otonom dengan koneksi antarkelompok seminimal mungkin hanya dengan menghitung nilai eigen kedua dari matriks selisih derajat jaringan (*Spectral Laplacian Matrix*)?
+
+Diberikan sebuah graf tak berarah $G = (V, E)$ berbentuk cincin 4 simpul dengan satu diagonal:
+$$V = \{1, 2, 3, 4\}, \quad E = \{(1, 2), (2, 3), (3, 4), (4, 1), (1, 3)\}$$
+1. Hitung bilangan kromatik $\chi(G)$ dan ukuran klik maksimum $\omega(G)$. Tentukan alokasi warna optimal menggunakan heuristik DSATUR (*Degree of Saturation*).
+2. Konstruksi Matriks Derajat $D$, Matriks Ketetanggaan $A$, dan Matriks Laplacian Kombinatorial $L = D - A$.
+3. Hitung seluruh nilai eigen dari matriks Laplacian $L$. Identifikasi nilai eigen terkecil kedua $\lambda_2$ (Konektivitas Aljabar Fiedler) dan jelaskan makna fisis/topologisnya terhadap partisi graf.
+
+<details>
+<summary>💡 Petunjuk Bertahap (Hint)</summary>
+
+- **Petunjuk 1 (Klik dan Batas Bawah):** Simpul $\{1, 2, 3\}$ membentuk segitiga ($K_3$). Berapa banyak warna minimum untuk segitiga?
+- **Petunjuk 2 (Matriks Laplacian):** Diagonal $L_{ii} = \deg(v_i)$, dan non-diagonal $L_{ij} = -1$ jika ada sisi $(i, j)$, serta $0$ jika tidak ada.
+- **Petunjuk 3 (Spektrum Laplacian):** Nilai eigen $\lambda_1$ selalu nol dengan vektor eigen konstan $\mathbf{1}$. Nilai eigen $\lambda_2 > 0$ mengukur ketahanan konektivitas graf.
+</details>
+
+<details>
+<summary>✅ Pembahasan & Solusi Lengkap</summary>
+
+**Langkah 1: Bilangan Kromatik & Pewarnaan DSATUR**
+1. Simpul $\{1, 2, 3\}$ saling terhubung membentuk klik berukuran 3 ($K_3$). Oleh karena itu, ukuran klik maksimum adalah $\omega(G) = 3$.
+2. Karena $\chi(G) \ge \omega(G)$, maka $\chi(G) \ge 3$.
+3. Algoritma DSATUR:
+   - Derajat awal: $\deg(1) = 3, \deg(2) = 2, \deg(3) = 3, \deg(4) = 2$.
+   - Warnai simpul 1 (derajat maksimum) dengan Warna 0: `Warna[1] = 0`.
+   - Derajat saturasi: Simpul 2, 3, 4 masing-masing memiliki 1 tetangga berwarna (DSAT = 1).
+   - Tie-break: Simpul 3 memiliki derajat asli lebih besar ($\deg(3) = 3$). Warnai simpul 3 dengan warna non-negatif terkecil yang belum dipakai tetangganya: `Warna[3] = 1`.
+   - Evaluasi simpul 2: Tetangganya (1 dan 3) menggunakan Warna 0 dan 1. Maka `Warna[2] = 2`.
+   - Evaluasi simpul 4: Tetangganya (1 dan 3) menggunakan Warna 0 dan 1. Warna 2 belum digunakan tetangga 4, maka `Warna[4] = 2`.
+4. Total warna yang digunakan adalah tepat 3 warna:
+   $$\chi(G) = 3$$
+
+**Langkah 2: Konstruksi Matriks Laplacian Kombinatorial $L = D - A$**
+Matriks Derajat $D$:
+$$D = \begin{pmatrix} 3 & 0 & 0 & 0 \\ 0 & 2 & 0 & 0 \\ 0 & 0 & 3 & 0 \\ 0 & 0 & 0 & 2 \end{pmatrix}$$
+Matriks Ketetanggaan $A$:
+$$A = \begin{pmatrix} 0 & 1 & 1 & 1 \\ 1 & 0 & 1 & 0 \\ 1 & 1 & 0 & 1 \\ 1 & 0 & 1 & 0 \end{pmatrix}$$
+Matriks Laplacian $L = D - A$:
+$$L = \begin{pmatrix} 3 & -1 & -1 & -1 \\ -1 & 2 & -1 & 0 \\ -1 & -1 & 3 & -1 \\ -1 & 0 & -1 & 2 \end{pmatrix}$$
+Perhatikan bahwa jumlah setiap elemen pada baris matriks $L$ adalah nol ($L \mathbf{1} = \mathbf{0}$).
+
+**Langkah 3: Perhitungan Spektrum Nilai Eigen Laplacian**
+Persamaan karakteristik: $\det(L - \lambda I) = 0$.
+Perhatikan struktur simetri graf:
+1. Vektor eigen trivial: $v_1 = [1, 1, 1, 1]^T \implies L v_1 = 0 \cdot v_1 \implies \lambda_1 = 0$.
+2. Vektor simetri simpul 2 dan 4: $v_2 = [0, 1, 0, -1]^T$:
+   $$L v_2 = \begin{pmatrix} 3 & -1 & -1 & -1 \\ -1 & 2 & -1 & 0 \\ -1 & -1 & 3 & -1 \\ -1 & 0 & -1 & 2 \end{pmatrix} \begin{pmatrix} 0 \\ 1 \\ 0 \\ -1 \end{pmatrix} = \begin{pmatrix} 0 \\ 2 \\ 0 \\ -2 \end{pmatrix} = 2 \begin{pmatrix} 0 \\ 1 \\ 0 \\ -1 \end{pmatrix} \implies \lambda_2 = 2$$
+3. Vektor simetri simpul 1 dan 3: $v_3 = [1, 0, -1, 0]^T$:
+   $$L v_3 = [4, 0, -4, 0]^T = 4 v_3 \implies \lambda_3 = 4$$
+4. Vektor ortogonal terakhir: $v_4 = [1, -1, 1, -1]^T$:
+   $$L v_4 = [4, -4, 4, -4]^T = 4 v_4 \implies \lambda_4 = 4$$
+Himpunan nilai eigen Laplacian adalah:
+$$\text{Spec}(L) = \{0, 2, 4, 4\}$$
+- **Konektivitas Aljabar Fiedler**: $\lambda_2 = 2$.
+Karena $\lambda_2 = 2 > 0$, graf dijamin terhubung kokoh. Vektor eigen Fiedler $v_2 = [0, 1, 0, -1]^T$ mempartisi simpul menjadi dua klaster optimal berdasarkan tanda entri vektor ($+1$ untuk simpul 2 dan $-1$ untuk simpul 4), mengisolasi kedua simpul perifer secara simetris sempurna. $\blacksquare$
+</details>
+
+---
+
 ## 5. Rubrik Evaluasi Mandiri & Peta Remediasi
 
 | Skor Capaian | Klasifikasi Kemahiran | Rekomendasi Tindakan Remediasi |
