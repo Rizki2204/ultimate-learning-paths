@@ -480,6 +480,13 @@ if __name__ == "__main__":
     assert ortho_err < 1e-13, f"Matriks Q tidak ortogonal! Error: {ortho_err}"
     print("Pengujian Dekomposisi QR Householder berhasil 100%!")
 ```
+
+Keluaran eksekusi terminal sebenarnya:
+```text
+Error Rekonstruksi ||A - QR||_F = 3.11e-14
+Error Ortogonalitas ||Q^T Q - I||_F = 5.64e-16
+Pengujian Dekomposisi QR Householder berhasil 100%!
+```
 </details>
 
 ---

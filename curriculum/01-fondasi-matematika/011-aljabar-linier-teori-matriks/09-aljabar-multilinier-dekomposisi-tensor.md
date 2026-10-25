@@ -790,6 +790,19 @@ if __name__ == "__main__":
     run_numpy_hosvd_suite()
 ```
 
+Keluaran eksekusi terminal sebenarnya:
+```text
+=== 1. PENGUJIAN TENSOR SIMETRIS 2x2x2 ===
+Norma Frobenius: 14.282857 (Teoretis sqrt(204): 14.282857)
+Galat Rekonstruksi HOSVD Simetris: 3.4417e-15
+
+=== 2. PENGUJIAN TENSOR ASIMETRIS (2, 3, 4) & HOSVD RANKS [1, 2, 3] ===
+Shape setelah perkalian Mode 1 (Harus (2, 5, 4)): (2, 5, 4)
+Shape Core Tensor Terpangkas (Harus (1, 2, 3)): (1, 2, 3)
+Galat Rekonstruksi Rank Penuh Asimetris: 4.1651e-14
+[SUKSES] Bug permutasi sumbu mode-product terbukti sembuh 100%!
+```
+
 ---
 
 ### 4.4 Tabel Bedah Kode Baris-demi-Baris

@@ -941,8 +941,13 @@ class Pilot011Verifier:
                 if "# non-runnable" in code or "# pseudocode" in code:
                     continue
 
-                post_text = content[match.end():match.end() + 800]
+                # Mandatori Output Terminal Nyata: Setiap blok kode runnable wajib disertai blok output
+                next_py_pos = content.find("```python", match.end())
+                limit_pos = next_py_pos if next_py_pos != -1 else min(len(content), match.end() + 2500)
+                post_text = content[match.end():limit_pos]
                 out_match = re.search(r"```(?:output|text)\s*\n([\s\S]*?)```", post_text)
+                if not out_match:
+                    code_errors.append(f"{rel}: code block #{b_idx} lacks mandatory terminal execution output block (```text or ```output)")
                 expected_out = out_match.group(1).strip() if out_match else ""
 
                 tasks.append((rel, b_idx, code, expected_out))

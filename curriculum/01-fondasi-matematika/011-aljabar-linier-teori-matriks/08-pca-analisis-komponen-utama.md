@@ -940,9 +940,9 @@ def run_numpy_pca_demo() -> None:
     explained_var = (s[:1] ** 2) / (X.shape[0] - 1)          # 5. Varians terjelaskan lambda = s^2 / (n - 1)
 
     print("--- Hasil PCA Industri Berbasis NumPy SVD ---")
-    print(f"Komponen Utama PC1 (Vt[0]) : {[round(c, 4) for c in components[0]]}")
+    print(f"Komponen Utama PC1 (Vt[0]) : {[round(float(c), 4) for c in components[0]]}")
     print(f"Varians Terjelaskan        : {explained_var[0]:.4f}")
-    print(f"Skor Proyeksi 3 Sampel Awal: {[round(z[0], 4) for z in Z[:3]]}")
+    print(f"Skor Proyeksi 3 Sampel Awal: {[round(float(z[0]), 4) for z in Z[:3]]}")
 
     # Bukti kesamaan hasil dengan Pure Python Tahap 5A
     assert np.allclose(np.abs(components[0]), [0.8, 0.6], atol=1e-4)
@@ -951,6 +951,15 @@ def run_numpy_pca_demo() -> None:
 
 if __name__ == "__main__":
     run_numpy_pca_demo()
+```
+
+Keluaran eksekusi terminal sebenarnya:
+```text
+--- Hasil PCA Industri Berbasis NumPy SVD ---
+Komponen Utama PC1 (Vt[0]) : [0.8, 0.6]
+Varians Terjelaskan        : 14.5000
+Skor Proyeksi 3 Sampel Awal: [-4.2, -1.6, -2.0]
+[SUKSES] Hasil SVD NumPy terbukti 100% identik dengan implementasi analitis Tahap 5A!
 ```
 
 ---

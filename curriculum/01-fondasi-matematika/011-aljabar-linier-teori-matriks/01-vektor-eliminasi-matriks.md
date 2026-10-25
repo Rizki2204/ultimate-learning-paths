@@ -88,6 +88,11 @@ v = [10.0, 20.0, 30.0]
 print(v[0])  # Mencetak 10.0 (elemen pertama)
 ```
 
+Keluaran eksekusi terminal sebenarnya:
+```text
+10.0
+```
+
 2. **Matriks (Nested List 2D)**:
 ```python
 # Matriks 2 baris x 2 kolom
@@ -98,11 +103,22 @@ A = [
 print(A[0][1])  # Baris 0, Kolom 1 -> mencetak 1.0
 ```
 
+Keluaran eksekusi terminal sebenarnya:
+```text
+1.0
+```
+
 3. **Loop & List Comprehension**:
 ```python
 # Mengalikan setiap elemen vektor dengan skalar c = 3
 v = [1.0, 2.0, 3.0]
 scaled_v = [3.0 * x for x in v]  # Hasil: [3.0, 6.0, 9.0]
+print(scaled_v)
+```
+
+Keluaran eksekusi terminal sebenarnya:
+```text
+[3.0, 6.0, 9.0]
 ```
 
 4. **Fungsi `zip()` untuk Menggabungkan Pasangan Elemen**:
@@ -111,6 +127,12 @@ u = [1.0, 2.0, 3.0]
 v = [4.0, 5.0, 6.0]
 # Menghitung dot product: 1*4 + 2*5 + 3*6 = 32
 dot_product = sum(x * y for x, y in zip(u, v))
+print(dot_product)
+```
+
+Keluaran eksekusi terminal sebenarnya:
+```text
+32.0
 ```
 5. **Operator `@` pada Pustaka NumPy**:
    Jika menggunakan pustaka NumPy, perkalian matriks tidak perlu ditulis dengan loop bersarang, melainkan cukup menggunakan operator `@`: `C = A @ B`.
@@ -858,6 +880,25 @@ print("Vektor Solusi x:\n", x)
 print(f"Norma Residu Numerik: {residu:.2e}")
 ```
 
+Keluaran eksekusi terminal sebenarnya:
+```text
+Matriks Permutasi P:
+ [[0. 0. 1.]
+ [0. 1. 0.]
+ [1. 0. 0.]]
+Matriks L:
+ [[ 1.   0.   0. ]
+ [ 0.5  1.   0. ]
+ [ 0.  -0.8  1. ]]
+Matriks U:
+ [[ 2.   3.  -1. ]
+ [ 0.  -2.5  1.5]
+ [ 0.   0.   2.2]]
+Vektor Solusi x:
+ [-0.63636364  1.45454545  2.09090909]
+Norma Residu Numerik: 0.00e+00
+```
+
 #### Tabel Bedah Kode Baris-demi-Baris
 
 | Baris Kode | Apa yang Dilakukan Komputer | Terjemahan Bahasa Manusia |
@@ -890,6 +931,12 @@ x = np.linalg.solve(A, b)
 assert np.allclose(A @ x, b)
 print("Solusi stabil via solve():", x)
 ```
+
+Keluaran eksekusi terminal sebenarnya:
+```text
+Solusi stabil via solve(): [ 7.11111111 -3.22222222]
+```
+
 **Mengapa `inv(A)` berbahaya?**
 1. **Biaya Flops**: Menghitung $A^{-1}$ secara eksplisit membutuhkan $2n^3$ total FLOPs (tiga kali lebih lambat daripada eliminasi $LU$ yang hanya memerlukan $\frac{2}{3}n^3$ total FLOPs).
 2. **Ketidakstabilan Numerik**: Mengalikan matriks $A^{-1}$ yang telah terkontaminasi galat pembulatan floating-point dengan vektor $\mathbf{b}$ akan menggandakan kesalahan numerik sebanding dengan kuadrat bilangan kondisi $\kappa(A)$. Sebaliknya, algoritma Gaussian elimination dengan *partial pivoting* dijamin stabil secara numerik mundur (*backward stable*).

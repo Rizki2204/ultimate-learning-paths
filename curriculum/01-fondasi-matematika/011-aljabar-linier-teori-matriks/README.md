@@ -105,6 +105,16 @@ x = [10.0, 20.0, 30.0]
 n = len(x)
 # range(n) menghasilkan angka 0, 1, 2, ..., n-1 (tepat n elemen!)
 total = sum(x[k] for k in range(n))
+print("Panjang vektor:", n)
+print("Elemen pertama x[0]:", x[0])
+print("Total elemen:", total)
+```
+
+Keluaran eksekusi terminal sebenarnya:
+```text
+Panjang vektor: 3
+Elemen pertama x[0]: 10.0
+Total elemen: 60.0
 ```
 
 | Notasi Matematika | Representasi Python Murni | Representasi NumPy | Keterangan & Jembatan Pemikiran |
@@ -129,6 +139,12 @@ print("Panjang vektor:", len(v))
 print("Elemen pertama:", v[0])
 ```
 
+Keluaran eksekusi terminal sebenarnya:
+```text
+Panjang vektor: 3
+Elemen pertama: 1.0
+```
+
 2. **Membuat Matriks 2D (`nested list` / daftar di dalam daftar)**:
 ```python
 # Matriks 2 baris x 2 kolom: [[baris_0], [baris_1]]
@@ -139,11 +155,22 @@ A = [
 print("Baris 0, Kolom 1:", A[0][1])
 ```
 
+Keluaran eksekusi terminal sebenarnya:
+```text
+Baris 0, Kolom 1: 1.0
+```
+
 3. **Loop Dasar & *List Comprehension***:
 ```python
 # Mengalikan setiap elemen vektor dengan angka 2 (perkalian skalar)
 v = [1.0, 2.0, 3.0]
 hasil_cepat = [x * 2.0 for x in v]
+print("Hasil perkalian skalar:", hasil_cepat)
+```
+
+Keluaran eksekusi terminal sebenarnya:
+```text
+Hasil perkalian skalar: [2.0, 4.0, 6.0]
 ```
 
 4. **Fungsi `zip()` untuk Mengawinkan Dua Vektor**:
@@ -152,18 +179,28 @@ hasil_cepat = [x * 2.0 for x in v]
 u = [1.0, 2.0, 3.0]
 v = [4.0, 5.0, 6.0]
 dot_product = sum(a * b for a, b in zip(u, v))
+print("Hasil dot product:", dot_product)
+```
+
+Keluaran eksekusi terminal sebenarnya:
+```text
+Hasil dot product: 32.0
 ```
 
 5. **Pustaka Industri NumPy & Operator `@`**:
 ```python
+import numpy as np
+
 # Operator @ adalah simbol resmi perkalian matriks di Python 3.5+
-try:
-    import numpy as np
-    A_np = np.array([[2.0, 1.0], [1.0, 2.0]])
-    x_np = np.array([25000.0, 20000.0])
-    b_np = A_np @ x_np
-except ModuleNotFoundError:
-    pass
+A_np = np.array([[2.0, 1.0], [1.0, 2.0]])
+x_np = np.array([25000.0, 20000.0])
+b_np = A_np @ x_np
+print("Hasil perkalian matriks b = A @ x:", b_np)
+```
+
+Keluaran eksekusi terminal sebenarnya:
+```text
+Hasil perkalian matriks b = A @ x: [70000. 65000.]
 ```
 
 ---

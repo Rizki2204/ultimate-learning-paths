@@ -689,6 +689,27 @@ galat_rekonstruksi = np.linalg.norm(A - C @ R_factor)
 print(f"\nGalat Rekonstruksi A = CR: {galat_rekonstruksi:.2e}")
 ```
 
+Keluaran eksekusi terminal sebenarnya:
+```text
+Rank Terdeteksi: 2
+Basis Ortonormal Ruang Kolom C(A) (Kolom U_1 .. U_r):
+ [[ 0.1903642   0.79399505]
+ [ 0.59243779 -0.56185776]
+ [ 0.78280198  0.23213729]]
+Basis Ortonormal Ruang Nol Kiri N(A^T) (Kolom U_{r+1} .. U_m):
+ [[-0.57735027]
+ [-0.57735027]
+ [ 0.57735027]]
+Basis Ortonormal Ruang Baris C(A^T) (Baris V_1^T .. V_r^T):
+ [[ 0.20165281  0.40330562  0.55225693  0.70120825]
+ [ 0.36297374  0.72594749  0.07319227 -0.57956294]]
+Basis Ortonormal Ruang Nol N(A) (Baris V_{r+1}^T .. V_n^T):
+ [[ 0.90709686 -0.40892335 -0.08925015  0.04462508]
+ [ 0.06900363  0.37832066 -0.82564495  0.41282247]]
+
+Galat Rekonstruksi A = CR: 0.00e+00
+```
+
 #### Tabel Bedah Kode Baris-demi-Baris
 
 | Baris Kode | Apa yang Dilakukan Komputer | Terjemahan Bahasa Manusia |

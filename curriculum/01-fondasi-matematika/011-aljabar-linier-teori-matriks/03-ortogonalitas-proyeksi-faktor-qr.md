@@ -649,6 +649,13 @@ print("Solusi Kuadrat Terkecil Householder QR:\n", x_hh)
 print("Galat Rekonstruksi ||A - QR||:", np.linalg.norm(A_np - Q_hh[:, :2] @ R_hh[:2, :2]))
 ```
 
+Keluaran eksekusi terminal sebenarnya:
+```text
+Solusi Kuadrat Terkecil Householder QR:
+ [-0.   1.7]
+Galat Rekonstruksi ||A - QR||: 3.255813018879823e-15
+```
+
 #### Tabel Bedah Kode Baris-demi-Baris
 
 | Baris Kode | Apa yang Dilakukan Komputer | Terjemahan Bahasa Manusia |

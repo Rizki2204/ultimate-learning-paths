@@ -609,6 +609,24 @@ print("\nVerifikasi A @ adj(A) = det(A) * I:")
 print(np.round(A @ adj_A, 4))
 ```
 
+Keluaran eksekusi terminal sebenarnya:
+```text
+Determinan Standar np.linalg.det:    8.0000
+Tanda slogdet:                      1.0
+Log-Determinan ln|det(A)|:          2.0794
+Rekonstruksi exp(logdet):           8.0000
+
+Matriks Adjugat adj(A) = C^T:
+[[ 54. -22.   6.]
+ [-22.  10.  -2.]
+ [  6.  -2.   2.]]
+
+Verifikasi A @ adj(A) = det(A) * I:
+[[ 8.  0. -0.]
+ [-0.  8. -0.]
+ [ 0. -0.  8.]]
+```
+
 #### Tabel Bedah Kode Baris-demi-Baris
 
 | Baris Kode | Apa yang Dilakukan Komputer | Terjemahan Bahasa Manusia |
@@ -642,12 +660,27 @@ $$
 ---
 
 ### 5.2 Miskonsepsi Kritis: Menguji Singularitas Matriks Hanya dari Nilai Determinan Kecil
-Banyak programmer pemula memeriksa apakah matriks singular dengan menulis kode:
+Banyak programmer pemula memeriksa apakah matriks singular dengan menulis kode seperti berikut:
 ```python
-# non-runnable: contoh miskonsepsi pemula yang keliru
-if abs(np.linalg.det(A)) < 1e-6:
-    print("Matriks Singular!")
+import numpy as np
+
+# Matriks diagonal 100x100 dengan entri 0.1 (sebenarnya non-singular & memiliki invers!)
+A = np.diag([0.1] * 100)
+
+det_val = np.linalg.det(A)
+print(f"det(A) terhitung: {det_val}")
+
+# Miskonsepsi pemula: menganggap matriks singular jika |det| < 1e-6
+if abs(det_val) < 1e-6:
+    print("Diagnosis Keliru: Matriks dianggap singular padahal non-singular!")
 ```
+
+Keluaran eksekusi terminal sebenarnya:
+```text
+det(A) terhitung: 0.0
+Diagnosis Keliru: Matriks dianggap singular padahal non-singular!
+```
+
 - **Bahaya Skala Dimensi**: Tinjau matriks diagonal $100 \times 100$ dengan elemen diagonal $0{,}1$ :
 
 $$

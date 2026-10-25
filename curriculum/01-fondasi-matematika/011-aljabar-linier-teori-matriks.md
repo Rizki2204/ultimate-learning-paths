@@ -597,6 +597,15 @@ if __name__ == "__main__" and np is not None:
     print("[VERIFIKASI SUKSES] Asersi Eckart-Young NumPy terpenuhi 100%!")
 ```
 
+Keluaran eksekusi terminal sebenarnya:
+```text
+--- Dekomposisi SVD Industri NumPy ---
+Nilai Singular (sigma): [5.0000, 3.0000]
+Galat Frobenius Aktual : 3.000000
+Prediksi Teori (sigma_2): 3.000000
+[VERIFIKASI SUKSES] Asersi Eckart-Young NumPy terpenuhi 100%!
+```
+
 ---
 
 ### Tabel Bedah Kode Baris-demi-Baris
@@ -700,6 +709,12 @@ if __name__ == "__main__":
     print("Distribusi Peringkat Terhitung:")
     print([round(r, 6) for r in ranks])
     # Hasil eksak terverifikasi: [0.047619, 0.836905, 0.047619, 0.067857]
+```
+
+Keluaran eksekusi terminal sebenarnya:
+```text
+Distribusi Peringkat Terhitung:
+[0.047619, 0.836905, 0.047619, 0.067857]
 ```
 
 - **Analisis Teoretis & Solusi Perron-Frobenius**:  
